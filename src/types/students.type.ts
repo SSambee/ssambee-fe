@@ -138,3 +138,57 @@ export type CreateAttendanceRequest = {
   leaveTime?: string;
   memo?: string | null;
 };
+
+// mock data type 삭제 예정
+export type StudentEnrollmentStatus = "재원" | "휴원" | "퇴원";
+export type StudentEnrollment = {
+  enrollmentId: string;
+  registeredAt: string;
+  status: StudentEnrollmentStatus;
+  id: string | null;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  parentPhone: string;
+  school: string;
+  schoolYear: string;
+  profileImage?: string;
+  isAppUser: boolean;
+  lecture: {
+    id: string;
+    title: string;
+    subject?: string;
+    isActive: boolean;
+  };
+  attendance: {
+    percentage: number;
+    summary: {
+      PRESENT?: number;
+      LATE?: number;
+      ABSENT?: number;
+      EARLY_LEAVE?: number;
+    };
+    records: {
+      date: string;
+      status: AttendanceStatus;
+      memo?: string | null;
+    }[];
+  };
+  exams: {
+    id: string;
+    title: string;
+    score: number;
+    cutoffScore: number;
+    isPass: boolean;
+    clinics: {
+      id: string;
+      title: string;
+      status: ExamClinicStatus;
+      deadline?: string;
+    }[];
+  }[];
+  extraInfo?: {
+    memo?: string;
+    consultationRecords?: string[];
+  };
+};
