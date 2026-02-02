@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import "@/styles/globals.css";
+import "@/styles/colors.css";
 import { geistMono, pretendard } from "@/styles/fonts";
 import Providers from "@/providers/Providers";
 
