@@ -19,6 +19,9 @@ export default function EducatorsDashboardPage() {
       <Button variant="outline">
         <Link href="/educators/students">학생 관리</Link>
       </Button>
+      <Button variant="outline">
+        <Link href="/educators/communication">소통 관리</Link>
+      </Button>
     </div>
   );
 }
