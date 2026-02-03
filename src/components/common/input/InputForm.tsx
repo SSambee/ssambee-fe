@@ -1,10 +1,9 @@
 "use client";
 
 import { forwardRef, ComponentPropsWithRef } from "react";
-import Image from "next/image";
 
-import deleteIcon from "@/assets/icons/delete.svg";
 import { cn } from "@/lib/utils";
+import { ResetIcon } from "@/components/icons/AuthIcons";
 
 type InputFormProps = ComponentPropsWithRef<"input"> & {
   label: string;
@@ -59,7 +58,7 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
             className="absolute right-4 top-[29px] -translate-y-1/2 z-20 p-1 hover:bg-gray-100 rounded-full transition-colors"
             tabIndex={-1} // 탭 이동 시 버튼 제외
           >
-            <Image src={deleteIcon} alt="reset" width={22} height={22} />
+            <ResetIcon size={22} />
           </button>
         )}
 

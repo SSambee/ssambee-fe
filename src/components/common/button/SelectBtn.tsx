@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useState } from "react";
 
 import {
@@ -8,8 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import dropdown_off from "@/assets/icons/dropdown_off.svg";
-import dropdown_on from "@/assets/icons/dropdown_on.svg";
+import { SelectCloseIcon, SelectOpenIcon } from "@/components/icons/AuthIcons";
 
 type SelectOption = {
   label: string;
@@ -66,13 +64,11 @@ export default function SelectBtn({
       >
         <SelectValue placeholder={placeholder} />
         <div className="ml-2 shrink-0">
-          <Image
-            src={isOpen ? dropdown_on : dropdown_off}
-            alt={isOpen ? "close menu" : "open menu"}
-            width={24}
-            height={24}
-            className="text-gray-400"
-          />
+          {isOpen ? (
+            <SelectOpenIcon size={24} />
+          ) : (
+            <SelectCloseIcon size={24} />
+          )}
         </div>
       </SelectTrigger>
       <SelectContent className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-none!">

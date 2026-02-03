@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 import {
   registerFormSchema,
@@ -17,10 +16,12 @@ import { verifyPhoneAPI } from "@/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
 import { phoneNumberFormatter } from "@/utils/phone";
 import { InputForm } from "@/components/common/input/InputForm";
-import eyeOpenIcon from "@/assets/icons/eye_on.svg";
-import eyeClosedIcon from "@/assets/icons/eye_off.svg";
-import checkedIcon from "@/assets/icons/checked.svg";
-import uncheckedIcon from "@/assets/icons/un_checked.svg";
+import {
+  CheckedIcon,
+  EyeClosedIcon,
+  EyeOpenIcon,
+  UncheckedIcon,
+} from "@/components/icons/AuthIcons";
 
 type RegisterFormProps = {
   requireAuthCode?: boolean; // 인증 코드 필요 여부 - 조교
@@ -270,13 +271,11 @@ export default function RegisterForm({
                     showPassword ? "비밀번호 숨기기" : "비밀번호 표시"
                   }
                 >
-                  <Image
-                    src={showPassword ? eyeOpenIcon : eyeClosedIcon}
-                    alt="비밀번호 표시"
-                    width={22}
-                    height={22}
-                    style={{ width: "auto", height: "auto" }}
-                  />
+                  {showPassword ? (
+                    <EyeOpenIcon size={22} />
+                  ) : (
+                    <EyeClosedIcon size={22} />
+                  )}
                 </button>
               )}
             </div>
@@ -302,13 +301,11 @@ export default function RegisterForm({
                 className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
                 aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
               >
-                <Image
-                  src={showPasswordConfirm ? eyeOpenIcon : eyeClosedIcon}
-                  alt="비밀번호 표시"
-                  width={22}
-                  height={22}
-                  style={{ width: "auto", height: "auto" }}
-                />
+                {showPasswordConfirm ? (
+                  <EyeOpenIcon size={22} />
+                ) : (
+                  <EyeClosedIcon size={22} />
+                )}
               </button>
             )}
           </div>
@@ -326,13 +323,11 @@ export default function RegisterForm({
               htmlFor="agreePrivacy"
               className="flex items-center gap-2 text-4 text-neutral-300 cursor-pointer"
             >
-              <Image
-                src={isAgreePrivacy ? checkedIcon : uncheckedIcon}
-                alt={isAgreePrivacy ? "개인정보 동의" : "개인정보 동의 해제"}
-                width={24}
-                height={24}
-                className="shrink-0 object-contain cursor-pointer"
-              />
+              {isAgreePrivacy ? (
+                <CheckedIcon size={24} />
+              ) : (
+                <UncheckedIcon size={24} />
+              )}
               <div className="flex items-center text-4">
                 <span className="text-blue-700 font-semibold">
                   개인정보 처리 방침
@@ -347,7 +342,10 @@ export default function RegisterForm({
           </div>
 
           {errors.agreePrivacy && (
-            <p id="agreePrivacy-error" className="mt-1 text-3 text-red-600">
+            <p
+              id="agreePrivacy-error"
+              className="mt-1 text-[12px] text-red-600"
+            >
               {errors.agreePrivacy.message}
             </p>
           )}

@@ -2,32 +2,34 @@
 
 import Image from "next/image";
 
-import instructorIcon from "@/assets/icons/instructor.svg";
-import assistantIcon from "@/assets/icons/assistant.svg";
-import studentIcon from "@/assets/icons/student.svg";
-import parentIcon from "@/assets/icons/parent.svg";
 import { Role, RoleOption } from "@/types/auth.type";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  AssistantIcon,
+  InstructorIcon,
+  ParentIcon,
+  StudentIcon,
+} from "@/components/icons/AuthIcons";
 
 const ROLE_INFO_MAP = {
   INSTRUCTOR: {
-    icon: instructorIcon,
+    icon: <InstructorIcon size={24} />,
     title: "강사예요",
     description: "수업 및 일정을 관리하고 운영해요",
   },
   ASSISTANT: {
-    icon: assistantIcon,
+    icon: <AssistantIcon size={24} />,
     title: "조교예요",
     description: "수업에 필요한 업무 및 소통을 도와요",
   },
   STUDENT: {
-    icon: studentIcon,
+    icon: <StudentIcon size={24} />,
     title: "학생이에요",
     description: "내 수업과 시험 정보를 확인해요",
   },
   PARENT: {
-    icon: parentIcon,
+    icon: <ParentIcon size={24} />,
     title: "학부모예요",
     description: "자녀의 학습 현황을 확인해요",
   },
@@ -78,20 +80,15 @@ export default function RoleSelectorBtn<T extends Role>({
             className={styles.card}
           >
             <CardContent className="flex items-start gap-4 p-0 w-full">
-              {/* 왼쪽: 아이콘 영역 */}
-
-              <Image
-                src={info.icon}
-                alt={option.label}
-                width={24}
-                height={24}
+              <div
                 className={cn(
-                  "flex justify-center items-start shrink-0",
+                  "flex justify-center items-start shrink-0 transition-colors",
                   isSelected ? "text-brand-800" : "text-neutral-500"
                 )}
-              />
+              >
+                {info.icon}
+              </div>
 
-              {/* 오른쪽: 텍스트 정보 영역 */}
               <div className="flex flex-col">
                 <span className={styles.title}>{info.title}</span>
                 <p className={styles.description}>{info.description}</p>

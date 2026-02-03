@@ -4,18 +4,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 import { loginSchema } from "@/validation/auth.validation";
 import { LoginFormData, Role } from "@/types/auth.type";
 import { LOGIN_FORM_DEFAULTS } from "@/constants/auth.defaults";
 import { useAuth } from "@/hooks/useAuth";
-import checkedIcon from "@/assets/icons/checked.svg";
-import uncheckedIcon from "@/assets/icons/un_checked.svg";
-import googleIcon from "@/assets/icons/google.svg";
 import { InputForm } from "@/components/common/input/InputForm";
-import eyeOpenIcon from "@/assets/icons/eye_on.svg";
-import eyeClosedIcon from "@/assets/icons/eye_off.svg";
+import {
+  CheckedIcon,
+  EyeClosedIcon,
+  EyeOpenIcon,
+  GoogleIcon,
+  UncheckedIcon,
+} from "@/components/icons/AuthIcons";
 
 type LoginFormProps = {
   selectedRole: Role;
@@ -121,13 +122,11 @@ export default function LoginForm({ selectedRole }: LoginFormProps) {
                 className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
                 aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
               >
-                <Image
-                  src={showPassword ? eyeOpenIcon : eyeClosedIcon}
-                  alt="비밀번호 표시"
-                  width={22}
-                  height={22}
-                  style={{ width: "auto", height: "auto" }}
-                />
+                {showPassword ? (
+                  <EyeOpenIcon size={22} />
+                ) : (
+                  <EyeClosedIcon size={22} />
+                )}
               </button>
             )}
           </div>
@@ -145,15 +144,11 @@ export default function LoginForm({ selectedRole }: LoginFormProps) {
               htmlFor="rememberMe"
               className="flex items-center gap-2 text-4 text-neutral-300 cursor-pointer"
             >
-              <Image
-                src={isRememberMe ? checkedIcon : uncheckedIcon}
-                alt={
-                  isRememberMe ? "로그인 상태 유지" : "로그인 상태 유지 해제"
-                }
-                width={24}
-                height={24}
-                className="shrink-0 object-contain cursor-pointer"
-              />
+              {isRememberMe ? (
+                <CheckedIcon size={24} />
+              ) : (
+                <UncheckedIcon size={24} />
+              )}
               <span className="text-4 text-neutral-300">로그인 상태 유지</span>
             </label>
           </div>
@@ -195,7 +190,7 @@ export default function LoginForm({ selectedRole }: LoginFormProps) {
         className="w-full flex items-center justify-center gap-3 text-4 font-semibold bg-white border border-neutral-200 text-neutral-400 py-4 px-4 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200 shadow-sm"
         aria-label="구글 로그인"
       >
-        <Image src={googleIcon} alt="Google" width={24} height={24} />
+        <GoogleIcon size={20} />
         Google로 로그인하기
       </button>
 
