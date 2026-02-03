@@ -1,9 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import {
   registerFormSchema,
@@ -15,6 +16,11 @@ import { REGISTER_FORM_DEFAULTS } from "@/constants/auth.defaults";
 import { verifyPhoneAPI } from "@/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
 import { phoneNumberFormatter } from "@/utils/phone";
+import { InputForm } from "@/components/common/input/InputForm";
+import eyeOpenIcon from "@/assets/icons/eye_on.svg";
+import eyeClosedIcon from "@/assets/icons/eye_off.svg";
+import checkedIcon from "@/assets/icons/checked.svg";
+import uncheckedIcon from "@/assets/icons/un_checked.svg";
 
 type RegisterFormProps = {
   requireAuthCode?: boolean; // 인증 코드 필요 여부 - 조교
@@ -49,15 +55,36 @@ export default function RegisterForm({
     register,
     handleSubmit,
     setError,
+    clearErrors,
     trigger,
     getValues,
     setValue,
-    formState: { errors, isValid },
+    control,
+    getFieldState,
+    formState,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: REGISTER_FORM_DEFAULTS,
+  });
+
+  const { errors, isValid } = formState;
+
+  // 실시간 값 감시 - 리셋 버튼 표시 여부
+  const nameValue = useWatch({ control, name: "name" });
+  const emailValue = useWatch({ control, name: "email" });
+  const phoneNumberValue = useWatch({ control, name: "phoneNumber" });
+  const passwordValue = useWatch({ control, name: "password" });
+  const passwordConfirmValue = useWatch({ control, name: "passwordConfirm" });
+
+  const { error: phoneError } = getFieldState("phoneNumber", formState);
+  const isPhoneInputValid = phoneNumberValue && !phoneError;
+
+  const isAgreePrivacy = useWatch({
+    control,
+    name: "agreePrivacy",
+    defaultValue: false,
   });
 
   // 뒤로가기 시 상태 초기화
@@ -120,7 +147,7 @@ export default function RegisterForm({
       return;
     }
 
-    // 전화 번호 하이픈 포맷 적용
+    // 전화 번호 하이픈 포맷 적용(한 번 더)
     const formattedPhone = phoneNumberFormatter(data.phoneNumber);
 
     // passwordConfirm 제거
@@ -150,186 +177,139 @@ export default function RegisterForm({
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            이름
-          </label>
-          <input
-            id="name"
-            type="text"
-            {...register("name")}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-            placeholder="실명을 입력해주세요"
-            aria-invalid={errors.name ? "true" : "false"}
-            aria-describedby={errors.name ? "name-error" : undefined}
+        <InputForm
+          id="name"
+          type="text"
+          label="이름"
+          error={errors.name?.message}
+          {...register("name")}
+          showReset={!!nameValue}
+          onReset={() => {
+            setValue("name", "");
+            clearErrors("name");
+          }}
+        />
+
+        <div className="flex items-start gap-[10px]">
+          <InputForm
+            id="phoneNumber"
+            label="전화번호"
+            type="tel"
+            disabled={isPhoneVerified || phoneLoading}
+            error={errors.phoneNumber?.message}
+            {...register("phoneNumber", {
+              onChange: (e) => {
+                const formatted = phoneNumberFormatter(e.target.value);
+                setValue("phoneNumber", formatted);
+              },
+            })}
+            showReset={!!phoneNumberValue && !isPhoneVerified}
+            onReset={() => {
+              setValue("phoneNumber", "");
+              clearErrors("phoneNumber");
+            }}
           />
 
-          {errors.name && (
-            <p id="name-error" className="mt-1 text-sm text-red-600">
-              {errors.name.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="phoneNumber"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            전화번호
-          </label>
-          <div className="flex gap-2">
-            <input
-              id="phoneNumber"
-              type="tel"
-              {...register("phoneNumber")}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              disabled={isPhoneVerified || phoneLoading}
-              placeholder="010-1234-5678"
-              aria-invalid={errors.phoneNumber ? "true" : "false"}
-              aria-describedby={
-                errors.phoneNumber ? "phoneNumber-error" : undefined
-              }
-            />
-
-            <button
-              type="button"
-              onClick={handleVerifyPhone}
-              disabled={isPhoneVerified || phoneLoading}
-              aria-label={
-                isPhoneVerified
-                  ? "전화번호 인증 완료"
-                  : phoneLoading
-                    ? "인증 중..."
-                    : "전화번호 인증"
-              }
-              className={`px-4 py-3 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                phoneLoading
-                  ? "bg-gray-400 text-white cursor-wait"
-                  : isPhoneVerified
-                    ? "bg-gray-600 text-white cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-              }`}
-            >
-              {phoneLoading
-                ? "인증 중..."
+          <button
+            type="button"
+            onClick={handleVerifyPhone}
+            disabled={!isPhoneInputValid || isPhoneVerified || phoneLoading}
+            className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors ${
+              phoneLoading
+                ? "bg-gray-200 text-gray-500 cursor-wait"
                 : isPhoneVerified
-                  ? "인증 완료"
-                  : "인증 하기"}
-            </button>
-          </div>
-
-          {errors.phoneNumber && (
-            <p id="phoneNumber-error" className="mt-1 text-sm text-red-600">
-              {errors.phoneNumber.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-2"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : isPhoneInputValid
+                    ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer shadow-md"
+                    : "bg-blue-100 text-blue-300 cursor-not-allowed"
+            }`}
           >
-            이메일
-          </label>
-          <input
-            id="email"
-            type="email"
-            {...register("email")}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-            placeholder="example@email.com"
-            aria-invalid={errors.email ? "true" : "false"}
-            aria-describedby={errors.email ? "email-error" : undefined}
-          />
-
-          {errors.email && (
-            <p id="email-error" className="mt-1 text-sm text-red-600">
-              {errors.email.message}
-            </p>
-          )}
+            {phoneLoading
+              ? "인증 중..."
+              : isPhoneVerified
+                ? "인증 완료"
+                : "인증 요청"}
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <InputForm
+          id="email"
+          label="이메일"
+          type="email"
+          error={errors.email?.message}
+          {...register("email")}
+          showReset={!!emailValue}
+          onReset={() => {
+            setValue("email", "");
+            clearErrors("email");
+          }}
+        />
+
+        <div className="grid grid-cols-2 gap-[10px]">
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              비밀번호
-            </label>
             <div className="relative">
-              <input
+              <InputForm
                 id="password"
+                label="비밀번호"
                 type={showPassword ? "text" : "password"}
+                error={errors.password?.message}
                 {...register("password")}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition pr-12"
-                placeholder="••••••••"
-                aria-invalid={errors.password ? "true" : "false"}
-                aria-describedby={
-                  errors.password ? "password-error" : undefined
-                }
+                showReset={!!passwordValue}
+                onReset={() => {
+                  setValue("password", "");
+                  clearErrors("password");
+                }}
               />
 
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
-              >
-                {showPassword ? "🙈" : "👁️"}
-              </button>
+              {passwordValue && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
+                  aria-label={
+                    showPassword ? "비밀번호 숨기기" : "비밀번호 표시"
+                  }
+                >
+                  <Image
+                    src={showPassword ? eyeOpenIcon : eyeClosedIcon}
+                    alt="비밀번호 표시"
+                    width={22}
+                    height={22}
+                    style={{ width: "auto", height: "auto" }}
+                  />
+                </button>
+              )}
             </div>
-
-            {errors.password && (
-              <p id="password-error" className="mt-1 text-sm text-red-600">
-                {errors.password.message}
-              </p>
-            )}
           </div>
 
-          <div>
-            <label
-              htmlFor="passwordConfirm"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              비밀번호 확인
-            </label>
-            <div className="relative">
-              <input
-                id="passwordConfirm"
-                type={showPasswordConfirm ? "text" : "password"}
-                {...register("passwordConfirm")}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition pr-12"
-                placeholder="••••••••"
-                aria-invalid={errors.passwordConfirm ? "true" : "false"}
-                aria-describedby={
-                  errors.passwordConfirm ? "passwordConfirm-error" : undefined
-                }
-              />
-
+          <div className="relative">
+            <InputForm
+              id="passwordConfirm"
+              label="비밀번호 확인"
+              type={showPasswordConfirm ? "text" : "password"}
+              error={errors.passwordConfirm?.message}
+              {...register("passwordConfirm")}
+              showReset={!!passwordConfirmValue}
+              onReset={() => {
+                setValue("passwordConfirm", "");
+                clearErrors("passwordConfirm");
+              }}
+            />
+            {passwordConfirmValue && (
               <button
                 type="button"
                 onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                aria-label={
-                  showPasswordConfirm ? "비밀번호 숨기기" : "비밀번호 표시"
-                }
+                className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
+                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
               >
-                {showPasswordConfirm ? "🙈" : "👁️"}
+                <Image
+                  src={showPasswordConfirm ? eyeOpenIcon : eyeClosedIcon}
+                  alt="비밀번호 표시"
+                  width={22}
+                  height={22}
+                  style={{ width: "auto", height: "auto" }}
+                />
               </button>
-            </div>
-
-            {errors.passwordConfirm && (
-              <p
-                id="passwordConfirm-error"
-                className="mt-1 text-sm text-red-600"
-              >
-                {errors.passwordConfirm.message}
-              </p>
             )}
           </div>
         </div>
@@ -340,22 +320,34 @@ export default function RegisterForm({
               id="agreePrivacy"
               type="checkbox"
               {...register("agreePrivacy")}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-              aria-invalid={errors.agreePrivacy ? "true" : "false"}
-              aria-describedby={
-                errors.agreePrivacy ? "agreePrivacy-error" : undefined
-              }
+              className="hidden"
             />
             <label
               htmlFor="agreePrivacy"
-              className="ml-2 text-sm text-gray-700"
+              className="flex items-center gap-2 text-4 text-neutral-300 cursor-pointer"
             >
-              개인정보 처리방침에 동의합니다
+              <Image
+                src={isAgreePrivacy ? checkedIcon : uncheckedIcon}
+                alt={isAgreePrivacy ? "개인정보 동의" : "개인정보 동의 해제"}
+                width={24}
+                height={24}
+                className="shrink-0 object-contain cursor-pointer"
+              />
+              <div className="flex items-center text-4">
+                <span className="text-blue-700 font-semibold">
+                  개인정보 처리 방침
+                </span>
+                <span className="text-neutral-300 mx-1.5"> 및 </span>
+                <span className="text-blue-700 font-semibold">
+                  서비스 이용약관
+                </span>
+                <span className="text-neutral-300 ml-0.5">에 동의합니다.</span>
+              </div>
             </label>
           </div>
 
           {errors.agreePrivacy && (
-            <p id="agreePrivacy-error" className="mt-1 text-sm text-red-600">
+            <p id="agreePrivacy-error" className="mt-1 text-3 text-red-600">
               {errors.agreePrivacy.message}
             </p>
           )}
@@ -364,25 +356,23 @@ export default function RegisterForm({
         <button
           type="submit"
           disabled={loading || isSubmitDisabled}
-          className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-            loading
-              ? "bg-gray-400 text-white cursor-wait"
-              : isSubmitDisabled
-                ? "bg-gray-600 text-white cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          className={`w-full py-4 px-4 rounded-lg font-medium transition-colors duration-200 shadow-sm mt-[38px] ${
+            loading || isSubmitDisabled
+              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+              : "bg-blue-700 text-white hover:bg-blue-500 cursor-pointer"
           }`}
         >
           {loading ? "처리 중..." : "회원가입"}
         </button>
       </form>
 
-      <div className="text-center space-y-3">
-        <p className="text-sm text-gray-600">이미 계정이 있으신가요?</p>
+      <div className="flex items-center justify-center gap-2 text-center text-4 text-neutral-400 mt-[38px]">
+        <p>이미 계정이 있으신가요?</p>
         <Link
           href={
             roleType === "EDUCATORS" ? "/educators/login" : "/learners/login"
           }
-          className="text-blue-600 hover:text-blue-700 font-medium"
+          className="text-blue-700 hover:text-blue-500 font-semibold transition-colors duration-200"
         >
           로그인하기
         </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useState } from "react";
 
 import { authCodeSchema } from "@/validation/auth.validation";
@@ -9,6 +9,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { AuthCodeFormData } from "@/types/auth.type";
 import { AUTH_CODE_FORM_DEFAULTS } from "@/constants/auth.defaults";
 import { verifyAuthCodeAPI } from "@/services/auth.service";
+import { InputForm } from "@/components/common/input/InputForm";
 
 export default function AuthenticationCodeForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,13 +20,23 @@ export default function AuthenticationCodeForm() {
     getValues,
     trigger,
     reset,
-    formState: { errors },
+    control,
+    getFieldState,
+    formState,
+    setValue,
+    clearErrors,
   } = useForm<AuthCodeFormData>({
     resolver: zodResolver(authCodeSchema),
     mode: "onChange",
     reValidateMode: "onChange",
     defaultValues: AUTH_CODE_FORM_DEFAULTS,
   });
+
+  const { errors } = formState;
+
+  const signupCodeValue = useWatch({ control, name: "signupCode" });
+  const codeField = getFieldState("signupCode", formState);
+  const isCodeInputValid = signupCodeValue && !codeField.error;
 
   const handleVerifyCode = async () => {
     const isValidCode = await trigger("signupCode");
@@ -61,62 +72,49 @@ export default function AuthenticationCodeForm() {
 
   return (
     <div className="space-y-4">
-      {/* 인증 코드 입력 */}
       <div className="space-y-2">
-        <label
-          htmlFor="code"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          인증 코드
-        </label>
-        <div className="flex gap-2">
-          <input
-            id="code"
-            type="text"
-            {...register("signupCode")}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-            disabled={isLoading || isCodeVerified}
-            placeholder="6자리 코드 입력"
-            aria-invalid={errors.signupCode ? "true" : "false"}
-            aria-describedby={errors.signupCode ? "code-error" : undefined}
-          />
+        <div className="flex items-start gap-[10px]">
+          <div className="flex-1">
+            <InputForm
+              id="signupCode"
+              label="인증 코드 (6자리)"
+              type="text"
+              disabled={isLoading || isCodeVerified}
+              error={errors.signupCode?.message}
+              {...register("signupCode")}
+              showReset={!!signupCodeValue}
+              onReset={() => {
+                setValue("signupCode", "");
+                clearErrors("signupCode");
+              }}
+            />
+          </div>
 
           <button
             type="button"
             onClick={handleVerifyCode}
-            disabled={isLoading || isCodeVerified}
-            aria-label={
+            disabled={!isCodeInputValid || isLoading || isCodeVerified}
+            className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors ${
               isLoading
-                ? "인증 중..."
+                ? "bg-gray-200 text-gray-500 cursor-wait"
                 : isCodeVerified
-                  ? "인증 완료"
-                  : "인증하기"
-            }
-            className={`px-4 py-3 rounded-lg font-medium whitespace-nowrap transition-colors ${
-              isLoading
-                ? "bg-gray-400 text-white cursor-wait"
-                : isCodeVerified
-                  ? "bg-gray-600 text-white cursor-not-allowed"
-                  : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : isCodeInputValid
+                    ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer shadow-md"
+                    : "bg-blue-100 text-blue-300 cursor-not-allowed"
             }`}
           >
             {isLoading
               ? "인증 중..."
               : isCodeVerified
                 ? "인증 완료"
-                : "인증하기"}
+                : "인증 요청"}
           </button>
         </div>
 
         <p className="text-xs text-gray-500">
           * 소속 학원 및 담당 강사 정보가 코드를 통해 자동으로 연결됩니다.
         </p>
-
-        {errors.signupCode && (
-          <p id="code-error" className="mt-1 text-sm text-red-600">
-            {errors.signupCode.message}
-          </p>
-        )}
       </div>
     </div>
   );

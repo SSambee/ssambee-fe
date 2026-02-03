@@ -5,7 +5,7 @@ export default function InstructorRegisterPage() {
   return (
     <AuthLayout
       title="강사 회원가입"
-      description="회원가입을 위해 필수 정보를 입력해주세요."
+      description="강사 등록을 위해 필수 정보를 입력해주세요."
     >
       <RegisterForm roleType="EDUCATORS" userType="INSTRUCTOR" />
     </AuthLayout>
