@@ -20,10 +20,7 @@ export const registerBaseSchema = z.object({
     .string()
     .trim()
     .min(1, "연락처를 입력해주세요")
-    .regex(
-      /^01[016789]\d{8}$|^01[016789]-\d{4}-\d{4}$/,
-      "전화번호 형식이 올바르지 않습니다"
-    ),
+    .regex(/^01[016789]-\d{3,4}-\d{4}$/, "전화번호 형식이 올바르지 않습니다"),
   email: z
     .string()
     .trim()

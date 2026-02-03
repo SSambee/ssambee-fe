@@ -9,18 +9,12 @@ const studentBaseSchema = z.object({
     .string()
     .trim()
     .min(1, "학생 연락처를 입력해주세요")
-    .regex(
-      /^01[016789]\d{8}$|^01[016789]-\d{4}-\d{4}$/,
-      "전화번호 형식이 올바르지 않습니다"
-    ),
+    .regex(/^01[016789]-\d{3,4}-\d{4}$/, "전화번호 형식이 올바르지 않습니다"),
   parentPhone: z
     .string()
     .trim()
     .min(1, "학부모 연락처를 입력해주세요")
-    .regex(
-      /^01[016789]\d{8}$|^01[016789]-\d{4}-\d{4}$/,
-      "전화번호 형식이 올바르지 않습니다"
-    ),
+    .regex(/^01[016789]-\d{3,4}-\d{4}$/, "전화번호 형식이 올바르지 않습니다"),
 });
 
 export const studentCreateSchema = studentBaseSchema.extend({
