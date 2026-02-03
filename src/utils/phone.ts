@@ -20,3 +20,6 @@ export const formatPhoneNumber = (phone: string) => {
 
   return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
 };
+
+// Backward-compatible named export used in older imports.
+export const phoneNumberFormatter = formatPhoneNumber;
