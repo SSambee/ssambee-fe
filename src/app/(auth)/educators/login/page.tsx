@@ -17,8 +17,8 @@ export default function EducatorsLoginPage() {
 
   return (
     <AuthLayout
-      title="교직원 로그인"
-      description="강사 또는 조교를 선택하여 로그인 해주세요."
+      title="반가워요!"
+      description="강사 또는 조교를 선택해 로그인 해주세요."
     >
       <RoleSelectorBtn
         options={EDUCATOR_ROLES}
