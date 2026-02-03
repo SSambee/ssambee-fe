@@ -17,8 +17,8 @@ export default function LearnersLoginPage() {
 
   return (
     <AuthLayout
-      title="반갑습니다! 👋"
-      description="학생 또는 학부모를 선택하여 로그인 해주세요."
+      title="반가워요!"
+      description="학생 또는 학부모를 선택해 로그인 해주세요."
     >
       <RoleSelectorBtn
         options={LEARNER_ROLES}
