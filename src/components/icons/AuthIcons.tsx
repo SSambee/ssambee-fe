@@ -111,7 +111,7 @@ export const StudentIcon = ({ className, size = 24 }: IconProps) => (
 export const ParentIcon = ({ className, size = 24 }: IconProps) => (
   <svg
     width={size}
-    height={size}
+    height={size * (32 / 34)}
     viewBox="0 0 34 32"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
