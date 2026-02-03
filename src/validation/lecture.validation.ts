@@ -50,7 +50,7 @@ export type ScheduleInput = z.infer<typeof scheduleSchema>;
 export const lectureInfoSchema = z.object({
   name: z.string().trim().min(1, "수업명을 입력해주세요"),
   subject: z.string().trim().min(1, "과목을 입력해주세요"),
-  grade: z.string().trim().min(1, "학년을 입력해주세요"),
+  schoolYear: z.string().trim().min(1, "학년을 입력해주세요"),
   startDate: z.string().trim().min(1, "개강일을 입력해주세요"),
   status: z.string().min(1, "수업 상태를 선택해주세요"),
 });

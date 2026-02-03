@@ -39,7 +39,7 @@ export default function LectureCreatePage() {
     defaultValues: {
       name: "",
       subject: "",
-      grade: "",
+      schoolYear: "",
       startDate: "",
       status: "개강전",
       students: [

@@ -58,6 +58,7 @@ export const useLectureCreateForm = ({
 
     const payload: LectureCreatePayload = {
       title: lectureData.name,
+      schoolYear: lectureData.schoolYear,
       subject: lectureData.subject,
       status: mapLectureStatusToApi(lectureData.status as LectureStatus),
       startAt: lectureData.startDate

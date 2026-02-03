@@ -19,7 +19,7 @@ export type EditTimeRow = {
 export type LectureEditFormValues = {
   editTitle: string;
   editSubject: string;
-  editGrade: string;
+  editSchoolYear: string;
   editStatus: LectureStatus | "";
   editStartDate: string;
   editInstructor: string;

@@ -59,7 +59,7 @@ export const fetchLectureEnrollmentsAPI = async (
     id: enrollment.id,
     name: enrollment.studentName,
     school: enrollment.school,
-    grade: enrollment.schoolYear,
+    schoolYear: enrollment.schoolYear,
     phone: enrollment.studentPhone,
     parentPhone: enrollment.parentPhone,
   }));

@@ -237,7 +237,7 @@ export default function StudentDetailPage() {
                       {lecture.subject}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {lecture.grade}
+                      {lecture.schoolYear}
                     </span>
                   </div>
                   <h4 className="font-semibold text-lg">{lecture.name}</h4>

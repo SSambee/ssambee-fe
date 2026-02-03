@@ -55,14 +55,17 @@ export const useLectureDetailModal = ({
     editForm.resetForm({
       editTitle: mergedLecture.name,
       editSubject: mergedLecture.subject,
-      editGrade: mergedLecture.grade,
+      editSchoolYear: mergedLecture.schoolYear,
       editStatus: mergedLecture.status ?? "",
       editStartDate: mergedLecture.startDate ?? "",
       editInstructor: fallbackInstructor ? `${fallbackInstructor} 강사님` : "",
     });
 
-    scheduleEdit.resetSchedule(mergedLecture.schedule);
-  }, [editForm, scheduleEdit, mergedLecture, user]);
+    scheduleEdit.resetSchedule(
+      mergedLecture.schedule,
+      lectureDetail?.lectureTimes ?? mergedLecture.lectureTimes
+    );
+  }, [editForm, scheduleEdit, mergedLecture, lectureDetail, user]);
 
   const handleEditStart = useCallback(() => {
     resetEditState();
@@ -93,6 +96,7 @@ export const useLectureDetailModal = ({
         lectureId,
         payload: {
           title: formValues.editTitle,
+          schoolYear: formValues.editSchoolYear,
           subject: formValues.editSubject,
           status: mapLectureStatusToApi(formValues.editStatus as LectureStatus),
           startAt: formValues.editStartDate

@@ -151,7 +151,8 @@ export function ExamInfoSection({
                     <SelectContent>
                       {mockLectures.map((lecture) => (
                         <SelectItem key={lecture.id} value={lecture.id}>
-                          {lecture.name} ({lecture.subject} · {lecture.grade})
+                          {lecture.name} ({lecture.subject} ·{" "}
+                          {lecture.schoolYear})
                         </SelectItem>
                       ))}
                     </SelectContent>

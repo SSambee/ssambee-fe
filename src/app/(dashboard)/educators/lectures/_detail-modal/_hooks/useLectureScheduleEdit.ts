@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { WEEKDAY_OPTIONS } from "@/constants/lectures.constants";
-import type { LectureSchedule } from "@/types/lectures";
+import type { LectureSchedule, LectureTime } from "@/types/lectures";
 
 import type { EditTimeRow } from "./types";
 
@@ -73,8 +73,20 @@ export const useLectureScheduleEdit = () => {
   }, [editTimes]);
 
   const resetSchedule = useCallback(
-    (schedule: LectureSchedule) => {
+    (schedule: LectureSchedule, lectureTimes?: LectureTime[]) => {
       setLocalSchedule(schedule);
+
+      if (lectureTimes && lectureTimes.length > 0) {
+        const rows = lectureTimes.map((time) =>
+          createTimeRow({
+            day: time.day ?? "",
+            startTime: time.startTime ?? "",
+            endTime: time.endTime ?? "",
+          })
+        );
+        setEditTimes(rows);
+        return;
+      }
 
       if (schedule.days.length > 0) {
         const [startTime, endTime] = schedule.time
