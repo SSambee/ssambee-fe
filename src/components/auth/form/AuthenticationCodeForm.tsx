@@ -36,7 +36,7 @@ export default function AuthenticationCodeForm() {
 
   const signupCodeValue = useWatch({ control, name: "signupCode" });
   const codeField = getFieldState("signupCode", formState);
-  const isCodeInputValid = signupCodeValue && !codeField.error;
+  const isCodeInputValid = signupCodeValue?.trim() && !codeField.error;
 
   const handleVerifyCode = async () => {
     const isValidCode = await trigger("signupCode");

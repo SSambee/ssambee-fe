@@ -51,12 +51,13 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
           {label}
         </label>
 
-        {showReset && !props.disabled && (
+        {showReset && onReset && !props.disabled && (
           <button
             type="button"
             onClick={onReset}
             className="absolute right-4 top-[29px] -translate-y-1/2 z-20 p-1 hover:bg-gray-100 rounded-full transition-colors"
             tabIndex={-1} // 탭 이동 시 버튼 제외
+            aria-label="Reset input"
           >
             <ResetIcon size={22} />
           </button>

@@ -299,7 +299,9 @@ export default function RegisterForm({
                 type="button"
                 onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
                 className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
-                aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
+                aria-label={
+                  showPasswordConfirm ? "비밀번호 숨기기" : "비밀번호 표시"
+                }
               >
                 {showPasswordConfirm ? (
                   <EyeOpenIcon size={22} />
