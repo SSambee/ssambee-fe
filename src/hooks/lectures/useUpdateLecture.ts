@@ -4,7 +4,7 @@ import { lectureKeys } from "@/constants/query-keys";
 import {
   LectureUpdatePayload,
   updateLectureAPI,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 
 type UpdateLectureParams = {
   lectureId: string;

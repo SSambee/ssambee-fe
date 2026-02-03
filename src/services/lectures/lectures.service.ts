@@ -22,7 +22,7 @@ export {
   mapLectureApiToView,
   mapLectureDetailApiToView,
   mapLectureStatusToApi,
-} from "@/services/lectures.mapper";
+} from "@/services/lectures/lectures.mapper";
 
 export const fetchLecturesAPI = async (
   query: LecturesListQuery

@@ -4,7 +4,7 @@ import { lectureKeys } from "@/constants/query-keys";
 import {
   fetchLectureDetailAPI,
   mapLectureDetailApiToView,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 
 export const useLectureDetail = (lectureId: string, enabled = true) => {
   return useQuery({

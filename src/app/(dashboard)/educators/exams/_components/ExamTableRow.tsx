@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import { Exam } from "@/types/exams";
 
@@ -7,15 +9,18 @@ type ExamTableRowProps = {
   exam: Exam;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
-  isUiOnly: boolean;
+  disableSelection?: boolean;
+  disableGrading?: boolean;
 };
 
 export function ExamTableRow({
   exam,
   isSelected,
   onSelect,
-  isUiOnly,
+  disableSelection = false,
+  disableGrading = false,
 }: ExamTableRowProps) {
+  const router = useRouter();
   const statusColor =
     exam.status === "채점 완료" ? "text-green-600" : "text-orange-600";
   const statusDotColor =
@@ -29,7 +34,7 @@ export function ExamTableRow({
           checked={isSelected}
           onChange={(e) => onSelect(e.target.checked)}
           className="cursor-pointer"
-          disabled={isUiOnly}
+          disabled={disableSelection}
           aria-label={`${exam.name} 선택`}
         />
       </td>
@@ -55,8 +60,8 @@ export function ExamTableRow({
         <Button
           variant="outline"
           className="h-8 rounded-md px-3 text-xs"
-          onClick={() => console.log("채점하기:", exam.id)}
-          disabled={isUiOnly}
+          onClick={() => router.push(`/educators/exams/${exam.id}/grading`)}
+          disabled={disableGrading}
         >
           채점하기
         </Button>

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { lectureKeys } from "@/constants/query-keys";
-import { deleteLectureAPI } from "@/services/lectures.service";
+import { deleteLectureAPI } from "@/services/lectures/lectures.service";
 
 type UseDeleteLectureOptions = {
   onSuccess?: () => void;

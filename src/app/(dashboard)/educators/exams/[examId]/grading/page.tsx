@@ -1,17 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
-import {
-  mockGradingExamInfo,
-  mockGradingQuestions,
-  mockGradingReportOverview,
-  mockGradingReportQuestionStats,
-  mockGradingReportStudentRows,
-  mockGradingStudents,
-  mockGradingSummary,
-} from "@/data/grading.mock";
+import { useGradingPage } from "@/app/(dashboard)/educators/exams/[examId]/grading/_hooks/useGradingPage";
 
 import { GradingPageHeader } from "./_components/GradingPageHeader";
 import { StudentListSidebar } from "./_components/StudentListSidebar";
@@ -20,63 +10,117 @@ import { QuestionAnswerList } from "./_components/QuestionAnswerList";
 import { GradingResultModal } from "./_modals/grading-result/GradingResultModal";
 
 export default function GradingPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const modal = searchParams.get("modal");
-  const isResultModalOpen = modal === "result";
+  const {
+    examDetail,
+    isPending,
+    isError,
+    examName,
+    lectureName,
+    examSubtitle,
+    students,
+    selectedStudentId,
+    onSelectStudent,
+    summary,
+    gradingQuestions,
+    handleSelectObjectiveAnswer,
+    handleEssayAnswerChange,
+    handleEssayCorrectChange,
+    handleSave,
+    handleTempSave,
+    handleEdit,
+    handleComplete,
+    canSave,
+    canTempSave,
+    canComplete,
+    canViewResult,
+    isCompleted,
+    isInputDisabled,
+    isEditing,
+    isResultModalOpen,
+    openResultModal,
+    closeResultModal,
+    isSubmitting,
+  } = useGradingPage();
 
-  const selectedStudentId = mockGradingStudents[0]?.id ?? "";
+  if (isPending) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-sm text-muted-foreground">
+          시험 정보를 불러오는 중입니다.
+        </div>
+      </div>
+    );
+  }
 
-  const openResultModal = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("modal", "result");
-    const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname);
-  };
-
-  const closeResultModal = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("modal");
-    const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname);
-  };
+  if (isError || !examDetail) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-sm text-red-500">
+          시험 정보를 불러오지 못했습니다.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
       <GradingPageHeader
-        examName={mockGradingExamInfo.examName}
-        lectureName={mockGradingExamInfo.lectureName}
-        examSubtitle={mockGradingExamInfo.examSubtitle}
+        examName={examName}
+        lectureName={lectureName}
+        examSubtitle={examSubtitle}
       />
 
       <div className="flex gap-6">
-        {/* 왼쪽: 학생 리스트 */}
         <StudentListSidebar
-          students={mockGradingStudents}
+          students={students}
           selectedStudentId={selectedStudentId}
+          onSelectStudentAction={onSelectStudent}
+          onCompleteAction={handleComplete}
           onOpenResultModalAction={openResultModal}
+          disableComplete={!canComplete}
+          disabled={isSubmitting}
+          canViewResult={canViewResult}
         />
 
-        {/* 오른쪽: 메인 영역 */}
         <div className="flex-1">
           {selectedStudentId ? (
             <>
-              {/* 요약 카드 */}
-              <GradingSummaryCards summary={mockGradingSummary} />
+              <GradingSummaryCards summary={summary} />
 
-              {/* 문항별 답안 입력 */}
               <QuestionAnswerList
-                examSubtitle={mockGradingExamInfo.examSubtitle}
-                questions={mockGradingQuestions}
+                examSubtitle={examSubtitle}
+                questions={gradingQuestions}
+                onSelectObjectiveAnswer={handleSelectObjectiveAnswer}
+                onEssayAnswerChange={handleEssayAnswerChange}
+                onEssayCorrectChange={handleEssayCorrectChange}
+                disabled={isInputDisabled}
               />
 
-              {/* 하단 액션 버튼 */}
-              <div className="flex justify-end gap-3 mt-6">
-                <Button variant="outline" disabled>
-                  임시저장
-                </Button>
-                <Button disabled>저장</Button>
+              <div className="flex items-center justify-end gap-3 mt-6">
+                {isEditing ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={handleTempSave}
+                      disabled={isInputDisabled || !canTempSave}
+                    >
+                      임시저장
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      disabled={isInputDisabled || !canSave}
+                    >
+                      저장
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={handleEdit}>수정</Button>
+                )}
+                {isCompleted && (
+                  <span className="text-xs text-muted-foreground">
+                    완료된 시험이라 저장이 실패할 수 있습니다.
+                  </span>
+                )}
               </div>
             </>
           ) : (
@@ -90,11 +134,16 @@ export default function GradingPage() {
       <GradingResultModal
         open={isResultModalOpen}
         onOpenChange={(open) => (open ? openResultModal() : closeResultModal())}
-        title={mockGradingExamInfo.examName}
-        subtitle={`${mockGradingExamInfo.examSubtitle} ${mockGradingExamInfo.examName}`}
-        overview={mockGradingReportOverview}
-        studentRows={mockGradingReportStudentRows}
-        questionStats={mockGradingReportQuestionStats}
+        title={examName}
+        subtitle={`${examSubtitle} ${examName}`}
+        overview={{
+          examDate: "-",
+          averageScore: 0,
+          top30AverageScore: 0,
+          maxScore: 0,
+        }}
+        studentRows={[]}
+        questionStats={[]}
       />
     </div>
   );
