@@ -6,7 +6,7 @@ import { UseMutationResult } from "@tanstack/react-query";
 import {
   LectureCreatePayload,
   mapLectureStatusToApi,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 import { LectureStatus, ScheduleData } from "@/types/lectures";
 import {
   LectureFormInput,

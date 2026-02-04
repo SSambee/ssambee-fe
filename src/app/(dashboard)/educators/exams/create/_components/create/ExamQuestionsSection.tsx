@@ -11,9 +11,10 @@ import { QuestionItem } from "./QuestionItem";
 
 type ExamQuestionsSectionProps = {
   form: UseFormReturn<ExamFormInput>;
-  fields: FieldArrayWithId<ExamFormInput, "questions", "id">[];
+  fields: FieldArrayWithId<ExamFormInput, "questions", "fieldId">[];
   onAdd: () => void;
   onRemove: (index: number) => void;
+  onScoreManualChange?: () => void;
   disabled?: boolean;
 };
 
@@ -22,6 +23,7 @@ export function ExamQuestionsSection({
   fields,
   onAdd,
   onRemove,
+  onScoreManualChange,
   disabled = false,
 }: ExamQuestionsSectionProps) {
   return (
@@ -42,12 +44,13 @@ export function ExamQuestionsSection({
           <Accordion type="multiple" className="space-y-2">
             {fields.map((field, index) => (
               <QuestionItem
-                key={field.id}
+                key={field.fieldId}
                 form={form}
                 index={index}
                 questionNumber={index + 1}
                 disabled={disabled}
                 onDelete={() => onRemove(index)}
+                onScoreManualChange={onScoreManualChange}
               />
             ))}
           </Accordion>

@@ -1,10 +1,9 @@
-export type GradingStudentStatus = "대기" | "임시 저장";
-
 export type GradingStudent = {
   id: string;
   name: string;
   lectureName: string;
-  status: GradingStudentStatus;
+  isFinalSaved: boolean;
+  hasDraft?: boolean;
   score?: number;
 };
 

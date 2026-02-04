@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { useAuthContext } from "@/providers/AuthProvider";
-import { mapLectureStatusToApi } from "@/services/lectures.service";
+import { mapLectureStatusToApi } from "@/services/lectures/lectures.service";
 import { Lecture, LectureStatus } from "@/types/lectures";
 import { useLectureDetail } from "@/hooks/lectures/useLectureDetail";
 import { useUpdateLecture } from "@/hooks/lectures/useUpdateLecture";

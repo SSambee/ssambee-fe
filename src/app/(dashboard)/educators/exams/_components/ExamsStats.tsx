@@ -1,12 +1,16 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
-import { useExamsStore } from "@/stores/exams.store";
+import type { Exam } from "@/types/exams";
 
-export function ExamsStats() {
-  const { exams } = useExamsStore();
+type ExamsStatsProps = {
+  exams: Exam[];
+  isLoading?: boolean;
+};
+
+export function ExamsStats({ exams, isLoading = false }: ExamsStatsProps) {
   const totalExams = exams.length;
   const clinicExams = exams.filter((exam) => exam.status === "진행 중").length;
+  const totalLabel = isLoading ? "-" : `${totalExams}개`;
+  const clinicLabel = isLoading ? "-" : `${clinicExams}개`;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -15,7 +19,7 @@ export function ExamsStats() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">총 시험 등록</p>
-              <p className="text-3xl font-bold">{totalExams}개</p>
+              <p className="text-3xl font-bold">{totalLabel}</p>
               <p className="text-xs text-muted-foreground">등록된 시험 수</p>
             </div>
           </div>
@@ -27,7 +31,7 @@ export function ExamsStats() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">클리닉 대상 시험</p>
-              <p className="text-3xl font-bold">{clinicExams}개</p>
+              <p className="text-3xl font-bold">{clinicLabel}</p>
               <p className="text-xs text-muted-foreground">
                 클리닉 대상 클래스 기준
               </p>

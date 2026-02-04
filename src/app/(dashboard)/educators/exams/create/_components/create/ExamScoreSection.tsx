@@ -6,17 +6,35 @@ type ExamScoreSectionProps = {
   totalQuestions: number;
   totalScore: number;
   errorMessage?: string;
+  autoScore?: boolean;
+  onAutoScoreChange?: (value: boolean) => void;
+  disabled?: boolean;
 };
 
 export function ExamScoreSection({
   totalQuestions,
   totalScore,
   errorMessage,
+  autoScore = true,
+  onAutoScoreChange,
+  disabled = false,
 }: ExamScoreSectionProps) {
   return (
     <Card>
       <div className="p-6 border-b">
-        <h2 className="text-xl font-semibold">⚙️ 문항 및 배점 구성</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">⚙️ 문항 및 배점 구성</h2>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={autoScore}
+              onChange={(event) => onAutoScoreChange?.(event.target.checked)}
+              disabled={disabled}
+              className="h-4 w-4"
+            />
+            자동 배점
+          </label>
+        </div>
       </div>
       <CardContent className="p-6">
         <div className="flex items-center gap-8">

@@ -5,7 +5,7 @@ import {
   fetchLecturesAPI,
   LecturesListQuery,
   mapLectureApiToView,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 
 export const useLecturesList = (query: LecturesListQuery) => {
   return useQuery({

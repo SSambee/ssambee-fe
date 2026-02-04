@@ -1,6 +1,6 @@
 import type { ExamFormInput } from "@/validation/exam.validation";
 
-export const EXAMS_UI_ONLY = true; //추후작업을 위해 임시로 true로 설정
+export const EXAMS_UI_ONLY = true; // 삭제/채점 액션은 추후 연동
 
 export const createDefaultQuestion =
   (): ExamFormInput["questions"][number] => ({
@@ -23,5 +23,6 @@ export const EXAM_FORM_DEFAULTS: ExamFormInput = {
   source: "",
   passScore: undefined,
   autoRetest: true,
+  autoScore: true,
   questions: [],
 };

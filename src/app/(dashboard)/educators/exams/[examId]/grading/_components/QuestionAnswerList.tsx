@@ -5,16 +5,25 @@ import { ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { GradingQuestion } from "@/types/grading";
 
 type QuestionAnswerListProps = {
   questions: GradingQuestion[];
   examSubtitle: string;
+  disabled?: boolean;
+  onSelectObjectiveAnswer?: (questionNumber: number, answer: number) => void;
+  onEssayAnswerChange?: (questionNumber: number, value: string) => void;
+  onEssayCorrectChange?: (questionNumber: number, isCorrect: boolean) => void;
 };
 
 export function QuestionAnswerList({
   questions,
   examSubtitle,
+  disabled = false,
+  onSelectObjectiveAnswer,
+  onEssayAnswerChange,
+  onEssayCorrectChange,
 }: QuestionAnswerListProps) {
   const totalCount = questions.length;
   const [visibleCount, setVisibleCount] = useState(10);
@@ -36,10 +45,19 @@ export function QuestionAnswerList({
         {visibleQuestions.map((question) => {
           const statusText =
             question.status === "미입력"
-              ? `미입력 정답 ${question.correctAnswer}`
+              ? question.type === "객관식"
+                ? `미입력 정답 ${question.correctAnswer}`
+                : "미입력"
               : question.status === "오답"
                 ? "오답"
                 : "정답";
+          const isEssayCorrect = question.status === "정답";
+          const isEssayIncorrect = question.status === "오답";
+          const essayAnswer =
+            typeof question.studentAnswer === "string"
+              ? question.studentAnswer
+              : "";
+          const hasEssayAnswer = essayAnswer.trim().length > 0;
 
           return (
             <Card key={question.id}>
@@ -71,11 +89,52 @@ export function QuestionAnswerList({
                                 ? "bg-primary border-primary text-primary-foreground"
                                 : "bg-background border-input hover:bg-accent"
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
-                            disabled
+                            onClick={() =>
+                              onSelectObjectiveAnswer?.(question.number, num)
+                            }
+                            disabled={disabled}
                           >
                             {num}
                           </button>
                         ))}
+                      </div>
+                    )}
+
+                    {question.type === "주관식" && (
+                      <div className="space-y-2">
+                        <Input
+                          value={essayAnswer}
+                          onChange={(event) =>
+                            onEssayAnswerChange?.(
+                              question.number,
+                              event.target.value
+                            )
+                          }
+                          placeholder="학생 답안을 입력하세요"
+                          disabled={disabled}
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant={isEssayCorrect ? "default" : "outline"}
+                            onClick={() =>
+                              onEssayCorrectChange?.(question.number, true)
+                            }
+                            disabled={disabled || !hasEssayAnswer}
+                          >
+                            정답
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={isEssayIncorrect ? "default" : "outline"}
+                            onClick={() =>
+                              onEssayCorrectChange?.(question.number, false)
+                            }
+                            disabled={disabled || !hasEssayAnswer}
+                          >
+                            오답
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>

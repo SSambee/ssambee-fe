@@ -64,6 +64,7 @@ export const buildScheduleFromTimes = (
   ).sort((a, b) => (DAY_ORDER[a] ?? 99) - (DAY_ORDER[b] ?? 99));
 
   const [first] = lectureTimes;
+  // TODO: 첫 번째 항목에 시간 정보가 없고 이후 항목에만 있는 경우를 고려해 로직 보완 필요
   const hasValidTime = first.startTime && first.endTime;
   const isSameTime = lectureTimes.every(
     (time) =>
