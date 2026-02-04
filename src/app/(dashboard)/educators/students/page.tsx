@@ -3,25 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Title from "@/components/common/header/Title";
-import SelectBtn from "@/components/common/button/SelectBtn";
-import StatusLabel from "@/components/common/label/StatusLabel";
 import { useModal } from "@/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
 import {
   PaginationType,
-  SchoolYear,
   EnrollmentListQuery,
   StudentStatus,
 } from "@/types/students.type";
@@ -31,22 +17,16 @@ import {
   useUpdateAllAttendance,
   useUpdateEnrollment,
 } from "@/hooks/useEnrollment";
-import {
-  GRADE_SELECT_OPTIONS,
-  STATUS_SELECT_OPTIONS,
-  STUDENT_STATUS_LABEL,
-  STUDENTS_TABLE_COLUMNS,
-  LECTURE_STATUS_LABEL,
-} from "@/constants/students.default";
+import { STUDENT_STATUS_LABEL } from "@/constants/students.default";
 import { Pagination } from "@/components/common/pagination/Pagination";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import { getTodayYMD } from "@/utils/date";
 import { useDebounce } from "@/hooks/useDebounce";
 
-import { StudentChangeModal } from "./_components/students-modal/ClassChangeModal";
-import { TalkNotificationModal } from "./_components/students-modal/TalkNotificationModal";
 import { StudentTableData } from "./_components/table/StudentTableColumns";
-import { StudentCreateModal } from "./_components/students-modal/StudentCreateModal";
+import { StudentFilter } from "./_components/filter/StudentFilter";
+import { StudentActions } from "./_components/action/StudentActions";
+import { StudentTable } from "./_components/table/StudentTable";
 
 const PAGE_LIMIT = 10;
 
@@ -54,6 +34,7 @@ export default function StudentsListPage() {
   const router = useRouter();
   const { openModal } = useModal();
 
+  // 검색어
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -233,197 +214,34 @@ export default function StudentsListPage() {
         title="전체 학생 관리"
         description={`총 ${pagination.totalCount}명의 학생 정보를 관리하고 있습니다.`}
       />
-      {/* 필터 */}
-      <div className="border rounded-lg p-4 mt-[74px]">
-        <div className="w-full flex flex-col items-start gap-2 mb-3">
-          <h2 className="text-lg font-semibold mr-1">수업 선택</h2>
 
-          <div className="w-full flex flex-wrap items-center gap-4">
-            <div className="w-full lg:w-[280px] shrink-0 h-14">
-              <SelectBtn
-                className="text-base px-4 h-full w-full"
-                optionSize="sm"
-                value={query.lecture ?? "all"}
-                placeholder="전체 수업"
-                options={lectureOptions.map((option) => ({
-                  value: option.value,
-                  label: option.status ? (
-                    <div className="flex items-center gap-2">
-                      <span>{option.label}</span>
-                      <StatusLabel
-                        color={LECTURE_STATUS_LABEL[option.status].color}
-                      >
-                        {LECTURE_STATUS_LABEL[option.status].label}
-                      </StatusLabel>
-                    </div>
-                  ) : (
-                    option.label
-                  ),
-                }))}
-                onChange={(value) =>
-                  setQuery((prev) => ({
-                    ...prev,
-                    lecture: value === "all" ? null : (value as string),
-                    page: 1,
-                  }))
-                }
-              />
-            </div>
+      <StudentFilter
+        query={query}
+        setQuery={setQuery}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        lectureOptions={lectureOptions.map((option) => ({
+          label: option.label,
+          value: option.value,
+          status: option.status ?? null,
+        }))}
+      />
 
-            <div className="flex-1 flex flex-wrap sm:flex-nowrap justify-end items-center gap-3 h-ful text-base">
-              <Input
-                className="h-14 w-full sm:flex-1 min-w-[200px] max-w-[400px] p-4 text-base placeholder:text-base"
-                placeholder="이름, 전화번호로 검색해보세요"
-                value={searchTerm} // query.keyword 대신 사용
-                onChange={(e) => setSearchTerm(e.target.value)} // setQuery 대신 setSearchTerm 사용
-              />
-              <div className="grid grid-cols-2 gap-2 w-full sm:w-[280px] shrink-0 h-14">
-                <div className="h-full">
-                  <SelectBtn
-                    className="text-base px-4 h-full w-full"
-                    optionSize="sm"
-                    value={query.year ?? "all"}
-                    placeholder="학년 선택"
-                    options={GRADE_SELECT_OPTIONS}
-                    onChange={(value) =>
-                      setQuery((prev) => ({
-                        ...prev,
-                        year: value === "all" ? null : (value as SchoolYear),
-                        page: 1,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="h-full">
-                  <SelectBtn
-                    className="text-base px-4 h-full w-full"
-                    optionSize="sm"
-                    value={query.status ?? "all"}
-                    placeholder="상태 선택"
-                    options={STATUS_SELECT_OPTIONS}
-                    onChange={(value) =>
-                      setQuery((prev) => ({
-                        ...prev,
-                        status:
-                          value === "all" ? null : (value as StudentStatus),
-                        page: 1,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StudentActions
+        selectedStudentIds={selectedStudentIds}
+        queryLecture={query.lecture ?? null}
+        isUpdating={isUpdating}
+        selectedLectureStatus={selectedLectureInfo?.status}
+        onAttendanceClick={handleAttendanceClick}
+      />
 
-      <div className="flex justify-between items-center mt-[58px] mb-5">
-        {/* 모달 버튼 */}
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            onClick={() => openModal(<StudentCreateModal />)}
-          >
-            학생 등록
-          </Button>
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            disabled={selectedStudentIds.length === 0}
-            onClick={() => openModal(<StudentChangeModal />)}
-          >
-            수업 변경
-          </Button>
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            disabled={selectedStudentIds.length === 0}
-            onClick={() => openModal(<TalkNotificationModal />)}
-          >
-            알림 발송
-          </Button>
-          <Button
-            variant="default"
-            disabled={
-              !query.lecture ||
-              selectedStudentIds.length === 0 ||
-              isUpdating ||
-              selectedLectureInfo?.status === "COMPLETED"
-            }
-            className="cursor-pointer"
-            onClick={handleAttendanceClick}
-          >
-            {isUpdating ? "등록 중..." : "출결 등록"}
-          </Button>
-        </div>
-        {selectedStudentIds.length > 0 && (
-          <div>
-            <span className="flex items-end text-sm text-muted-foreground">
-              선택된 학생 {selectedStudentIds.length}명
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 테이블 */}
-      <div className="border rounded-lg overflow-x-auto min-h-[550px]">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="whitespace-nowrap w-[50px]">
-                <Checkbox
-                  checked={isCurrentPageAllSelected}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              {STUDENTS_TABLE_COLUMNS.map((col) => (
-                <TableHead key={col.key} className="whitespace-nowrap">
-                  {col.label}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isPending ? (
-              <TableRow>
-                <TableCell
-                  colSpan={STUDENTS_TABLE_COLUMNS.length + 1}
-                  className="text-center"
-                >
-                  로딩 중...
-                </TableCell>
-              </TableRow>
-            ) : studentList.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={STUDENTS_TABLE_COLUMNS.length + 1}
-                  className="h-[550px] text-center align-middle"
-                >
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <span className="text-gray-400 text-lg font-medium">
-                      검색 결과가 없습니다.
-                    </span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              studentList.map((studentData) => (
-                <TableRow key={studentData.id}>
-                  {columns.map((col) => (
-                    <TableCell
-                      key={col.key}
-                      className="whitespace-nowrap text-sm"
-                    >
-                      {col.render(studentData)}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <StudentTable
+        isPending={isPending}
+        studentList={studentList}
+        isCurrentPageAllSelected={isCurrentPageAllSelected}
+        handleSelectAll={handleSelectAll}
+        columns={columns}
+      />
 
       <Pagination
         pagination={pagination as PaginationType}
