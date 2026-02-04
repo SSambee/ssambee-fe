@@ -99,10 +99,10 @@ export function ManualStudentForm({
               <div className="flex items-center gap-3">
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => handleToggleLock(index, field.id)}
                   disabled={disabled}
-                  className="h-10 px-3 text-[14px] font-semibold text-[#3863f6]"
+                  className="h-10 px-3 border-transparent bg-transparent shadow-none text-[14px] font-semibold text-[#3863f6] hover:bg-transparent hover:text-[#3863f6]"
                 >
                   {isLocked ? "수정" : "확정"}
                 </Button>
