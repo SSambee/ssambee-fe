@@ -6,7 +6,7 @@ import { UseMutationResult } from "@tanstack/react-query";
 import {
   LectureCreatePayload,
   mapLectureStatusToApi,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 import { LectureStatus, ScheduleData } from "@/types/lectures";
 import {
   LectureFormInput,
@@ -58,6 +58,7 @@ export const useLectureCreateForm = ({
 
     const payload: LectureCreatePayload = {
       title: lectureData.name,
+      schoolYear: lectureData.schoolYear,
       subject: lectureData.subject,
       status: mapLectureStatusToApi(lectureData.status as LectureStatus),
       startAt: lectureData.startDate

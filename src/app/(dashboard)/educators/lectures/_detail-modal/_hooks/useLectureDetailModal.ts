@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { useAuthContext } from "@/providers/AuthProvider";
-import { mapLectureStatusToApi } from "@/services/lectures.service";
+import { mapLectureStatusToApi } from "@/services/lectures/lectures.service";
 import { Lecture, LectureStatus } from "@/types/lectures";
 import { useLectureDetail } from "@/hooks/lectures/useLectureDetail";
 import { useUpdateLecture } from "@/hooks/lectures/useUpdateLecture";
@@ -55,14 +55,17 @@ export const useLectureDetailModal = ({
     editForm.resetForm({
       editTitle: mergedLecture.name,
       editSubject: mergedLecture.subject,
-      editGrade: mergedLecture.grade,
+      editSchoolYear: mergedLecture.schoolYear,
       editStatus: mergedLecture.status ?? "",
       editStartDate: mergedLecture.startDate ?? "",
       editInstructor: fallbackInstructor ? `${fallbackInstructor} 강사님` : "",
     });
 
-    scheduleEdit.resetSchedule(mergedLecture.schedule);
-  }, [editForm, scheduleEdit, mergedLecture, user]);
+    scheduleEdit.resetSchedule(
+      mergedLecture.schedule,
+      lectureDetail?.lectureTimes ?? mergedLecture.lectureTimes
+    );
+  }, [editForm, scheduleEdit, mergedLecture, lectureDetail, user]);
 
   const handleEditStart = useCallback(() => {
     resetEditState();
@@ -93,6 +96,7 @@ export const useLectureDetailModal = ({
         lectureId,
         payload: {
           title: formValues.editTitle,
+          schoolYear: formValues.editSchoolYear,
           subject: formValues.editSubject,
           status: mapLectureStatusToApi(formValues.editStatus as LectureStatus),
           startAt: formValues.editStartDate

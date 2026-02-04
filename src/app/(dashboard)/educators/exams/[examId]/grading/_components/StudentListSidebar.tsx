@@ -10,18 +10,26 @@ type StudentListSidebarProps = {
   students: GradingStudent[];
   selectedStudentId?: string;
   onSelectStudentAction?: (studentId: string) => void;
+  onCompleteAction?: () => void;
   onOpenResultModalAction?: () => void;
+  disableComplete?: boolean;
+  disabled?: boolean;
+  canViewResult?: boolean;
 };
 
 export function StudentListSidebar({
   students,
   selectedStudentId,
   onSelectStudentAction,
+  onCompleteAction,
   onOpenResultModalAction,
+  disableComplete = false,
+  disabled = false,
+  canViewResult = false,
 }: StudentListSidebarProps) {
   const isAllSaved =
-    students.length > 0 &&
-    students.every((student) => student.status === "임시 저장");
+    students.length > 0 && students.every((student) => student.isFinalSaved);
+  const isCompleteDisabled = disableComplete || !isAllSaved;
 
   return (
     <div className="w-80 space-y-4">
@@ -33,9 +41,10 @@ export function StudentListSidebar({
       <div className="space-y-2">
         {students.map((student) => {
           const isSelected = selectedStudentId === student.id;
-          const statusText =
-            student.status === "임시 저장"
-              ? `임시 저장 ${student.score ?? 0}점`
+          const statusText = student.isFinalSaved
+            ? `저장 완료 ${student.score ?? 0}점`
+            : student.hasDraft
+              ? "임시 저장"
               : "대기";
 
           return (
@@ -44,7 +53,10 @@ export function StudentListSidebar({
               className={`cursor-pointer transition-colors ${
                 isSelected ? "bg-primary/10 border-primary" : ""
               }`}
-              onClick={() => onSelectStudentAction?.(student.id)}
+              onClick={() => {
+                if (disabled) return;
+                onSelectStudentAction?.(student.id);
+              }}
             >
               <CardContent className="p-4">
                 <div className="space-y-1">
@@ -64,11 +76,19 @@ export function StudentListSidebar({
         <Button
           className="w-full"
           size="lg"
-          disabled={!isAllSaved}
-          onClick={onOpenResultModalAction}
+          disabled={isCompleteDisabled}
+          onClick={onCompleteAction}
         >
           <Check className="h-4 w-4 mr-2" />
           전체 완료
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={disabled || !canViewResult}
+          onClick={onOpenResultModalAction}
+        >
+          결과 보기
         </Button>
         <p className="text-xs text-muted-foreground text-center">
           모든 학생이 저장되면 활성화됩니다.

@@ -30,19 +30,19 @@ export function LectureDetailModal({
     resetEditState,
     editTitle,
     editSubject,
-    editGrade,
+    editSchoolYear,
     editStatus,
     editStartDate,
     editInstructor,
     editTimes,
     subjectOptions,
-    gradeOptions,
+    schoolYearOptions,
     statusOptions,
     dayOptions,
     scheduleSummary,
     setEditTitle,
     setEditSubject,
-    setEditGrade,
+    setEditSchoolYear,
     setEditStatus,
     setEditStartDate,
     handleEditStart,
@@ -78,19 +78,19 @@ export function LectureDetailModal({
             <LectureDetailEditForm
               editTitle={editTitle}
               editSubject={editSubject}
-              editGrade={editGrade}
+              editSchoolYear={editSchoolYear}
               editStatus={editStatus}
               editStartDate={editStartDate}
               editInstructor={editInstructor}
               editTimes={editTimes}
               currentStudents={currentStudents}
               subjectOptions={subjectOptions}
-              gradeOptions={gradeOptions}
+              schoolYearOptions={schoolYearOptions}
               statusOptions={statusOptions}
               dayOptions={dayOptions}
               onTitleChange={setEditTitle}
               onSubjectChange={setEditSubject}
-              onGradeChange={setEditGrade}
+              onSchoolYearChange={setEditSchoolYear}
               onStatusChange={(value) => setEditStatus(value as LectureStatus)}
               onStartDateChange={setEditStartDate}
               onScheduleAdd={handleAddSchedule}
@@ -103,7 +103,7 @@ export function LectureDetailModal({
               currentStudents={currentStudents}
               scheduleSummary={scheduleSummary()}
               subjectOverride={editSubject}
-              gradeOverride={editGrade}
+              schoolYearOverride={editSchoolYear}
               statusOverride={editStatus}
               startDateOverride={editStartDate}
               instructorOverride={editInstructor}

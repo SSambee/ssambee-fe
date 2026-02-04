@@ -1,24 +1,37 @@
-"use client";
+import {
+  mockDashboardClinics,
+  mockDashboardInquiries,
+  mockDashboardSchedule,
+  mockDashboardStats,
+  mockDashboardTasks,
+} from "@/data/dashboard.mock";
 
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { DashboardClinicCard } from "./_components/dashboard/DashboardClinicCard";
+import { DashboardHeader } from "./_components/dashboard/DashboardHeader";
+import { DashboardInquiryTable } from "./_components/dashboard/DashboardInquiryTable";
+import { DashboardStatCards } from "./_components/dashboard/DashboardStatCards";
+import { DashboardTaskList } from "./_components/dashboard/DashboardTaskList";
+import { DashboardTodayScheduleCard } from "./_components/dashboard/DashboardTodayScheduleCard";
 
 export default function EducatorsDashboardPage() {
-  const { signout } = useAuth();
   return (
-    <div>
-      <h1>EducatorsDashboardPage</h1>
-      <Button variant="outline" onClick={() => signout("MGMT")}>
-        Educator 로그아웃
-      </Button>
-      <Button variant="outline">
-        <Link href="/educators/lectures">수업 관리</Link>
-      </Button>
-      <Button variant="outline">
-        <Link href="/educators/students">학생 관리</Link>
-      </Button>
+    <div className="container mx-auto space-y-8 p-6">
+      <DashboardHeader />
+      <DashboardStatCards stats={mockDashboardStats} />
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] 2xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+        <div className="space-y-6">
+          <DashboardInquiryTable inquiries={mockDashboardInquiries} />
+          <DashboardTaskList tasks={mockDashboardTasks} />
+        </div>
+        <div className="space-y-6">
+          <DashboardClinicCard clinics={mockDashboardClinics} />
+          <DashboardTodayScheduleCard
+            dateLabel="10월 25일"
+            items={mockDashboardSchedule}
+          />
+        </div>
+      </div>
     </div>
   );
 }

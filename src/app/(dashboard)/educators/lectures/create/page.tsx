@@ -11,6 +11,7 @@ import {
   lectureFormSchema,
   LectureFormInput,
 } from "@/validation/lecture.validation";
+import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 import { CreatePageHeader } from "./_components/CreatePageHeader";
 import { LectureInfoSection } from "./_components/LectureInfoSection";
@@ -21,6 +22,12 @@ import { useLectureCreateForm } from "./_hooks/useLectureCreateForm";
 
 export default function LectureCreatePage() {
   const router = useRouter();
+
+  useSetBreadcrumb([
+    { label: "수업 관리", href: "/educators/lectures" },
+    { label: "수업 개설" },
+  ]);
+
   const schedules = useLectureCreateStore((state) => state.schedules);
   const scheduleData = useLectureCreateStore((state) => state.scheduleData);
   const isSaved = useLectureCreateStore((state) => state.isSaved);
@@ -39,7 +46,7 @@ export default function LectureCreatePage() {
     defaultValues: {
       name: "",
       subject: "",
-      grade: "",
+      schoolYear: "",
       startDate: "",
       status: "개강전",
       students: [

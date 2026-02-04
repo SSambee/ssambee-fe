@@ -16,19 +16,19 @@ type EditTimeRow = {
 type LectureDetailEditFormProps = {
   editTitle: string;
   editSubject: string;
-  editGrade: string;
+  editSchoolYear: string;
   editStatus: LectureStatus | "";
   editStartDate: string;
   editInstructor: string;
   editTimes: EditTimeRow[];
   currentStudents: number;
   subjectOptions: LectureSelectOption[];
-  gradeOptions: LectureSelectOption[];
+  schoolYearOptions: LectureSelectOption[];
   statusOptions: LectureSelectOption[];
   dayOptions: LectureSelectOption[];
   onTitleChange: (value: string) => void;
   onSubjectChange: (value: string) => void;
-  onGradeChange: (value: string) => void;
+  onSchoolYearChange: (value: string) => void;
   onStatusChange: (value: LectureStatus | "") => void;
   onStartDateChange: (value: string) => void;
   onScheduleAdd: () => void;
@@ -43,19 +43,19 @@ type LectureDetailEditFormProps = {
 export function LectureDetailEditForm({
   editTitle,
   editSubject,
-  editGrade,
+  editSchoolYear,
   editStatus,
   editStartDate,
   editInstructor,
   editTimes,
   currentStudents,
   subjectOptions,
-  gradeOptions,
+  schoolYearOptions,
   statusOptions,
   dayOptions,
   onTitleChange,
   onSubjectChange,
-  onGradeChange,
+  onSchoolYearChange,
   onStatusChange,
   onStartDateChange,
   onScheduleAdd,
@@ -83,10 +83,10 @@ export function LectureDetailEditForm({
       </InfoRow>
       <InfoRow label="학년">
         <SelectBtn
-          value={editGrade}
+          value={editSchoolYear}
           placeholder="학년 선택"
-          options={gradeOptions}
-          onChange={(value) => onGradeChange(value)}
+          options={schoolYearOptions}
+          onChange={(value) => onSchoolYearChange(value)}
         />
       </InfoRow>
       <InfoRow label="수업 상태">

@@ -35,6 +35,7 @@ export type LectureEnrollmentCreateApi = {
 
 export type LectureCreatePayload = {
   title: string;
+  schoolYear?: string;
   subject?: string;
   description?: string;
   status?: LectureApiStatus;
@@ -63,6 +64,7 @@ export type LecturesPagination = {
 export type LectureApi = {
   id: string;
   title: string;
+  schoolYear?: string | null;
   subject?: string | null;
   description?: string | null;
   status?: LectureApiStatus | null;

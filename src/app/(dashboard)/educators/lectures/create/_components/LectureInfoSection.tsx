@@ -1,6 +1,6 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,12 +23,12 @@ export function LectureInfoSection({
   const {
     register,
     setValue,
-    watch,
     formState: { errors },
   } = form;
 
-  const gradeValue = watch("grade");
-  const gradeOptions = LECTURE_GRADES.map((grade) => ({
+  const schoolYearValue =
+    useWatch({ control: form.control, name: "schoolYear" }) ?? "";
+  const schoolYearOptions = LECTURE_GRADES.map((grade) => ({
     label: grade,
     value: grade,
   }));
@@ -39,6 +39,7 @@ export function LectureInfoSection({
         <h2 className="text-xl font-semibold">📄 강의 기본정보</h2>
       </div>
       <CardContent className="p-6 space-y-4">
+        <input type="hidden" {...register("schoolYear")} />
         <div>
           <label
             htmlFor="lecture-name"
@@ -86,18 +87,21 @@ export function LectureInfoSection({
             </label>
             <SelectBtn
               id="lecture-grade"
-              value={gradeValue}
+              value={schoolYearValue}
               placeholder="학년 선택"
-              options={gradeOptions}
+              options={schoolYearOptions}
               onChange={(value) =>
-                setValue("grade", value, { shouldValidate: true })
+                setValue("schoolYear", value, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
               }
               className="w-full"
               disabled={disabled}
             />
-            {errors.grade && (
+            {errors.schoolYear && (
               <p className="text-xs text-red-500 mt-1">
-                {errors.grade.message}
+                {errors.schoolYear.message}
               </p>
             )}
           </div>

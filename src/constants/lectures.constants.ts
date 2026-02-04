@@ -53,7 +53,7 @@ export const DEFAULT_LECTURE: Lecture = {
   id: "",
   name: "",
   subject: "",
-  grade: "",
+  schoolYear: "",
   instructor: "",
   currentStudents: 0,
   maxStudents: 0,

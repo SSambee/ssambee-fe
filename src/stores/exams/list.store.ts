@@ -1,10 +1,6 @@
 import { create } from "zustand";
 
-import { mockExams } from "@/data/exams.mock";
-import { Exam } from "@/types/exams";
-
 type ExamsStore = {
-  exams: Exam[];
   selectedIds: string[];
   currentPage: number;
   itemsPerPage: number;
@@ -17,7 +13,6 @@ type ExamsStore = {
 const ITEMS_PER_PAGE = 4;
 
 export const useExamsStore = create<ExamsStore>((set) => ({
-  exams: mockExams,
   selectedIds: [],
   currentPage: 1,
   itemsPerPage: ITEMS_PER_PAGE,

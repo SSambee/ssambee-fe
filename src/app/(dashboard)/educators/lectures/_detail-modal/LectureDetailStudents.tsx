@@ -43,9 +43,9 @@ export function LectureDetailStudents({
             >
               <div className="font-medium">{student.name || "-"}</div>
               <div className="text-muted-foreground">
-                {student.school && student.grade
-                  ? `${student.school} · ${student.grade}`
-                  : student.school || student.grade || "-"}
+                {student.school && student.schoolYear
+                  ? `${student.school} · ${student.schoolYear}`
+                  : student.school || student.schoolYear || "-"}
               </div>
               <div className="text-muted-foreground">
                 {formatPhoneNumber(student.phone) || student.phone || "-"}

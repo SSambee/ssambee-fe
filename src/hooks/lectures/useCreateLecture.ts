@@ -4,7 +4,7 @@ import { lectureKeys } from "@/constants/query-keys";
 import {
   createLectureAPI,
   LectureCreatePayload,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 
 type UseCreateLectureOptions = {
   onSuccess?: () => void;

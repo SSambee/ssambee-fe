@@ -20,7 +20,9 @@ export const useLectureEditForm = (params?: UseLectureEditFormParams) => {
 
   const [editTitle, setEditTitle] = useState(initial?.editTitle ?? "");
   const [editSubject, setEditSubject] = useState(initial?.editSubject ?? "");
-  const [editGrade, setEditGrade] = useState(initial?.editGrade ?? "");
+  const [editSchoolYear, setEditSchoolYear] = useState(
+    initial?.editSchoolYear ?? ""
+  );
   const [editInstructor, setEditInstructor] = useState(
     initial?.editInstructor ?? ""
   );
@@ -43,16 +45,16 @@ export const useLectureEditForm = (params?: UseLectureEditFormParams) => {
     () => buildOptions(editSubject, LECTURE_SUBJECTS),
     [buildOptions, editSubject]
   );
-  const gradeOptions = useMemo(
-    () => buildOptions(editGrade, LECTURE_GRADES),
-    [buildOptions, editGrade]
+  const schoolYearOptions = useMemo(
+    () => buildOptions(editSchoolYear, LECTURE_GRADES),
+    [buildOptions, editSchoolYear]
   );
   const statusOptions = useMemo(() => [...LECTURE_STATUS_OPTIONS], []);
 
   const resetForm = useCallback((values: LectureEditFormValues) => {
     setEditTitle(values.editTitle);
     setEditSubject(values.editSubject);
-    setEditGrade(values.editGrade);
+    setEditSchoolYear(values.editSchoolYear);
     setEditInstructor(values.editInstructor);
     setEditStatus(values.editStatus);
     setEditStartDate(values.editStartDate);
@@ -62,7 +64,7 @@ export const useLectureEditForm = (params?: UseLectureEditFormParams) => {
     (): LectureEditFormValues => ({
       editTitle,
       editSubject,
-      editGrade,
+      editSchoolYear,
       editStatus,
       editStartDate,
       editInstructor,
@@ -70,7 +72,7 @@ export const useLectureEditForm = (params?: UseLectureEditFormParams) => {
     [
       editTitle,
       editSubject,
-      editGrade,
+      editSchoolYear,
       editStatus,
       editStartDate,
       editInstructor,
@@ -80,18 +82,18 @@ export const useLectureEditForm = (params?: UseLectureEditFormParams) => {
   return {
     editTitle,
     editSubject,
-    editGrade,
+    editSchoolYear,
     editStatus,
     editStartDate,
     editInstructor,
     setEditTitle,
     setEditSubject,
-    setEditGrade,
+    setEditSchoolYear,
     setEditStatus,
     setEditStartDate,
     setEditInstructor,
     subjectOptions,
-    gradeOptions,
+    schoolYearOptions,
     statusOptions,
     resetForm,
     getFormValues,

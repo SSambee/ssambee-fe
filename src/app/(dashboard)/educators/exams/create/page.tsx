@@ -1,109 +1,100 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-import { CreatePageHeader } from "@/app/(dashboard)/educators/exams/create/_components/create/CreatePageHeader";
-import { ExamSelectSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamSelectSection";
+import Title from "@/components/common/header/Title";
+import { ExamSelectionSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamSelectionSection";
 import { ExamInfoSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamInfoSection";
 import { ExamScoreSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamScoreSection";
 import { ExamQuestionsSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamQuestionsSection";
-import {
-  createDefaultQuestion,
-  EXAM_FORM_DEFAULTS,
-} from "@/constants/exam.defaults";
-import { ExamFormInput, examFormSchema } from "@/validation/exam.validation";
+import { ExamStickyFooter } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamStickyFooter";
+import { useExamCreateForm } from "@/app/(dashboard)/educators/exams/create/_hooks/useExamCreateForm";
 
 export default function CreateExamPage() {
-  const router = useRouter();
-  const [isSaved, setIsSaved] = useState(false);
-
-  const examForm = useForm<ExamFormInput>({
-    resolver: zodResolver(examFormSchema),
-    mode: "onChange",
-    defaultValues: EXAM_FORM_DEFAULTS,
-  });
-
-  const { control, handleSubmit, formState } = examForm;
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "questions",
-  });
-
-  const questions = useWatch({ control, name: "questions" }) || [];
-  const totalQuestions = questions.length;
-  const totalScore = questions.reduce(
-    (sum, question) => sum + (question?.score ?? 0),
-    0
-  );
-  const questionsErrorMessage =
-    typeof formState.errors.questions?.message === "string"
-      ? formState.errors.questions?.message
-      : undefined;
-
-  const handleAddQuestion = () => {
-    if (isSaved) return;
-    append(createDefaultQuestion());
-  };
-
-  const handleRemoveQuestion = (index: number) => {
-    if (isSaved) return;
-    remove(index);
-  };
-
-  const handleSave = handleSubmit((formData) => {
-    const data = {
-      ...formData,
-      totalQuestions: formData.questions.length,
-      totalScore,
-    };
-
-    console.log("=== 저장된 데이터 ===");
-    console.log(JSON.stringify(data, null, 2));
-    console.log("==================");
-
-    setIsSaved(true);
-    alert("저장되었습니다! (콘솔을 확인하세요)");
-  });
-
-  const handleCancel = () => {
-    if (isSaved) {
-      setIsSaved(false);
-    } else {
-      if (confirm("작성 중인 내용을 취소하시겠습니까?")) {
-        router.back();
-      }
-    }
-  };
+  const {
+    examForm,
+    fields,
+    lectures,
+    examsByLecture,
+    activeLectureId,
+    selectedExamId,
+    isEditMode,
+    isEditing,
+    isReadOnly,
+    isSubmitting,
+    isFormDisabled,
+    isSelectDisabled,
+    isLecturesPending,
+    isExamsByLecturePending,
+    totalQuestions,
+    totalScore,
+    autoScore,
+    questionsErrorMessage,
+    handleLectureSelection,
+    handleExamSelection,
+    handleAddQuestion,
+    handleRemoveQuestion,
+    handleAutoScoreChange,
+    handleManualScoreChange,
+    handleSave,
+    openBackModal,
+    startEdit,
+  } = useExamCreateForm();
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
-      <CreatePageHeader
-        totalQuestions={totalQuestions}
-        totalScore={totalScore}
-        isSaved={isSaved}
-        onSave={handleSave}
-        onCancel={handleCancel}
+    <div className="container mx-auto space-y-6 p-6 pb-28">
+      <Title
+        title="시험 등록/수정"
+        description="시험 정보를 입력하고 문항을 구성합니다."
       />
 
-      <ExamSelectSection disabled={isSaved} />
+      <ExamSelectionSection
+        lectures={lectures}
+        lectureValue={activeLectureId}
+        onLectureChange={handleLectureSelection}
+        isLecturesLoading={isLecturesPending}
+        exams={examsByLecture}
+        examValue={selectedExamId}
+        onExamChange={handleExamSelection}
+        isExamsLoading={isExamsByLecturePending}
+        disabled={isSelectDisabled}
+      />
 
-      <ExamInfoSection form={examForm} disabled={isSaved} />
+      <ExamInfoSection
+        form={examForm}
+        lectures={lectures}
+        isLecturesLoading={isLecturesPending}
+        disabled={isFormDisabled}
+        disableLectureSelect={isEditing}
+        showLectureSelect={false}
+      />
 
       <ExamScoreSection
         totalQuestions={totalQuestions}
         totalScore={totalScore}
         errorMessage={questionsErrorMessage}
+        autoScore={autoScore}
+        onAutoScoreChange={handleAutoScoreChange}
+        disabled={isFormDisabled}
       />
 
       <ExamQuestionsSection
         form={examForm}
         fields={fields}
-        disabled={isSaved}
+        disabled={isFormDisabled}
         onAdd={handleAddQuestion}
         onRemove={handleRemoveQuestion}
+        onScoreManualChange={handleManualScoreChange}
+      />
+
+      <ExamStickyFooter
+        totalQuestions={totalQuestions}
+        totalScore={totalScore}
+        isSaving={isSubmitting}
+        isSaveDisabled={isReadOnly}
+        showEditButton={isEditing && !isEditMode}
+        onEdit={startEdit}
+        onBack={openBackModal}
+        backLabel="뒤로가기"
+        onSave={handleSave}
       />
     </div>
   );

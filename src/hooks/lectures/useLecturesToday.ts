@@ -4,7 +4,7 @@ import { lectureKeys } from "@/constants/query-keys";
 import {
   fetchLecturesAPI,
   mapLectureApiToView,
-} from "@/services/lectures.service";
+} from "@/services/lectures/lectures.service";
 
 export type TodayScheduleItem = {
   id: string;

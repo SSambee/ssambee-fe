@@ -26,7 +26,7 @@ type LectureDetailInfoProps = {
 export function LectureDetailInfo({ lecture }: LectureDetailInfoProps) {
   const items: InfoItemProps[] = [
     { label: "과목", value: lecture.subject },
-    { label: "학년", value: lecture.grade },
+    { label: "학년", value: lecture.schoolYear },
     { label: "담당 강사", value: lecture.instructor },
   ];
 
