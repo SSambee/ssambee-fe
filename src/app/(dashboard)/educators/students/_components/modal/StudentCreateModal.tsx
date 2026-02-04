@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useModal } from "@/providers/ModalProvider";
-import { CreateEnrollment, StudentCreateFormData } from "@/types/students.type";
+import { StudentCreateFormData } from "@/types/students.type";
 import {
   getCreateStudentFormDefaults,
   GRADE_SELECTING_OPTIONS,
@@ -70,7 +70,7 @@ export function StudentCreateModal() {
       { lectureId, data: { ...rest, lectureId } },
       {
         onSuccess: () => {
-          alert("등록되었습니다.");
+          alert("수강생이 등록되었습니다.");
           closeModal();
           reset();
         },
