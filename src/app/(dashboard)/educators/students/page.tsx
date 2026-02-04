@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -41,6 +41,7 @@ import {
 import { Pagination } from "@/components/common/pagination/Pagination";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import { getTodayYMD } from "@/utils/date";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import { StudentChangeModal } from "./_components/students-modal/ClassChangeModal";
 import { TalkNotificationModal } from "./_components/students-modal/TalkNotificationModal";
@@ -52,6 +53,9 @@ const PAGE_LIMIT = 10;
 export default function StudentsListPage() {
   const router = useRouter();
   const { openModal } = useModal();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // 체크박스 스토어
   const {
@@ -88,7 +92,16 @@ export default function StudentsListPage() {
     examId: null,
   });
 
-  // 수강생 목록 조회
+  // 디바운스된 검색어가 바뀔 때만 실제 query의 keyword를 업데이트
+  useEffect(() => {
+    setQuery((prev) => ({
+      ...prev,
+      keyword: debouncedSearchTerm,
+      page: 1, // 검색어가 바뀌면 1페이지로 리셋
+    }));
+  }, [debouncedSearchTerm]);
+
+  // 수강생 목록 조회 -> 검색할 때 query.keyword가 0.5초 뒤에 변경됨
   const { data, isPending, isError } = useEnrollmentList(query);
   const studentList = data?.list || [];
   const pagination: PaginationType = data?.pagination ?? {
@@ -261,14 +274,8 @@ export default function StudentsListPage() {
               <Input
                 className="h-14 w-full sm:flex-1 min-w-[200px] max-w-[400px] p-4 text-base placeholder:text-base"
                 placeholder="이름, 전화번호로 검색해보세요"
-                value={query.keyword ?? ""}
-                onChange={(e) =>
-                  setQuery((prev) => ({
-                    ...prev,
-                    keyword: e.target.value,
-                    page: 1,
-                  }))
-                }
+                value={searchTerm} // query.keyword 대신 사용
+                onChange={(e) => setSearchTerm(e.target.value)} // setQuery 대신 setSearchTerm 사용
               />
               <div className="grid grid-cols-2 gap-2 w-full sm:w-[280px] shrink-0 h-14">
                 <div className="h-full">
