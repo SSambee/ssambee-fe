@@ -8,6 +8,7 @@ import {
   CreateEnrollment,
   CreateEnrollmentAttendance,
   EnrollmentListQuery,
+  MigrateStudents,
   UpdateEnrollmentInfo,
 } from "@/types/students.type";
 import { getTodayYMD } from "@/utils/date";
@@ -65,7 +66,7 @@ export const useUpdateAllAttendance = () => {
     }: {
       lectureId: string;
       enrollmentIds: string[];
-      status: AttendanceStatus;
+      status?: AttendanceStatus;
     }) => {
       const payload = {
         date: getTodayYMD(),
@@ -97,10 +98,9 @@ export const useMigrateStudents = () => {
     }: {
       lectureId: string;
       enrollmentIds: string[];
-    }) => api.migrateStudentsAPI(lectureId, enrollmentIds),
+    }) => api.migrateStudentsAPI(lectureId, { enrollmentIds }),
     onSuccess: () => {
       alert("수업 변경이 완료되었습니다.");
-      // 학생 목록 및 관련 데이터 갱신
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
     onError: (error) => {

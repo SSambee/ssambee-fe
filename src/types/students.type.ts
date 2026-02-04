@@ -106,6 +106,12 @@ export type CreateEnrollment = {
   memo?: string | null;
 };
 
+// 단체 수업 변경: POST /lectures/:lectureId/enrollments/migration
+export type MigrateStudents = {
+  enrollmentIds: string[];
+  // memo?: string | null;
+};
+
 // 단체 출결 등록: POST /attendances
 export type CreateAllAttendance = {
   date: string;

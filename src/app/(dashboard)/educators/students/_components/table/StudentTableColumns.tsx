@@ -97,7 +97,9 @@ export const StudentTableData = ({
   {
     key: "class",
     render: (row: GetEnrollmentList) => (
-      <span className="text-base whitespace-nowrap">{row.lecture.title}</span>
+      <span className="text-base whitespace-nowrap">
+        {row.lecture?.title || "-"}
+      </span>
     ),
   },
   {

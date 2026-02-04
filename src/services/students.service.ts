@@ -10,6 +10,7 @@ import {
   PaginationType,
   GetEnrollmentAttendanceStats,
   LectureStatus,
+  MigrateStudents,
 } from "@/types/students.type";
 
 import { axiosClient } from "./axiosClient";
@@ -31,7 +32,7 @@ export const createEnrollmentAPI = (
 ) =>
   axiosClient
     .post<
-      ApiResponse<GetEnrollmentDetail>
+      ApiResponse<CreateEnrollment>
     >(`/lectures/${lectureId}/enrollments`, data)
     .then((res) => res.data);
 
@@ -53,10 +54,12 @@ export const getLecturesAPI = (query?: { page?: number; limit?: number }) =>
 // 수강생 단체 강의 변경
 export const migrateStudentsAPI = (
   lectureId: string,
-  enrollmentIds: string[]
+  payload: MigrateStudents
 ) =>
   axiosClient
-    .post(`/lectures/${lectureId}/enrollments/migration`, { enrollmentIds })
+    .post<
+      ApiResponse<MigrateStudents>
+    >(`/lectures/${lectureId}/enrollments/migration`, payload)
     .then((res) => res.data);
 
 // 수강생 단체 출결 등록

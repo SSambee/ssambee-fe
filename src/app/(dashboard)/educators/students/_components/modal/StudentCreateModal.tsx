@@ -33,7 +33,7 @@ export function StudentCreateModal() {
   const { mutate: createEnrollment, isPending } = useCreateEnrollment();
 
   // 강의 목록 불러오기
-  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 20 });
+  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
   const lectureOptions = lectures.map((l) => ({ label: l.title, value: l.id }));
 
   const {

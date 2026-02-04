@@ -49,7 +49,7 @@ export const APP_INSTALL_LABEL = {
 export const LECTURE_STATUS_LABEL = {
   SCHEDULED: { label: "개강전", color: "blue" },
   IN_PROGRESS: { label: "진행중", color: "green" },
-  COMPLETED: { label: "폐강", color: "gray" },
+  COMPLETED: { label: "완료", color: "gray" },
 } as const;
 
 // 오늘 출결 상태 매핑

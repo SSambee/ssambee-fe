@@ -105,9 +105,13 @@ export function AppSidebar() {
   const handleLogout = async () => {
     if (!user?.userType) return;
 
-    // 현재 유저의 타입에 맞는 API Role(MGMT or SVC) 전달
-    const apiRole = API_URL_TYPE[user.userType];
-    await signout(apiRole);
+    try {
+      // 현재 유저의 타입에 맞는 API Role(MGMT or SVC) 전달
+      const apiRole = API_URL_TYPE[user.userType];
+      await signout(apiRole);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (

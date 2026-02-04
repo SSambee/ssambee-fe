@@ -48,7 +48,7 @@ export default function StudentsListPage() {
   } = useStudentSelectionStore();
 
   // 강의 목록 불러오기
-  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 20 });
+  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
   const lectureOptions = [
     { label: "전체 수업", value: "all", status: null },
     ...lectures.map((l) => ({
@@ -171,7 +171,7 @@ export default function StudentsListPage() {
   };
 
   const handleAttendanceClick = () => {
-    if (selectedStudentIds.length === 0) return;
+    if (selectedStudentIds.length === 0 || !query.lecture) return;
 
     openModal(
       <CheckModal

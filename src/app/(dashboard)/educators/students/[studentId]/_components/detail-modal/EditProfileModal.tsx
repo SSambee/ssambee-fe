@@ -178,6 +178,11 @@ export default function EditProfileModal({
                   }
                   placeholder="학년 선택"
                 />
+                {errors.schoolYear?.message && (
+                  <p className="text-xs text-red-500 ml-1">
+                    {errors.schoolYear.message}
+                  </p>
+                )}
               </div>
 
               <InputForm

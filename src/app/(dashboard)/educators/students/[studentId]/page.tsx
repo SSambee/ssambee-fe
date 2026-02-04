@@ -21,7 +21,7 @@ import {
   GetEnrollmentDetail,
 } from "@/types/students.type";
 import { STUDENT_STATUS_LABEL } from "@/constants/students.default";
-import { formatLectureTimes } from "@/utils/foramtLectureTimes";
+import { formatLectureTimes } from "@/utils/formatLectureTimes";
 
 import EditProfileModal from "./_components/detail-modal/EditProfileModal";
 import AttendanceDetailModal from "./_components/detail-modal/AttendanceDetailModal";
@@ -45,6 +45,9 @@ export default function StudentDetailPage() {
 
   // 수강 중인 첫 번째 강의 ID 추출 (출결 조회의 기준)
   const mainLectureId = enrollmentData?.lectures?.[0]?.id;
+
+  // 수업이 있는지 확인
+  const hasNoLecture = !mainLectureId;
 
   // 학생 출결 통계 조회
   const {
@@ -178,6 +181,7 @@ export default function StudentDetailPage() {
               </Button>
               <Button
                 className="cursor-pointer"
+                disabled={hasNoLecture}
                 variant="default"
                 onClick={() =>
                   openModal(
@@ -237,8 +241,9 @@ export default function StudentDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {enrolledLectures.map(
-            (lecture: GetEnrollmentDetail["lectures"][0]) => (
+          {enrolledLectures
+            .slice(0, visibleLectures)
+            .map((lecture: GetEnrollmentDetail["lectures"][0]) => (
               <Card
                 key={lecture.id}
                 className="hover:shadow-md transition-shadow relative cursor-pointer"
@@ -275,9 +280,7 @@ export default function StudentDetailPage() {
                   </div>
                 </CardContent>
               </Card>
-            )
-          )}
-
+            ))}
           {visibleLectures < enrolledLectures.length && (
             <div className="flex justify-center pt-4">
               <Button variant="outline" onClick={handleLoadMore}>

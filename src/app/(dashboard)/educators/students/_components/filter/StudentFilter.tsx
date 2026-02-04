@@ -75,7 +75,7 @@ export function StudentFilter({
             />
           </div>
 
-          <div className="flex-1 flex flex-wrap sm:flex-nowrap justify-end items-center gap-3 h-ful text-base">
+          <div className="flex-1 flex flex-wrap sm:flex-nowrap justify-end items-center gap-3 h-full text-base">
             <Input
               className="h-14 w-full sm:flex-1 min-w-[200px] max-w-[400px] p-4 text-base placeholder:text-base"
               placeholder="이름, 전화번호로 검색해보세요"

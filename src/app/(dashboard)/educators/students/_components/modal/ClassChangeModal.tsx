@@ -25,7 +25,7 @@ export function StudentChangeModal() {
   const [memo, setMemo] = useState("");
 
   // 강의 목록 불러오기 (TanStack Query 캐싱 활용)
-  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 20 });
+  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
 
   const lectureOptions = lectures.map((lecture) => ({
     label: lecture.title,
