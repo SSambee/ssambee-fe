@@ -1,0 +1,125 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  GraduationCap,
+  BookOpen,
+  Calendar,
+  MessageSquare,
+  Users,
+  FileText,
+  FolderOpen,
+} from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { useAuthContext } from "@/providers/AuthProvider";
+import { Role } from "@/types/auth.type";
+
+const instructorMenuItems = [
+  {
+    title: "학생 관리",
+    url: "/educators/students",
+    icon: GraduationCap,
+  },
+  {
+    title: "수업 관리",
+    url: "/educators/lectures",
+    icon: BookOpen,
+  },
+  {
+    title: "스케줄 관리",
+    url: "/educators/schedules",
+    icon: Calendar,
+  },
+  {
+    title: "소통",
+    url: "/educators/communication",
+    icon: MessageSquare,
+  },
+  {
+    title: "조교 센터",
+    url: "/educators/assistants",
+    icon: Users,
+  },
+  {
+    title: "시험 관리",
+    url: "/educators/exams",
+    icon: FileText,
+  },
+  {
+    title: "학습 자료실",
+    url: "/educators/materials",
+    icon: FolderOpen,
+  },
+];
+
+const otherMenuItems = [
+  {
+    title: "예제1",
+    url: "/example1",
+    icon: BookOpen,
+  },
+  {
+    title: "예제2",
+    url: "/example2",
+    icon: Calendar,
+  },
+  {
+    title: "예제3",
+    url: "/example3",
+    icon: FileText,
+  },
+];
+
+const getMenuItems = (userType?: Role) => {
+  if (userType === "INSTRUCTOR") return instructorMenuItems;
+  return otherMenuItems;
+};
+
+export function AppSidebar() {
+  const { user } = useAuthContext();
+  const menuItems = getMenuItems(user?.userType);
+  const pathname = usePathname();
+
+  return (
+    <Sidebar>
+      <SidebarHeader className="p-4">
+        <span className="text-lg font-semibold">Logo</span>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={
+                      pathname === item.url ||
+                      pathname?.startsWith(item.url + "/")
+                    }
+                  >
+                    <Link href={item.url}>
+                      <item.icon className="size-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+}

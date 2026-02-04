@@ -11,11 +11,15 @@ import { useLecturesList } from "@/hooks/lectures/useLecturesList";
 import { useLecturesToday } from "@/hooks/lectures/useLecturesToday";
 import { SearchBarWithAction } from "@/components/common/SearchBarWithAction";
 import { useLectureSearchDebounce } from "@/hooks/lectures/useLectureSearchDebounce";
+import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 const LOAD_MORE_STEP = 2;
 
 export default function LecturesPage() {
   const router = useRouter();
+
+  useSetBreadcrumb([{ label: "수업 관리" }]);
+
   const limit = useLecturesUiStore((state) => state.limit);
   const searchInput = useLecturesUiStore((state) => state.searchInput);
   const searchValue = useLecturesUiStore((state) => state.searchValue);
