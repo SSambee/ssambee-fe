@@ -82,11 +82,10 @@ export const useUpdateAllAttendance = () => {
     },
     onError: (error) => {
       console.error("출결 등록 실패:", error);
-      alert("출결 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      alert("재원 상태인 학생만 출결 등록 가능합니다.");
     },
   });
 };
-
 // 수강생 단체 강의 변경
 export const useMigrateStudents = () => {
   const queryClient = useQueryClient();

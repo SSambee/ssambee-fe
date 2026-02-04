@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Title from "@/components/common/header/Title";
@@ -49,18 +49,14 @@ export default function StudentsListPage() {
 
   // 강의 목록 불러오기
   const { data: lectures = [] } = useLecturesList({ page: 1, limit: 20 });
-
-  const lectureOptions = useMemo(
-    () => [
-      { label: "전체 수업", value: "all", status: null },
-      ...lectures.map((l) => ({
-        label: l.title,
-        value: l.id,
-        status: l.status,
-      })),
-    ],
-    [lectures]
-  );
+  const lectureOptions = [
+    { label: "전체 수업", value: "all", status: null },
+    ...lectures.map((l) => ({
+      label: l.title,
+      value: l.id,
+      status: l.status,
+    })),
+  ];
 
   // 요청 쿼리
   const [query, setQuery] = useState<EnrollmentListQuery>({
@@ -94,6 +90,16 @@ export default function StudentsListPage() {
     hasPrevPage: false,
   };
 
+  // 선택된 학생들의 데이터 상세 정보
+  const selectedFullProfiles = studentList.filter((s) =>
+    selectedStudentIds.includes(s.id)
+  );
+
+  // ACTIVE가 아닌 학생 포함 여부 (서버 롤백 방지용)
+  const hasNonActiveStudent = selectedFullProfiles.some(
+    (s) => s.status !== "ACTIVE"
+  );
+
   // 수강생 재원 상태 수정
   const { mutate: updateStatus } = useUpdateEnrollment();
 
@@ -102,10 +108,9 @@ export default function StudentsListPage() {
     useUpdateAllAttendance();
 
   // 현재 선택된 수업의 상세 정보 찾기
-  const selectedLectureInfo = useMemo(() => {
-    if (!query.lecture) return null;
-    return lectures.find((l) => l.id === query.lecture);
-  }, [lectures, query.lecture]);
+  const selectedLectureInfo = query.lecture
+    ? lectures.find((l) => l.id === query.lecture)
+    : null;
 
   // 현재 페이지의 모든 학생이 선택되었는지 여부 확인
   const isCurrentPageAllSelected =
