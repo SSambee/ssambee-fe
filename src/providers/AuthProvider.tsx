@@ -16,6 +16,7 @@ type AuthUser = {
   email: string;
   name?: string;
   userType: Role;
+  image?: string | null;
 };
 
 type AuthContextType = {
