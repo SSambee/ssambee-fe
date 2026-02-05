@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useGradingPage } from "@/app/(dashboard)/educators/exams/[examId]/grading/_hooks/useGradingPage";
+import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 import { GradingPageHeader } from "./_components/GradingPageHeader";
 import { StudentListSidebar } from "./_components/StudentListSidebar";
@@ -41,6 +42,11 @@ export default function GradingPage() {
     closeResultModal,
     isSubmitting,
   } = useGradingPage();
+
+  useSetBreadcrumb([
+    { label: "시험 관리", href: "/educators/exams" },
+    { label: "채점 관리" },
+  ]);
 
   if (isPending) {
     return (

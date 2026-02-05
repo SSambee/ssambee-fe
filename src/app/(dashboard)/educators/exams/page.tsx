@@ -4,8 +4,10 @@ import { ExamsHeader } from "@/app/(dashboard)/educators/exams/_components/Exams
 import { ExamsStats } from "@/app/(dashboard)/educators/exams/_components/ExamsStats";
 import { ExamsList } from "@/app/(dashboard)/educators/exams/_components/ExamsList";
 import { useExamsPage } from "@/app/(dashboard)/educators/exams/_hooks/useExamsPage";
+import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 export default function ExamsPage() {
+  useSetBreadcrumb([{ label: "시험 관리" }]);
   const { lectures, exams, activeLectureId, setSelectedLectureId, isLoading } =
     useExamsPage();
 
