@@ -1,3 +1,5 @@
+"use client";
+
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 import { ClinicHeader } from "./_components/ClinicHeader";

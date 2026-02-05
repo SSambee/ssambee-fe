@@ -1,3 +1,5 @@
+"use client";
+
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 import { ReportHeader } from "./_components/ReportHeader";
