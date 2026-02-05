@@ -40,11 +40,7 @@ export const useExamsListState = ({
     clearSelection,
   } = useExamsStore();
 
-  const deleteExamMutation = useDeleteExam({
-    onError: (error) => {
-      alert(error.message);
-    },
-  });
+  const deleteExamMutation = useDeleteExam();
 
   const examLectureMap = useMemo(() => {
     return new Map(exams.map((exam) => [exam.id, exam.lectureId]));
