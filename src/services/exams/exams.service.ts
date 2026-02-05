@@ -69,10 +69,6 @@ export const updateExamAPI = async (
   return data.data;
 };
 
-export const deleteExamAPI = async (examId: string) => {
-  const { data } = await axiosClient.delete<ApiResponse<void>>(
-    `/exams/${examId}`
-  );
-
-  return data;
+export const deleteExamAPI = async (examId: string): Promise<void> => {
+  await axiosClient.delete(`/exams/${examId}`);
 };
