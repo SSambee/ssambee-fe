@@ -1,70 +1,111 @@
 import {
   ApiResponse,
-  EnrollmentListResponse,
-  EnrollmentDetailResponse,
-  AttendanceListWithStatsResponse,
-  StudentListQuery,
-  UpdateStudentRequest,
-  CreateAttendanceRequest,
-  Attendance,
-  Student,
+  EnrollmentListQuery,
+  GetEnrollmentList,
+  CreateEnrollment,
+  GetEnrollmentDetail,
+  UpdateEnrollmentInfo,
+  CreateAllAttendance,
+  CreateEnrollmentAttendance,
+  PaginationType,
+  GetEnrollmentAttendanceStats,
+  LectureStatus,
+  MigrateStudents,
 } from "@/types/students.type";
 
 import { axiosClient } from "./axiosClient";
 
+// 수강생 리스트 API ---------------------
+
 // 전체 수강생 목록 조회
-export const getEnrollmentsAPI = (query?: StudentListQuery) =>
-  axiosClient
-    .get<ApiResponse<EnrollmentListResponse>>("/enrollments", { params: query })
-    .then((res) => res.data);
-
-// 수강생 상세 조회
-export const getEnrollmentByIdAPI = (id: string) =>
-  axiosClient
-    .get<ApiResponse<EnrollmentDetailResponse>>(`/enrollments/${id}`)
-    .then((res) => res.data);
-
-// 수강생 정보 수정
-export const updateEnrollmentAPI = (id: string, data: UpdateStudentRequest) =>
-  axiosClient
-    .patch<
-      ApiResponse<{ enrollment: Partial<Student> }>
-    >(`/enrollments/${id}`, data)
-    .then((res) => res.data);
-
-// 수강생 삭제
-export const deleteEnrollmentAPI = (id: string) =>
-  axiosClient
-    .delete<ApiResponse<null>>(`/enrollments/${id}`)
-    .then((res) => res.data);
-
-// 특정 수강생 출결 목록 조회
-export const getAttendancesAPI = (id: string) =>
+export const getEnrollmentsAPI = (query?: EnrollmentListQuery) =>
   axiosClient
     .get<
-      ApiResponse<AttendanceListWithStatsResponse>
-    >(`/enrollments/${id}/attendances`)
+      ApiResponse<{ list: GetEnrollmentList[]; pagination: PaginationType }>
+    >("/enrollments", { params: query })
     .then((res) => res.data);
 
-// 특정 수강생 출결 등록
-export const createAttendanceAPI = (
-  id: string,
-  data: CreateAttendanceRequest
+// 수강생 등록
+export const createEnrollmentAPI = (
+  lectureId: string,
+  data: Omit<CreateEnrollment, "lectureId"> // payload에서 lectureId를 제외한 나머지
 ) =>
   axiosClient
     .post<
-      ApiResponse<{ attendance: Attendance }>
-    >(`/enrollments/${id}/attendances`, data)
+      ApiResponse<CreateEnrollment>
+    >(`/lectures/${lectureId}/enrollments`, { ...data, lectureId })
     .then((res) => res.data);
 
-// 수강생 출결 정정/수정
-export const updateAttendanceAPI = (
-  id: string,
-  attendanceId: string,
-  data: Partial<Attendance>
+// 강의 목록 조회
+export const getLecturesAPI = (query?: { page?: number; limit?: number }) =>
+  axiosClient
+    .get<
+      ApiResponse<{
+        lectures: {
+          id: string;
+          title: string;
+          status?: LectureStatus;
+        }[];
+        pagination: PaginationType;
+      }>
+    >("/lectures", { params: query })
+    .then((res) => res.data);
+
+// 수강생 단체 강의 변경
+export const migrateStudentsAPI = (
+  lectureId: string,
+  payload: MigrateStudents
+) =>
+  axiosClient
+    .post<
+      ApiResponse<MigrateStudents>
+    >(`/lectures/${lectureId}/enrollments/migration`, payload)
+    .then((res) => res.data);
+
+// 수강생 단체 출결 등록
+export const createAllAttendanceAPI = (
+  lectureId: string,
+  data: CreateAllAttendance
+) =>
+  axiosClient
+    .post<
+      ApiResponse<CreateAllAttendance>
+    >(`/lectures/${lectureId}/enrollments/attendances`, data)
+    .then((res) => res.data);
+
+// 수강생 상세 조회------------------------------------------------------
+export const getEnrollmentByIdAPI = (id: string) =>
+  axiosClient
+    .get<ApiResponse<{ enrollment: GetEnrollmentDetail }>>(`/enrollments/${id}`)
+    .then((res) => res.data);
+
+// 수강생 개별 정보 수정
+export const updateEnrollmentAPI = (
+  enrollmentId: string,
+  data: UpdateEnrollmentInfo
 ) =>
   axiosClient
     .patch<
-      ApiResponse<{ attendance: Attendance }>
-    >(`/enrollments/${id}/attendances/${attendanceId}`, data)
+      ApiResponse<{ enrollment: GetEnrollmentDetail }>
+    >(`/enrollments/${enrollmentId}`, data)
+    .then((res) => res.data);
+
+// 수강생 개별 출결 조회
+export const getAttendancesAPI = (lectureId: string, enrollmentId: string) =>
+  axiosClient
+    .get<
+      ApiResponse<GetEnrollmentAttendanceStats>
+    >(`/lectures/${lectureId}/enrollments/${enrollmentId}/attendances`)
+    .then((res) => res.data);
+
+// 수강생 개별 출결 등록
+export const createAttendanceAPI = (
+  lectureId: string,
+  enrollmentId: string,
+  data: CreateEnrollmentAttendance
+) =>
+  axiosClient
+    .post<
+      ApiResponse<CreateEnrollmentAttendance>
+    >(`/lectures/${lectureId}/enrollments/${enrollmentId}/attendances`, data)
     .then((res) => res.data);

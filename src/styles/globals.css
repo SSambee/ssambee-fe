@@ -160,9 +160,9 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-body {
+/* body {
   font-family: var(--font-sans);
-}
+} */
 
 @layer utilities {
   .btn-primary {

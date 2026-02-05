@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AttendanceStatus, Attendance } from "@/types/students.type";
+import { AttendanceStatus, AttendanceList } from "@/types/students.type";
 
 const STATUS_LABEL: Record<AttendanceStatus, string> = {
   PRESENT: "출석",
@@ -27,21 +27,21 @@ const STATUS_COLOR: Record<AttendanceStatus, string> = {
 type AttendanceTableColumn = {
   key: string;
   label: string;
-  render: (row: Attendance) => React.ReactNode;
+  render: (row: AttendanceList) => React.ReactNode;
 };
 
 const ATTENDANCE_TABLE_COLUMNS: AttendanceTableColumn[] = [
   {
     key: "date",
     label: "수업 일자",
-    render: (row: Attendance) => (
-      <span className="text-sm whitespace-nowrap">{row.date || "-"}</span>
+    render: (row: AttendanceList) => (
+      <span className="text-sm whitespace-nowrap">{row.date}</span>
     ),
   },
   {
     key: "status",
     label: "출결 상태",
-    render: (row: Attendance) => (
+    render: (row: AttendanceList) => (
       <span
         className={`font-medium ${STATUS_COLOR[row.status as AttendanceStatus]}`}
       >
@@ -52,8 +52,10 @@ const ATTENDANCE_TABLE_COLUMNS: AttendanceTableColumn[] = [
   {
     key: "memo",
     label: "메모",
-    render: (row: Attendance) => (
-      <span className="text-sm whitespace-nowrap">{row.memo ?? "-"}</span>
+    render: (row: AttendanceList) => (
+      <span className="text-sm whitespace-nowrap">
+        {row.memo && row.memo.trim() !== "" ? row.memo : "-"}
+      </span>
     ),
   },
 ];
@@ -61,7 +63,7 @@ const ATTENDANCE_TABLE_COLUMNS: AttendanceTableColumn[] = [
 export default function AttendanceDetailTable({
   records,
 }: {
-  records: Attendance[];
+  records: AttendanceList[];
 }) {
   return (
     <Table>
@@ -77,8 +79,8 @@ export default function AttendanceDetailTable({
 
       <TableBody>
         {records.length > 0 ? (
-          records.map((record, index) => (
-            <TableRow key={`${record.date}-${index}`}>
+          records.map((record) => (
+            <TableRow key={record.date}>
               {ATTENDANCE_TABLE_COLUMNS.map((col) => (
                 <TableCell key={col.key} className="whitespace-nowrap text-sm">
                   {col.render(record)}

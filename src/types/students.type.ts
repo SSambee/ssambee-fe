@@ -9,6 +9,7 @@ import {
 
 // 학생 정보 타입
 export type SchoolYear = "중1" | "중2" | "중3" | "고1" | "고2" | "고3";
+export type LectureStatus = "SCHEDULED" | "IN_PROGRESS" | "COMPLETED";
 export type StudentStatus = "ACTIVE" | "DROPPED" | "PAUSED"; // 학생 수강 상태
 export type AttendanceStatus = "PRESENT" | "LATE" | "ABSENT" | "EARLY_LEAVE"; // 출석 상태
 export type ExamClinicStatus = "PENDING" | "COMPLETED"; // 클리닉 상태
@@ -21,6 +22,7 @@ export type AttendanceRegisterFormData = z.infer<
   typeof AttendanceRegisterSchema
 >;
 
+// 프로필 수정 폼 데이터 타입
 export type EditProfileFormDataType = EditProfileFormData & {
   id: string;
 };
@@ -28,49 +30,55 @@ export type EditProfileFormDataType = EditProfileFormData & {
 // 서버 응답 공통 포맷
 export type ApiResponse<T> = {
   status: "success" | "error";
-  message: string;
   data: T;
+  message: string;
 };
 
-// 학생 목록 조회 쿼리 타입
-export type Student = {
-  id: string;
-  studentName: string;
-  email?: string | null; // 미등록 학생일 경우 빈 문자열
-  studentPhone: string;
-  parentPhone: string;
-  school: string;
-  schoolYear: string;
-  status: StudentStatus;
-  memo: string | null;
-  registeredAt: string;
-  appStudentId: boolean | null;
-  profileImage?: string | null;
-  attendanceRate?: number; // 데이터가 없음!
-  lecture: {
+/**
+ * 수강생 목록 페이지 ------------------------------------------------------------
+ */
+
+// 강의 목록 조회: GET /lectures
+export type LectureListQuery = {
+  lectures: {
     id: string;
     title: string;
-    subject?: string;
-    instructor?: {
-      id: string;
-      name: string;
-    };
+  }[];
+};
+
+// 수강생 목록 조회 쿼리: GET /enrollments
+export type EnrollmentListQuery = {
+  page?: number | null;
+  limit?: number | null;
+  keyword?: string | null;
+  year?: SchoolYear | null;
+  status?: StudentStatus | null;
+  lecture?: string | null;
+  examId?: string | null;
+};
+
+// 전체 수강생 목록 조회: GET /enrollments
+export type GetEnrollmentList = {
+  id: string;
+  studentName: string;
+  status: StudentStatus;
+  appStudentId: boolean | null;
+  school: string;
+  schoolYear: string;
+  studentPhone: string;
+  parentPhone: string;
+  registeredAt: string;
+  attendance: {
+    id: string;
+    date: string;
+    status: AttendanceStatus;
+  };
+  lecture: {
+    title: string;
   };
 };
 
-// 출결 정보 (개별 객체)
-export type Attendance = {
-  id: string;
-  enrollmentId?: string;
-  date: string;
-  status: AttendanceStatus;
-  enterTime?: string | null;
-  leaveTime?: string | null;
-  memo?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
-};
-
+// 수강생 목록 조회 페이지네이션
 export type PaginationType = {
   totalCount: number;
   totalPage: number;
@@ -80,21 +88,103 @@ export type PaginationType = {
   hasPrevPage: boolean;
 };
 
-// GET /enrollments 응답 데이터
+// 수강생 목록 조회 응답
 export type EnrollmentListResponse = {
-  list: Student[];
+  list: GetEnrollmentList[];
   pagination: PaginationType;
 };
 
-// GET /enrollments/:id 응답 데이터
-export type EnrollmentDetailResponse = {
-  enrollment: Student & {
-    attendances: Pick<Attendance, "id" | "date" | "status">[];
-  };
+// 수강생 등록: POST /lectures/:lectureId/enrollments
+export type CreateEnrollment = {
+  studentName: string;
+  studentPhone: string;
+  school: string;
+  schoolYear: string;
+  parentPhone: string;
+  lectureId: string;
+  registrationDate: string;
+  memo?: string | null;
 };
 
-// GET /enrollments/:id/attendances 응답 데이터 (통계 포함)
-export type AttendanceListWithStatsResponse = {
+// 단체 수업 변경: POST /lectures/:lectureId/enrollments/migration
+export type MigrateStudents = {
+  enrollmentIds: string[];
+  // memo?: string | null;
+};
+
+// 단체 출결 등록: POST /attendances
+export type CreateAllAttendance = {
+  date: string;
+  attendances: {
+    enrollmentId: string;
+    status: AttendanceStatus;
+  }[];
+};
+
+/**
+ * 수강생 상세 페이지 ------------------------------------------------------------
+ */
+
+// 수강생 상세 조회 /enrollments/:id
+export type GetEnrollmentDetail = {
+  id: string;
+  studentName: string;
+  appStudentId: boolean | null;
+  status: StudentStatus;
+  email?: string | null; // 미등록 학생일 경우 빈 문자열
+  studentPhone: string;
+  parentPhone: string;
+  school: string;
+  schoolYear: string;
+  memo: string | null;
+  registeredAt: string;
+  instructorName: string;
+  lectures: {
+    id: string;
+    title: string;
+    subject: string;
+    schoolYear: string;
+    description: string;
+    status: LectureStatus;
+    lectureTimes: {
+      day: string;
+      startTime: string;
+      endTime: string;
+    }[];
+  }[];
+};
+
+// 개별 정보 수정: PATCH /enrollments/:enrollmentId
+export type UpdateEnrollmentInfo = {
+  school?: string;
+  schoolYear?: string;
+  status?: StudentStatus;
+  memo?: string | null;
+};
+
+// 개별 출결 상세 조회: GET /:enrollmentId/attendances
+export type GetEnrollmentAttendance = {
+  id: string;
+  lectureId: string;
+  enrollmentId: string;
+  lectureEnrollmentId: string;
+  date: string;
+  status: AttendanceStatus;
+  enterTime?: string | null;
+  leaveTime?: string | null;
+  memo?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Attendance 타입 (테이블 표시용)
+export type AttendanceList = {
+  date: string;
+  status: AttendanceStatus;
+  memo?: string | null;
+};
+
+export type GetEnrollmentAttendanceStats = {
   stats: {
     totalCount: number;
     presentCount: number;
@@ -104,91 +194,12 @@ export type AttendanceListWithStatsResponse = {
     attendanceRate: number;
     absentRate: number;
   };
-  attendances: Attendance[];
+  attendances: GetEnrollmentAttendance[];
 };
 
-// GET /enrollments 쿼리 파라미터
-export type StudentListQuery = {
-  page?: number;
-  limit?: number;
-  keyword?: string;
-  year?: SchoolYear | null;
-  status?: StudentStatus | null;
-  lectureId?: string | null;
-  includeClosed?: boolean; // 종강 포함 여부? //TODO: 클래스 상태 관련 필터 없음
-};
-
-// PATCH /enrollments/:id 요청 바디
-export type UpdateStudentRequest = Partial<
-  Pick<Student, "school" | "schoolYear" | "memo" | "status">
->;
-
-// export type UpdateStudentRequest = {
-//   school?: string;
-//   schoolYear?: string;
-//   status?: StudentStatus;
-//   memo?: string | null;
-// };
-
-// POST /enrollments/:id/attendances 요청 바디
-export type CreateAttendanceRequest = {
+// 개별 출결 등록: POST /:enrollmentId/attendances
+export type CreateEnrollmentAttendance = {
   date: string;
   status: AttendanceStatus;
-  enterTime?: string;
-  leaveTime?: string;
   memo?: string | null;
-};
-
-// mock data type 삭제 예정
-export type StudentEnrollmentStatus = "재원" | "휴원" | "퇴원";
-export type StudentEnrollment = {
-  enrollmentId: string;
-  registeredAt: string;
-  status: StudentEnrollmentStatus;
-  id: string | null;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  parentPhone: string;
-  school: string;
-  schoolYear: string;
-  profileImage?: string;
-  isAppUser: boolean;
-  lecture: {
-    id: string;
-    title: string;
-    subject?: string;
-    isActive: boolean;
-  };
-  attendance: {
-    percentage: number;
-    summary: {
-      PRESENT?: number;
-      LATE?: number;
-      ABSENT?: number;
-      EARLY_LEAVE?: number;
-    };
-    records: {
-      date: string;
-      status: AttendanceStatus;
-      memo?: string | null;
-    }[];
-  };
-  exams: {
-    id: string;
-    title: string;
-    score: number;
-    cutoffScore: number;
-    isPass: boolean;
-    clinics: {
-      id: string;
-      title: string;
-      status: ExamClinicStatus;
-      deadline?: string;
-    }[];
-  }[];
-  extraInfo?: {
-    memo?: string;
-    consultationRecords?: string[];
-  };
 };

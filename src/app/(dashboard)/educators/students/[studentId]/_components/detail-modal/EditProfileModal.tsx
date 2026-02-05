@@ -1,7 +1,7 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { useEffect, useRef, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { useModal } from "@/providers/ModalProvider";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   EditProfileFormData,
@@ -21,11 +20,27 @@ import {
 } from "@/types/students.type";
 import { editProfileSchema } from "@/validation/students.validation";
 import { useUpdateEnrollment } from "@/hooks/useEnrollment";
-import { EDIT_PROFILE_FORM_DEFAULTS } from "@/constants/students.default";
+import { GRADE_SELECTING_OPTIONS } from "@/constants/students.default";
 import { Textarea } from "@/components/ui/textarea";
+import { InputForm } from "@/components/common/input/InputForm";
+import SelectBtn from "@/components/common/button/SelectBtn";
 
 type EditProfileModalProps = {
   studentData: EditProfileFormDataType;
+};
+
+const getFormDataOnly = (
+  data: EditProfileFormDataType
+): EditProfileFormData => {
+  return {
+    studentName: data.studentName ?? "",
+    school: data.school ?? "",
+    schoolYear: data.schoolYear ?? "",
+    studentPhone: data.studentPhone ?? "",
+    parentPhone: data.parentPhone ?? "",
+    email: data.email ?? "",
+    memo: data.memo ?? "",
+  };
 };
 
 export default function EditProfileModal({
@@ -41,37 +56,42 @@ export default function EditProfileModal({
     register,
     handleSubmit,
     reset,
+    setValue,
+    control,
     formState: { errors, isValid, isDirty, dirtyFields },
   } = useForm<EditProfileFormData>({
     resolver: zodResolver(editProfileSchema),
     mode: "onChange",
-    defaultValues: EDIT_PROFILE_FORM_DEFAULTS,
+    defaultValues: getFormDataOnly(studentData),
   });
 
-  // 이전 모달 상태 추적
-  const prevIsOpenRef = useRef(false);
-  // 모달 열릴 때만 studentData로 폼 초기화
-  // 모달이 열린 상태에서 studentData가 변경되면 편집 중인 내용이 날아갈 수 있기 때문
+  // 모달 열릴 때 폼 초기화
   useEffect(() => {
-    if (isOpen && !prevIsOpenRef.current) {
-      reset(studentData);
+    if (isOpen) {
+      reset(getFormDataOnly(studentData));
     }
-    prevIsOpenRef.current = isOpen;
   }, [isOpen, studentData, reset]);
 
-  const handleEditToggle = () => {
-    setIsEditMode(true);
-  };
+  const watchedName = useWatch({ control, name: "studentName" });
+  const watchedSchool = useWatch({ control, name: "school" });
+  const watchedSchoolYear = useWatch({ control, name: "schoolYear" });
+  const watchedStudentPhone = useWatch({ control, name: "studentPhone" });
+  const watchedEmail = useWatch({ control, name: "email" });
+  const watchedParentPhone = useWatch({ control, name: "parentPhone" });
 
   const onSubmit = (data: EditProfileFormData) => {
     // dirtyFields 기준으로 변경된 데이터만 추출
     const changedData = Object.keys(dirtyFields).reduce((acc, key) => {
-      acc[key as keyof EditProfileFormData] =
-        data[key as keyof EditProfileFormData];
+      const field = key as keyof EditProfileFormData;
+      acc[field] = data[field];
       return acc;
     }, {} as Partial<EditProfileFormData>);
 
-    if (Object.keys(changedData).length === 0) return;
+    if (Object.keys(changedData).length === 0) {
+      // 혹시나 isDirty가 true인데 바뀐게 없다면
+      setIsEditMode(false);
+      return;
+    }
 
     updateStudent(
       { id: studentData.id, data: changedData },
@@ -93,6 +113,10 @@ export default function EditProfileModal({
     reset(studentData); // 변경사항 초기화
     setIsEditMode(false);
     closeModal();
+  };
+
+  const handleEditToggle = () => {
+    setIsEditMode(true);
   };
 
   return (
@@ -118,89 +142,79 @@ export default function EditProfileModal({
           <div className="max-h-[70vh] overflow-y-auto pr-2 py-2 space-y-4 custom-scrollbar">
             {/* 학생 정보 */}
             <div className="flex flex-col gap-4 text-xs">
+              <InputForm
+                label="학생 이름"
+                disabled={!isEditMode}
+                error={errors.studentName?.message}
+                {...register("studentName")}
+                onReset={() =>
+                  setValue("studentName", "", { shouldDirty: true })
+                }
+                showReset={isEditMode && !!watchedName}
+              />
+
+              <InputForm
+                label="학교"
+                disabled={!isEditMode}
+                error={errors.school?.message}
+                {...register("school")}
+                onReset={() => setValue("school", "", { shouldDirty: true })}
+                showReset={isEditMode && !!watchedSchool}
+              />
+
               <div className="space-y-2">
-                <Label htmlFor="studentName">학생 이름</Label>
-                <Input
-                  id="studentName"
-                  className="w-full"
+                <Label className="text-xs text-gray-500 ml-1">학년</Label>
+                <SelectBtn
                   disabled={!isEditMode}
-                  {...register("studentName")}
-                  placeholder="학생 이름"
+                  value={watchedSchoolYear}
+                  optionSize="sm"
+                  className="w-full h-[58px] text-base"
+                  options={GRADE_SELECTING_OPTIONS}
+                  onChange={(val) =>
+                    setValue("schoolYear", val as string, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  placeholder="학년 선택"
                 />
-                {errors.studentName && (
-                  <p className="text-red-500">{errors.studentName.message}</p>
+                {errors.schoolYear?.message && (
+                  <p className="text-xs text-red-500 ml-1">
+                    {errors.schoolYear.message}
+                  </p>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="school">학교</Label>
-                <Input
-                  id="school"
-                  className="w-full"
-                  disabled={!isEditMode}
-                  {...register("school")}
-                  placeholder="학교"
-                />
-                {errors.school && (
-                  <p className="text-red-500">{errors.school.message}</p>
-                )}
-              </div>
+              <InputForm
+                label="연락처"
+                disabled={!isEditMode}
+                error={errors.studentPhone?.message}
+                {...register("studentPhone")}
+                onReset={() =>
+                  setValue("studentPhone", "", { shouldDirty: true })
+                }
+                showReset={isEditMode && !!watchedStudentPhone}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="schoolYear">학년</Label>
-                <Input
-                  id="schoolYear"
-                  className="w-full"
-                  disabled={!isEditMode}
-                  {...register("schoolYear")}
-                  placeholder="학년"
-                />
-                {errors.schoolYear && (
-                  <p className="text-red-500">{errors.schoolYear.message}</p>
-                )}
-              </div>
+              <InputForm
+                label="이메일"
+                disabled={!isEditMode}
+                error={errors.email?.message}
+                {...register("email")}
+                onReset={() => setValue("email", "", { shouldDirty: true })}
+                showReset={isEditMode && !!watchedEmail}
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="studentPhone">연락처</Label>
-                <Input
-                  id="studentPhone"
-                  className="w-full"
-                  disabled={!isEditMode}
-                  {...register("studentPhone")}
-                  placeholder="연락처"
-                />
-                {errors.studentPhone && (
-                  <p className="text-red-500">{errors.studentPhone.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">이메일</Label>
-                <Input
-                  id="email"
-                  className="w-full"
-                  disabled={!isEditMode}
-                  {...register("email")}
-                  placeholder="이메일"
-                />
-                {errors.email && (
-                  <p className="text-red-500">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="parentPhone">학부모 연락처</Label>
-                <Input
-                  id="parentPhone"
-                  disabled={!isEditMode}
-                  {...register("parentPhone")}
-                  placeholder="학부모 연락처"
-                  className="w-full"
-                />
-                {errors.parentPhone && (
-                  <p className="text-red-500">{errors.parentPhone.message}</p>
-                )}
-              </div>
+              <InputForm
+                label="학부모 연락처"
+                disabled={!isEditMode}
+                error={errors.parentPhone?.message}
+                {...register("parentPhone")}
+                onReset={() =>
+                  setValue("parentPhone", "", { shouldDirty: true })
+                }
+                showReset={isEditMode && !!watchedParentPhone}
+              />
             </div>
 
             <div className="space-y-2">

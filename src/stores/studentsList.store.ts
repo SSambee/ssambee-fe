@@ -3,9 +3,9 @@ import { create } from "zustand";
 type SelectedStudent = {
   enrollmentId: string;
   name: string;
-  lectureTitle: string;
   phoneNumber?: string;
   parentPhone?: string;
+  title: string;
 };
 
 type StudentSelectionState = {

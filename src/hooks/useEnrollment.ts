@@ -4,24 +4,112 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import * as api from "@/services/students.service";
 import {
-  StudentListQuery,
-  UpdateStudentRequest,
-  CreateAttendanceRequest,
+  AttendanceStatus,
+  CreateEnrollment,
+  CreateEnrollmentAttendance,
+  EnrollmentListQuery,
+  UpdateEnrollmentInfo,
 } from "@/types/students.type";
 import { getTodayYMD } from "@/utils/date";
 
-// 수강생 목록 조회
-export const useEnrollmentList = (query: StudentListQuery) =>
+// 강의 목록 조회
+export const useLecturesList = (query?: { page?: number; limit?: number }) =>
+  useQuery({
+    queryKey: ["lectures", query],
+    queryFn: () => api.getLecturesAPI(query),
+    select: (res) => res.data.lectures,
+    staleTime: 1000 * 60, // 강의 목록 1분 캐시
+  });
+
+// 전체 수강생 목록 조회
+export const useEnrollmentList = (query?: EnrollmentListQuery) =>
   useQuery({
     queryKey: ["enrollments", query],
     queryFn: () => api.getEnrollmentsAPI(query),
     select: (res) => ({
-      items: res.data.list,
+      list: res.data.list,
       pagination: res.data.pagination,
     }),
+    staleTime: 1000 * 30, // 30초 동안은 캐시된 데이터 사용
+    placeholderData: (previousData) => previousData, // 페이지 전환 시 깜빡임 방지
   });
 
-// 수강생 상세 조회
+// 수강생 등록
+export const useCreateEnrollment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      lectureId,
+      data,
+    }: {
+      lectureId: string;
+      data: CreateEnrollment;
+    }) => api.createEnrollmentAPI(lectureId, data),
+    onSuccess: () => {
+      // 학생 목록 무효화해서 최신화
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+    },
+  });
+};
+
+// 수강생 단체 출결 등록
+export const useUpdateAllAttendance = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      lectureId,
+      enrollmentIds,
+      status = "PRESENT", // 기본값은 출석
+    }: {
+      lectureId: string;
+      enrollmentIds: string[];
+      status?: AttendanceStatus;
+    }) => {
+      const payload = {
+        date: getTodayYMD(),
+        attendances: enrollmentIds.map((id) => ({
+          enrollmentId: id,
+          status: status,
+        })),
+      };
+      return api.createAllAttendanceAPI(lectureId, payload);
+    },
+    onSuccess: () => {
+      alert("일괄 출결 등록이 완료되었습니다.");
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+    },
+    onError: (error) => {
+      console.error("출결 등록 실패:", error);
+      alert("재원 상태인 학생만 출결 등록 가능합니다.");
+    },
+  });
+};
+// 수강생 단체 강의 변경
+export const useMigrateStudents = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      lectureId,
+      enrollmentIds,
+    }: {
+      lectureId: string;
+      enrollmentIds: string[];
+    }) => api.migrateStudentsAPI(lectureId, { enrollmentIds }),
+    onSuccess: () => {
+      alert("수업 변경이 완료되었습니다.");
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+    },
+    onError: (error) => {
+      console.error("수업 변경 실패:", error);
+      alert("수업 변경 중 오류가 발생했습니다.");
+    },
+  });
+};
+
+// 수강생 상세 조회------------------------------------------------------
 export const useEnrollmentDetail = (id: string) =>
   useQuery({
     queryKey: ["enrollments", "detail", id],
@@ -29,19 +117,11 @@ export const useEnrollmentDetail = (id: string) =>
     select: (res) => res.data.enrollment,
   });
 
-// 수강생 출결 목록 조회(출결 목록 & 통계)
-export const useEnrollmentAttendances = (id: string) =>
-  useQuery({
-    queryKey: ["enrollments", "attendances", id],
-    queryFn: () => api.getAttendancesAPI(id),
-    select: (res) => res.data,
-  });
-
 // 수강생 정보 수정
 export const useUpdateEnrollment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateStudentRequest }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateEnrollmentInfo }) =>
       api.updateEnrollmentAPI(id, data),
     onSuccess: (_, { id }) => {
       // 수강생 목록 데이터 갱신
@@ -54,87 +134,40 @@ export const useUpdateEnrollment = () => {
   });
 };
 
-// 수강생 삭제
-export const useDeleteEnrollment = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api.deleteEnrollmentAPI(id),
-    onSuccess: () => {
-      // 삭제 후 수강생 목록 새로고침
-      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
-    },
+// 수강생 출결 목록 조회(출결 목록 & 통계)
+export const useEnrollmentAttendances = (
+  lectureId: string | undefined,
+  enrollmentId: string
+) =>
+  useQuery({
+    queryKey: ["enrollments", "attendances", lectureId, enrollmentId],
+    queryFn: () => api.getAttendancesAPI(lectureId!, enrollmentId),
+    enabled: !!lectureId, // lectureId가 있을 때만 실행
+    select: (res) => res.data,
   });
-};
 
 // 수강생 출결 등록
-export const useCreateAttendance = (enrollmentId: string) => {
+export const useCreateAttendance = (
+  lectureId: string,
+  enrollmentId: string
+) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: CreateAttendanceRequest) =>
-      api.createAttendanceAPI(enrollmentId, data),
+    mutationFn: (data: CreateEnrollmentAttendance) =>
+      api.createAttendanceAPI(lectureId, enrollmentId, data),
+
     onSuccess: () => {
-      // 수강생 출결 목록 데이터 갱신
+      alert("출결 등록이 완료되었습니다.");
+
       queryClient.invalidateQueries({
-        queryKey: ["enrollments", "attendances", enrollmentId],
+        queryKey: ["enrollments", "attendances", lectureId, enrollmentId],
       });
-    },
-  });
-};
-
-// 수강생 출결 정정/수정
-export const useUpdateAttendance = (enrollmentId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({
-      attendanceId,
-      data,
-    }: {
-      attendanceId: string;
-      data: Parameters<typeof api.updateAttendanceAPI>[2];
-    }) => api.updateAttendanceAPI(enrollmentId, attendanceId, data),
-    onSuccess: () => {
-      // 정정 후 해당 학생의 출결 목록 및 통계 데이터 갱신
-      queryClient.invalidateQueries({
-        queryKey: ["enrollments", "attendances", enrollmentId],
-      });
-    },
-  });
-};
-
-// 수강생 단체 출결 등록
-export const useCreateMassAttendance = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ ids }: { ids: string[] }) => {
-      const today = getTodayYMD();
-
-      // 여러 명의 API 호출을 동시에 실행
-      const results = await Promise.allSettled(
-        ids.map((id) =>
-          api.createAttendanceAPI(id, {
-            date: today,
-            status: "PRESENT", // 단체 출결 등록은 무조건 PRESENT
-          })
-        )
-      );
-      const failures = results.filter((r) => r.status === "rejected");
-      if (failures.length > 0) {
-        throw new Error(`${failures.length}명의 출결 등록에 실패했습니다.`);
-      }
-      return results;
-    },
-    onSuccess: (_, { ids }) => {
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
-      alert(`${ids.length}명의 출결 등록이 완료되었습니다.`);
     },
+
     onError: (error) => {
-      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
-      alert(
-        error instanceof Error
-          ? error.message
-          : "출결 등록 중 오류가 발생했습니다."
-      );
+      console.error("출결 등록 실패:", error);
+      alert("출결 등록에 실패했습니다. 다시 시도해주세요.");
     },
   });
 };

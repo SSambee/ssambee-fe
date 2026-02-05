@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { mockLectures } from "@/data/lectures.mock";
 import { useModal } from "@/providers/ModalProvider";
 import { StudentCreateFormData } from "@/types/students.type";
 import {
@@ -23,9 +22,19 @@ import {
 } from "@/constants/students.default";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { studentCreateSchema } from "@/validation/students.validation";
+import { useCreateEnrollment, useLecturesList } from "@/hooks/useEnrollment";
+import { InputForm } from "@/components/common/input/InputForm";
+import { formatPhoneNumber } from "@/utils/phone";
 
 export function StudentCreateModal() {
   const { isOpen, closeModal } = useModal();
+
+  // 수강생 등록
+  const { mutate: createEnrollment, isPending } = useCreateEnrollment();
+
+  // 강의 목록 불러오기
+  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
+  const lectureOptions = lectures.map((l) => ({ label: l.title, value: l.id }));
 
   const {
     register,
@@ -43,13 +52,31 @@ export function StudentCreateModal() {
   const schoolYear = useWatch({ control, name: "schoolYear" });
   const assignedClass = useWatch({ control, name: "assignedClass" });
 
-  const onSubmit = (data: StudentCreateFormData) => {
-    console.log("학생 등록 데이터:", data);
-    // TODO: API 호출
-    reset();
-    closeModal();
+  // 전화번호 포맷팅
+  const handlePhoneChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: "studentPhone" | "parentPhone"
+  ) => {
+    const formatted = formatPhoneNumber(e.target.value);
+
+    setValue(field, formatted, { shouldValidate: true });
   };
 
+  const onSubmit = (data: StudentCreateFormData) => {
+    // 폼에서 assignedClass 필드를 lectureId로 추출
+    const { assignedClass: lectureId, ...rest } = data;
+
+    createEnrollment(
+      { lectureId, data: { ...rest, lectureId } },
+      {
+        onSuccess: () => {
+          alert("수강생이 등록되었습니다.");
+          closeModal();
+          reset();
+        },
+      }
+    );
+  };
   const handleClose = () => {
     reset();
     closeModal();
@@ -68,66 +95,54 @@ export function StudentCreateModal() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             {/* 학생 정보 */}
-            <h3 className="text-sm font-semibold">학생 정보</h3>
+            <h3 className="text-base font-semibold">
+              학생 정보<span className="text-red-500">*</span>
+            </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="studentName">
-                  학생 이름 <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputForm
                   id="studentName"
+                  label="학생 이름"
+                  required
+                  error={errors.studentName?.message}
                   {...register("studentName")}
-                  placeholder="홍길동"
                 />
-                {errors.studentName && (
-                  <p className="text-xs text-red-500">
-                    {errors.studentName.message}
-                  </p>
-                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="studentPhone">
-                  연락처 <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputForm
                   id="studentPhone"
+                  label="연락처"
+                  required
+                  error={errors.studentPhone?.message}
                   {...register("studentPhone")}
-                  placeholder="010-1234-5678"
+                  onChange={(e) => handlePhoneChange(e, "studentPhone")}
                 />
-                {errors.studentPhone && (
-                  <p className="text-xs text-red-500">
-                    {errors.studentPhone.message}
-                  </p>
-                )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="school">
-                  학교 <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputForm
                   id="school"
+                  label="학교"
+                  required
+                  error={errors.school?.message}
                   {...register("school")}
-                  placeholder="서울고등학교"
                 />
-                {errors.school && (
-                  <p className="text-xs text-red-500">
-                    {errors.school.message}
-                  </p>
-                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="schoolYear">
-                  학년 <span className="text-red-500">*</span>
+                <Label htmlFor="schoolYear" className="sr-only">
+                  학년
                 </Label>
                 <SelectBtn
+                  id="schoolYear"
                   value={schoolYear}
                   placeholder="학년 선택"
+                  optionSize="sm"
+                  className="text-base px-4 h-[58px] w-full"
                   options={GRADE_SELECTING_OPTIONS}
                   onChange={(value) =>
                     setValue("schoolYear", value, {
@@ -147,48 +162,42 @@ export function StudentCreateModal() {
 
           {/* 학부모 정보 */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">학부모 정보</h3>
+            <h3 className="text-base font-semibold">
+              학부모 정보<span className="text-red-500">*</span>
+            </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="parentPhone">
-                  학부모 연락처 <span className="text-red-500">*</span>
-                </Label>
-                <Input
+                <InputForm
                   id="parentPhone"
+                  label="학부모 연락처"
+                  required
+                  error={errors.parentPhone?.message}
                   {...register("parentPhone")}
-                  placeholder="010-9876-5432"
+                  onChange={(e) => handlePhoneChange(e, "parentPhone")}
                 />
-                {errors.parentPhone && (
-                  <p className="text-xs text-red-500">
-                    {errors.parentPhone.message}
-                  </p>
-                )}
               </div>
             </div>
           </div>
 
           {/* 수업 정보 */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold">수업 정보</h3>
+            <h3 className="text-base font-semibold">
+              수업 정보<span className="text-red-500">*</span>
+            </h3>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="assignedClass">
-                  배정 클래스 <span className="text-red-500">*</span>
-                </Label>
+                <Label htmlFor="assignedClass">배정 클래스</Label>
                 <SelectBtn
+                  id="assignedClass"
                   value={assignedClass}
                   placeholder="클래스 선택"
-                  options={mockLectures.map((lecture) => ({
-                    label: lecture.name,
-                    value: lecture.id,
-                  }))}
-                  onChange={(value) =>
-                    setValue("assignedClass", value, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    })
+                  optionSize="sm"
+                  className="text-base px-4 h-[58px] w-full"
+                  options={lectureOptions}
+                  onChange={(val) =>
+                    setValue("assignedClass", val, { shouldValidate: true })
                   }
                 />
                 {errors.assignedClass && (
@@ -205,7 +214,7 @@ export function StudentCreateModal() {
                   type="date"
                   {...register("registrationDate")}
                   disabled
-                  className="bg-muted"
+                  className="bg-muted text-base px-4 h-[58px] w-full"
                 />
               </div>
             </div>
@@ -219,6 +228,7 @@ export function StudentCreateModal() {
               {...register("memo")}
               placeholder="학생에 대한 추가 정보를 입력하세요"
               rows={4}
+              className="text-base p-4 min-h-[130px] w-full"
             />
           </div>
 
@@ -232,15 +242,16 @@ export function StudentCreateModal() {
                 type="button"
                 variant="outline"
                 onClick={handleClose}
+                disabled={isPending}
               >
-                취소
+                닫기
               </Button>
               <Button
-                className="cursor-pointer"
+                className={`cursor-pointer ${!isValid || isPending ? "opacity-50 cursor-not-allowed" : ""}`}
                 type="submit"
-                disabled={!isValid}
+                disabled={!isValid || isPending}
               >
-                학생 등록
+                {isPending ? "등록 중..." : "학생 등록"}
               </Button>
             </div>
           </div>

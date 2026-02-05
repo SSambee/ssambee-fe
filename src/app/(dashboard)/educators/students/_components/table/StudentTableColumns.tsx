@@ -4,18 +4,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import {
+  APP_INSTALL_LABEL,
+  TODAY_ATTENDANCE_LABEL,
   STATUS_SETTING_OPTIONS,
   STUDENT_STATUS_LABEL,
 } from "@/constants/students.default";
-import { Student, StudentStatus } from "@/types/students.type";
+import { GetEnrollmentList, StudentStatus } from "@/types/students.type";
 import noProfileImage from "@/assets/images/no-profile.jpg";
-import { formatYMDFromISO } from "@/utils/date";
-import { ellipsText } from "@/utils/ellipsText";
+import { formatYMDFromISO, getTodayYMD } from "@/utils/date";
 import { phoneNumberFormatter } from "@/utils/phone";
 
 export type StudentTableColumn = {
   key: string;
-  render: (row: Student) => React.ReactNode;
+  render: (row: GetEnrollmentList) => React.ReactNode;
 };
 
 export const StudentTableData = ({
@@ -25,13 +26,13 @@ export const StudentTableData = ({
   onStatusChange,
 }: {
   selectedStudents: string[];
-  onToggleStudent: (student: Student) => void;
+  onToggleStudent: (student: GetEnrollmentList) => void;
   onNavigate: (enrollmentId: string) => void;
   onStatusChange: (id: string, status: StudentStatus) => void;
 }): StudentTableColumn[] => [
   {
     key: "select",
-    render: (row: Student) => (
+    render: (row: GetEnrollmentList) => (
       <Checkbox
         className="cursor-pointer"
         checked={selectedStudents.includes(row.id)}
@@ -41,7 +42,7 @@ export const StudentTableData = ({
   },
   {
     key: "profile",
-    render: (row: Student) => (
+    render: (row: GetEnrollmentList) => (
       <Image
         src={noProfileImage.src}
         alt={row.studentName}
@@ -53,18 +54,18 @@ export const StudentTableData = ({
   },
   {
     key: "name",
-    render: (row: Student) => (
+    render: (row: GetEnrollmentList) => (
       <span
-        className="font-medium whitespace-nowrap text-sm cursor-pointer hover:text-primary hover:underline"
+        className="font-medium whitespace-nowrap text-base cursor-pointer hover:text-primary hover:underline"
         onClick={() => onNavigate(row.id)}
       >
-        {row.studentName}
+        {row.studentName || "-"}
       </span>
     ),
   },
   {
     key: "status",
-    render: (row: Student) => (
+    render: (row: GetEnrollmentList) => (
       <StatusLabel
         color={
           row.status === "ACTIVE"
@@ -74,62 +75,78 @@ export const StudentTableData = ({
               : "red"
         }
       >
-        {STUDENT_STATUS_LABEL[row.status]}
+        {STUDENT_STATUS_LABEL[row.status as StudentStatus]}
       </StatusLabel>
     ),
   },
   {
     key: "appInstalled",
-    render: (row: Student) => (
-      <span className="text-sm whitespace-nowrap">
-        {row.appStudentId ? "O" : "X"}
-      </span>
-    ),
+    render: (row: GetEnrollmentList) => {
+      const isInstalled = !!row.appStudentId;
+      const config = isInstalled
+        ? APP_INSTALL_LABEL.INSTALLED
+        : APP_INSTALL_LABEL.NOT_INSTALLED;
+
+      return (
+        <StatusLabel color={config.color} showDot noBackground>
+          {config.label}
+        </StatusLabel>
+      );
+    },
   },
   {
     key: "class",
-    render: (row: Student) => (
-      <span className="text-sm whitespace-nowrap">
-        {ellipsText(row.lecture.title)}
+    render: (row: GetEnrollmentList) => (
+      <span className="text-base whitespace-nowrap">
+        {row.lecture?.title || "-"}
       </span>
     ),
   },
   {
     key: "school",
-    render: (row: Student) => (
-      <span className="text-sm whitespace-nowrap">
-        {row.school} / {row.schoolYear}
+    render: (row: GetEnrollmentList) => (
+      <span className="text-base whitespace-nowrap">
+        {row.school || "-"} / {row.schoolYear || "-"}
       </span>
     ),
   },
   {
     key: "phoneNumber",
-    render: (row: Student) => (
-      <span className="text-sm whitespace-nowrap">
-        {phoneNumberFormatter(row.studentPhone)}
+    render: (row: GetEnrollmentList) => (
+      <span className="text-base whitespace-nowrap">
+        {phoneNumberFormatter(row.studentPhone || "-")}
       </span>
     ),
   },
   {
     key: "registeredAt",
-    render: (row: Student) => (
-      <span className="text-sm whitespace-nowrap">
+    render: (row: GetEnrollmentList) => (
+      <span className="text-base whitespace-nowrap">
         {row.registeredAt ? formatYMDFromISO(row.registeredAt) : "-"}
       </span>
     ),
   },
   {
-    // TODO: 출결율 데이터 없음!
     key: "attendance",
-    render: (row: Student) => (
-      <span className="text-sm whitespace-nowrap">
-        {row.attendanceRate != null ? `${row.attendanceRate}%` : "-"}
-      </span>
-    ),
+    render: (row: GetEnrollmentList) => {
+      const today = getTodayYMD(); // 예: "2026-02-04"
+
+      // 데이터가 있는지 확인하고 T를 기준으로 자름
+      const attendanceDate = row.attendance?.date?.split("T")[0];
+
+      // 오늘 날짜와 비교
+      const isAttendedToday = attendanceDate === today;
+
+      const config = isAttendedToday
+        ? TODAY_ATTENDANCE_LABEL.ATTENDED
+        : TODAY_ATTENDANCE_LABEL.NOT_ATTENDED;
+
+      return <StatusLabel color={config.color}>{config.label}</StatusLabel>;
+    },
   },
   {
     key: "statusSelect",
-    render: (row: Student) => (
+    render: (row: GetEnrollmentList) => (
       <SelectBtn
         className="w-[100px]"
         value={row.status}

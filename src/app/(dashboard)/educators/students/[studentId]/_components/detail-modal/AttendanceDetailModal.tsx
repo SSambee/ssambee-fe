@@ -6,31 +6,29 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useModal } from "@/providers/ModalProvider";
-import { Student } from "@/types/students.type";
-import { useEnrollmentAttendances } from "@/hooks/useEnrollment";
+import { GetEnrollmentDetail, AttendanceList } from "@/types/students.type";
 import { formatYMDFromISO } from "@/utils/date";
 
 import AttendanceDetailTable from "../table/AttendanceDetailTable";
 
 type AttendanceDetailModalProps = {
-  studentData: Student;
+  studentData: GetEnrollmentDetail;
+  attendancesList: AttendanceList[];
 };
 
 export default function AttendanceDetailModal({
   studentData,
+  attendancesList,
 }: AttendanceDetailModalProps) {
   const { isOpen, closeModal } = useModal();
 
-  // 수강생 출결 상세 조회
-  const { data: attendanceData } = useEnrollmentAttendances(studentData.id);
-  const attendanceRecords = attendanceData?.attendances
-    ? [...attendanceData.attendances]
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .map((record) => ({
-          ...record,
-          date: formatYMDFromISO(record.date) ?? record.date,
-        }))
-    : [];
+  // 날짜 포맷팅 (안전하게 처리)
+  const attendanceRecords: AttendanceList[] = (attendancesList || []).map(
+    (record) => ({
+      ...record,
+      date: formatYMDFromISO(record.date) ?? record.date,
+    })
+  );
 
   const handleClose = () => {
     closeModal();
@@ -38,14 +36,22 @@ export default function AttendanceDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>출결 상세</DialogTitle>
-          <DialogDescription>최근 출결 현황을 확인하세요.</DialogDescription>
+          <DialogTitle>{studentData.studentName} 학생 출결 상세</DialogTitle>
+          <DialogDescription>
+            최근 출결 현황을 확인하세요. (총 {attendanceRecords.length}건)
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 border rounded-md p-2 max-h-[400px] overflow-y-auto">
-          <AttendanceDetailTable records={attendanceRecords ?? []} />
+        <div className="mt-4 border rounded-md p-4 max-h-[500px] overflow-y-auto">
+          {attendanceRecords.length > 0 ? (
+            <AttendanceDetailTable records={attendanceRecords} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              출결 기록이 없습니다.
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

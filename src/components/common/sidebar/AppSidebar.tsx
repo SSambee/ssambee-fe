@@ -11,6 +11,7 @@ import {
   FileText,
   FolderOpen,
   Home,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -22,9 +23,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { Role } from "@/types/auth.type";
+import { API_URL_TYPE, useAuth } from "@/hooks/useAuth";
 
 const instructorMenuItems = [
   {
@@ -94,8 +97,22 @@ const getMenuItems = (userType?: Role) => {
 
 export function AppSidebar() {
   const { user } = useAuthContext();
+  const { signout, loading } = useAuth();
   const menuItems = getMenuItems(user?.userType);
   const pathname = usePathname();
+
+  // 로그아웃 핸들러
+  const handleLogout = async () => {
+    if (!user?.userType) return;
+
+    try {
+      // 현재 유저의 타입에 맞는 API Role(MGMT or SVC) 전달
+      const apiRole = API_URL_TYPE[user.userType];
+      await signout(apiRole);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <Sidebar>
@@ -126,6 +143,16 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleLogout} disabled={loading}>
+              <LogOut className="size-4" />
+              <span>{loading ? "로그아웃 중..." : "로그아웃"}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   );
 }

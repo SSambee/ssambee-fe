@@ -27,16 +27,20 @@ import { useCreateAttendance } from "@/hooks/useEnrollment";
 
 type AttendanceRegisterModalProps = {
   studentId: string;
+  mainLectureId: string;
 };
 
 export default function AttendanceRegisterModal({
   studentId,
+  mainLectureId,
 }: AttendanceRegisterModalProps) {
   const { isOpen, closeModal } = useModal();
 
   // 개별 수강생 출결 등록
-  const { mutate: createAttendance, isPending } =
-    useCreateAttendance(studentId);
+  const { mutate: createAttendance, isPending } = useCreateAttendance(
+    mainLectureId,
+    studentId
+  );
 
   const {
     register,

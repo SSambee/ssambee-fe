@@ -11,7 +11,7 @@ import { SelectCloseIcon, SelectOpenIcon } from "@/components/icons/AuthIcons";
 import { cn } from "@/lib/utils";
 
 type SelectOption = {
-  label: string;
+  label: string | React.ReactNode;
   value: string;
 };
 
@@ -91,7 +91,9 @@ export default function SelectBtn({
           <SelectItem
             key={option.value}
             value={option.value}
-            className="cursor-pointer py-3 px-4 text-base hover:bg-blue-50 focus:bg-blue-50 transition-colors"
+            className={`cursor-pointer hover:bg-blue-50 focus:bg-blue-50 transition-colors
+              ${sizeStyles[optionSize]}
+            `.trim()}
           >
             {option.label}
           </SelectItem>

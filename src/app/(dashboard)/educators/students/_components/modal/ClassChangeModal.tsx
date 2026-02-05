@@ -14,31 +14,48 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { mockLectures } from "@/data/lectures.mock";
 import { useModal } from "@/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
 import SelectBtn from "@/components/common/button/SelectBtn";
+import { useLecturesList, useMigrateStudents } from "@/hooks/useEnrollment";
 
 export function StudentChangeModal() {
   const { isOpen, closeModal } = useModal();
   const [targetLecture, setTargetLecture] = useState("");
   const [memo, setMemo] = useState("");
 
+  // 강의 목록 불러오기 (TanStack Query 캐싱 활용)
+  const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
+
+  const lectureOptions = lectures.map((lecture) => ({
+    label: lecture.title,
+    value: lecture.id,
+  }));
+
+  // 수업 변경
+  const { mutate: migrateStudents, isPending } = useMigrateStudents();
+
   const { selectedStudents, removeStudent, resetSelection } =
     useStudentSelectionStore();
 
   const handleSubmit = () => {
-    const payload = {
-      studentIds: selectedStudents.map((s) => s.enrollmentId),
-      targetLecture,
-      memo,
-    };
-    console.log("제출 데이터:", payload);
+    if (!targetLecture || selectedStudents.length === 0) return;
 
-    //TODO: API 호출
-    resetForm();
-    resetSelection(); // 작업 완료 후 선택 초기화
-    closeModal();
+    const enrollmentIds = selectedStudents.map((s) => s.enrollmentId);
+
+    migrateStudents(
+      {
+        lectureId: targetLecture,
+        enrollmentIds,
+      },
+      {
+        onSuccess: () => {
+          resetForm();
+          resetSelection();
+          closeModal();
+        },
+      }
+    );
   };
 
   const resetForm = () => {
@@ -72,7 +89,7 @@ export function StudentChangeModal() {
             </div>
 
             {/* 학생 목록 */}
-            <div className="max-h-[300px] overflow-y-auto space-y-2">
+            <div className="max-h-[350px] overflow-y-auto space-y-2">
               {selectedStudents.length === 0 ? (
                 <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent">
                   <p className="text-center text-sm text-muted-foreground">
@@ -88,8 +105,7 @@ export function StudentChangeModal() {
                     <div className="flex-1">
                       <p className="text-sm font-medium">{student.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {/* TODO: 수업 관리 API 연동 후 수정 */}
-                        현재 수업: {student.lectureTitle}
+                        현재 수업: {student.title}
                       </p>
                     </div>
                     <button
@@ -113,13 +129,11 @@ export function StudentChangeModal() {
 
               <SelectBtn
                 id="targetLecture"
-                className="w-full"
                 value={targetLecture}
-                placeholder="수업 선택"
-                options={mockLectures.map((lecture) => ({
-                  label: lecture.name,
-                  value: lecture.id,
-                }))}
+                placeholder={"수업 선택"}
+                optionSize="sm"
+                className="text-base px-4 h-[58px] w-full"
+                options={lectureOptions}
                 onChange={setTargetLecture}
               />
             </div>
@@ -133,6 +147,7 @@ export function StudentChangeModal() {
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
               placeholder="수업 변경 사유를 입력하세요"
+              className="text-base p-4 min-h-[130px] w-full"
               rows={4}
             />
           </div>
@@ -148,15 +163,18 @@ export function StudentChangeModal() {
               type="button"
               variant="outline"
               onClick={handleClose}
+              disabled={isPending}
             >
               닫기
             </Button>
             <Button
               className="cursor-pointer"
               onClick={handleSubmit}
-              disabled={selectedStudents.length === 0 || !targetLecture}
+              disabled={
+                selectedStudents.length === 0 || !targetLecture || isPending
+              }
             >
-              수업 변경 적용
+              {isPending ? "수업 변경 중..." : "수업 변경 적용"}
             </Button>
           </div>
         </DialogFooter>
