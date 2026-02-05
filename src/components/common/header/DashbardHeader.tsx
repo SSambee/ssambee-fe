@@ -3,7 +3,6 @@
 import React from "react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -39,37 +38,55 @@ export function DashboardHeader() {
   const initials = user?.name?.charAt(0) || "";
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b bg-background px-4">
+    <header className="flex h-[88px] shrink-0 items-center justify-between border-b border-[#e9ebf0] bg-white px-14 py-5">
       <div className="flex items-center gap-2">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="mx-2 h-4" />
+        <SidebarTrigger className="h-6 w-6 rounded-none bg-transparent p-0 text-[#8b90a3] shadow-none hover:bg-transparent hover:text-[#8b90a3] [&_svg]:size-6" />
         {breadcrumbs.length > 0 && (
           <Breadcrumb>
-            <BreadcrumbList>
-              {breadcrumbs.map((crumb, index) => (
-                <React.Fragment key={index}>
-                  {index > 0 && <BreadcrumbSeparator />}
-                  <BreadcrumbItem>
-                    {crumb.href ? (
-                      <BreadcrumbLink href={crumb.href}>
-                        {crumb.label}
-                      </BreadcrumbLink>
-                    ) : (
-                      <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+            <BreadcrumbList className="flex items-center gap-0.5 text-[16px] leading-6 tracking-[-0.16px]">
+              {breadcrumbs.map((crumb, index) => {
+                const isLast = index === breadcrumbs.length - 1;
+                const textColor = isLast ? "text-[#8b90a3]" : "text-[#b0b4c2]";
+                return (
+                  <React.Fragment key={index}>
+                    {index > 0 && (
+                      <BreadcrumbSeparator className="px-[10px] py-[6px] text-[#b0b4c2]">
+                        /
+                      </BreadcrumbSeparator>
                     )}
-                  </BreadcrumbItem>
-                </React.Fragment>
-              ))}
+                    <BreadcrumbItem>
+                      {crumb.href ? (
+                        <BreadcrumbLink
+                          href={crumb.href}
+                          className={`rounded-full px-[10px] py-[6px] font-semibold ${textColor}`}
+                        >
+                          {crumb.label}
+                        </BreadcrumbLink>
+                      ) : (
+                        <BreadcrumbPage
+                          className={`rounded-full px-[10px] py-[6px] font-semibold ${textColor}`}
+                        >
+                          {crumb.label}
+                        </BreadcrumbPage>
+                      )}
+                    </BreadcrumbItem>
+                  </React.Fragment>
+                );
+              })}
             </BreadcrumbList>
           </Breadcrumb>
         )}
       </div>
-      <div className="flex items-center gap-3">
-        <Avatar className="size-8">
+      <div className="flex items-center gap-4">
+        <Avatar className="size-12 border-[1.5px] border-[#f4f6fa] bg-white">
           <AvatarImage src={user?.image || undefined} alt={displayName} />
-          <AvatarFallback>{initials}</AvatarFallback>
+          <AvatarFallback className="bg-[#f4f6fa] text-sm text-[#8b90a3]">
+            {initials}
+          </AvatarFallback>
         </Avatar>
-        <span className="text-sm font-medium">{displayName}</span>
+        <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-[#8b90a3]">
+          {displayName}
+        </span>
       </div>
     </header>
   );
