@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 
 import {
   Select,
@@ -11,7 +12,7 @@ import { SelectCloseIcon, SelectOpenIcon } from "@/components/icons/AuthIcons";
 import { cn } from "@/lib/utils";
 
 type SelectOption = {
-  label: string | React.ReactNode;
+  label: string | ReactNode;
   value: string;
 };
 
@@ -25,6 +26,7 @@ type CommonSelectProps = {
   isError?: boolean;
   disabled?: boolean;
   variant?: "default" | "figma";
+  optionSize?: "sm" | "lg";
 };
 
 export default function SelectBtn({
@@ -37,8 +39,14 @@ export default function SelectBtn({
   disabled,
   isError,
   variant = "default",
+  optionSize = "lg",
 }: CommonSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const sizeStyles = {
+    sm: "py-1.5 text-sm",
+    lg: "py-3 px-4 text-base",
+  };
 
   const baseClasses =
     variant === "figma"
@@ -91,9 +99,10 @@ export default function SelectBtn({
           <SelectItem
             key={option.value}
             value={option.value}
-            className={`cursor-pointer hover:bg-blue-50 focus:bg-blue-50 transition-colors
-              ${sizeStyles[optionSize]}
-            `.trim()}
+            className={cn(
+              "cursor-pointer hover:bg-blue-50 focus:bg-blue-50 transition-colors",
+              sizeStyles[optionSize]
+            )}
           >
             {option.label}
           </SelectItem>
