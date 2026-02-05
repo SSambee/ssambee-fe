@@ -1,18 +1,15 @@
 import { Input } from "@/components/ui/input";
 import SelectBtn from "@/components/common/button/SelectBtn";
-import {
-  ANSWER_STATUS_OPTIONS,
-  WRITER_TYPE_OPTIONS,
-} from "@/constants/communication.default";
+import { CONTENT_TYPE_OPTIONS } from "@/constants/communication.default";
 
-export default function InquiryFilter() {
+export default function NotificationFilter() {
   return (
     <div className="w-full border rounded-lg p-4 bg-white">
       <div className="flex flex-wrap gap-3 w-full items-center">
         <div className="w-full xl:flex-1 min-w-[300px]">
           <Input
             className="h-14 w-full p-4 text-base placeholder:text-base"
-            placeholder="학생명, 제목으로 검색해보세요"
+            placeholder="제목으로 검색해보세요"
           />
         </div>
 
@@ -22,15 +19,8 @@ export default function InquiryFilter() {
               className="flex-1 w-full lg:w-[140px] h-14 text-base"
               optionSize="sm"
               value="ALL"
-              placeholder="작성자"
-              options={WRITER_TYPE_OPTIONS}
-            />
-            <SelectBtn
-              className="flex-1 w-full lg:w-[140px] h-14 text-base"
-              optionSize="sm"
-              value="ALL"
-              placeholder="답변 상태"
-              options={ANSWER_STATUS_OPTIONS}
+              placeholder="게시글 분류"
+              options={CONTENT_TYPE_OPTIONS}
             />
           </div>
 
