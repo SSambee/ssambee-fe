@@ -12,6 +12,7 @@ export type QuestionApi = {
   score: number;
   choices?: Record<string, string> | null;
   source?: string | null;
+  category?: string | null;
   correctAnswer: string;
 };
 
@@ -22,6 +23,10 @@ export type ExamApi = {
   title: string;
   cutoffScore: number;
   source?: string | null;
+  examDate?: string | null;
+  category?: string | null;
+  isAutoClinic?: boolean | null;
+  lectureTitle?: string;
   createdAt: string;
   updatedAt?: string | null;
   gradingStatus: GradingStatusApi;
@@ -38,7 +43,7 @@ export type EnrollmentGradeInfoApi = {
 
 export type ExamDetailApi = ExamApi & {
   questions: QuestionApi[];
-  lecture?: { title: string };
+  lecture?: { title: string; subject?: string | null };
   enrollments?: EnrollmentGradeInfoApi[];
 };
 
@@ -49,6 +54,7 @@ export type QuestionCreatePayload = {
   score: number;
   choices?: Record<string, string>;
   source?: string;
+  category?: string;
   correctAnswer: string;
 };
 
@@ -60,6 +66,9 @@ export type CreateExamPayload = {
   title: string;
   cutoffScore: number;
   source?: string;
+  examDate?: string;
+  category?: string;
+  isAutoClinic?: boolean;
   questions: QuestionCreatePayload[];
 };
 
@@ -67,5 +76,8 @@ export type UpdateExamPayload = {
   title?: string;
   cutoffScore?: number;
   source?: string | null;
+  examDate?: string | null;
+  category?: string | null;
+  isAutoClinic?: boolean;
   questions?: QuestionUpsertPayload[];
 };

@@ -23,8 +23,11 @@ export const lectureKeys = {
 export const examKeys = {
   all: ["exams"] as const,
   lists: () => [...examKeys.all, "list"] as const,
+  listAll: () => [...examKeys.lists(), "all"] as const,
   listByLecture: (lectureId: string) =>
     [...examKeys.lists(), { lectureId }] as const,
   details: () => [...examKeys.all, "detail"] as const,
   detail: (examId: string) => [...examKeys.details(), examId] as const,
+  gradeDetail: (examId: string, lectureEnrollmentId: string) =>
+    [...examKeys.details(), examId, "grade", lectureEnrollmentId] as const,
 };

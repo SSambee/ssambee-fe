@@ -18,7 +18,7 @@ export function ExamAutoRetestToggle({
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"
-          {...register("autoRetest")}
+          {...register("isAutoClinic")}
           disabled={disabled}
           className="mt-1"
         />

@@ -24,6 +24,9 @@ export const useCreateExam = (options?: UseCreateExamOptions) => {
       queryClient.invalidateQueries({
         queryKey: examKeys.listByLecture(variables.lectureId),
       });
+      queryClient.invalidateQueries({
+        queryKey: examKeys.listAll(),
+      });
       options?.onSuccess?.();
     },
     onError: (error) => {

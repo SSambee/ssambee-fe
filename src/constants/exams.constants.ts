@@ -1,6 +1,6 @@
 import type { ExamFormInput } from "@/validation/exam.validation";
 
-export const EXAMS_UI_ONLY = true; // 삭제/채점 액션은 추후 연동
+export const EXAMS_UI_ONLY = false; // 삭제 연동 완료
 
 export const createDefaultQuestion =
   (): ExamFormInput["questions"][number] => ({
@@ -17,12 +17,12 @@ export const createDefaultQuestion =
 export const EXAM_FORM_DEFAULTS: ExamFormInput = {
   name: "",
   subject: "",
-  examType: "",
+  category: "",
   examDate: "",
   lectureId: "",
   source: "",
   passScore: undefined,
-  autoRetest: true,
+  isAutoClinic: true,
   autoScore: true,
   questions: [],
 };

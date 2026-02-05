@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { useExamDetail } from "@/hooks/exams/useExamDetail";
+import { useStudentGradeWithAnswers } from "@/hooks/grades/useStudentGradeWithAnswers";
 import type { GradingQuestion, GradingStudent } from "@/types/grading";
 
 import type { AnswerState } from "./types";
@@ -107,7 +108,7 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
     for (const enrollment of examDetail.enrollments ?? []) {
       const studentId = enrollment.lectureEnrollmentId;
       const draft = loadDraft(examId, studentId);
-      if (draft && draft.length > 0) {
+      if (!enrollment.hasGrade && draft && draft.length > 0) {
         const merged = new Map(
           baseAnswers.map((answer) => [answer.questionNumber, answer])
         );
@@ -122,9 +123,10 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
         next[studentId] = Array.from(merged.values()).sort(
           (a, b) => a.questionNumber - b.questionNumber
         );
-      } else {
-        next[studentId] = baseAnswers.map((a) => ({ ...a }));
+        continue;
       }
+
+      next[studentId] = baseAnswers.map((a) => ({ ...a }));
     }
     return next;
   }, [examDetail, examId]);
@@ -134,6 +136,50 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
     baseStudents.some((student) => student.id === selectedStudentId)
       ? selectedStudentId
       : (baseStudents[0]?.id ?? "");
+
+  const activeEnrollment = examDetail?.enrollments?.find(
+    (enrollment) => enrollment.lectureEnrollmentId === activeStudentId
+  );
+
+  const { data: studentGradeDetail } = useStudentGradeWithAnswers(
+    examId,
+    activeStudentId,
+    Boolean(activeEnrollment?.hasGrade)
+  );
+
+  const fetchedAnswersByStudent = useMemo(() => {
+    if (!studentGradeDetail || !examDetail) return null;
+    const base = (examDetail.questions ?? []).map((question) => ({
+      questionNumber: question.questionNumber,
+      submittedAnswer: "",
+      isCorrect: false,
+    }));
+    const answerMap = new Map(
+      studentGradeDetail.questions.map((question) => [
+        question.questionNumber,
+        {
+          questionNumber: question.questionNumber,
+          submittedAnswer: question.submittedAnswer ?? "",
+          isCorrect: Boolean(question.isCorrect),
+        },
+      ])
+    );
+
+    return base.map((answer) => answerMap.get(answer.questionNumber) ?? answer);
+  }, [examDetail, studentGradeDetail]);
+
+  const mergedAnswersByStudent = useMemo(() => {
+    if (!fetchedAnswersByStudent || !activeStudentId) return null;
+    return { [activeStudentId]: fetchedAnswersByStudent };
+  }, [activeStudentId, fetchedAnswersByStudent]);
+
+  const finalAnswersByStudent = useMemo(() => {
+    if (!mergedAnswersByStudent) return baseAnswersByStudent;
+    return {
+      ...baseAnswersByStudent,
+      ...mergedAnswersByStudent,
+    };
+  }, [baseAnswersByStudent, mergedAnswersByStudent]);
 
   return {
     examDetail,
@@ -146,7 +192,7 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
     defaultAnswers,
     questionMetaMap,
     baseStudents,
-    baseAnswersByStudent,
+    baseAnswersByStudent: finalAnswersByStudent,
     selectedStudentId,
     activeStudentId,
     setSelectedStudentId,

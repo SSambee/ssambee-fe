@@ -114,6 +114,14 @@ export const useGradingPage = () => {
     answers.triggerTempSave();
   };
 
+  const handleEdit = () => {
+    if (isCompleted) {
+      const confirmed = confirm("채점 완료된 시험입니다. 수정을 진행할까요?");
+      if (!confirmed) return;
+    }
+    answers.triggerEdit();
+  };
+
   const handleComplete = () => {
     if (!canComplete) return;
     answers.triggerComplete();
@@ -136,7 +144,7 @@ export const useGradingPage = () => {
     handleEssayCorrectChange: answers.handleEssayCorrectChange,
     handleSave,
     handleTempSave,
-    handleEdit: answers.triggerEdit,
+    handleEdit,
     handleComplete,
     canSave,
     canTempSave,

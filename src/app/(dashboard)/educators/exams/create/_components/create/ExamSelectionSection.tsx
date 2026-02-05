@@ -98,7 +98,8 @@ export function ExamSelectionSection({
                 ) : (
                   exams.map((exam) => (
                     <SelectItem key={exam.id} value={exam.id}>
-                      {exam.title} · {renderDate(exam.createdAt)}
+                      {exam.title} ·{" "}
+                      {renderDate(exam.examDate ?? exam.createdAt)}
                     </SelectItem>
                   ))
                 )}

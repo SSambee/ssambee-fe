@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import type { UseFormReturn } from "react-hook-form";
 
 import { useCreateExam } from "@/hooks/exams/useCreateExam";
@@ -24,21 +23,15 @@ export const useExamSubmit = ({
   selectedExamId,
   activeLectureId,
 }: UseExamSubmitParams) => {
-  const router = useRouter();
-
   const createExamMutation = useCreateExam({
-    onSuccess: () => {
-      router.push("/educators/exams");
-    },
+    onSuccess: () => {},
     onError: (error) => {
       alert(error.message);
     },
   });
 
   const updateExamMutation = useUpdateExam({
-    onSuccess: () => {
-      router.push("/educators/exams");
-    },
+    onSuccess: () => {},
     onError: (error) => {
       alert(error.message);
     },

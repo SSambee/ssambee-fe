@@ -73,20 +73,21 @@ export const useExamSelectionState = ({
 
     const mapped = mapExamDetailToFormInput(examDetail, {
       lectureSubject: lectureSubject || form.getValues("subject") || "",
-      autoRetest: form.getValues("autoRetest"),
+      isAutoClinic: form.getValues("isAutoClinic"),
       autoScore: form.getValues("autoScore"),
-      examType: form.getValues("examType"),
+      category: form.getValues("category"),
+      examDate: form.getValues("examDate"),
     });
 
     form.reset(mapped, { keepDefaultValues: true });
     form.setValue("name", mapped.name);
     form.setValue("subject", mapped.subject);
-    form.setValue("examType", mapped.examType ?? "");
+    form.setValue("category", mapped.category ?? "");
     form.setValue("examDate", mapped.examDate);
     form.setValue("lectureId", mapped.lectureId);
     form.setValue("source", mapped.source ?? "");
     form.setValue("passScore", mapped.passScore);
-    form.setValue("autoRetest", mapped.autoRetest);
+    form.setValue("isAutoClinic", mapped.isAutoClinic);
     replaceQuestions(mapped.questions);
   }, [examDetail, form, isEditing, isEditMode, lecturesData, replaceQuestions]);
 

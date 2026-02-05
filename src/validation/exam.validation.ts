@@ -29,12 +29,12 @@ export const examFormSchema = z
   .object({
     name: z.string().trim().min(1, "시험명을 입력해주세요"),
     subject: z.string().trim().min(1, "과목을 선택해주세요"),
-    examType: z.string().optional(),
+    category: z.string().optional(),
     examDate: z.string().trim().min(1, "시험일을 선택해주세요"),
     lectureId: z.string().trim().min(1, "수업을 선택해주세요"),
     source: z.string().optional(),
     passScore: z.number().min(0).max(100).optional(),
-    autoRetest: z.boolean(),
+    isAutoClinic: z.boolean(),
     autoScore: z.boolean(),
     questions: z
       .array(questionSchema)

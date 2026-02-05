@@ -28,14 +28,19 @@ const formatRegistrationDate = (iso?: string | null) => {
 };
 
 export const mapExamApiToView = (exam: ExamApi, lectureName: string): Exam => {
+  const resolvedLectureName =
+    lectureName && lectureName !== "수업 미지정"
+      ? lectureName
+      : exam.lectureTitle || "수업 미지정";
+
   return {
     id: exam.id,
     lectureId: exam.lectureId,
     name: exam.title,
     subtitle: exam.source ? exam.source : "출처 미지정",
-    type: "기타",
+    type: exam.category ?? "기타",
     source: exam.source ?? undefined,
-    lectureName: lectureName || "수업 미지정",
+    lectureName: resolvedLectureName,
     registrationDate: formatRegistrationDate(exam.createdAt),
     createdAt: exam.createdAt,
     status: mapGradingStatusToView(exam.gradingStatus),
@@ -54,13 +59,28 @@ const mapQuestionTypeToForm = (
   return type === "MULTIPLE" ? "객관식" : "주관식";
 };
 
+const normalizeExamDateToIso = (raw?: string | null) => {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return `${trimmed}T00:00:00.000Z`;
+  }
+  return trimmed;
+};
+
 export const mapExamFormToCreatePayload = (
   input: ExamFormInput
 ): CreateExamPayload => {
+  const examDate = normalizeExamDateToIso(input.examDate);
+
   return {
     title: input.name.trim(),
     cutoffScore: input.passScore ?? 0,
     source: input.source?.trim() || undefined,
+    examDate: examDate || undefined,
+    category: input.category?.trim() ? input.category.trim() : undefined,
+    isAutoClinic: input.isAutoClinic,
     questions: input.questions.map((question, index) => {
       const isMultiple = question.type === "객관식";
       const correctAnswer = isMultiple
@@ -73,6 +93,7 @@ export const mapExamFormToCreatePayload = (
         type: mapQuestionTypeToApi(question.type),
         score: question.score,
         source: question.source?.trim() || undefined,
+        category: question.category?.trim() || undefined,
         correctAnswer,
       };
     }),
@@ -82,10 +103,15 @@ export const mapExamFormToCreatePayload = (
 export const mapExamFormToUpdatePayload = (
   input: ExamFormInput
 ): UpdateExamPayload => {
+  const examDate = normalizeExamDateToIso(input.examDate);
+
   return {
     title: input.name.trim(),
     cutoffScore: input.passScore ?? 0,
     source: input.source?.trim() ? input.source.trim() : null,
+    examDate: examDate,
+    category: input.category?.trim() ? input.category.trim() : null,
+    isAutoClinic: input.isAutoClinic,
     questions: input.questions.map((question, index) => {
       const isMultiple = question.type === "객관식";
       const correctAnswer = isMultiple
@@ -99,6 +125,7 @@ export const mapExamFormToUpdatePayload = (
         type: mapQuestionTypeToApi(question.type),
         score: question.score,
         source: question.source?.trim() || undefined,
+        category: question.category?.trim() || undefined,
         correctAnswer,
       };
     }),
@@ -107,8 +134,9 @@ export const mapExamFormToUpdatePayload = (
 
 type ExamFormMappingOptions = {
   lectureSubject?: string;
-  autoRetest?: boolean;
-  examType?: string;
+  isAutoClinic?: boolean;
+  category?: string;
+  examDate?: string;
   autoScore?: boolean;
 };
 
@@ -123,7 +151,7 @@ export const mapExamDetailToFormInput = (
       const base = {
         id: question.id,
         score: question.score,
-        category: "",
+        category: question.category ?? "",
         source: question.source ?? "",
         content: question.content ?? "",
       };
@@ -152,13 +180,16 @@ export const mapExamDetailToFormInput = (
 
   return {
     name: exam.title ?? "",
-    subject: options?.lectureSubject ?? "",
-    examType: options?.examType ?? "",
-    examDate: formatDateYMD(exam.createdAt) ?? "",
+    subject: exam.lecture?.subject ?? options?.lectureSubject ?? "",
+    category: exam.category ?? options?.category ?? "",
+    examDate:
+      formatDateYMD(exam.examDate ?? exam.createdAt ?? null) ??
+      options?.examDate ??
+      "",
     lectureId: exam.lectureId ?? "",
     source: exam.source ?? "",
     passScore: exam.cutoffScore ?? 0,
-    autoRetest: options?.autoRetest ?? true,
+    isAutoClinic: exam.isAutoClinic ?? options?.isAutoClinic ?? true,
     autoScore: options?.autoScore ?? true,
     questions,
   };

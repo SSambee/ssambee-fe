@@ -96,9 +96,7 @@ export function ExamsFilterBar({
             <SelectValue placeholder="수업 선택" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all" disabled>
-              전체 (준비중)
-            </SelectItem>
+            <SelectItem value="all">전체</SelectItem>
             {lectures.length === 0 ? (
               <SelectItem value="__empty__" disabled>
                 {isLoading

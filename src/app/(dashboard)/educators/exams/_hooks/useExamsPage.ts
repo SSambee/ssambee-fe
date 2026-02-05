@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { useLecturesList } from "@/hooks/lectures/useLecturesList";
 import { useExamsByLecture } from "@/hooks/exams/useExamsByLecture";
+import { useExamsAll } from "@/hooks/exams/useExamsAll";
 import { mapExamApiToView } from "@/services/exams/exams.mapper";
 
 export const useExamsPage = () => {
@@ -13,19 +14,26 @@ export const useExamsPage = () => {
   });
   const lectures = lecturesData?.lectures ?? [];
 
-  const [selectedLectureId, setSelectedLectureId] = useState("");
-  const activeLectureId =
-    selectedLectureId &&
-    lectures.some((lecture) => lecture.id === selectedLectureId)
+  const [selectedLectureId, setSelectedLectureId] = useState("all");
+  const isAllSelected = selectedLectureId === "all";
+  const activeLectureId = isAllSelected
+    ? "all"
+    : selectedLectureId &&
+        lectures.some((lecture) => lecture.id === selectedLectureId)
       ? selectedLectureId
       : (lectures[0]?.id ?? "");
 
-  const selectedLecture = lectures.find(
-    (lecture) => lecture.id === activeLectureId
-  );
+  const selectedLecture = isAllSelected
+    ? undefined
+    : lectures.find((lecture) => lecture.id === activeLectureId);
 
-  const { data: examsData = [], isPending: isExamsPending } =
-    useExamsByLecture(activeLectureId);
+  const { data: examsAll = [], isPending: isExamsAllPending } =
+    useExamsAll(isAllSelected);
+
+  const { data: examsByLecture = [], isPending: isExamsByLecturePending } =
+    useExamsByLecture(isAllSelected ? "" : activeLectureId);
+
+  const examsData = isAllSelected ? examsAll : examsByLecture;
 
   const exams = useMemo(() => {
     return examsData.map((exam) =>
@@ -38,8 +46,10 @@ export const useExamsPage = () => {
     exams,
     activeLectureId,
     setSelectedLectureId,
-    isLoading: isLecturesPending || isExamsPending,
+    isLoading:
+      isLecturesPending ||
+      (isAllSelected ? isExamsAllPending : isExamsByLecturePending),
     isLecturesPending,
-    isExamsPending,
+    isExamsPending: isAllSelected ? isExamsAllPending : isExamsByLecturePending,
   };
 };

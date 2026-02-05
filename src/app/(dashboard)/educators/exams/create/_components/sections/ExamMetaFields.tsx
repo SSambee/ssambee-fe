@@ -85,15 +85,18 @@ export function ExamMetaFields({
       </div>
 
       <div>
-        <label htmlFor="exam-type" className="block text-sm font-medium mb-2">
+        <label
+          htmlFor="exam-category"
+          className="block text-sm font-medium mb-2"
+        >
           시험지 유형
         </label>
         <Controller
-          name="examType"
+          name="category"
           control={control}
           render={({ field }) => (
             <Input
-              id="exam-type"
+              id="exam-category"
               {...field}
               value={field.value ?? ""}
               placeholder="예: 모의고사, 단원 평가"

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { EXAMS_UI_ONLY } from "@/constants/exams.constants";
+import { useDeleteExam } from "@/hooks/exams/useDeleteExam";
 import { useExamsStore } from "@/stores/exams";
 import type { Exam } from "@/types/exams";
 
@@ -28,6 +29,7 @@ export const useExamsListState = ({
   const [statusFilter, setStatusFilter] = useState<ExamsStatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<ExamsSortOrder>("latest");
+  const [isDeleting, setIsDeleting] = useState(false);
   const {
     selectedIds,
     currentPage,
@@ -37,6 +39,12 @@ export const useExamsListState = ({
     toggleSelected,
     clearSelection,
   } = useExamsStore();
+
+  const deleteExamMutation = useDeleteExam();
+
+  const examLectureMap = useMemo(() => {
+    return new Map(exams.map((exam) => [exam.id, exam.lectureId]));
+  }, [exams]);
 
   const filteredExams = useMemo(() => {
     const keyword = searchQuery.trim().toLowerCase();
@@ -101,11 +109,42 @@ export const useExamsListState = ({
     toggleSelected(id, checked);
   };
 
-  /** 삭제 확인 다이얼로그에서 '삭제' 클릭 시 호출. 선택 상태를 초기화(실제 삭제는 부모/API에서 처리). */
-  const handleClearSelectionAfterDelete = () => {
-    if (selectedIds.length > 0) {
-      clearSelection();
+  /** 삭제 확인 다이얼로그에서 '삭제' 클릭 시 호출. */
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0 || !selectedLectureId) return;
+    setIsDeleting(true);
+
+    const results = await Promise.allSettled(
+      selectedIds.map((examId) =>
+        deleteExamMutation.mutateAsync({
+          examId,
+          lectureId: examLectureMap.get(examId) ?? undefined,
+        })
+      )
+    );
+
+    const failedIds = results
+      .map((result, index) =>
+        result.status === "rejected" ? selectedIds[index] : null
+      )
+      .filter((id): id is string => Boolean(id));
+
+    setIsDeleting(false);
+
+    if (failedIds.length > 0) {
+      selectAll(failedIds);
+      const firstError = results.find(
+        (result) => result.status === "rejected"
+      ) as PromiseRejectedResult | undefined;
+      const message =
+        firstError?.reason instanceof Error
+          ? firstError.reason.message
+          : "시험 삭제 중 오류가 발생했습니다.";
+      alert(`${failedIds.length}건 삭제 실패: ${message}`);
+      return;
     }
+
+    clearSelection();
   };
 
   const handleLectureChange = (lectureId: string) => {
@@ -113,8 +152,9 @@ export const useExamsListState = ({
     onLectureChange(lectureId);
   };
 
-  const isSelectionDisabled = isUiOnly || isLoading || !selectedLectureId;
-  const isPaginationDisabled = isLoading || !selectedLectureId;
+  const isSelectionDisabled =
+    isUiOnly || isLoading || isDeleting || !selectedLectureId;
+  const isPaginationDisabled = isLoading || isDeleting || !selectedLectureId;
   const emptyMessage = isLoading
     ? "시험 목록을 불러오는 중입니다."
     : !hasLectures
@@ -142,7 +182,7 @@ export const useExamsListState = ({
     emptyMessage,
     handleSelectAll,
     handleSelectExam,
-    handleDeleteSelected: handleClearSelectionAfterDelete,
+    handleDeleteSelected,
     handleLectureChange,
   };
 };
