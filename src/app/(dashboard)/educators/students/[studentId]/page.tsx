@@ -43,19 +43,19 @@ export default function StudentDetailPage() {
     isError: isDetailError,
   } = useEnrollmentDetail(studentId);
 
-  // IN_PROGRESS 상태인 강의들 1차 필터링
-  const scheduledLectures =
-    enrollmentData?.lectures?.filter(
-      (lecture) => lecture.status === "IN_PROGRESS"
-    ) || [];
+  // 전체 강의 목록 (상태 필터링 제거)
+  const allLectures = enrollmentData?.lectures || [];
 
-  // 필터링된 강의 중 가장 최신인 0번 인덱스 ID (출결 조회의 기준)
-  const mainLectureId = scheduledLectures[0]?.id;
+  // IN_PROGRESS 상태인 강의 중 가장 최신 강의 ID (출결 조회의 기준)
+  const inProgressLectures = allLectures.filter(
+    (lecture) => lecture.status === "IN_PROGRESS"
+  );
+  const mainLectureId = inProgressLectures[0]?.id;
 
-  // 수업이 있는지 확인
-  const hasNoLecture = !mainLectureId;
+  // 진행 중인 수업이 있는지 확인 (출결 등록 가능 여부)
+  const hasNoInProgressLecture = !mainLectureId;
 
-  // 학생 출결 통계 조회
+  // 학생 출결 통계 조회 (진행 중인 강의가 있을 때만)
   const {
     data: attendanceData,
     isPending: isAttendancePending,
@@ -66,14 +66,18 @@ export default function StudentDetailPage() {
   const attendancesList = attendanceData?.attendances || [];
   const enrolledLectures = enrollmentData?.lectures || [];
 
-  if (isDetailPending || isAttendancePending) {
+  if (isDetailPending || (isAttendancePending && !hasNoInProgressLecture)) {
     return (
       <div className="flex items-center justify-center h-screen">
         로딩 중...
       </div>
     );
   }
-  if (isDetailError || isAttendanceError || !enrollmentData) {
+  if (
+    isDetailError ||
+    (!hasNoInProgressLecture && isAttendanceError) ||
+    !enrollmentData
+  ) {
     return (
       <EmptyState
         message="학생 정보를 불러올 수 없습니다."
@@ -187,7 +191,7 @@ export default function StudentDetailPage() {
               </Button>
               <Button
                 className="cursor-pointer"
-                disabled={hasNoLecture}
+                disabled={hasNoInProgressLecture}
                 variant="default"
                 onClick={() =>
                   openModal(
