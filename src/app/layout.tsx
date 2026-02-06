@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 
+import "react-day-picker/dist/style.css";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+
 import "@/styles/globals.css";
 import { geistMono, pretendard } from "@/styles/fonts";
 import Providers from "@/providers/Providers";

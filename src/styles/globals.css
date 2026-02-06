@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "react-day-picker/dist/style.css";
-@import "react-big-calendar/lib/css/react-big-calendar.css";
 @import "./typography.css";
 @import "./colors.css";
 

@@ -1616,13 +1616,13 @@ packages:
       react-redux:
         optional: true
 
+  '@remirror/core-constants@3.0.0':
+    resolution: {integrity: sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==}
+
   '@restart/hooks@0.4.16':
     resolution: {integrity: sha512-f7aCv7c+nU/3mF7NWLtVVr0Ra80RqsO89hO72r+Y/nvQr5+q0UFGkocElTH6MJApvReVh6JHUFYn2cw1WdHF3w==}
     peerDependencies:
       react: '>=16.8.0'
-
-  '@remirror/core-constants@3.0.0':
-    resolution: {integrity: sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==}
 
   '@rollup/plugin-commonjs@28.0.1':
     resolution: {integrity: sha512-+tNWdlWKbpB3WgBN7ijjYkq9X5uhjmcvyjEght4NmH5fAU++zfQzAJ6wumLS+dNcvwEZhKx2Z+skY8m7v0wGSA==}
@@ -7328,12 +7328,12 @@ snapshots:
       react: 19.2.3
       react-redux: 9.2.0(@types/react@19.2.10)(react@19.2.3)(redux@5.0.1)
 
+  '@remirror/core-constants@3.0.0': {}
+
   '@restart/hooks@0.4.16(react@19.2.3)':
     dependencies:
       dequal: 2.0.3
       react: 19.2.3
-
-  '@remirror/core-constants@3.0.0': {}
 
   '@rollup/plugin-commonjs@28.0.1(rollup@4.57.1)':
     dependencies:
