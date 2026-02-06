@@ -7,8 +7,13 @@ import { ExamScoreSection } from "@/app/(dashboard)/educators/exams/create/_comp
 import { ExamQuestionsSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamQuestionsSection";
 import { ExamStickyFooter } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamStickyFooter";
 import { useExamCreateForm } from "@/app/(dashboard)/educators/exams/create/_hooks/useExamCreateForm";
+import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 export default function CreateExamPage() {
+  useSetBreadcrumb([
+    { label: "시험 관리", href: "/educators/exams" },
+    { label: "시험 등록/수정" },
+  ]);
   const {
     examForm,
     fields,
