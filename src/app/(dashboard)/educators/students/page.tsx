@@ -83,6 +83,7 @@ export default function StudentsListPage() {
 
   // 수강생 목록 조회 -> 검색할 때 query.keyword가 0.5초 뒤에 변경됨
   const { data, isPending, isError } = useEnrollmentList(query);
+
   const studentList = data?.list || [];
   const pagination: PaginationType = data?.pagination ?? {
     totalCount: 0,
@@ -92,6 +93,10 @@ export default function StudentsListPage() {
     hasNextPage: false,
     hasPrevPage: false,
   };
+
+  // 전체 인원 수 표시용
+  const { data: totalData } = useEnrollmentList({ page: 1, limit: 1 });
+  const ListTotalCount = totalData?.pagination?.totalCount ?? 0;
 
   // 수강생 재원 상태 수정
   const { mutate: updateStatus } = useUpdateEnrollment();
@@ -210,7 +215,7 @@ export default function StudentsListPage() {
     <div className="container mx-auto px-8 py-8 max-w-[1400px]">
       <Title
         title="전체 학생 관리"
-        description={`총 ${pagination.totalCount}명의 학생 정보를 관리하고 있습니다.`}
+        description={`총 ${ListTotalCount}명의 학생 정보를 관리하고 있습니다.`}
       />
 
       <StudentFilter
