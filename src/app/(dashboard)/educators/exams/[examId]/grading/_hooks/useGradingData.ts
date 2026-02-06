@@ -6,7 +6,7 @@ import { useExamDetail } from "@/hooks/exams/useExamDetail";
 import { useStudentGradeWithAnswers } from "@/hooks/grades/useStudentGradeWithAnswers";
 import type { GradingQuestion, GradingStudent } from "@/types/grading";
 
-import type { AnswerState } from "./types";
+import type { AnswerState, QuestionMeta } from "./types";
 
 type UseGradingDataResult = {
   examDetail: ReturnType<typeof useExamDetail>["data"];
@@ -17,10 +17,7 @@ type UseGradingDataResult = {
   examSubtitle: string;
   questions: GradingQuestion[];
   defaultAnswers: AnswerState[];
-  questionMetaMap: Map<
-    number,
-    { score: number; correctAnswer?: string | number }
-  >;
+  questionMetaMap: Map<number, QuestionMeta>;
   baseStudents: GradingStudent[];
   baseAnswersByStudent: Record<string, AnswerState[]>;
   selectedStudentId: string;

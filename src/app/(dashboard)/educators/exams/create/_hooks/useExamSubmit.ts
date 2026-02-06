@@ -26,6 +26,9 @@ export const useExamSubmit = ({
   const createExamMutation = useCreateExam({
     onSuccess: () => {},
     onError: (error) => {
+      if (error.message.includes("문번은 중복")) {
+        form.setError("questions", { message: error.message });
+      }
       alert(error.message);
     },
   });
@@ -33,6 +36,9 @@ export const useExamSubmit = ({
   const updateExamMutation = useUpdateExam({
     onSuccess: () => {},
     onError: (error) => {
+      if (error.message.includes("문번은 중복")) {
+        form.setError("questions", { message: error.message });
+      }
       alert(error.message);
     },
   });

@@ -1,6 +1,5 @@
+import type { GradingReportOverview } from "@/types/exams";
 import { Card, CardContent } from "@/components/ui/card";
-
-import { GradingReportOverview } from "./types";
 
 type GradingResultSummaryProps = {
   overview: GradingReportOverview;

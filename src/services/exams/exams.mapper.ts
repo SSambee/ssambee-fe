@@ -76,6 +76,7 @@ export const mapExamFormToCreatePayload = (
 
   return {
     title: input.name.trim(),
+    subject: input.subject.trim(),
     cutoffScore: input.passScore ?? 0,
     source: input.source?.trim() || undefined,
     examDate: examDate || undefined,
@@ -107,6 +108,7 @@ export const mapExamFormToUpdatePayload = (
 
   return {
     title: input.name.trim(),
+    subject: input.subject.trim() ? input.subject.trim() : null,
     cutoffScore: input.passScore ?? 0,
     source: input.source?.trim() ? input.source.trim() : null,
     examDate: examDate,
@@ -180,7 +182,8 @@ export const mapExamDetailToFormInput = (
 
   return {
     name: exam.title ?? "",
-    subject: exam.lecture?.subject ?? options?.lectureSubject ?? "",
+    subject:
+      exam.subject ?? exam.lecture?.subject ?? options?.lectureSubject ?? "",
     category: exam.category ?? options?.category ?? "",
     examDate:
       formatDateYMD(exam.examDate ?? exam.createdAt ?? null) ??

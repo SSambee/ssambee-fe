@@ -22,6 +22,7 @@ import { Pagination } from "@/components/common/pagination/Pagination";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import { getTodayYMD } from "@/utils/date";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 import { StudentTableData } from "./_components/table/StudentTableColumns";
 import { StudentFilter } from "./_components/filter/StudentFilter";
@@ -33,6 +34,8 @@ const PAGE_LIMIT = 10;
 export default function StudentsListPage() {
   const router = useRouter();
   const { openModal } = useModal();
+
+  useSetBreadcrumb([{ label: "학생 관리" }]);
 
   // 검색어
   const [searchTerm, setSearchTerm] = useState("");

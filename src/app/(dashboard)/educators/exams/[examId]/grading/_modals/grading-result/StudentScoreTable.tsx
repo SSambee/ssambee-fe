@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 
+import type { GradingReportStudentRow } from "@/types/exams";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -10,8 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { GradingReportStudentRow } from "./types";
 
 type StudentScoreTableProps = {
   rows: GradingReportStudentRow[];

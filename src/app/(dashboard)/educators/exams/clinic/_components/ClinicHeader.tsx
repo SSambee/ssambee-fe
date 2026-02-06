@@ -9,11 +9,22 @@ import {
   KakaoNotificationModal,
   NotificationRecipient,
 } from "@/components/common/modals/KakaoNotificationModal";
-import { useClinicStore } from "@/stores/clinic.store";
+import type { ClinicStudent } from "@/types/clinics";
 
-export function ClinicHeader() {
+type ClinicHeaderProps = {
+  students: ClinicStudent[];
+  selectedIds: string[];
+  onSendNotification: () => void;
+  isSending?: boolean;
+};
+
+export function ClinicHeader({
+  students,
+  selectedIds,
+  onSendNotification,
+  isSending = false,
+}: ClinicHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { students, selectedIds } = useClinicStore();
 
   // ClinicStudent를 NotificationRecipient로 변환
   const selectedRecipients: NotificationRecipient[] = students
@@ -44,7 +55,7 @@ export function ClinicHeader() {
         <Button
           className="gap-2"
           onClick={handleOpenModal}
-          disabled={selectedIds.length === 0}
+          disabled={selectedIds.length === 0 || isSending}
         >
           <Bell className="h-4 w-4" />
           알림 발송
@@ -57,6 +68,7 @@ export function ClinicHeader() {
         recipients={selectedRecipients}
         title="클리닉 알림 발송"
         subtitle="클리닉 대상자 알림"
+        onSend={() => onSendNotification()}
       />
     </>
   );

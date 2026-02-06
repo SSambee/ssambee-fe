@@ -3,3 +3,8 @@ export type AnswerState = {
   submittedAnswer: string;
   isCorrect: boolean;
 };
+
+export type QuestionMeta = {
+  score: number;
+  correctAnswer?: string | number;
+};

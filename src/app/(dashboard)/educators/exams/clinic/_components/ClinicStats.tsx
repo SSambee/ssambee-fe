@@ -1,14 +1,14 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
-import { useClinicStore } from "@/stores/clinic.store";
 
-export function ClinicStats() {
-  const { students } = useClinicStore();
+type ClinicStatsProps = {
+  totalTargets: number;
+  completedTargets: number;
+};
 
-  const totalTargets = students.length;
-  const completedTargets = students.filter((s) => s.status === "완료").length;
-
+export function ClinicStats({
+  totalTargets,
+  completedTargets,
+}: ClinicStatsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {/* 전체 클리닉 대상자 */}

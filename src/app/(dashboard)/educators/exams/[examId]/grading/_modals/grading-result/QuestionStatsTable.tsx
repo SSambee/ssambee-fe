@@ -1,3 +1,4 @@
+import type { GradingReportQuestionStat } from "@/types/exams";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -7,8 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { GradingReportQuestionStat } from "./types";
 
 type QuestionStatsTableProps = {
   stats: GradingReportQuestionStat[];

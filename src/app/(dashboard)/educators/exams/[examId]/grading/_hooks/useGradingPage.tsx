@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useParams,
   usePathname,
@@ -8,6 +8,8 @@ import {
   useSearchParams,
 } from "next/navigation";
 
+import { CheckModal } from "@/components/common/modals/CheckModal";
+import { useModal } from "@/providers/ModalProvider";
 import type { GradingStudent } from "@/types/grading";
 
 import { useGradingData } from "./useGradingData";
@@ -22,20 +24,22 @@ export const useGradingPage = () => {
   const searchParams = useSearchParams();
   const modal = searchParams.get("modal");
   const isResultModalOpen = modal === "result";
+  const [requiresRecomplete, setRequiresRecomplete] = useState(false);
+  const { openModal } = useModal();
 
-  const openResultModal = () => {
+  const updateResultModal = (nextOpen: boolean) => {
     const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("modal", "result");
+    if (nextOpen) {
+      nextParams.set("modal", "result");
+    } else {
+      nextParams.delete("modal");
+    }
     const query = nextParams.toString();
     router.replace(query ? `${pathname}?${query}` : pathname);
   };
 
-  const closeResultModal = () => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("modal");
-    const query = nextParams.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname);
-  };
+  const openResultModal = () => updateResultModal(true);
+  const closeResultModal = () => updateResultModal(false);
 
   const {
     examDetail,
@@ -60,7 +64,9 @@ export const useGradingPage = () => {
     questionMetaMap,
     baseAnswersByStudent,
     defaultAnswers,
-    onCompleteSuccess: openResultModal,
+    onCompleteSuccess: () => {
+      setRequiresRecomplete(false);
+    },
   });
 
   const students = useMemo<GradingStudent[]>(() => {
@@ -76,10 +82,10 @@ export const useGradingPage = () => {
     students.length > 0 && students.every((student) => student.isFinalSaved);
   const canComplete =
     isAllFinalSaved &&
-    !isCompleted &&
+    (!isCompleted || requiresRecomplete) &&
     !answers.completePending &&
     !answers.submitPending;
-  const canViewResult = Boolean(isCompleted);
+  const canViewResult = Boolean(isCompleted && !requiresRecomplete);
 
   const selectedStudent = students.find(
     (student) => student.id === activeStudentId
@@ -116,15 +122,36 @@ export const useGradingPage = () => {
 
   const handleEdit = () => {
     if (isCompleted) {
-      const confirmed = confirm("채점 완료된 시험입니다. 수정을 진행할까요?");
-      if (!confirmed) return;
+      openModal(
+        <CheckModal
+          title="채점 완료된 시험입니다."
+          description="수정을 진행할까요?"
+          confirmText="수정하기"
+          cancelText="취소"
+          onConfirm={() => {
+            setRequiresRecomplete(true);
+            answers.triggerEdit();
+          }}
+        />
+      );
+      return;
     }
     answers.triggerEdit();
   };
 
   const handleComplete = () => {
     if (!canComplete) return;
-    answers.triggerComplete();
+    openModal(
+      <CheckModal
+        title="채점을 완료할까요?"
+        description="클리닉 생성이 함께 진행되며, 완료 후에는 결과 확인만 가능합니다."
+        confirmText="전체 완료"
+        cancelText="취소"
+        onConfirm={() => {
+          answers.triggerComplete();
+        }}
+      />
+    );
   };
 
   return {
@@ -150,6 +177,7 @@ export const useGradingPage = () => {
     canTempSave,
     canComplete,
     canViewResult,
+    requiresRecomplete,
     isCompleted,
     isInputDisabled,
     isEditing,
