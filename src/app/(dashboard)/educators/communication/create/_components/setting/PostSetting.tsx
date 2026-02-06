@@ -165,11 +165,7 @@ export default function PostSetting({
               * 게시글 등록 알림을 받을 대상을 선택합니다.
             </p>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardContent className="p-6 space-y-4">
           {/* 학생 검색 */}
           <div className="space-y-2">
             <Label className="text-base font-medium">학생 검색</Label>
