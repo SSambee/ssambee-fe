@@ -30,4 +30,16 @@ export const examKeys = {
   detail: (examId: string) => [...examKeys.details(), examId] as const,
   gradeDetail: (examId: string, lectureEnrollmentId: string) =>
     [...examKeys.details(), examId, "grade", lectureEnrollmentId] as const,
+  statistics: (examId: string) =>
+    [...examKeys.details(), examId, "statistics"] as const,
+};
+
+/**
+ * Clinic Query Keys Factory
+ */
+export const clinicKeys = {
+  all: ["clinics"] as const,
+  lists: () => [...clinicKeys.all, "list"] as const,
+  list: (query: Record<string, string | undefined>) =>
+    [...clinicKeys.lists(), query] as const,
 };

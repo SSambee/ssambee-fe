@@ -1,23 +1,36 @@
 "use client";
 
-import { useClinicStore } from "@/stores/clinic.store";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import StatusLabel from "@/components/common/label/StatusLabel";
+import type { ClinicStudent } from "@/types/clinics";
 
-export function ClinicTable() {
-  const { students, selectedIds, selectAll, toggleSelected, clearSelection } =
-    useClinicStore();
+type ClinicTableProps = {
+  students: ClinicStudent[];
+  selectedIds: string[];
+  onSelectAll: (checked: boolean) => void;
+  onToggleSelect: (id: string, checked: boolean) => void;
+  selectedExamLabel: string;
+};
 
+const statusColorMap = {
+  "알림 예정": "gray",
+  "알림 발송": "green",
+  완료: "blue",
+} as const;
+
+export function ClinicTable({
+  students,
+  selectedIds,
+  onSelectAll,
+  onToggleSelect,
+  selectedExamLabel,
+}: ClinicTableProps) {
   const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      selectAll(students.map((student) => student.id));
-    } else {
-      clearSelection();
-    }
+    onSelectAll(checked);
   };
 
   const handleSelectStudent = (id: string, checked: boolean) => {
-    toggleSelected(id, checked);
+    onToggleSelect(id, checked);
   };
 
   return (
@@ -25,7 +38,7 @@ export function ClinicTable() {
       {/* 테이블 헤더 */}
       <div className="text-sm text-muted-foreground">
         선택된 시험:{" "}
-        <span className="font-medium text-foreground">모든 시험</span>
+        <span className="font-medium text-foreground">{selectedExamLabel}</span>
       </div>
 
       {/* 테이블 */}
@@ -117,10 +130,7 @@ export function ClinicTable() {
                     {student.failedDate}
                   </td>
                   <td className="px-4 py-3">
-                    <StatusLabel
-                      color={student.status === "완료" ? "blue" : "green"}
-                      showDot
-                    >
+                    <StatusLabel color={statusColorMap[student.status]} showDot>
                       {student.status}
                     </StatusLabel>
                   </td>

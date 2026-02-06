@@ -1,7 +1,5 @@
 "use client";
 
-import { RefreshCw } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,18 +8,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useClinicStore } from "@/stores/clinic.store";
 
-export function ClinicFilters() {
-  const { selectedIds, markAsCompleted } = useClinicStore();
+type FilterOption = {
+  value: string;
+  label: string;
+};
 
-  const handleResetFilters = () => {
-    // TODO: 필터 초기화 로직 연결
-  };
+type ClinicFiltersProps = {
+  lectureOptions: FilterOption[];
+  examOptions: FilterOption[];
+  lectureValue: string;
+  examValue: string;
+  onLectureChange: (value: string) => void;
+  onExamChange: (value: string) => void;
+  isLectureLoading?: boolean;
+  isExamLoading?: boolean;
+  selectedCount: number;
+  onMarkCompleted: () => void;
+  isMarkingCompleted?: boolean;
+};
 
+export function ClinicFilters({
+  lectureOptions,
+  examOptions,
+  lectureValue,
+  examValue,
+  onLectureChange,
+  onExamChange,
+  isLectureLoading = false,
+  isExamLoading = false,
+  selectedCount,
+  onMarkCompleted,
+  isMarkingCompleted = false,
+}: ClinicFiltersProps) {
   const handleMarkCompleted = () => {
-    if (selectedIds.length > 0) {
-      markAsCompleted();
+    if (selectedCount > 0) {
+      onMarkCompleted();
     }
   };
 
@@ -31,24 +53,40 @@ export function ClinicFilters() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">수업:</span>
-          <Select defaultValue="all">
+          <Select
+            value={lectureValue}
+            onValueChange={onLectureChange}
+            disabled={isLectureLoading}
+          >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="전체 수업" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">전체 수업</SelectItem>
+              {lectureOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">시험:</span>
-          <Select defaultValue="all">
+          <Select
+            value={examValue}
+            onValueChange={onExamChange}
+            disabled={isExamLoading}
+          >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="모든 시험" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">모든 시험</SelectItem>
+              {examOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -58,16 +96,8 @@ export function ClinicFilters() {
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          className="h-9 w-9 p-0"
-          aria-label="필터 초기화"
-          onClick={handleResetFilters}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
           onClick={handleMarkCompleted}
-          disabled={selectedIds.length === 0}
+          disabled={selectedCount === 0 || isMarkingCompleted}
         >
           완료 표시
         </Button>

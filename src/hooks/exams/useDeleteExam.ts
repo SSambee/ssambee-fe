@@ -13,6 +13,9 @@ type UseDeleteExamOptions = {
   onError?: (error: Error) => void;
 };
 
+const normalizeError = (error: unknown) =>
+  error instanceof Error ? error : new Error(String(error));
+
 export const useDeleteExam = (options?: UseDeleteExamOptions) => {
   const queryClient = useQueryClient();
 
@@ -35,10 +38,7 @@ export const useDeleteExam = (options?: UseDeleteExamOptions) => {
       options?.onSuccess?.();
     },
     onError: (error) => {
-      const normalizedError =
-        error instanceof Error ? error : new Error(String(error));
-      console.error("시험 삭제 실패:", normalizedError.message);
-      options?.onError?.(normalizedError);
+      options?.onError?.(normalizeError(error));
     },
   });
 };

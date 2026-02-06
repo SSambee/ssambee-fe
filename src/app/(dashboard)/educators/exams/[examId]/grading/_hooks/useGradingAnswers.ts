@@ -3,20 +3,26 @@
 import { useMemo, useState } from "react";
 
 import { useCompleteGrading } from "@/hooks/clinics/useCompleteGrading";
+import { calculateExamStatisticsAPI } from "@/services/exams/statistics.service";
 import { useSubmitGrading } from "@/hooks/grades/useSubmitGrading";
 import type { GradingQuestion, GradingStudent } from "@/types/grading";
 import type { SubmitGradingPayload } from "@/types/grades";
 
-import type { AnswerState } from "./types";
+import {
+  buildAnswerMap,
+  buildGradingQuestions,
+  clearDraft,
+  computeScoreAndCorrectCount,
+  resolveAnswers,
+  saveDraft,
+} from "./gradingAnswers.utils";
+import type { AnswerState, QuestionMeta } from "./types";
 
 type UseGradingAnswersParams = {
   examId: string;
   activeStudentId: string;
   questions: GradingQuestion[];
-  questionMetaMap: Map<
-    number,
-    { score: number; correctAnswer?: string | number }
-  >;
+  questionMetaMap: Map<number, QuestionMeta>;
   baseAnswersByStudent: Record<string, AnswerState[]>;
   defaultAnswers: AnswerState[];
   onCompleteSuccess: () => void;
@@ -43,9 +49,10 @@ export const useGradingAnswers = ({
 
   const selectedAnswers = useMemo(() => {
     if (!activeStudentId) return defaultAnswers;
-    return (
-      answerOverridesByStudent[activeStudentId] ??
-      baseAnswersByStudent[activeStudentId] ??
+    return resolveAnswers(
+      activeStudentId,
+      answerOverridesByStudent,
+      baseAnswersByStudent,
       defaultAnswers
     );
   }, [
@@ -56,47 +63,16 @@ export const useGradingAnswers = ({
   ]);
 
   const selectedAnswerMap = useMemo(() => {
-    return new Map(
-      selectedAnswers.map((answer) => [answer.questionNumber, answer])
-    );
+    return buildAnswerMap(selectedAnswers);
   }, [selectedAnswers]);
 
   const gradingQuestions: GradingQuestion[] = useMemo(() => {
-    return questions.map((question) => {
-      const answer = selectedAnswerMap.get(question.number);
-      const submittedAnswer = answer?.submittedAnswer ?? "";
-      const hasAnswer = submittedAnswer.trim().length > 0;
-      const status = !hasAnswer
-        ? "미입력"
-        : answer?.isCorrect
-          ? "정답"
-          : "오답";
-
-      return {
-        ...question,
-        studentAnswer:
-          question.type === "객관식"
-            ? submittedAnswer
-              ? Number(submittedAnswer)
-              : undefined
-            : submittedAnswer || undefined,
-        status,
-      };
-    });
+    return buildGradingQuestions(questions, selectedAnswerMap);
   }, [questions, selectedAnswerMap]);
 
   const { currentScore, correctCount } = useMemo(() => {
-    let score = 0;
-    let correct = 0;
-    for (const answer of selectedAnswers) {
-      if (!answer.isCorrect) continue;
-      const question = questionMetaMap.get(answer.questionNumber);
-      if (!question) continue;
-      score += question.score;
-      correct += 1;
-    }
-    return { currentScore: score, correctCount: correct };
-  }, [questionMetaMap, selectedAnswers]);
+    return computeScoreAndCorrectCount(selectedAnswers, questionMetaMap);
+  }, [selectedAnswers, questionMetaMap]);
 
   const submitGradingMutation = useSubmitGrading({
     onSuccess: (variables) => {
@@ -123,13 +99,35 @@ export const useGradingAnswers = ({
   });
 
   const completeGradingMutation = useCompleteGrading({
-    onSuccess: () => {
-      onCompleteSuccess();
+    onSuccess: async () => {
+      try {
+        await calculateExamStatisticsAPI(examId);
+      } catch (err) {
+        console.error("통계 갱신 실패:", err);
+      } finally {
+        onCompleteSuccess();
+      }
     },
     onError: (error) => {
       alert(error.message);
     },
   });
+
+  const updateAnswersForStudent = (
+    studentId: string,
+    updater: (current: AnswerState[]) => AnswerState[]
+  ) => {
+    setAnswerOverridesByStudent((prev) => {
+      const current = resolveAnswers(
+        studentId,
+        prev,
+        baseAnswersByStudent,
+        defaultAnswers
+      );
+      const next = updater(current);
+      return { ...prev, [studentId]: next };
+    });
+  };
 
   const handleSelectObjectiveAnswer = (
     questionNumber: number,
@@ -141,28 +139,19 @@ export const useGradingAnswers = ({
     const submittedAnswer = String(answer);
     const isCorrect = submittedAnswer === String(correctAnswer);
 
-    setAnswerOverridesByStudent((prev) => {
-      const current =
-        prev[activeStudentId] ??
-        baseAnswersByStudent[activeStudentId] ??
-        defaultAnswers;
-      const next = current.map((item) =>
+    updateAnswersForStudent(activeStudentId, (current) =>
+      current.map((item) =>
         item.questionNumber === questionNumber
           ? { ...item, submittedAnswer, isCorrect }
           : item
-      );
-      return { ...prev, [activeStudentId]: next };
-    });
+      )
+    );
   };
 
   const handleEssayAnswerChange = (questionNumber: number, value: string) => {
     if (!activeStudentId) return;
-    setAnswerOverridesByStudent((prev) => {
-      const current =
-        prev[activeStudentId] ??
-        baseAnswersByStudent[activeStudentId] ??
-        defaultAnswers;
-      const next = current.map((item) =>
+    updateAnswersForStudent(activeStudentId, (current) =>
+      current.map((item) =>
         item.questionNumber === questionNumber
           ? {
               ...item,
@@ -170,9 +159,8 @@ export const useGradingAnswers = ({
               isCorrect: value.trim().length === 0 ? false : item.isCorrect,
             }
           : item
-      );
-      return { ...prev, [activeStudentId]: next };
-    });
+      )
+    );
   };
 
   const handleEssayCorrectChange = (
@@ -180,16 +168,11 @@ export const useGradingAnswers = ({
     isCorrect: boolean
   ) => {
     if (!activeStudentId) return;
-    setAnswerOverridesByStudent((prev) => {
-      const current =
-        prev[activeStudentId] ??
-        baseAnswersByStudent[activeStudentId] ??
-        defaultAnswers;
-      const next = current.map((item) =>
+    updateAnswersForStudent(activeStudentId, (current) =>
+      current.map((item) =>
         item.questionNumber === questionNumber ? { ...item, isCorrect } : item
-      );
-      return { ...prev, [activeStudentId]: next };
-    });
+      )
+    );
   };
 
   const triggerSave = () => {
@@ -236,10 +219,6 @@ export const useGradingAnswers = ({
   };
 
   const triggerComplete = () => {
-    const confirmed = confirm(
-      "채점을 완료하고 클리닉을 생성할까요? 이 작업은 되돌릴 수 없습니다."
-    );
-    if (!confirmed) return;
     completeGradingMutation.mutate({ examId, payload: {} });
   };
 
@@ -260,23 +239,4 @@ export const useGradingAnswers = ({
     submitPending: submitGradingMutation.isPending,
     completePending: completeGradingMutation.isPending,
   };
-};
-
-const buildDraftKey = (examId: string, studentId: string) =>
-  `grading-draft:${examId}:${studentId}`;
-
-const saveDraft = (
-  examId: string,
-  studentId: string,
-  answers: AnswerState[]
-) => {
-  if (typeof window === "undefined") return;
-  const key = buildDraftKey(examId, studentId);
-  window.localStorage.setItem(key, JSON.stringify(answers));
-};
-
-const clearDraft = (examId: string, studentId: string) => {
-  if (typeof window === "undefined") return;
-  const key = buildDraftKey(examId, studentId);
-  window.localStorage.removeItem(key);
 };

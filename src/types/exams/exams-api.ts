@@ -21,6 +21,7 @@ export type ExamApi = {
   lectureId: string;
   instructorId?: string | null;
   title: string;
+  subject?: string | null;
   cutoffScore: number;
   source?: string | null;
   examDate?: string | null;
@@ -64,6 +65,7 @@ export type QuestionUpsertPayload = QuestionCreatePayload & {
 
 export type CreateExamPayload = {
   title: string;
+  subject?: string;
   cutoffScore: number;
   source?: string;
   examDate?: string;
@@ -74,6 +76,7 @@ export type CreateExamPayload = {
 
 export type UpdateExamPayload = {
   title?: string;
+  subject?: string | null;
   cutoffScore?: number;
   source?: string | null;
   examDate?: string | null;

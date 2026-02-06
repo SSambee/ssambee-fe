@@ -124,43 +124,6 @@ export function ExamMetaFields({
           )}
         />
       </div>
-
-      <div>
-        <label
-          htmlFor="exam-pass-score"
-          className="block text-sm font-medium mb-2"
-        >
-          통과 기준 점수
-        </label>
-        <div className="flex gap-2">
-          <Controller
-            name="passScore"
-            control={control}
-            render={({ field }) => (
-              <Input
-                id="exam-pass-score"
-                type="number"
-                placeholder="80"
-                value={field.value ?? ""}
-                onChange={(event) => {
-                  const next = event.target.value;
-                  field.onChange(next === "" ? undefined : Number(next));
-                }}
-                disabled={disabled}
-                className="flex-1"
-              />
-            )}
-          />
-          <span className="flex items-center text-sm text-muted-foreground">
-            점
-          </span>
-        </div>
-        {errors.passScore && (
-          <p className="text-xs text-red-500 mt-1">
-            {errors.passScore.message}
-          </p>
-        )}
-      </div>
     </>
   );
 }
