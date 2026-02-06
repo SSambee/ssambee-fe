@@ -43,8 +43,14 @@ export default function StudentDetailPage() {
     isError: isDetailError,
   } = useEnrollmentDetail(studentId);
 
-  // 수강 중인 첫 번째 강의 ID 추출 (출결 조회의 기준)
-  const mainLectureId = enrollmentData?.lectures?.[0]?.id;
+  // IN_PROGRESS 상태인 강의들 1차 필터링
+  const scheduledLectures =
+    enrollmentData?.lectures?.filter(
+      (lecture) => lecture.status === "IN_PROGRESS"
+    ) || [];
+
+  // 필터링된 강의 중 가장 최신인 0번 인덱스 ID (출결 조회의 기준)
+  const mainLectureId = scheduledLectures[0]?.id;
 
   // 수업이 있는지 확인
   const hasNoLecture = !mainLectureId;
