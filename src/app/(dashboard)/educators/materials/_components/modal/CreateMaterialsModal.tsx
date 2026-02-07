@@ -18,6 +18,7 @@ import {
   RequestFormData,
   OtherFormData,
 } from "@/types/materials.type";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 import MaterialsTypeSelect from "./_components/tab/MaterialsTypeSelect";
 import PaperTypeForm from "./_components/form/PaperTypeForm";
@@ -27,11 +28,15 @@ import OtherTypeForm from "./_components/form/OtherTypeForm";
 
 export function CreateMaterialsModal() {
   const { isOpen, closeModal } = useModal();
+  const { user } = useAuthContext();
+
   const [selectedMaterialsType, setSelectedMaterialsType] =
     useState<MaterialsType>("PAPER");
+
   const [formData, setFormData] = useState<
     PaperFormData | VideoFormData | RequestFormData | OtherFormData | null
   >(null);
+
   const [isFormValid, setIsFormValid] = useState(false);
 
   const toggleMaterialsType = (materialsType: MaterialsType) => {
@@ -76,15 +81,21 @@ export function CreateMaterialsModal() {
 
   // 선택된 분류에 따라 해당 폼 렌더링
   const renderForm = () => {
+    // 작성자명
+    const commonProps = {
+      onDataChange: handleFormDataChange,
+      userName: user?.name || "",
+    };
+
     switch (selectedMaterialsType) {
       case "PAPER":
-        return <PaperTypeForm onDataChange={handleFormDataChange} />;
+        return <PaperTypeForm {...commonProps} />;
       case "VIDEO":
-        return <VideoTypeForm onDataChange={handleFormDataChange} />;
+        return <VideoTypeForm {...commonProps} />;
       case "REQUEST":
-        return <RequestTypeForm onDataChange={handleFormDataChange} />;
+        return <RequestTypeForm {...commonProps} />;
       case "OTHER":
-        return <OtherTypeForm onDataChange={handleFormDataChange} />;
+        return <OtherTypeForm {...commonProps} />;
       default:
         return null;
     }

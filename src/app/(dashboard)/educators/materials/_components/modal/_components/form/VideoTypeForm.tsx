@@ -14,9 +14,13 @@ import { getYoutubeVideoId } from "@/utils/youtubeLink";
 
 type VideoTypeFormProps = {
   onDataChange?: (data: VideoFormData, isValid: boolean) => void;
+  userName: string;
 };
 
-export default function VideoTypeForm({ onDataChange }: VideoTypeFormProps) {
+export default function VideoTypeForm({
+  onDataChange,
+  userName,
+}: VideoTypeFormProps) {
   const {
     register,
     control,
@@ -67,7 +71,8 @@ export default function VideoTypeForm({ onDataChange }: VideoTypeFormProps) {
               id="writer"
               disabled
               className="bg-gray-50"
-              {...register("writer")}
+              value={userName}
+              readOnly
             />
           </div>
 

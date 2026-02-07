@@ -14,9 +14,13 @@ import { getPaperFormDefaults } from "@/constants/materials.default";
 
 type PaperTypeFormProps = {
   onDataChange?: (data: PaperFormData, isValid: boolean) => void;
+  userName: string;
 };
 
-export default function PaperTypeForm({ onDataChange }: PaperTypeFormProps) {
+export default function PaperTypeForm({
+  onDataChange,
+  userName,
+}: PaperTypeFormProps) {
   const {
     register,
     setValue,
@@ -67,7 +71,8 @@ export default function PaperTypeForm({ onDataChange }: PaperTypeFormProps) {
               id="writer"
               disabled
               className="bg-gray-50"
-              {...register("writer")}
+              value={userName}
+              readOnly
             />
           </div>
 

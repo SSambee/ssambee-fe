@@ -14,10 +14,12 @@ import { getRequestFormDefaults } from "@/constants/materials.default";
 
 type RequestTypeFormProps = {
   onDataChange?: (data: RequestFormData, isValid: boolean) => void;
+  userName: string;
 };
 
 export default function RequestTypeForm({
   onDataChange,
+  userName,
 }: RequestTypeFormProps) {
   const {
     register,
@@ -69,7 +71,8 @@ export default function RequestTypeForm({
               id="writer"
               disabled
               className="bg-gray-50"
-              {...register("writer")}
+              value={userName}
+              readOnly
             />
           </div>
 

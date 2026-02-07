@@ -14,9 +14,13 @@ import { getOtherFormDefaults } from "@/constants/materials.default";
 
 type OtherTypeFormProps = {
   onDataChange?: (data: OtherFormData, isValid: boolean) => void;
+  userName: string;
 };
 
-export default function OtherTypeForm({ onDataChange }: OtherTypeFormProps) {
+export default function OtherTypeForm({
+  onDataChange,
+  userName,
+}: OtherTypeFormProps) {
   const {
     register,
     setValue,
@@ -67,7 +71,8 @@ export default function OtherTypeForm({ onDataChange }: OtherTypeFormProps) {
               id="writer"
               disabled
               className="bg-gray-50"
-              {...register("writer")}
+              value={userName}
+              readOnly
             />
           </div>
 
