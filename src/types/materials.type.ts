@@ -1,6 +1,21 @@
+import { z } from "zod";
+
+import {
+  paperFormSchema,
+  videoFormSchema,
+  requestFormSchema,
+  otherFormSchema,
+} from "@/validation/materials.validation";
+
 // 시험지, 동영상, 요청 자료, 기타
 export type MaterialsType = "PAPER" | "VIDEO" | "REQUEST" | "OTHER";
 export type SortOption = "LATEST" | "OLDEST";
+
+// RHF
+export type PaperFormData = z.infer<typeof paperFormSchema>;
+export type VideoFormData = z.infer<typeof videoFormSchema>;
+export type RequestFormData = z.infer<typeof requestFormSchema>;
+export type OtherFormData = z.infer<typeof otherFormSchema>;
 
 export type MaterialsPagination = {
   totalCount: number;
@@ -21,7 +36,7 @@ export type Materials = {
   id: string;
   title: string; // 제목
   description: string; // 소개 또는 세부 내용
-  file?: { name: string; file: File }; // 첨부파일(시험지, 요청 자료)
+  file?: File | null; // 첨부파일(시험지, 요청 자료)
   link?: string; // 동영상 링크
   writer: string; // 작성자
   date: string; // 작성일

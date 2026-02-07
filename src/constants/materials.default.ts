@@ -1,3 +1,10 @@
+import {
+  OtherFormData,
+  PaperFormData,
+  RequestFormData,
+  VideoFormData,
+} from "@/types/materials.type";
+
 export const MATERIALS_TYPE_OPTIONS = [
   { label: "전체", value: "ALL" },
   { label: "시험지", value: "PAPER" },
@@ -19,3 +26,44 @@ export const SORT_OPTIONS = [
   { label: "최신순", value: "LATEST" },
   { label: "오래된순", value: "OLDEST" },
 ];
+
+export function getVideoFormDefaults(): VideoFormData {
+  return {
+    title: "",
+    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    className: "",
+    description: "",
+    youtubeLink: "",
+  };
+}
+
+export function getRequestFormDefaults(): RequestFormData {
+  return {
+    title: "",
+    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    className: "",
+    description: "",
+    file: null as unknown as File,
+    driveLink: "",
+  };
+}
+
+export function getOtherFormDefaults(): OtherFormData {
+  return {
+    title: "",
+    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    className: "",
+    description: "",
+    file: null as unknown as File,
+  };
+}
+
+export function getPaperFormDefaults(): PaperFormData {
+  return {
+    title: "",
+    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    className: "",
+    description: "",
+    file: null as unknown as File,
+  };
+}
