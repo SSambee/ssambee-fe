@@ -27,10 +27,20 @@ export const SORT_OPTIONS = [
   { label: "오래된순", value: "OLDEST" },
 ];
 
+export function getPaperFormDefaults(): PaperFormData {
+  return {
+    title: "",
+    writer: "",
+    className: "",
+    description: "",
+    file: null,
+  };
+}
+
 export function getVideoFormDefaults(): VideoFormData {
   return {
     title: "",
-    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    writer: "",
     className: "",
     description: "",
     youtubeLink: "",
@@ -40,10 +50,10 @@ export function getVideoFormDefaults(): VideoFormData {
 export function getRequestFormDefaults(): RequestFormData {
   return {
     title: "",
-    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    writer: "",
     className: "",
     description: "",
-    file: null as unknown as File,
+    file: null,
     driveLink: "",
   };
 }
@@ -51,19 +61,9 @@ export function getRequestFormDefaults(): RequestFormData {
 export function getOtherFormDefaults(): OtherFormData {
   return {
     title: "",
-    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
+    writer: "",
     className: "",
     description: "",
-    file: null as unknown as File,
-  };
-}
-
-export function getPaperFormDefaults(): PaperFormData {
-  return {
-    title: "",
-    writer: "현재 로그인된 사용자", // TODO: 실제 로그인 유저 정보로 대체
-    className: "",
-    description: "",
-    file: null as unknown as File,
+    image: null,
   };
 }

@@ -72,7 +72,29 @@ export const requestFormSchema = z.object({
 // 기타 자료 폼 스키마
 export const otherFormSchema = z.object({
   ...commonFields,
-  file: fileSchema.refine((file) => file && file.size <= 20 * 1024 * 1024, {
-    message: "파일 크기는 20MB 이하여야 합니다.",
-  }),
+  image: z
+    .any()
+    .refine((file) => file !== null && file instanceof File, {
+      message: "이미지를 업로드해주세요.",
+    })
+    .refine((file) => file && file.size > 0, {
+      message: "이미지를 업로드해주세요.",
+    })
+    .refine(
+      (file) => {
+        if (!file) return false;
+        const validTypes = [
+          "image/jpeg",
+          "image/jpg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+        ];
+        return validTypes.includes(file.type);
+      },
+      { message: "이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WEBP)" }
+    )
+    .refine((file) => file && file.size <= 5 * 1024 * 1024, {
+      message: "이미지 크기는 5MB 이하여야 합니다.",
+    }),
 });
