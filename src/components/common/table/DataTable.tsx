@@ -21,7 +21,7 @@ type CommonDataTableProps<T> = {
   emptyMessage?: string;
 };
 
-export default function CommonDataTable<T extends { id: string }>({
+export default function DataTable<T extends { id: string }>({
   data,
   columns,
   onRowClick,
