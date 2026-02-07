@@ -1,12 +1,20 @@
-import Link from "next/link";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
+import { useModal } from "@/providers/ModalProvider";
 
 import MaterialsFilter from "./_components/filter/MaterialsFilter";
 import MaterialsTable from "./_components/table/MaterialsTable";
+import { CreateMaterialsModal } from "./_components/modal/CreateMaterialsModal";
 
 export default function MaterialsPage() {
+  const { openModal } = useModal();
+
+  const handleOpenCreateModal = () => {
+    openModal(<CreateMaterialsModal />);
+  };
+
   return (
     <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
       <div className="flex items-center justify-between gap-4">
@@ -18,9 +26,9 @@ export default function MaterialsPage() {
         <Button
           variant="outline"
           className="max-w-[180px] h-[50px] w-full rounded-lg text-base cursor-pointer"
-          asChild
+          onClick={handleOpenCreateModal}
         >
-          <Link href="/educators/communication/create">등록하기</Link>
+          등록하기
         </Button>
       </div>
 
