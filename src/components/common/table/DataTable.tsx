@@ -10,7 +10,7 @@ import {
 // 컬럼 정의를 위한 타입
 export type ColumnDefinition<T> = {
   key: string;
-  label: string;
+  label: React.ReactNode;
   render: (row: T) => React.ReactNode;
 };
 
@@ -28,9 +28,9 @@ export default function DataTable<T extends { id: string }>({
   emptyMessage = "기록이 없습니다.",
 }: CommonDataTableProps<T>) {
   return (
-    <div className="border rounded-lg overflow-x-auto min-h-[500px] bg-white">
+    <div className="border rounded-lg overflow-x-auto min-h-[180px] bg-white">
       <Table>
-        <TableHeader>
+        <TableHeader className="whitespace-nowrap h-[45px]">
           <TableRow className="bg-muted/30">
             {columns.map((col) => (
               <TableHead
@@ -48,10 +48,21 @@ export default function DataTable<T extends { id: string }>({
             data.map((record) => (
               <TableRow
                 key={record.id}
-                className={`transition-colors h-[70px] ${
+                className={`transition-colors h-[60px] ${
                   onRowClick ? "cursor-pointer hover:bg-muted/50" : ""
                 }`}
-                onClick={() => onRowClick && onRowClick(record)}
+                onClick={(e) => {
+                  // 클릭된 요소가 체크박스(input)나 링크(a)라면 행 전체 클릭 이벤트 무시
+                  const target = e.target as HTMLElement;
+                  if (
+                    target.closest("button") ||
+                    target.closest("a") ||
+                    target.closest("input")
+                  ) {
+                    return;
+                  }
+                  onRowClick?.(record);
+                }}
               >
                 {columns.map((col) => (
                   <TableCell

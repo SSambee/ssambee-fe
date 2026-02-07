@@ -69,20 +69,20 @@ export default function TabSection() {
             router.push(`/educators/communication/${row.id}`)
           }
         />
-      </div>
 
-      {/* 페이지네이션 */}
-      <Pagination
-        pagination={{
-          totalCount: currentData.length,
-          totalPage: 1,
-          currentPage: 1,
-          limit: 10,
-          hasNextPage: false,
-          hasPrevPage: false,
-        }}
-        onPageChange={(page) => console.log(page)}
-      />
+        {/* 페이지네이션 */}
+        <Pagination
+          pagination={{
+            totalCount: currentData.length,
+            totalPage: 1,
+            currentPage: 1,
+            limit: 10,
+            hasNextPage: false,
+            hasPrevPage: false,
+          }}
+          onPageChange={(page) => console.log(page)}
+        />
+      </div>
     </div>
   );
 }
