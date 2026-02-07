@@ -39,7 +39,7 @@ export default function PaperTypeForm({
     defaultValues: initialData
       ? {
           title: initialData.title,
-          writer: userName,
+          writer: initialData?.writer ? initialData.writer : userName,
           className: initialData.className || "",
           description: initialData.description,
           file: initialData.file || null,

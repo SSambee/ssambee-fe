@@ -41,7 +41,7 @@ export default function OtherTypeForm({
     defaultValues: initialData
       ? {
           title: initialData.title,
-          writer: userName,
+          writer: initialData?.writer ? initialData.writer : userName,
           className: initialData.className || "",
           description: initialData.description,
           image: initialData.image instanceof File ? initialData.image : null,
