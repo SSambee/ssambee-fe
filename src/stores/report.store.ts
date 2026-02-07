@@ -351,6 +351,9 @@ export const useReportStore = create<ReportStore>((set, get) => ({
       exams: [],
       students: [],
       enrollments: [],
+      examStatsById: {},
+      isLoadingExams: false,
+      isLoadingStudents: false,
     })),
   getSelectedStudent: () => {
     const state = get();

@@ -222,12 +222,11 @@ export default function ClinicPage() {
     : "표시할 클리닉 대상자가 없습니다.";
 
   const handleSelectAll = (checked: boolean) => {
+    const pageIds = new Set(pagedStudents.map((student) => student.id));
     if (checked) {
-      setSelectedIdsState(
-        Array.from(new Set(pagedStudents.map((student) => student.id)))
-      );
+      setSelectedIdsState((prev) => Array.from(new Set([...prev, ...pageIds])));
     } else {
-      setSelectedIdsState([]);
+      setSelectedIdsState((prev) => prev.filter((id) => !pageIds.has(id)));
     }
   };
 
