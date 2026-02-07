@@ -74,13 +74,13 @@ export default function TabSection() {
         <Pagination
           pagination={{
             totalCount: currentData.length,
-            totalPage: 1,
+            totalPage: Math.ceil(currentData.length / 10),
             currentPage: 1,
             limit: 10,
-            hasNextPage: false,
+            hasNextPage: currentData.length > 10,
             hasPrevPage: false,
           }}
-          onPageChange={(page) => console.log(page)}
+          onPageChange={() => {}}
         />
       </div>
     </div>

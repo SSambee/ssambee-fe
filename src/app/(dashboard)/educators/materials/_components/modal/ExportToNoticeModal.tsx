@@ -66,10 +66,15 @@ export function ExportToNoticeModal({ material }: ExportToNoticeModalProps) {
     const allFilteredSelected = filteredStudents.every((s) =>
       selectedStudentIds.includes(s.id)
     );
+    const filteredIds = filteredStudents.map((s) => s.id);
     if (allFilteredSelected) {
-      setSelectedStudentIds([]);
+      setSelectedStudentIds(
+        selectedStudentIds.filter((id) => !filteredIds.includes(id))
+      );
     } else {
-      setSelectedStudentIds(filteredStudents.map((s) => s.id));
+      setSelectedStudentIds([
+        ...new Set([...selectedStudentIds, ...filteredIds]),
+      ]);
     }
   };
 
@@ -84,7 +89,7 @@ export function ExportToNoticeModal({ material }: ExportToNoticeModalProps) {
       return;
     }
 
-    // TODO: API 호출하여 공지 생성
+    // TODO: API
     console.log("공지 내보내기:", {
       materialId: material.id,
       materialTitle: material.title,

@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { X, Upload } from "lucide-react";
+import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,21 @@ export default function FileUploadField({
   showPreview = false,
 }: FileUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 메모리 누수 방지 로직
+  const previewUrl = useMemo(() => {
+    if (file && showPreview && file.type.startsWith("image/")) {
+      return URL.createObjectURL(file);
+    }
+    return null;
+  }, [file, showPreview]);
+
+  // 메모리 청소만 담당
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -82,11 +98,14 @@ export default function FileUploadField({
             </button>
           </div>
 
-          {showPreview && isImage && (
+          {showPreview && isImage && previewUrl && (
             <div className="mt-4">
-              <img
-                src={URL.createObjectURL(file)}
+              <Image
+                src={previewUrl}
                 alt="미리보기"
+                width={500}
+                height={500}
+                unoptimized
                 className="max-w-full h-auto max-h-[300px] rounded-lg object-contain"
               />
             </div>

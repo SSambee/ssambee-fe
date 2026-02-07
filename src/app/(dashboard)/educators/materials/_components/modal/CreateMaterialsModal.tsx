@@ -55,11 +55,6 @@ export function CreateMaterialsModal() {
 
   // 학습 자료 등록
   const handleSubmit = () => {
-    if (!selectedMaterialsType) {
-      alert("학습 자료 유형을 선택해주세요.");
-      return;
-    }
-
     if (!isFormValid) {
       alert("필수 항목을 모두 입력해주세요.");
       return;

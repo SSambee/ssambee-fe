@@ -39,22 +39,22 @@ export default function PaperTypeForm({
     defaultValues: initialData
       ? {
           title: initialData.title,
-          writer: initialData.writer,
+          writer: userName,
           className: initialData.className || "",
           description: initialData.description,
           file: initialData.file || null,
         }
-      : getPaperFormDefaults(),
+      : { ...getPaperFormDefaults(), writer: userName },
   });
 
-  const file = useWatch({ control, name: "file" });
+  const watchedValues = useWatch({ control });
 
   useEffect(() => {
     if (mode !== "view") {
       const formData = getValues();
       onDataChange?.(formData, isValid);
     }
-  }, [file, isValid, getValues, onDataChange, mode]);
+  }, [watchedValues, isValid, getValues, onDataChange, mode]);
 
   return (
     <Card>
@@ -93,9 +93,9 @@ export default function PaperTypeForm({
             <InputForm
               label="등록자"
               id="writer"
-              disabled
+              readOnly
               className="bg-gray-50"
-              value={userName}
+              {...register("writer")}
             />
           </div>
 
@@ -110,7 +110,7 @@ export default function PaperTypeForm({
           {!isDisabled && (
             <FileUploadField
               label="시험지 파일"
-              file={file}
+              file={watchedValues.file}
               onFileChange={(file) =>
                 setValue("file", file, { shouldValidate: true })
               }
@@ -119,13 +119,15 @@ export default function PaperTypeForm({
             />
           )}
 
-          {isDisabled && file && (
+          {isDisabled && watchedValues.file && (
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 첨부 파일
               </label>
               <div className="border rounded-lg p-4 bg-gray-50">
-                <p className="text-sm text-gray-900">{file.name}</p>
+                <p className="text-sm text-gray-900">
+                  {watchedValues.file.name}
+                </p>
               </div>
             </div>
           )}

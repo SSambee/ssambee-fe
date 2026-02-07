@@ -12,19 +12,25 @@ import { MATERIALS_TABLE_COLUMNS } from "./MaterialsTableColumns";
 export default function MaterialsTable() {
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
 
-  // 전체 선택 여부 계산
-  const isAllSelected =
-    MOCK_MATERIALS.length > 0 &&
-    selectedMaterials.length === MOCK_MATERIALS.length;
+  // 현재 화면에 있는 데이터 ID 추출
+  const currentDataIds = MOCK_MATERIALS.map((m) => m.id);
 
-  // 전체 선택/해제
+  // 현재 화면의 데이터가 모두 선택되었는지 확인
+  const isAllSelected =
+    currentDataIds.length > 0 &&
+    currentDataIds.every((id) => selectedMaterials.includes(id));
+
   const handleToggleAll = () => {
     if (isAllSelected) {
-      // 이미 다 선택되어 있다면 모두 해제
-      setSelectedMaterials([]);
+      // 현재 화면에 있는 ID들만 기존 선택 목록에서 제외
+      setSelectedMaterials((prev) =>
+        prev.filter((id) => !currentDataIds.includes(id))
+      );
     } else {
-      // 아니라면 모든 ID를 추가
-      setSelectedMaterials(MOCK_MATERIALS.map((m) => m.id));
+      // 기존 선택에 현재 화면 ID들만 추가 (중복 제거)
+      setSelectedMaterials((prev) =>
+        Array.from(new Set([...prev, ...currentDataIds]))
+      );
     }
   };
 
@@ -45,8 +51,7 @@ export default function MaterialsTable() {
     }
 
     // TODO: 실제 API에서는 파일 URL을 받아서 다운로드
-    // 임시로 File 객체의 이름만 사용
-    const fileName = material.file.name || `${material.title}.pdf`;
+    const fileName = material.file.name || material.title;
     alert(`다운로드: ${fileName}`);
   };
 
@@ -72,7 +77,7 @@ export default function MaterialsTable() {
           hasNextPage: false,
           hasPrevPage: false,
         }}
-        onPageChange={(page) => console.log(page)}
+        onPageChange={() => {}}
       />
     </div>
   );

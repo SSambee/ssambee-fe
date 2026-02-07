@@ -40,15 +40,16 @@ export default function RequestTypeForm({
     defaultValues: initialData
       ? {
           title: initialData.title,
-          writer: initialData.writer,
+          writer: userName,
           className: initialData.className || "",
           description: initialData.description,
           file: initialData.file || null,
           driveLink: initialData.link || "",
         }
-      : getRequestFormDefaults(),
+      : { ...getRequestFormDefaults(), writer: userName },
   });
 
+  const formValues = useWatch({ control });
   const file = useWatch({ control, name: "file" });
 
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function RequestTypeForm({
       const formData = getValues();
       onDataChange?.(formData, isValid);
     }
-  }, [file, isValid, getValues, onDataChange, mode]);
+  }, [formValues, isValid, getValues, onDataChange, mode]);
 
   return (
     <Card>
@@ -95,9 +96,9 @@ export default function RequestTypeForm({
             <InputForm
               label="등록자"
               id="writer"
-              disabled
+              readOnly
               className="bg-gray-50"
-              value={userName}
+              {...register("writer")}
             />
           </div>
 
@@ -127,7 +128,9 @@ export default function RequestTypeForm({
                 첨부 파일
               </label>
               <div className="border rounded-lg p-4 bg-gray-50">
-                <p className="text-sm text-gray-900">{file.name}</p>
+                <p className="text-sm text-gray-900">
+                  {file instanceof File ? file.name : file}
+                </p>
               </div>
             </div>
           )}
@@ -139,7 +142,6 @@ export default function RequestTypeForm({
               error={errors.driveLink?.message}
               disabled={isDisabled}
               {...register("driveLink")}
-              value={getValues("driveLink") || ""}
             />
 
             {isDisabled && initialData?.link && (

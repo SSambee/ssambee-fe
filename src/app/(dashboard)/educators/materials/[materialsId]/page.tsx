@@ -97,7 +97,7 @@ export default function MaterialsDetailPage() {
       return;
     }
 
-    const fileName = material.file.name || `${material.title}.pdf`;
+    const fileName = material.file.name || material.title;
     alert(`다운로드: ${fileName}`);
     // TODO: 실제 파일 다운로드 구현
   };

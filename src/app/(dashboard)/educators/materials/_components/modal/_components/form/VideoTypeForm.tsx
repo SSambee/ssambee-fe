@@ -46,15 +46,16 @@ export default function VideoTypeForm({
     defaultValues: initialData
       ? {
           title: initialData.title,
-          writer: initialData.writer,
+          writer: userName,
           className: initialData.className || "",
           description: initialData.description,
           youtubeLink: initialData.link || "",
         }
-      : getVideoFormDefaults(),
+      : { ...getVideoFormDefaults(), writer: userName },
   });
 
-  const youtubeLink = useWatch({ control, name: "youtubeLink" });
+  const watchedFields = useWatch({ control });
+  const youtubeLink = watchedFields.youtubeLink;
   const videoId = extractVideoId(youtubeLink || "");
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function VideoTypeForm({
       const formData = getValues();
       onDataChange?.(formData, isValid);
     }
-  }, [youtubeLink, isValid, getValues, onDataChange, mode]);
+  }, [watchedFields, isValid, getValues, onDataChange, mode]);
 
   return (
     <Card>
@@ -101,9 +102,9 @@ export default function VideoTypeForm({
             <InputForm
               label="등록자"
               id="writer"
-              disabled
+              readOnly
               className="bg-gray-50"
-              value={userName}
+              {...register("writer")}
             />
           </div>
 
@@ -123,7 +124,7 @@ export default function VideoTypeForm({
             {...register("youtubeLink")}
           />
 
-          {videoId && (
+          {youtubeLink && videoId && (
             <div className="mt-4">
               <p className="text-sm font-medium text-gray-700 mb-2">미리보기</p>
               <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">

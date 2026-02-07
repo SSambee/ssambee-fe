@@ -41,12 +41,12 @@ export default function OtherTypeForm({
     defaultValues: initialData
       ? {
           title: initialData.title,
-          writer: initialData.writer,
+          writer: userName,
           className: initialData.className || "",
           description: initialData.description,
           image: initialData.image instanceof File ? initialData.image : null,
         }
-      : getOtherFormDefaults(),
+      : { ...getOtherFormDefaults(), writer: userName },
   });
 
   const handleImageChange = (file: File | null) => {
@@ -54,14 +54,14 @@ export default function OtherTypeForm({
     setValue("image", file, { shouldValidate: true }); // react-hook-form 상태 업데이트 (실제 전송용)
   };
 
-  const image = useWatch({ control, name: "image" });
+  const watchedValues = useWatch({ control });
 
   useEffect(() => {
     if (mode !== "view") {
       const formData = getValues();
       onDataChange?.(formData, isValid);
     }
-  }, [image, isValid, getValues, onDataChange, mode]);
+  }, [watchedValues, isValid, getValues, onDataChange, mode]);
 
   /**
    * [실제 서비스용 로직]
@@ -100,7 +100,7 @@ export default function OtherTypeForm({
           </h3>
           <p className="text-sm text-muted-foreground">
             {mode === "create"
-              ? "시험지, 동영상, 전달 업무 자료 외의 자료입니다."
+              ? "이미지 등의 자료를 업로드합니다."
               : mode === "view"
                 ? "기타 자료 정보를 확인합니다."
                 : "기타 자료 정보를 수정합니다."}
@@ -128,9 +128,9 @@ export default function OtherTypeForm({
             <InputForm
               label="등록자"
               id="writer"
-              disabled
+              readOnly
               className="bg-gray-50"
-              value={userName}
+              {...register("writer")}
             />
           </div>
 

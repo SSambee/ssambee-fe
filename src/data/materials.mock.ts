@@ -4,12 +4,12 @@ export const MOCK_MATERIALS: Materials[] = [
   {
     id: "MAT-2026-001",
     title: "2026 2월 영어 시험지",
-    description: "2026년도도 2월 영어 시험지입니다.",
+    description: "2026년도 2월 영어 시험지입니다.",
     file: new File([], "2026 2월 영어 시험지.pdf"),
     writer: "김강사",
     date: "2026-02-01",
     type: "PAPER",
-    classId: "class-eng-b1",
+    classId: "class-eng-a1",
     className: "영어 A반",
   },
   {
@@ -21,7 +21,7 @@ export const MOCK_MATERIALS: Materials[] = [
     date: "2026-02-02",
     type: "VIDEO",
     classId: "class-eng-b1",
-    className: "영어 A반",
+    className: "영어 B반",
   },
   {
     id: "MAT-2026-003",
@@ -33,7 +33,7 @@ export const MOCK_MATERIALS: Materials[] = [
     date: "2026-02-03",
     type: "REQUEST",
     classId: "class-eng-b1",
-    className: "영어 A반",
+    className: "영어 B반",
   },
   {
     id: "MAT-2026-004",
