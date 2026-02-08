@@ -85,7 +85,6 @@ export const otherFormSchema = z.object({
         if (!file) return false;
         const validTypes = [
           "image/jpeg",
-          "image/jpg",
           "image/png",
           "image/gif",
           "image/webp",
