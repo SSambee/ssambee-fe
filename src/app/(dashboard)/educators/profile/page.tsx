@@ -19,7 +19,14 @@ export default function ProfilePage() {
 
   const handleEditClick = () => {
     openModal(
-      <ProfileEditModal profile={profile} onSubmit={handleProfileUpdate} />
+      <ProfileEditModal
+        profile={profile}
+        onSubmit={(data) =>
+          handleProfileUpdate(
+            data as ProfileUpdateFormData & { imageFile: File | null }
+          )
+        }
+      />
     );
   };
 
@@ -31,10 +38,17 @@ export default function ProfilePage() {
     openModal(<PhoneChangeModal currentPhone={profile.phone} />);
   };
 
-  const handleProfileUpdate = (data: ProfileUpdateFormData) => {
+  const handleProfileUpdate = (
+    data: ProfileUpdateFormData & { imageFile: File | null }
+  ) => {
+    let newImageUrl = profile.image;
+    if (data.imageFile) {
+      newImageUrl = URL.createObjectURL(data.imageFile);
+    }
     setProfile({
       ...profile,
       ...data,
+      image: newImageUrl,
       subjects: data.subjects || [],
     });
     closeModal();

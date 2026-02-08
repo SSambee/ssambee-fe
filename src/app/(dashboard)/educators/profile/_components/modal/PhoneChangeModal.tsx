@@ -50,7 +50,6 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
     formState: { errors: codeErrors, isValid: isCodeValid },
     setValue: setCodeValue,
     reset: resetCode,
-    trigger: triggerCode,
   } = useForm<VerificationCodeFormData>({
     resolver: zodResolver(verificationCodeSchema),
     mode: "onChange",

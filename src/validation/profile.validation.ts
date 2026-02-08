@@ -17,7 +17,7 @@ export const profileUpdateSchema = z.object({
   subjects: z.array(z.string()).optional(),
   academyName: z.string().trim().optional(),
   bio: z.string().trim().optional(),
-  image: z.string().nullable().optional(),
+  imageFile: z.instanceof(File).nullable().optional(),
 });
 
 // 전화번호 변경 스키마

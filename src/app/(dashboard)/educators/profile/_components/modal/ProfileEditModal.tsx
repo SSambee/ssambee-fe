@@ -52,6 +52,13 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
 
   const formValues = useWatch({ control });
 
+  const onInternalSubmit = (data: ProfileUpdateFormData) => {
+    onSubmit({
+      ...data,
+      imageFile: imageFile,
+    });
+  };
+
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -78,7 +85,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
             프로필을 최신 정보로 수정하세요.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onInternalSubmit)} className="space-y-6">
           <div className="flex justify-center">
             <div className="relative">
               <Avatar className="size-24 border-2 border-neutral-50">
