@@ -1,5 +1,7 @@
 "use client";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
+
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import type { ClinicStudent } from "@/types/clinics";
@@ -10,6 +12,13 @@ type ClinicTableProps = {
   onSelectAll: (checked: boolean) => void;
   onToggleSelect: (id: string, checked: boolean) => void;
   selectedExamLabel: string;
+  dateSort: "latest" | "oldest";
+  incompleteFirst: boolean;
+  onSortLatest: () => void;
+  onSortIncomplete: () => void;
+  emptyMessage?: string;
+  showResetButton?: boolean;
+  onResetFilters?: () => void;
 };
 
 const statusColorMap = {
@@ -24,6 +33,13 @@ export function ClinicTable({
   onSelectAll,
   onToggleSelect,
   selectedExamLabel,
+  dateSort,
+  incompleteFirst,
+  onSortLatest,
+  onSortIncomplete,
+  emptyMessage,
+  showResetButton = false,
+  onResetFilters,
 }: ClinicTableProps) {
   const handleSelectAll = (checked: boolean) => {
     onSelectAll(checked);
@@ -70,10 +86,46 @@ export function ClinicTable({
                 점수 / 컷
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium">
-                미통과 일자
+                <div className="flex items-center gap-1">
+                  미통과 일자
+                  <button
+                    type="button"
+                    onClick={onSortLatest}
+                    className={`rounded p-0.5 transition ${
+                      dateSort === "latest"
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                    aria-label="미통과 일자 최신순 정렬"
+                  >
+                    {dateSort === "latest" ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </th>
               <th className="px-4 py-3 text-left text-sm font-medium">
-                재시험 확인
+                <div className="flex items-center gap-1">
+                  재시험 확인
+                  <button
+                    type="button"
+                    onClick={onSortIncomplete}
+                    className={`rounded p-0.5 transition ${
+                      incompleteFirst
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                    aria-label="미완료 우선 정렬"
+                  >
+                    {incompleteFirst ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </th>
             </tr>
           </thead>
@@ -84,7 +136,18 @@ export function ClinicTable({
                   colSpan={6}
                   className="px-4 py-8 text-center text-muted-foreground"
                 >
-                  표시할 클리닉 대상자가 없습니다.
+                  <div className="flex flex-col items-center gap-2">
+                    <p>{emptyMessage ?? "표시할 클리닉 대상자가 없습니다."}</p>
+                    {showResetButton && onResetFilters && (
+                      <button
+                        type="button"
+                        onClick={onResetFilters}
+                        className="text-xs font-medium text-primary underline"
+                      >
+                        필터 초기화
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -112,9 +175,6 @@ export function ClinicTable({
                       </Avatar>
                       <div>
                         <p className="font-medium">{student.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {student.class}
-                        </p>
                       </div>
                     </div>
                   </td>
@@ -130,7 +190,10 @@ export function ClinicTable({
                     {student.failedDate}
                   </td>
                   <td className="px-4 py-3">
-                    <StatusLabel color={statusColorMap[student.status]} showDot>
+                    <StatusLabel
+                      color={statusColorMap[student.status]}
+                      showDot={student.status !== "알림 예정"}
+                    >
                       {student.status}
                     </StatusLabel>
                   </td>

@@ -47,11 +47,11 @@ export function SimpleReportPdf({ data }: SimpleReportPdfProps) {
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>석차</Text>
             <Text style={styles.statValue}>
-              {data.rank} / {data.totalStudents}
+              {data.rank} / {data.totalStudents}등
             </Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>출결</Text>
+            <Text style={styles.statLabel}>출석률</Text>
             <Text style={styles.statValue}>{data.attendance}</Text>
           </View>
         </View>

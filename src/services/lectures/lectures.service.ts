@@ -5,6 +5,7 @@ import type {
   LectureApi,
   LectureCreatePayload,
   LectureDetailApi,
+  LectureEnrollmentDetailApi,
   LectureEnrollmentApi,
   LectureUpdatePayload,
   LecturesListApiResponse,
@@ -63,6 +64,20 @@ export const fetchLectureEnrollmentsAPI = async (
     phone: enrollment.studentPhone,
     parentPhone: enrollment.parentPhone,
   }));
+};
+
+export const fetchLectureEnrollmentDetailAPI = async (
+  lectureEnrollmentId: string
+): Promise<LectureEnrollmentDetailApi> => {
+  const { data } = await axiosClient.get<
+    ApiResponse<LectureEnrollmentDetailApi>
+  >(`/lectureEnrollments/${lectureEnrollmentId}`);
+
+  if (!data?.data) {
+    throw new Error("수강생 성적 정보를 찾을 수 없습니다.");
+  }
+
+  return data.data;
 };
 
 export const createLectureAPI = async (payload: LectureCreatePayload) => {

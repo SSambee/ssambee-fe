@@ -13,6 +13,7 @@ import { SimpleReportPdf } from "./SimpleReportPdf";
 
 type ExamData = {
   id: string;
+  examId: string;
   studentId: string;
   examName: string;
   examDate: string;
@@ -43,6 +44,14 @@ export function SimpleReportTemplate({ examData }: SimpleReportTemplateProps) {
 
   const handleSave = async () => {
     setIsSaving(true);
+    const payload = {
+      examId: examData.examId,
+      lectureEnrollmentId: examData.studentId,
+      template: "simple" as const,
+      message,
+    };
+    // TODO: 백엔드 저장 연결 후 console 로그 제거
+    console.info("[성적표 저장 payload]", payload);
     // TODO: 실제 API 호출로 대체
     await new Promise((resolve) => setTimeout(resolve, 500));
     setIsSaving(false);
@@ -227,13 +236,13 @@ export function SimpleReportTemplate({ examData }: SimpleReportTemplateProps) {
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground">석차</p>
                 <p className="text-xl font-bold">
-                  {examData.rank} / {examData.totalStudents}
+                  {examData.rank} / {examData.totalStudents}등
                 </p>
               </CardContent>
             </Card>
             <Card className="bg-muted/30">
               <CardContent className="p-4">
-                <p className="text-sm text-muted-foreground">출결</p>
+                <p className="text-sm text-muted-foreground">출석률</p>
                 <p className="text-xl font-bold">{examData.attendance}</p>
               </CardContent>
             </Card>

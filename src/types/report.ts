@@ -11,6 +11,26 @@ export type ReportStudent = {
   parentPhone?: string;
 };
 
+export type ClassExam = {
+  id: string;
+  examName: string;
+  examDate: string;
+  totalStudents: number;
+  hasStatistics: boolean;
+};
+
+export type ExamStudent = ReportStudent & {
+  examId: string;
+  score: number;
+  rank: number;
+  totalStudents: number;
+  averageScore: number;
+  attendance: string;
+  nextClass: string;
+  memo: string;
+  questionResults?: QuestionResult[];
+};
+
 export type ReportExam = {
   id: string;
   studentId: string;
@@ -27,6 +47,7 @@ export type ReportExam = {
 
 export type QuestionResult = {
   no: number;
+  content?: string;
   source: string;
   type: string;
   ox: "O" | "X";

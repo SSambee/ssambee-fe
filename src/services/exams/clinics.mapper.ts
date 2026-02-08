@@ -21,6 +21,13 @@ const formatDate = (iso?: string | null) => {
   return `${year}.${month}.${day}`;
 };
 
+const parseDateToTimestamp = (iso?: string | null) => {
+  if (!iso) return 0;
+  const date = new Date(iso);
+  const time = date.getTime();
+  return Number.isNaN(time) ? 0 : time;
+};
+
 const mapStatusLabel = (
   status: ClinicListItemApi["clinic"]["status"]
 ): ClinicStudent["status"] => {
@@ -51,6 +58,9 @@ export const mapClinicApiToStudent = (
     score: clinic.exam.score,
     cutoff: clinic.exam.cutoffScore,
     failedDate: formatDate(clinic.exam.date || clinic.clinic.createdAt),
+    failedDateSort: parseDateToTimestamp(
+      clinic.exam.date || clinic.clinic.createdAt
+    ),
     status: statusLabel,
     phone: clinic.student.phone,
     parentPhone: "",

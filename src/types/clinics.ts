@@ -50,6 +50,7 @@ export type ClinicStudent = {
   score: number;
   cutoff: number;
   failedDate: string;
+  failedDateSort: number;
   status: "알림 예정" | "알림 발송" | "완료";
   phone: string;
   parentPhone: string;
