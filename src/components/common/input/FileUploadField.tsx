@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useRef } from "react";
 import { X, Upload } from "lucide-react";
 import Image from "next/image";
 
@@ -13,6 +13,7 @@ type FileUploadFieldProps = {
   accept?: string;
   error?: string;
   showPreview?: boolean;
+  externalPreviewUrl?: string | null;
 };
 
 export default function FileUploadField({
@@ -22,30 +23,9 @@ export default function FileUploadField({
   accept,
   error,
   showPreview = false,
+  externalPreviewUrl,
 }: FileUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // 메모리 누수 방지 로직
-  const previewUrl = useMemo(() => {
-    if (file && showPreview && file.type.startsWith("image/")) {
-      return URL.createObjectURL(file);
-    }
-    return null;
-  }, [file, showPreview]);
-
-  // 메모리 청소만 담당
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      onFileChange(selectedFile);
-    }
-  };
 
   const handleRemoveFile = () => {
     onFileChange(null);
@@ -53,8 +33,6 @@ export default function FileUploadField({
       fileInputRef.current.value = "";
     }
   };
-
-  const isImage = file && file.type.startsWith("image/");
 
   return (
     <div className="space-y-2">
@@ -98,34 +76,29 @@ export default function FileUploadField({
             </button>
           </div>
 
-          {showPreview && isImage && previewUrl && (
+          {/* 부모가 전달해준 URL이 있을 때만 이미지를 보여줌 */}
+          {showPreview && externalPreviewUrl && (
             <div className="mt-4">
               <Image
-                src={previewUrl}
-                alt="미리보기"
+                src={externalPreviewUrl}
                 width={500}
                 height={500}
-                unoptimized
+                unoptimized // Blob URL이나 외부 경로는 최적화를 건너뜀
+                alt="미리보기"
                 className="max-w-full h-auto max-h-[300px] rounded-lg object-contain"
               />
             </div>
           )}
         </div>
       )}
-
       <input
         ref={fileInputRef}
         type="file"
         accept={accept}
-        onChange={handleFileSelect}
+        onChange={(e) => onFileChange(e.target.files?.[0] || null)}
         className="hidden"
       />
-
-      {error && (
-        <p className="text-[12px] text-red-600 animate-in fade-in slide-in-from-top-1">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-[12px] text-red-600">{error}</p>}
     </div>
   );
 }

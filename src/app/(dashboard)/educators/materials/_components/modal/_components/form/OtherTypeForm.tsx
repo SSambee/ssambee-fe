@@ -71,10 +71,7 @@ export default function OtherTypeForm({
    */
   const displayImageUrl = useMemo(() => {
     if (imageFile) {
-      const blobUrl = URL.createObjectURL(imageFile);
-      // 클린업 함수를 대신할 방법이 없으므로 useEffect에서 관리하거나
-      // 아래와 같이 처리 후 나중에 revoke 시점을 관리합니다.
-      return blobUrl;
+      return URL.createObjectURL(imageFile);
     }
     if (typeof initialData?.image === "string") {
       return initialData.image;
@@ -82,7 +79,7 @@ export default function OtherTypeForm({
     return null;
   }, [imageFile, initialData?.image]);
 
-  // 메모리 누수 방지를 위한 가비지 컬렉션
+  // 메모리 정리
   useEffect(() => {
     return () => {
       if (displayImageUrl && displayImageUrl.startsWith("blob:")) {
@@ -150,6 +147,7 @@ export default function OtherTypeForm({
               accept="image/*"
               error={errors.image?.message as string}
               showPreview={true}
+              externalPreviewUrl={displayImageUrl}
             />
           )}
 
@@ -164,9 +162,9 @@ export default function OtherTypeForm({
                   alt={initialData?.title || "이미지"}
                   width={400}
                   height={300}
-                  className="max-w-full h-auto max-h-[300px] rounded-lg object-contain"
-                  // blob URL일 때는 Next.js 서버 최적화 건너뜀뜀
+                  // blob URL일 때는 Next.js 서버 최적화 건너뜀
                   unoptimized={displayImageUrl.startsWith("blob:")}
+                  className="max-w-full h-auto max-h-[300px] rounded-lg object-contain"
                 />
               </div>
             </div>
