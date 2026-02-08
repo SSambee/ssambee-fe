@@ -162,7 +162,9 @@ export function ExportToNoticeModal({ material }: ExportToNoticeModalProps) {
                   onClick={toggleAllStudents}
                   className="h-auto py-1 px-2 text-xs"
                 >
-                  {selectedStudentIds.length === filteredStudents.length
+                  {filteredStudents.every((s) =>
+                    selectedStudentIds.includes(s.id)
+                  )
                     ? "전체 해제"
                     : "전체 선택"}
                 </Button>
