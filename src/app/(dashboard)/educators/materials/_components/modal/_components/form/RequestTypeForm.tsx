@@ -145,14 +145,13 @@ export default function RequestTypeForm({
             />
 
             {isDisabled && initialData?.link && (
-              <Link
+              <a
                 href={initialData.link}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="구글 드라이브 링크 열기"
                 className="absolute left-0 right-0 bottom-0 top-0 z-20 cursor-pointer rounded-lg hover:bg-blue-50/30 transition-colors"
-              >
-                <span className="sr-only">링크 열기</span>
-              </Link>
+              ></a>
             )}
           </div>
         </div>
