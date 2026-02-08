@@ -21,7 +21,7 @@ export function ProfileSummary({
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex gap-6">
             <Avatar className="size-24 border-2 border-neutral-50">
               <AvatarImage
