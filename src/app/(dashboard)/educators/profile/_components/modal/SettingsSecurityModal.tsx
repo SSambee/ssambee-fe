@@ -73,9 +73,8 @@ export function SettingsSecurityModal() {
     setShowConfirmPwd(false);
   };
 
-  const onSubmit = (data: PasswordChangeFormData) => {
+  const onSubmit = () => {
     // TODO: API 연동
-    console.log("비밀번호 변경:", data);
     handleClose();
   };
 
@@ -107,7 +106,7 @@ export function SettingsSecurityModal() {
           <div className="space-y-3 py-4">
             <Button
               variant="outline"
-              className="w-full justify-start h-14 text-base"
+              className="w-full justify-start h-14 text-base cursor-pointer"
               onClick={handlePasswordChange}
             >
               <Lock className="mr-3 h-5 w-5" />
@@ -115,7 +114,7 @@ export function SettingsSecurityModal() {
             </Button>
             <Button
               variant="outline"
-              className="w-full justify-start h-14 text-base text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="w-full justify-start h-14 text-base text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
               onClick={handleWithdrawal}
             >
               <UserX className="mr-3 h-5 w-5" />
@@ -128,9 +127,7 @@ export function SettingsSecurityModal() {
               <InputForm
                 label="현재 비밀번호"
                 type={showCurrentPwd ? "text" : "password"}
-                {...register("currentPassword", {
-                  onBlur: () => trigger("currentPassword"),
-                })}
+                {...register("currentPassword")}
                 error={errors.currentPassword?.message}
                 showReset={!!currentPasswordValue}
                 onReset={() => {
@@ -169,7 +166,7 @@ export function SettingsSecurityModal() {
                 <button
                   type="button"
                   onClick={() => setShowNewPwd(!showNewPwd)}
-                  className="absolute right-13 top-[30px] -translate-y-1/2"
+                  className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
                 >
                   {showNewPwd ? (
                     <EyeOpenIcon size={20} />
@@ -196,7 +193,7 @@ export function SettingsSecurityModal() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPwd(!showConfirmPwd)}
-                  className="absolute right-13 top-[30px] -translate-y-1/2"
+                  className="absolute right-13 top-[30px] -translate-y-1/2 cursor-pointer"
                 >
                   {showConfirmPwd ? (
                     <EyeOpenIcon size={20} />
@@ -210,13 +207,17 @@ export function SettingsSecurityModal() {
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 cursor-pointer"
                 onClick={handleBack}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 뒤로 가기
               </Button>
-              <Button type="submit" className="flex-1" disabled={!isValid}>
+              <Button
+                type="submit"
+                className="flex-1 cursor-pointer"
+                disabled={!isValid}
+              >
                 변경하기
               </Button>
             </div>

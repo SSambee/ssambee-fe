@@ -123,7 +123,7 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
               <Button
                 type="submit"
                 disabled={!!phoneErrors.phoneNumber || isCodeSent}
-                className="mt-0 h-[58px]"
+                className="mt-0 h-[58px] cursor-pointer"
               >
                 {isCodeSent ? "발송됨" : "인증번호 발송"}
               </Button>
@@ -151,7 +151,7 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
                 <Button
                   type="submit"
                   disabled={!isCodeValid || isVerified}
-                  className="mt-0 h-[58px]"
+                  className="mt-0 h-[58px] cursor-pointer"
                 >
                   {isVerified ? "인증완료" : "인증하기"}
                 </Button>
@@ -160,11 +160,15 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
           )}
 
           <div className="flex gap-2 pt-4">
-            <Button variant="outline" className="flex-1" onClick={handleClose}>
+            <Button
+              variant="outline"
+              className="flex-1 cursor-pointer"
+              onClick={handleClose}
+            >
               취소
             </Button>
             <Button
-              className="flex-1"
+              className="flex-1 cursor-pointer"
               onClick={handleFinalSubmit}
               disabled={!isVerified}
             >

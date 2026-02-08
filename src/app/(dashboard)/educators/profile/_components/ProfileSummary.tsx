@@ -45,8 +45,14 @@ export function ProfileSummary({
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-neutral-400" />
                   <span>{profile.academyName}</span>|
-                  <BookOpen className="h-4 w-4 text-neutral-400" />
-                  <span>{profile.subjects.join(", ")}</span>
+                  {profile.subjects.length > 0 ? (
+                    <>
+                      <BookOpen className="h-4 w-4 text-neutral-400" />
+                      <span>{profile.subjects.join(", ")}</span>
+                    </>
+                  ) : (
+                    <span>-</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-neutral-400" />

@@ -52,10 +52,18 @@ export function DashboardHeader() {
   const initials = user?.name?.charAt(0) || "";
 
   const handleProfileClick = () => {
-    router.push("/educators/profile");
+    const profileRoutes: Record<Role, string> = {
+      INSTRUCTOR: "/educators/profile",
+      ASSISTANT: "/educators/profile",
+      STUDENT: "/learners/profile",
+      PARENT: "/learners/profile",
+    };
+    const route = profileRoutes[user?.userType as Role] || "/educators/profile";
+    router.push(route);
   };
 
   const handleLogout = () => {
+    if (!user?.userType) return;
     signout(API_URL_TYPE[user?.userType as Role]);
   };
 
@@ -113,13 +121,16 @@ export function DashboardHeader() {
             </span>
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={handleProfileClick}>
+        <DropdownMenuContent align="end" className="w-50">
+          <DropdownMenuItem
+            onClick={handleProfileClick}
+            className="cursor-pointer"
+          >
             <User className="mr-2 h-4 w-4" />
             <span>내 프로필</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>로그아웃</span>
           </DropdownMenuItem>

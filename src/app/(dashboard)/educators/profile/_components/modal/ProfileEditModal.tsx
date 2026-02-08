@@ -29,6 +29,7 @@ type ProfileEditModalProps = {
 export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
   const { isOpen, closeModal } = useModal();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -64,7 +65,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
       };
       reader.readAsDataURL(file);
       // TODO: API 연동 - 이미지 업로드
-      console.log("이미지 업로드:", file);
+      setImageFile(file);
     }
   };
 
@@ -99,7 +100,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
               <Button
                 type="button"
                 onClick={handleImageClick}
-                className="absolute bottom-0 right-0 h-8 w-8 rounded-full border-2 border-white shadow-md p-0"
+                className="absolute bottom-0 right-0 h-8 w-8 rounded-full border-2 border-white shadow-md p-0 cursor-pointer"
               >
                 <Camera className="h-4 w-4" />
               </Button>
@@ -130,7 +131,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
             <InputForm
               id="subjects"
               label="담당 과목"
-              defaultValue={profile.subjects.join(", ")}
+              value={formValues.subjects?.join(", ") ?? ""}
               onChange={(e) => {
                 const subjects = e.currentTarget.value
                   .split(",")
@@ -159,10 +160,17 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
           />
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={closeModal}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={closeModal}
+              className="cursor-pointer"
+            >
               취소
             </Button>
-            <Button type="submit">변경 사항 저장</Button>
+            <Button type="submit" className="cursor-pointer">
+              변경 사항 저장
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -38,7 +38,11 @@ export function BasicInfo({ profile, onPhoneChangeClick }: BasicInfoProps) {
                 </span>
               )}
             </div>
-            <Button variant="outline" onClick={onPhoneChangeClick}>
+            <Button
+              variant="outline"
+              onClick={onPhoneChangeClick}
+              className="cursor-pointer"
+            >
               번호 변경
             </Button>
           </div>
