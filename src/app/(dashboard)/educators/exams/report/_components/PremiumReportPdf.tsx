@@ -34,6 +34,7 @@ type PremiumReportPdfProps = {
   };
   questionResults: Array<{
     no: number;
+    content?: string;
     source: string;
     type: string;
     ox: "O" | "X";
@@ -68,7 +69,7 @@ export function PremiumReportPdf({
           <View style={styles.attendanceTable}>
             <View style={styles.table}>
               <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderCell}>출결</Text>
+                <Text style={styles.tableHeaderCell}>출석률</Text>
                 <Text style={styles.tableHeaderCell}>복습테스트</Text>
               </View>
               <View style={styles.tableRow}>
@@ -95,9 +96,6 @@ export function PremiumReportPdf({
               <Text style={styles.infoLabel}>학원명</Text>
               {/* TODO: 학원명은 데이터 prop으로 치환 */}
               <Text style={styles.infoValue}></Text>
-              <Text style={styles.infoLabelSmall}>회차</Text>
-              {/* TODO: 회차는 데이터 기반으로 치환 */}
-              <Text style={styles.infoValue}>6회차</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>수강반</Text>
@@ -190,7 +188,7 @@ export function PremiumReportPdf({
                 <View style={[styles.scoreCell, styles.scoreCellBorder]}>
                   <Text style={styles.scoreLabel}>석차</Text>
                   <Text style={styles.scoreValue}>
-                    {data.rank}/{data.totalStudents}
+                    {data.rank}/{data.totalStudents}등
                   </Text>
                 </View>
                 <View style={[styles.scoreCell, styles.scoreCellBorder]}>
@@ -396,8 +394,11 @@ export function PremiumReportPdf({
           {/* 테이블 헤더 - 각 페이지마다 반복 */}
           <View style={styles.questionHeaderRow} fixed>
             <Text style={[styles.questionHeaderCell, { width: 28 }]}>No</Text>
-            <Text style={[styles.questionHeaderCell, { flex: 1 }]}>출처</Text>
+            <Text style={[styles.questionHeaderCell, { flex: 1 }]}>
+              문항내용
+            </Text>
             <Text style={[styles.questionHeaderCell, { width: 50 }]}>유형</Text>
+            <Text style={[styles.questionHeaderCell, { width: 70 }]}>출처</Text>
             <Text style={[styles.questionHeaderCell, { width: 32 }]}>O/X</Text>
             <Text style={[styles.questionHeaderCell, { width: 45 }]}>
               오답률
@@ -420,10 +421,13 @@ export function PremiumReportPdf({
               <Text
                 style={[styles.questionCell, { flex: 1, textAlign: "left" }]}
               >
-                {item.source}
+                {item.content || item.source}
               </Text>
               <Text style={[styles.questionCell, { width: 50 }]}>
                 {item.type}
+              </Text>
+              <Text style={[styles.questionCell, { width: 70 }]}>
+                {item.source}
               </Text>
               <Text
                 style={[

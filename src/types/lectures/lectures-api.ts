@@ -100,3 +100,33 @@ export type LectureEnrollmentApi = {
   school: string;
   schoolYear: string;
 };
+
+export type LectureEnrollmentGradeItemApi = {
+  exam: {
+    title: string;
+    examDate: string | null;
+    subject?: string | null;
+    average: number;
+    totalExaminees: number;
+  };
+  grade: {
+    score: number;
+    rank: number;
+  };
+};
+
+export type LectureEnrollmentDetailApi = {
+  lectureEnrollmentId: string;
+  lecture: {
+    title: string;
+    instructor: { name: string };
+    subject?: string | null;
+    schoolYear?: string | null;
+  };
+  enrollment: {
+    name: string;
+    school: string;
+    status: string;
+  };
+  grades: LectureEnrollmentGradeItemApi[];
+};

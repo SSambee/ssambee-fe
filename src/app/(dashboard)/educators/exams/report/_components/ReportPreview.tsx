@@ -25,6 +25,7 @@ export function ReportPreview() {
     if (!exam || !student) return null;
     return {
       id: student.id,
+      examId: exam.id,
       studentId: student.id,
       examName: exam.examName,
       examDate: exam.examDate,
@@ -35,6 +36,7 @@ export function ReportPreview() {
       attendance: student.attendance,
       nextClass: student.nextClass,
       memo: student.memo,
+      questionResults: student.questionResults ?? [],
       studentName: student.name,
       className: student.className,
       phone: student.phone,

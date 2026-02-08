@@ -30,3 +30,37 @@ export type StudentGradeWithAnswersApi = {
   examTitle: string;
   questions: StudentGradeAnswerApi[];
 };
+
+export type ExamGradeEnrollmentApi = {
+  id: string;
+  enrollment: {
+    id: string;
+    studentName: string;
+    studentPhone: string;
+    school: string;
+    schoolYear: string;
+  };
+};
+
+export type ExamGradeApi = {
+  id: string;
+  examId: string;
+  lectureEnrollmentId: string;
+  score: number;
+  isPass: boolean;
+  lectureEnrollment: ExamGradeEnrollmentApi;
+};
+
+export type ExamGradeReportApi = {
+  attendanceRate?: number | null;
+  questions?: ExamGradeReportQuestionApi[] | null;
+};
+
+export type ExamGradeReportQuestionApi = {
+  questionNumber: number;
+  content?: string | null;
+  source?: string | null;
+  category?: string | null;
+  isCorrect?: boolean | null;
+  wrongRate?: number | null;
+};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MessageSquare,
   FileText,
@@ -25,12 +25,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { KakaoNotificationModal } from "@/components/common/modals/KakaoNotificationModal";
-import { mockQuestionResults, mockScoreHistory } from "@/data/report.mock";
+import { fetchLectureEnrollmentDetailAPI } from "@/services/lectures/lectures.service";
+import type { QuestionResult, ScoreHistory } from "@/types/report";
+import { formatYMDFromISO } from "@/utils/date";
 
 import { PremiumReportPdf } from "./PremiumReportPdf";
 
 type ExamData = {
   id: string;
+  examId: string;
   studentId: string;
   examName: string;
   examDate: string;
@@ -41,6 +44,7 @@ type ExamData = {
   attendance: string;
   nextClass: string;
   memo: string;
+  questionResults?: QuestionResult[];
   studentName: string;
   className: string;
   phone?: string;
@@ -54,26 +58,98 @@ type PremiumReportTemplateProps = {
 export function PremiumReportTemplate({
   examData,
 }: PremiumReportTemplateProps) {
+  const [scoreHistory, setScoreHistory] = useState<ScoreHistory[]>([]);
+  const [isScoreHistoryLoading, setIsScoreHistoryLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [attendance, setAttendance] = useState("결석");
-  const [reviewTest, setReviewTest] = useState("자료수령");
+  const [reviewTest, setReviewTest] = useState("");
   const [weaknessType, setWeaknessType] = useState("");
-  const [homeworkWord, setHomeworkWord] = useState("미응시");
+  const [homeworkWord, setHomeworkWord] = useState("");
   const [homeworkTask, setHomeworkTask] = useState("");
   const [homeworkExtra, setHomeworkExtra] = useState("");
-  const [message, setMessage] = useState(
-    "[수업내용]\n24강 + 25강 (6지문) / 교과서 5과\n\n[과제]\n- 포켓보카 전범위 암기\n- 7주차 주간지 풀이/채점/오답\n- 교과서 5과 교재 02, 03번 풀이/채점/오답"
-  );
+  const [message, setMessage] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const attendanceRate = examData.attendance || "-";
+  const questionResults = examData.questionResults ?? [];
+
+  const formatMonthDay = (iso?: string | null) => {
+    const ymd = formatYMDFromISO(iso);
+    if (!ymd) return "";
+    const [, month, day] = ymd.split("-");
+    return `${Number(month)}/${Number(day)}`;
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadScoreHistory = async () => {
+      if (!examData.studentId) {
+        setScoreHistory([]);
+        return;
+      }
+
+      setIsScoreHistoryLoading(true);
+      try {
+        const detail = await fetchLectureEnrollmentDetailAPI(
+          examData.studentId
+        );
+
+        const mapped = detail.grades
+          .map((item) => ({
+            round: formatMonthDay(item.exam.examDate) || item.exam.title,
+            score: item.grade.score,
+            sortKey: item.exam.examDate
+              ? new Date(item.exam.examDate).getTime()
+              : 0,
+          }))
+          .sort((a, b) => a.sortKey - b.sortKey)
+          .map(({ round, score }) => ({ round, score }));
+
+        if (!cancelled) {
+          setScoreHistory(mapped);
+        }
+      } catch (error) {
+        console.error("성적 추이 로드 실패:", error);
+        if (!cancelled) {
+          setScoreHistory([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsScoreHistoryLoading(false);
+        }
+      }
+    };
+
+    void loadScoreHistory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [examData.studentId]);
+
+  const singlePointOnly = scoreHistory.length === 1;
 
   const totalPages = 2;
 
   const handleSave = async () => {
     setIsSaving(true);
+    const payload = {
+      examId: examData.examId,
+      lectureEnrollmentId: examData.studentId,
+      template: "premium" as const,
+      message,
+      reviewTest,
+      homeworkWord,
+      homeworkTask,
+      homeworkExtra,
+      weaknessType,
+      attendanceRate,
+    };
+    // TODO: 백엔드 저장 연결 후 console 로그 제거
+    console.info("[성적표 저장 payload]", payload);
     // TODO: 실제 API 호출로 대체
     await new Promise((resolve) => setTimeout(resolve, 500));
     setIsSaving(false);
@@ -107,7 +183,7 @@ export function PremiumReportTemplate({
         rank: examData.rank,
         totalStudents: examData.totalStudents,
         averageScore: examData.averageScore,
-        attendance,
+        attendance: attendanceRate,
         reviewTest,
         homeworkWord,
         homeworkTask,
@@ -120,8 +196,8 @@ export function PremiumReportTemplate({
       const blob = await pdf(
         <PremiumReportPdf
           data={pdfData}
-          questionResults={mockQuestionResults}
-          scoreHistory={mockScoreHistory}
+          questionResults={questionResults}
+          scoreHistory={scoreHistory}
         />
       ).toBlob();
 
@@ -277,10 +353,7 @@ export function PremiumReportTemplate({
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="bg-zinc-900 text-white">
-                      <th className="border p-2">
-                        출결{" "}
-                        <span className="text-xs opacity-70">(직접 입력)</span>
-                      </th>
+                      <th className="border p-2">출석률 </th>
                       <th className="border p-2">
                         복습테스트{" "}
                         <span className="text-xs opacity-70">(직접 입력)</span>
@@ -289,19 +362,8 @@ export function PremiumReportTemplate({
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="border p-0">
-                        <input
-                          type="text"
-                          value={attendance}
-                          onChange={(e) => {
-                            setAttendance(e.target.value);
-                            setIsSaved(false);
-                          }}
-                          disabled={!isEditing}
-                          aria-label="출결"
-                          className="w-full bg-transparent p-3 text-center outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                          placeholder="입력"
-                        />
+                      <td className="border p-3 text-center text-sm">
+                        {attendanceRate}
                       </td>
                       <td className="border p-0">
                         <input
@@ -341,15 +403,11 @@ export function PremiumReportTemplate({
                     {examData.examDate}
                   </span>
                 </div>
-                <div className="grid grid-cols-[100px_1fr_80px_1fr] gap-2 text-sm">
+                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
                   <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
                     학원명
                   </span>
                   <span className="border-b px-2 py-1.5"></span>
-                  <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
-                    회차
-                  </span>
-                  <span className="border-b px-2 py-1.5">6회차</span>
                 </div>
                 <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
                   <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
@@ -453,7 +511,7 @@ export function PremiumReportTemplate({
                       {examData.score}점
                     </td>
                     <td className="border p-3 text-center text-lg font-bold">
-                      {examData.rank}/{examData.totalStudents}
+                      {examData.rank}/{examData.totalStudents}등
                     </td>
                     <td className="border p-3 text-center text-lg font-bold">
                       {examData.averageScore}점
@@ -491,38 +549,53 @@ export function PremiumReportTemplate({
                   회차별 성적추이
                 </div>
                 <div className="h-[200px] p-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={mockScoreHistory}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                      <XAxis
-                        dataKey="round"
-                        tick={{ fontSize: 12 }}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        domain={[0, 100]}
-                        tick={{ fontSize: 12 }}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <Tooltip
-                        formatter={(value) => [`${value}점`, "점수"]}
-                        contentStyle={{
-                          backgroundColor: "#fff",
-                          border: "1px solid #e5e5e5",
-                          borderRadius: "8px",
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="score"
-                        stroke="#f59e0b"
-                        strokeWidth={2}
-                        dot={{ fill: "#f59e0b", strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 6 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {isScoreHistoryLoading ? (
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                      성적 추이를 불러오는 중입니다.
+                    </div>
+                  ) : scoreHistory.length === 0 ? (
+                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                      표시할 성적 추이가 없습니다.
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={scoreHistory}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                        <XAxis
+                          dataKey="round"
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          domain={[0, 100]}
+                          ticks={[0, 20, 40, 60, 80, 100]}
+                          tick={{ fontSize: 12 }}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <Tooltip
+                          formatter={(value) => [`${value}점`, "점수"]}
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #e5e5e5",
+                            borderRadius: "8px",
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="score"
+                          stroke="#f59e0b"
+                          strokeWidth={2}
+                          dot={
+                            singlePointOnly
+                              ? { fill: "#f59e0b", strokeWidth: 0, r: 5 }
+                              : { fill: "#f59e0b", strokeWidth: 2, r: 4 }
+                          }
+                          activeDot={singlePointOnly ? { r: 5 } : { r: 6 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </div>
 
@@ -565,7 +638,7 @@ export function PremiumReportTemplate({
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">총 문항</p>
                 <p className="text-2xl font-bold">
-                  {mockQuestionResults.length}문항
+                  {questionResults.length}문항
                 </p>
               </div>
             </div>
@@ -579,28 +652,43 @@ export function PremiumReportTemplate({
                 <thead>
                   <tr className="bg-muted">
                     <th className="w-16 border p-3">No.</th>
-                    <th className="border p-3">출처</th>
-                    <th className="w-24 border p-3">유형</th>
+                    <th className="border p-3 text-left">문항내용</th>
+                    <th className="w-20 border p-3">유형</th>
+                    <th className="w-24 border p-3">출처</th>
                     <th className="w-16 border p-3">O/X</th>
                     <th className="w-20 border p-3">오답률</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mockQuestionResults.map((q) => (
-                    <tr key={q.no}>
-                      <td className="border p-2 text-center">{q.no}</td>
-                      <td className="border p-2 text-center">{q.source}</td>
-                      <td className="border p-2 text-center">{q.type}</td>
+                  {questionResults.length === 0 ? (
+                    <tr>
                       <td
-                        className={`border p-2 text-center font-bold ${
-                          q.ox === "X" ? "text-red-500" : "text-blue-500"
-                        }`}
+                        colSpan={6}
+                        className="border p-4 text-center text-sm text-muted-foreground"
                       >
-                        {q.ox}
+                        표시할 문항별 응시 결과가 없습니다.
                       </td>
-                      <td className="border p-2 text-center">{q.errorRate}</td>
                     </tr>
-                  ))}
+                  ) : (
+                    questionResults.map((q) => (
+                      <tr key={q.no}>
+                        <td className="border p-2 text-center">{q.no}</td>
+                        <td className="border p-2 text-left">{q.content}</td>
+                        <td className="border p-2 text-center">{q.type}</td>
+                        <td className="border p-2 text-center">{q.source}</td>
+                        <td
+                          className={`border p-2 text-center font-bold ${
+                            q.ox === "X" ? "text-red-500" : "text-blue-500"
+                          }`}
+                        >
+                          {q.ox}
+                        </td>
+                        <td className="border p-2 text-center">
+                          {q.errorRate}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
