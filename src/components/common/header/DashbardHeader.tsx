@@ -51,20 +51,24 @@ export function DashboardHeader() {
   const displayName = user ? `${getRoleLabel(user.userType)} ${user.name}` : "";
   const initials = user?.name?.charAt(0) || "";
 
+  const isValidRole = (type: string): type is Role =>
+    ["INSTRUCTOR", "ASSISTANT", "STUDENT", "PARENT"].includes(type);
+
   const handleProfileClick = () => {
+    if (!user?.userType || !isValidRole(user.userType)) return;
     const profileRoutes: Record<Role, string> = {
       INSTRUCTOR: "/educators/profile",
       ASSISTANT: "/educators/profile",
       STUDENT: "/learners/profile",
       PARENT: "/learners/profile",
     };
-    const route = profileRoutes[user?.userType as Role] || "/educators/profile";
+    const route = profileRoutes[user.userType];
     router.push(route);
   };
 
   const handleLogout = () => {
-    if (!user?.userType) return;
-    signout(API_URL_TYPE[user?.userType as Role]);
+    if (!user?.userType || !isValidRole(user.userType)) return;
+    signout(API_URL_TYPE[user.userType]);
   };
 
   return (

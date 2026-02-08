@@ -41,15 +41,19 @@ export default function ProfilePage() {
   const handleProfileUpdate = (
     data: ProfileUpdateFormData & { imageFile: File | null }
   ) => {
+    const { imageFile, ...formData } = data;
     let newImageUrl = profile.image;
-    if (data.imageFile) {
-      newImageUrl = URL.createObjectURL(data.imageFile);
+    if (imageFile) {
+      if (profile.image?.startsWith("blob:")) {
+        URL.revokeObjectURL(profile.image);
+      }
+      newImageUrl = URL.createObjectURL(imageFile);
     }
     setProfile({
       ...profile,
-      ...data,
+      ...formData,
       image: newImageUrl,
-      subjects: data.subjects || [],
+      subjects: formData.subjects || [],
     });
     closeModal();
   };

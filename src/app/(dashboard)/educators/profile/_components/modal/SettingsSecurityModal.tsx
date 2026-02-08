@@ -58,6 +58,9 @@ export function SettingsSecurityModal() {
   const handleClose = () => {
     setViewMode("menu");
     reset();
+    setShowCurrentPwd(false);
+    setShowNewPwd(false);
+    setShowConfirmPwd(false);
     closeModal();
   };
 
