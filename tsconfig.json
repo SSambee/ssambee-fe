@@ -36,7 +36,8 @@
     "**/*.tsx", // 모든 .tsx 파일 포함
     ".next/types/**/*.ts", // Next.js 빌드 타입 포함
     ".next/dev/types/**/*.ts", // 개발 모드 타입 포함
-    "**/*.mts" // 모든 .mts 파일 포함 (모듈 타입스크립트)
+    "**/*.mts", // 모든 .mts 파일 포함 (모듈 타입스크립트)
+    "src/types/static.d.ts"
   ],
   // 제외할 폴더 설정 섹션
   "exclude": ["node_modules"] // node_modules 폴더는 컴파일 대상에서 제외
