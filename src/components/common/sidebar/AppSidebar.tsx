@@ -74,25 +74,38 @@ const instructorMenuItems = [
 
 const otherMenuItems = [
   {
-    title: "예제1",
-    url: "/example1",
-    icon: BookOpen,
+    title: "대시보드",
+    url: "/learners",
+    icon: Home,
   },
   {
-    title: "예제2",
-    url: "/example2",
-    icon: Calendar,
+    title: "마이페이지",
+    url: "/learners/mypage",
+    icon: Users,
   },
   {
-    title: "예제3",
-    url: "/example3",
+    title: "성적조회",
+    url: "/learners/exams",
     icon: FileText,
+  },
+  {
+    title: "소통",
+    url: "/learners/communication",
+    icon: MessageSquare,
   },
 ];
 
 const getMenuItems = (userType?: Role) => {
   if (userType === "INSTRUCTOR") return instructorMenuItems;
   return otherMenuItems;
+};
+
+const isMenuItemActive = (pathname: string, url: string) => {
+  if (url === "/educators" || url === "/learners") {
+    return pathname === url;
+  }
+
+  return pathname === url || pathname.startsWith(url + "/");
 };
 
 export function AppSidebar() {
@@ -129,10 +142,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    isActive={
-                      pathname === item.url ||
-                      pathname?.startsWith(item.url + "/")
-                    }
+                    isActive={isMenuItemActive(pathname, item.url)}
                     className="h-14 gap-[14px] rounded-[12px] px-6 py-4 text-[18px] leading-[26px] tracking-[-0.18px] font-semibold text-[rgba(22,22,27,0.28)] hover:bg-transparent hover:text-inherit data-[active=true]:bg-[#f4f6fe] data-[active=true]:text-[#4b72f7] data-[active=true]:font-bold"
                   >
                     <Link href={item.url}>
