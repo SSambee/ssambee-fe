@@ -10,7 +10,7 @@ import {
   registerRequestSchema,
 } from "@/validation/auth.validation";
 import { RegisterFormData, RegisterUser, Role } from "@/types/auth.type";
-import { useAuthStore, useSchoolStore } from "@/stores/auth.store";
+import { useAuthStore, useSchoolStore } from "@/stores/registered.store";
 import { REGISTER_FORM_DEFAULTS } from "@/constants/auth.defaults";
 import { verifyPhoneAPI } from "@/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
