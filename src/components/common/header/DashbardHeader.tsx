@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
+import { LogOut, User } from "lucide-react";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -12,12 +14,24 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useBreadcrumb } from "@/providers/BreadcrumbProvider";
+import { useAuth } from "@/hooks/useAuth";
+import { API_URL_TYPE } from "@/hooks/useAuth";
+import { Role } from "@/types/auth.type";
 
 export function DashboardHeader() {
   const { breadcrumbs } = useBreadcrumb();
   const { user } = useAuthContext();
+  const { signout } = useAuth();
+  const router = useRouter();
 
   const getRoleLabel = (userType: string) => {
     switch (userType) {
@@ -37,10 +51,30 @@ export function DashboardHeader() {
   const displayName = user ? `${getRoleLabel(user.userType)} ${user.name}` : "";
   const initials = user?.name?.charAt(0) || "";
 
+  const isValidRole = (type: string): type is Role =>
+    ["INSTRUCTOR", "ASSISTANT", "STUDENT", "PARENT"].includes(type);
+
+  const handleProfileClick = () => {
+    if (!user?.userType || !isValidRole(user.userType)) return;
+    const profileRoutes: Record<Role, string> = {
+      INSTRUCTOR: "/educators/profile",
+      ASSISTANT: "/educators/profile",
+      STUDENT: "/learners/profile",
+      PARENT: "/learners/profile",
+    };
+    const route = profileRoutes[user.userType];
+    router.push(route);
+  };
+
+  const handleLogout = () => {
+    if (!user?.userType || !isValidRole(user.userType)) return;
+    signout(API_URL_TYPE[user.userType]);
+  };
+
   return (
-    <header className="flex h-[88px] shrink-0 items-center justify-between border-b border-[#e9ebf0] bg-white px-14 py-5">
+    <header className="flex h-[88px] shrink-0 items-center justify-between border-b border-neutral-200 bg-white px-14 py-5">
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="h-6 w-6 rounded-none bg-transparent p-0 text-[#8b90a3] shadow-none hover:bg-transparent hover:text-[#8b90a3] [&_svg]:size-6" />
+        <SidebarTrigger className="h-6 w-6 rounded-none bg-transparent p-0 text-neutral-400 shadow-none hover:bg-transparent hover:text-neutral-400 [&_svg]:size-6" />
         {breadcrumbs.length > 0 && (
           <Breadcrumb>
             <BreadcrumbList className="flex items-center gap-0.5 text-[16px] leading-6 tracking-[-0.16px]">
@@ -50,7 +84,7 @@ export function DashboardHeader() {
                 return (
                   <React.Fragment key={index}>
                     {index > 0 && (
-                      <BreadcrumbSeparator className="inline-flex h-6 items-center px-[10px] py-0 text-[#b0b4c2]">
+                      <BreadcrumbSeparator className="inline-flex h-6 items-center px-[10px] py-0 text-neutral-300">
                         /
                       </BreadcrumbSeparator>
                     )}
@@ -77,17 +111,35 @@ export function DashboardHeader() {
           </Breadcrumb>
         )}
       </div>
-      <div className="flex items-center gap-4">
-        <Avatar className="size-12 border-[1.5px] border-[#f4f6fa] bg-white">
-          <AvatarImage src={user?.image || undefined} alt={displayName} />
-          <AvatarFallback className="bg-[#f4f6fa] text-sm text-[#8b90a3]">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-[#8b90a3]">
-          {displayName}
-        </span>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className="flex cursor-pointer items-center gap-4">
+            <Avatar className="size-12 border-[1.5px] border-neutral-50 bg-white">
+              <AvatarImage src={user?.image || undefined} alt={displayName} />
+              <AvatarFallback className="bg-neutral-50 text-sm text-neutral-400">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
+              {displayName}
+            </span>
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-50">
+          <DropdownMenuItem
+            onClick={handleProfileClick}
+            className="cursor-pointer"
+          >
+            <User className="mr-2 h-4 w-4" />
+            <span>내 프로필</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>로그아웃</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 }
