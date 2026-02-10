@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 
 import { SCHOOL_INFO_FORM_DEFAULTS } from "@/constants/auth.defaults";
-import { useSchoolStore } from "@/stores/auth.store";
+import { useSchoolStore } from "@/stores/registered.store";
 import { schoolInfoSchema } from "@/validation/auth.validation";
 import { SchoolInfoFormData } from "@/types/auth.type";
 import SelectBtn from "@/components/common/button/SelectBtn";
