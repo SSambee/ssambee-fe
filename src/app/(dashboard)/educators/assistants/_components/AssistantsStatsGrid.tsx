@@ -1,22 +1,7 @@
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
 
+import type { AssistantsStatItem } from "@/app/(dashboard)/educators/assistants/_types/assistants.page.types";
 import { Card, CardContent } from "@/components/ui/card";
-
-type AssistantsStatItem = {
-  label: string;
-  value: string;
-  delta: string;
-  icon: LucideIcon;
-  accent: string;
-  href?: string;
-  modal?:
-    | "none"
-    | "task"
-    | "contractManage"
-    | "sendContract"
-    | "assistantDetail";
-};
 
 type AssistantsStatsGridProps = {
   stats: AssistantsStatItem[];
