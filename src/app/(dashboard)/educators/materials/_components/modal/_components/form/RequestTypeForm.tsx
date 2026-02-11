@@ -53,7 +53,7 @@ export default function RequestTypeForm({
   const watchedValues = useWatch({ control });
 
   const file = watchedValues.file;
-  const driveLink = watchedValues.driveLink || initialData?.link;
+  const driveLink = watchedValues.driveLink ?? initialData?.link;
 
   // onDataChange를 ref로 관리하여 의존성 배열에서 제외
   const onDataChangeRef = useRef(onDataChange);
