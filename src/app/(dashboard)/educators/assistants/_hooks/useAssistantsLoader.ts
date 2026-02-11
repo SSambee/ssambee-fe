@@ -3,13 +3,11 @@ import {
   type SetStateAction,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
-import {
-  assistants,
-  type Assistant,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+import { type Assistant } from "@/app/(dashboard)/educators/assistants/_types/assistants";
 import type {
   AssistantsSummary,
   AssistantsDashboardSummary,
@@ -81,13 +79,18 @@ const getErrorMessage = (error: unknown) => {
 export const useAssistantsLoader = ({
   onError,
 }: UseAssistantsLoaderParams): UseAssistantsLoaderResult => {
-  const [assistantRecords, setAssistantRecords] =
-    useState<Assistant[]>(assistants);
+  const onErrorRef = useRef(onError);
+
+  const [assistantRecords, setAssistantRecords] = useState<Assistant[]>([]);
   const [summaryState, setSummaryState] = useState<AssistantsDashboardSummary>({
     summary: initialSummary,
     ordersStats: null,
   });
   const [isAssistantsLoading, setIsAssistantsLoading] = useState(false);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   const reloadAssistants = useCallback(async () => {
     setIsAssistantsLoading(true);
@@ -123,11 +126,11 @@ export const useAssistantsLoader = ({
         ordersStats: orderStats,
       });
     } catch (error) {
-      onError(getErrorMessage(error));
+      onErrorRef.current(getErrorMessage(error));
     } finally {
       setIsAssistantsLoading(false);
     }
-  }, [onError]);
+  }, []);
 
   useEffect(() => {
     void reloadAssistants();

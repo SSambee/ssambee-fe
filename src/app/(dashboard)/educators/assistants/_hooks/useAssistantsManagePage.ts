@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { DEFAULT_ACTIVE_STATUS_FILTER } from "@/app/(dashboard)/educators/assistants/_constants/assistants.constants";
 import { useAssistantsLoader } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsLoader";
 import {
-  assistants,
   type AssistantDetailDraft,
   contractRecords,
   contractStatusClassMap,
@@ -38,18 +37,12 @@ export const useAssistantsManagePage = () => {
     useState<ActiveStatusFilter>(DEFAULT_ACTIVE_STATUS_FILTER);
   const [currentPage, setCurrentPage] = useState(1);
   const [activeModal, setActiveModal] = useState<AssistantsModalType>("none");
-  const [selectedAssistantId, setSelectedAssistantId] = useState(
-    assistants[0]?.id ?? ""
-  );
+  const [selectedAssistantId, setSelectedAssistantId] = useState("");
   const [assistantDetailDraft, setAssistantDetailDraft] =
-    useState<AssistantDetailDraft>(() =>
-      createAssistantDetailDraft(assistants[0])
-    );
+    useState<AssistantDetailDraft>(() => createAssistantDetailDraft());
   const [isEditingAssistantDetail, setIsEditingAssistantDetail] =
     useState(false);
-  const [sendTargetId, setSendTargetId] = useState(
-    contractRecords[0]?.assistantId ?? assistants[0]?.id ?? ""
-  );
+  const [sendTargetId, setSendTargetId] = useState("");
   const [sendTemplate, setSendTemplate] = useState<
     (typeof contractTemplateOptions)[number]
   >(contractTemplateOptions[0]);
