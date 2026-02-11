@@ -12,9 +12,28 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+type DatePickerBaseProps = {
+  id?: string;
+  value?: string;
+  onChangeAction: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
+};
+
 type DatePickerFieldProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
+  id?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  className?: string;
+};
+
+type DatePickerInputProps = {
+  id?: string;
+  value?: string;
+  onChangeAction: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
@@ -29,16 +48,15 @@ const formatDisplayDate = (date: Date) => {
 
 const formatValueDate = (date: Date) => date.toLocaleDateString("sv-SE");
 
-export function DatePickerField<T extends FieldValues>({
-  control,
-  name,
+function DatePickerBase({
+  id,
+  value,
+  onChangeAction,
   placeholder = "날짜 선택",
   disabled,
   className,
-}: DatePickerFieldProps<T>) {
-  const { field } = useController({ control, name });
+}: DatePickerBaseProps) {
   const [open, setOpen] = useState(false);
-  const value = field.value as string | undefined;
 
   const selectedDate = useMemo(() => {
     if (!value) return undefined;
@@ -52,6 +70,7 @@ export function DatePickerField<T extends FieldValues>({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
+          id={id}
           type="button"
           disabled={disabled}
           className={cn(
@@ -71,7 +90,7 @@ export function DatePickerField<T extends FieldValues>({
           selected={selectedDate}
           onSelect={(date) => {
             if (!date) return;
-            field.onChange(formatValueDate(date));
+            onChangeAction(formatValueDate(date));
             setOpen(false);
           }}
           className="eduops-date-picker"
@@ -92,5 +111,47 @@ export function DatePickerField<T extends FieldValues>({
         />
       </PopoverContent>
     </Popover>
+  );
+}
+
+export function DatePickerField<T extends FieldValues>({
+  control,
+  name,
+  id,
+  placeholder = "날짜 선택",
+  disabled,
+  className,
+}: DatePickerFieldProps<T>) {
+  const { field } = useController({ control, name });
+
+  return (
+    <DatePickerBase
+      id={id}
+      value={field.value as string | undefined}
+      onChangeAction={field.onChange}
+      placeholder={placeholder}
+      disabled={disabled}
+      className={className}
+    />
+  );
+}
+
+export function DatePickerInput({
+  id,
+  value,
+  onChangeAction,
+  placeholder = "날짜 선택",
+  disabled,
+  className,
+}: DatePickerInputProps) {
+  return (
+    <DatePickerBase
+      id={id}
+      value={value}
+      onChangeAction={onChangeAction}
+      placeholder={placeholder}
+      disabled={disabled}
+      className={className}
+    />
   );
 }

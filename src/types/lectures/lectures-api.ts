@@ -64,6 +64,7 @@ export type LecturesPagination = {
 export type LectureApi = {
   id: string;
   title: string;
+  color?: string | null;
   schoolYear?: string | null;
   subject?: string | null;
   description?: string | null;

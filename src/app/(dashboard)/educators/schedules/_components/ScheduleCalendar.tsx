@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import {
   Calendar,
   Views,
@@ -15,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import type { CalendarEvent } from "@/app/(dashboard)/educators/schedules/_hooks/useScheduleEvents";
+import type { ScheduleCalendarEvent } from "@/types/schedules";
 
 const locales = { ko };
 
@@ -32,7 +33,6 @@ const calendarMessages = {
   previous: "이전",
   next: "다음",
   month: "월",
-  week: "주",
   day: "일",
   date: "날짜",
   time: "시간",
@@ -43,9 +43,24 @@ const calendarMessages = {
 type ScheduleCalendarProps = {
   view: View;
   currentDate: Date;
-  events: CalendarEvent[];
+  events: ScheduleCalendarEvent[];
   onViewChange: (view: View) => void;
   onNavigate: (date: Date) => void;
+  onSelectEvent?: (event: ScheduleCalendarEvent) => void;
+};
+
+const getReadableTextColor = (hexColor: string) => {
+  const normalized = hexColor.replace("#", "");
+  if (normalized.length !== 6) {
+    return "#1f2937";
+  }
+
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+
+  const luminance = (r * 299 + g * 587 + b * 114) / 1000;
+  return luminance >= 160 ? "#1f2937" : "#ffffff";
 };
 
 function CalendarToolbar({
@@ -53,7 +68,7 @@ function CalendarToolbar({
   view,
   onNavigate,
   onView,
-}: ToolbarProps<CalendarEvent, object>) {
+}: ToolbarProps<ScheduleCalendarEvent, object>) {
   const label = format(date, "yyyy년 M월", { locale: ko });
 
   return (
@@ -90,10 +105,7 @@ function CalendarToolbar({
         </span>
       </div>
       <ButtonGroup className="rounded-lg border border-input bg-background p-1 shadow-sm">
-        {[
-          { label: "월별", value: Views.MONTH },
-          { label: "주별", value: Views.WEEK },
-        ].map((option) => (
+        {[{ label: "월별", value: Views.MONTH }].map((option) => (
           <Button
             key={option.value}
             type="button"
@@ -115,12 +127,13 @@ function CalendarToolbar({
   );
 }
 
-export function ScheduleCalendar({
+function ScheduleCalendarComponent({
   view,
   currentDate,
   events,
   onViewChange,
   onNavigate,
+  onSelectEvent,
 }: ScheduleCalendarProps) {
   return (
     <Card className="border-none shadow-none">
@@ -130,13 +143,14 @@ export function ScheduleCalendar({
           events={events}
           startAccessor="start"
           endAccessor="end"
-          views={[Views.MONTH, Views.WEEK]}
+          views={[Views.MONTH]}
           view={view}
           date={currentDate}
           onView={(nextView: View) => onViewChange(nextView)}
           onNavigate={(nextDate: Date) => onNavigate(nextDate)}
+          onSelectEvent={onSelectEvent}
           popup
-          tooltipAccessor={(event: CalendarEvent) =>
+          tooltipAccessor={(event: ScheduleCalendarEvent) =>
             event.description ?? event.title
           }
           dayPropGetter={(date: Date) => {
@@ -150,8 +164,12 @@ export function ScheduleCalendar({
               ),
             };
           }}
-          eventPropGetter={(event: CalendarEvent) => ({
-            className: `eduops-calendar-event eduops-calendar-event--${event.category}`,
+          eventPropGetter={(event: ScheduleCalendarEvent) => ({
+            className: "eduops-calendar-event",
+            style: {
+              backgroundColor: event.categoryColor,
+              color: getReadableTextColor(event.categoryColor),
+            },
           })}
           components={{
             toolbar: CalendarToolbar,
@@ -164,3 +182,6 @@ export function ScheduleCalendar({
     </Card>
   );
 }
+
+export const ScheduleCalendar = memo(ScheduleCalendarComponent);
+ScheduleCalendar.displayName = "ScheduleCalendar";
