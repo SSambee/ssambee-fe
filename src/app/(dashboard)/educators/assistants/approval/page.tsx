@@ -7,9 +7,9 @@ import {
   KeyRound,
   UserPlus,
 } from "lucide-react";
-import { useMemo, useState } from "react";
 
 import AssistantsTabs from "@/app/(dashboard)/educators/assistants/_components/AssistantsTabs";
+import { useAssistantsApprovalPage } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsApprovalPage";
 import Title from "@/components/common/header/Title";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,38 +24,27 @@ import {
 } from "@/components/ui/select";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
-const approvalCode = "UCBW-NPZ7";
-
-const approvalStats = ["승인 대기", "승인 완료", "반려됨"] as const;
-type ApprovalStatus = (typeof approvalStats)[number];
-
-const applications = [
-  {
-    id: "1",
-    name: "김민수",
-    phone: "010-1234-5678",
-    email: "pjh@example.com",
-    appliedAt: "2024. 06. 20 14:30",
-    mentor: "김민수 선생님",
-    role: "중등 수학 보조",
-    status: "승인 대기",
-  },
-];
-
 export default function AssistantsApprovalPage() {
   useSetBreadcrumb([{ label: "조교 승인" }]);
 
-  const [activeStatusFilter, setActiveStatusFilter] =
-    useState<ApprovalStatus>("승인 대기");
-  const [actionNotice, setActionNotice] = useState<string | null>(null);
-
-  const filteredApplications = useMemo(
-    () =>
-      applications.filter(
-        (application) => application.status === activeStatusFilter
-      ),
-    [activeStatusFilter]
-  );
+  const {
+    approvalStats,
+    statusColorMap,
+    activeStatusFilter,
+    setActiveStatusFilter,
+    sortOrder,
+    setSortOrder,
+    actionNotice,
+    approvalCode,
+    isCodeCreating,
+    isApplicationsLoading,
+    processingApplicationId,
+    applicationsByStatus,
+    sortedApplications,
+    handleCreateApprovalCode,
+    handleCopyInviteLink,
+    handleSignAction,
+  } = useAssistantsApprovalPage();
 
   return (
     <div className="container mx-auto space-y-8 p-6">
@@ -73,19 +62,16 @@ export default function AssistantsApprovalPage() {
               <Button
                 variant="outline"
                 className="rounded-full"
-                onClick={() =>
-                  setActionNotice("인증 코드 생성은 UI 미리보기 단계입니다.")
-                }
+                onClick={handleCreateApprovalCode}
+                disabled={isCodeCreating}
               >
                 <KeyRound className="h-4 w-4" />
-                인증 코드 생성
+                {isCodeCreating ? "생성 중..." : "인증 코드 생성"}
               </Button>
               <Button
                 variant="outline"
                 className="rounded-full"
-                onClick={() =>
-                  setActionNotice("가입 링크 복사는 UI 미리보기 단계입니다.")
-                }
+                onClick={() => void handleCopyInviteLink()}
               >
                 <Copy className="h-4 w-4" />
                 가입 링크 복사
@@ -126,11 +112,7 @@ export default function AssistantsApprovalPage() {
               >
                 {stat}
                 <span className="ml-2 rounded-full bg-white/20 px-2 py-0.5 text-xs">
-                  {
-                    applications.filter(
-                      (application) => application.status === stat
-                    ).length
-                  }
+                  {applicationsByStatus[stat].length}
                 </span>
               </Button>
             ))}
@@ -145,7 +127,12 @@ export default function AssistantsApprovalPage() {
               <UserPlus className="h-4 w-4 text-muted-foreground" />
               <h3 className="text-sm font-semibold">조교 가입 신청 목록</h3>
             </div>
-            <Select defaultValue="latest">
+            <Select
+              value={sortOrder}
+              onValueChange={(value: "latest" | "oldest") =>
+                setSortOrder(value)
+              }
+            >
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="정렬" />
               </SelectTrigger>
@@ -157,12 +144,16 @@ export default function AssistantsApprovalPage() {
           </div>
 
           <div className="space-y-3">
-            {filteredApplications.length === 0 ? (
+            {isApplicationsLoading ? (
+              <div className="rounded-lg border border-dashed bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+                신청 내역을 불러오는 중입니다.
+              </div>
+            ) : sortedApplications.length === 0 ? (
               <div className="rounded-lg border border-dashed bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
                 선택한 상태의 신청 내역이 없습니다.
               </div>
             ) : (
-              filteredApplications.map((application) => (
+              sortedApplications.map((application) => (
                 <div
                   key={application.id}
                   className="flex flex-wrap items-center gap-4 rounded-lg border bg-background p-4"
@@ -176,7 +167,7 @@ export default function AssistantsApprovalPage() {
                   <div className="min-w-[200px] flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold">{application.name}</span>
-                      <StatusLabel color="blue">
+                      <StatusLabel color={statusColorMap[application.status]}>
                         {application.status}
                       </StatusLabel>
                     </div>
@@ -199,29 +190,37 @@ export default function AssistantsApprovalPage() {
                   </div>
 
                   <div className="ml-auto flex flex-wrap gap-2">
-                    <Button
-                      variant="secondary"
-                      className="rounded-full"
-                      onClick={() =>
-                        setActionNotice(
-                          `${application.name} 승인 처리는 UI 미리보기 단계입니다.`
-                        )
-                      }
-                    >
-                      <CheckCircle2 className="h-4 w-4" />
-                      승인
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="rounded-full"
-                      onClick={() =>
-                        setActionNotice(
-                          `${application.name} 반려 처리는 UI 미리보기 단계입니다.`
-                        )
-                      }
-                    >
-                      반려
-                    </Button>
+                    {(() => {
+                      const isPending = application.status === "승인 대기";
+                      const isProcessing =
+                        processingApplicationId === application.id;
+
+                      return (
+                        <>
+                          <Button
+                            variant="secondary"
+                            className="rounded-full"
+                            onClick={() =>
+                              void handleSignAction(application, "approve")
+                            }
+                            disabled={!isPending || isProcessing}
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                            {isProcessing ? "처리 중..." : "승인"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={() =>
+                              void handleSignAction(application, "reject")
+                            }
+                            disabled={!isPending || isProcessing}
+                          >
+                            반려
+                          </Button>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               ))

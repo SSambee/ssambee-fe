@@ -31,6 +31,7 @@ type AssistantDetailModalProps = {
   selectedAssistant: Assistant | undefined;
   assistantDetailDraft: AssistantDetailDraft;
   isEditingAssistantDetail: boolean;
+  isRetiringAssistant: boolean;
   editableStatusOptions: readonly ["근무전", "근무중"];
   onChangeStatus: (status: AssistantStatus) => void;
   onChangeMemo: (memo: string) => void;
@@ -47,6 +48,7 @@ export default function AssistantDetailModal({
   selectedAssistant,
   assistantDetailDraft,
   isEditingAssistantDetail,
+  isRetiringAssistant,
   editableStatusOptions,
   onChangeStatus,
   onChangeMemo,
@@ -136,18 +138,25 @@ export default function AssistantDetailModal({
                 variant="outline"
                 className="rounded-full"
                 onClick={onRetireAssistant}
-                disabled={selectedAssistant?.status === "퇴사"}
+                disabled={
+                  selectedAssistant?.status === "퇴사" || isRetiringAssistant
+                }
               >
-                퇴사 처리
+                {isRetiringAssistant ? "처리 중..." : "퇴사 처리"}
               </Button>
               <Button
                 variant="outline"
                 className="rounded-full"
                 onClick={onCancelEdit}
+                disabled={isRetiringAssistant}
               >
                 취소
               </Button>
-              <Button className="rounded-full" onClick={onSaveDetail}>
+              <Button
+                className="rounded-full"
+                onClick={onSaveDetail}
+                disabled={isRetiringAssistant}
+              >
                 <CheckSquare className="h-4 w-4" />
                 저장
               </Button>
@@ -158,6 +167,7 @@ export default function AssistantDetailModal({
                 variant="outline"
                 className="rounded-full"
                 onClick={onCloseDetail}
+                disabled={isRetiringAssistant}
               >
                 닫기
               </Button>
@@ -165,13 +175,17 @@ export default function AssistantDetailModal({
                 variant="outline"
                 className="rounded-full"
                 onClick={onRetireAssistant}
-                disabled={selectedAssistant?.status === "퇴사"}
+                disabled={
+                  selectedAssistant?.status === "퇴사" || isRetiringAssistant
+                }
               >
-                퇴사 처리
+                {isRetiringAssistant ? "처리 중..." : "퇴사 처리"}
               </Button>
               <Button
                 className="rounded-full"
-                disabled={selectedAssistant?.status === "퇴사"}
+                disabled={
+                  selectedAssistant?.status === "퇴사" || isRetiringAssistant
+                }
                 onClick={onStartEdit}
               >
                 수정

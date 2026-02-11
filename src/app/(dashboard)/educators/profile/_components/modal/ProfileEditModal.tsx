@@ -136,20 +136,6 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <InputForm
-              id="subjects"
-              label="담당 과목"
-              value={formValues.subjects?.join(", ") ?? ""}
-              onChange={(e) => {
-                const subjects = e.currentTarget.value
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean);
-                setValue("subjects", subjects);
-              }}
-              showReset={(formValues.subjects?.length ?? 0) > 0}
-              onReset={() => setValue("subjects", [])}
-            />
-            <InputForm
               id="academyName"
               label="소속 학원명"
               {...register("academyName")}
