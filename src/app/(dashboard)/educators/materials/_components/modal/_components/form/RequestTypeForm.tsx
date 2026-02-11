@@ -33,6 +33,7 @@ export default function RequestTypeForm({
     control,
     getValues,
     formState: { errors, isValid },
+    reset,
   } = useForm<RequestFormData>({
     resolver: mode === "view" ? undefined : zodResolver(requestFormSchema),
     mode: "onChange",
@@ -59,6 +60,20 @@ export default function RequestTypeForm({
       onDataChange(getValues(), isValid);
     }
   }, [watchedValues, isValid, mode, onDataChange, getValues]);
+
+  // mode가 view로 변경될 때 (취소 시) 폼 초기화
+  useEffect(() => {
+    if (mode === "view" && initialData) {
+      reset({
+        title: initialData.title,
+        writer: initialData?.writer ? initialData.writer : userName,
+        className: initialData.className || "",
+        description: initialData.description,
+        file: initialData.file || null,
+        driveLink: initialData.link || "",
+      });
+    }
+  }, [mode, initialData, userName, reset]);
 
   return (
     <Card>

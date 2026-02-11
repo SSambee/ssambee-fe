@@ -33,6 +33,7 @@ export default function PaperTypeForm({
     control,
     getValues,
     formState: { errors, isValid },
+    reset,
   } = useForm<PaperFormData>({
     resolver: mode === "view" ? undefined : zodResolver(paperFormSchema),
     mode: "onChange",
@@ -54,6 +55,19 @@ export default function PaperTypeForm({
       onDataChange(getValues(), isValid);
     }
   }, [watchedValues, isValid, mode, onDataChange, getValues]);
+
+  // mode가 view로 변경될 때 (취소 시) 폼 초기화
+  useEffect(() => {
+    if (mode === "view" && initialData) {
+      reset({
+        title: initialData.title,
+        writer: initialData?.writer ? initialData.writer : userName,
+        className: initialData.className || "",
+        description: initialData.description,
+        file: initialData.file || null,
+      });
+    }
+  }, [mode, initialData, userName, reset]);
 
   return (
     <Card>

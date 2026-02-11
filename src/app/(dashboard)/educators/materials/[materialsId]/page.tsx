@@ -164,13 +164,13 @@ export default function MaterialsDetailPage() {
 
     switch (material.type) {
       case "PAPER":
-        return <PaperTypeForm {...commonProps} />;
+        return <PaperTypeForm key={mode} {...commonProps} />;
       case "VIDEO":
-        return <VideoTypeForm {...commonProps} />;
+        return <VideoTypeForm key={mode} {...commonProps} />;
       case "REQUEST":
-        return <RequestTypeForm {...commonProps} />;
+        return <RequestTypeForm key={mode} {...commonProps} />;
       case "OTHER":
-        return <OtherTypeForm {...commonProps} />;
+        return <OtherTypeForm key={mode} {...commonProps} />;
       default:
         return null;
     }

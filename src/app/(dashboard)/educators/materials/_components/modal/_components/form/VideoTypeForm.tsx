@@ -32,6 +32,7 @@ export default function VideoTypeForm({
     getValues,
     control,
     formState: { errors, isValid },
+    reset,
   } = useForm<VideoFormData>({
     resolver: mode === "view" ? undefined : zodResolver(videoFormSchema),
     mode: "onChange",
@@ -57,6 +58,19 @@ export default function VideoTypeForm({
       onDataChange(getValues(), isValid);
     }
   }, [watchedValues, isValid, mode, onDataChange, getValues]);
+
+  // mode가 view로 변경될 때 (취소 시) 폼 초기화
+  useEffect(() => {
+    if (mode === "view" && initialData) {
+      reset({
+        title: initialData.title,
+        writer: initialData?.writer ? initialData.writer : userName,
+        className: initialData.className || "",
+        description: initialData.description,
+        link: initialData.link || "",
+      });
+    }
+  }, [mode, initialData, userName, reset]);
 
   return (
     <Card>
