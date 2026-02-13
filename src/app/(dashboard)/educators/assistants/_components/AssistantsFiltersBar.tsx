@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 
-import { ACTIVE_STATUS_FILTER_OPTIONS } from "@/app/(dashboard)/educators/assistants/_constants/assistants.constants";
-import type { ActiveStatusFilter } from "@/app/(dashboard)/educators/assistants/_types/assistants.page.types";
+import { ACTIVE_STATUS_FILTER_OPTIONS } from "@/constants/assistants.constants";
+import type { ActiveStatusFilter } from "@/types/assistants";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {

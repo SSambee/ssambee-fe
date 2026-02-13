@@ -1,7 +1,4 @@
-import {
-  type Assistant,
-  type AssistantsPagination,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+import { type Assistant, type AssistantsPagination } from "@/types/assistants";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import { Pagination } from "@/components/common/pagination/Pagination";
 import { Card, CardContent } from "@/components/ui/card";

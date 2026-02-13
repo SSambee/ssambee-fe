@@ -1,7 +1,4 @@
-import {
-  type Assistant,
-  type AssistantStatus,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+import { type Assistant, type AssistantStatus } from "@/types/assistants";
 import type { AssistantApi, AssistantSignStatus } from "@/types/assistants";
 
 export type ApprovalStatus = "승인 대기" | "승인 완료" | "반려됨";

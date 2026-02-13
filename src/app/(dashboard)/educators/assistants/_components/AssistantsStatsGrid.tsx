@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { AssistantsStatItem } from "@/app/(dashboard)/educators/assistants/_types/assistants.page.types";
+import type { AssistantsStatItem } from "@/types/assistants";
 import { Card, CardContent } from "@/components/ui/card";
 
 type AssistantsStatsGridProps = {

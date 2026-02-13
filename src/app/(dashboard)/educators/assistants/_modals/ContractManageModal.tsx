@@ -4,7 +4,7 @@ import {
   type Assistant,
   type ContractRecord,
   type ContractStatus,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+} from "@/types/assistants";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

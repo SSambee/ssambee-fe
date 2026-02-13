@@ -1,24 +1,30 @@
 import { Briefcase, CalendarCheck, ClipboardList, Users } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { DEFAULT_ACTIVE_STATUS_FILTER } from "@/app/(dashboard)/educators/assistants/_constants/assistants.constants";
 import { useAssistantsLoader } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsLoader";
 import {
-  type AssistantDetailDraft,
-  contractRecords,
   contractStatusClassMap,
   contractTemplateOptions,
   createAssistantDetailDraft,
+  DEFAULT_ACTIVE_STATUS_FILTER,
   editableStatusOptions,
   PAGE_LIMIT,
   resourceCategoryOptions,
-  resourceLibraryItems,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
-import type {
+} from "@/constants/assistants.constants";
+import {
+  mockContractRecords,
+  mockResourceLibraryItems,
+} from "@/data/assistants.mock";
+import { TIME_HHMM_REGEX } from "@/constants/regex";
+import {
+  type AssistantDetailDraft,
   ActiveStatusFilter,
   AssistantsModalType,
   AssistantsStatItem,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants.page.types";
+} from "@/types/assistants";
+import { htmlToPlainText } from "@/utils/assistants";
+import { createAssistantOrderAPI } from "@/services/assistants/assistantOrders.service";
+import type { AssistantOrderPriority } from "@/types/assistantOrders";
 import {
   signAssistantAPI,
   updateAssistantAPI,
@@ -47,6 +53,12 @@ export const useAssistantsManagePage = () => {
     (typeof contractTemplateOptions)[number]
   >(contractTemplateOptions[0]);
   const [uploadFileName, setUploadFileName] = useState("선택된 파일 없음");
+  const [taskAssigneeId, setTaskAssigneeId] = useState("");
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskPriority, setTaskPriority] =
+    useState<AssistantOrderPriority>("NORMAL");
+  const [taskDeadlineDate, setTaskDeadlineDate] = useState("");
+  const [taskDeadlineTime, setTaskDeadlineTime] = useState("");
   const [taskInstructionContent, setTaskInstructionContent] = useState("");
   const [isResourceLibraryModalOpen, setResourceLibraryModalOpen] =
     useState(false);
@@ -58,6 +70,7 @@ export const useAssistantsManagePage = () => {
   const [resourceCategoryFilter, setResourceCategoryFilter] =
     useState<(typeof resourceCategoryOptions)[number]>("전체");
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isRetiringAssistant, setIsRetiringAssistant] = useState(false);
   const retireInFlightRef = useRef(false);
 
@@ -67,7 +80,26 @@ export const useAssistantsManagePage = () => {
     assistantsSummary,
     assistantOrdersStats,
     isAssistantsLoading,
+    reloadAssistants,
   } = useAssistantsLoader({ onError: setActionNotice });
+
+  const assistantTaskOptions = useMemo(
+    () => assistantRecords.filter((assistant) => assistant.status !== "퇴사"),
+    [assistantRecords]
+  );
+
+  useEffect(() => {
+    if (assistantTaskOptions.length === 0) {
+      setTaskAssigneeId("");
+      return;
+    }
+
+    if (
+      !assistantTaskOptions.some((assistant) => assistant.id === taskAssigneeId)
+    ) {
+      setTaskAssigneeId(assistantTaskOptions[0].id);
+    }
+  }, [assistantTaskOptions, taskAssigneeId]);
 
   const filteredAssistants = useMemo(
     () =>
@@ -144,7 +176,7 @@ export const useAssistantsManagePage = () => {
           : "-",
         delta: assistantOrdersStats
           ? `이번 주 +${assistantOrdersStats.periodCount}건`
-          : "백엔드 연동 대기",
+          : "통계 API 미연결",
         icon: CalendarCheck,
         accent: "text-emerald-300",
         href: "/educators/assistants/history",
@@ -165,7 +197,7 @@ export const useAssistantsManagePage = () => {
 
   const attachedResources = useMemo(
     () =>
-      resourceLibraryItems.filter((item) =>
+      mockResourceLibraryItems.filter((item) =>
         attachedResourceIds.includes(item.id)
       ),
     [attachedResourceIds]
@@ -174,7 +206,7 @@ export const useAssistantsManagePage = () => {
   const filteredResourceLibraryItems = useMemo(() => {
     const normalizedKeyword = resourceSearchKeyword.trim().toLowerCase();
 
-    return resourceLibraryItems.filter((resource) => {
+    return mockResourceLibraryItems.filter((resource) => {
       const categoryMatched =
         resourceCategoryFilter === "전체" ||
         resource.category === resourceCategoryFilter;
@@ -327,6 +359,11 @@ export const useAssistantsManagePage = () => {
   };
 
   const closeTaskModal = () => {
+    setTaskAssigneeId(assistantTaskOptions[0]?.id ?? "");
+    setTaskTitle("");
+    setTaskPriority("NORMAL");
+    setTaskDeadlineDate("");
+    setTaskDeadlineTime("");
     setTaskInstructionContent("");
     setAttachedResourceIds([]);
     setLibraryDraftResourceIds([]);
@@ -336,9 +373,67 @@ export const useAssistantsManagePage = () => {
     setActiveModal("none");
   };
 
-  const submitTask = () => {
-    setActionNotice("업무 지시 등록은 UI 미리보기 단계입니다.");
-    closeTaskModal();
+  const submitTask = async () => {
+    const trimmedTitle = taskTitle.trim();
+
+    if (!taskAssigneeId) {
+      setActionNotice("업무를 배정할 조교를 선택해주세요.");
+      return;
+    }
+
+    if (trimmedTitle.length === 0) {
+      setActionNotice("업무명을 입력해주세요.");
+      return;
+    }
+
+    if (
+      taskDeadlineDate &&
+      taskDeadlineTime &&
+      !TIME_HHMM_REGEX.test(taskDeadlineTime)
+    ) {
+      setActionNotice("마감 시간은 HH:mm 형식으로 입력해주세요.");
+      return;
+    }
+
+    let deadlineAt: string | undefined;
+    if (taskDeadlineDate) {
+      const parsedDeadline = new Date(
+        `${taskDeadlineDate}T${taskDeadlineTime || "00:00"}`
+      );
+
+      if (Number.isNaN(parsedDeadline.getTime())) {
+        setActionNotice("마감 일시 형식을 다시 확인해주세요.");
+        return;
+      }
+
+      deadlineAt = parsedDeadline.toISOString();
+    }
+
+    setIsCreatingTask(true);
+
+    try {
+      const sanitizedMemo = htmlToPlainText(taskInstructionContent);
+
+      await createAssistantOrderAPI({
+        assistantId: taskAssigneeId,
+        title: trimmedTitle,
+        memo: sanitizedMemo || undefined,
+        priority: taskPriority,
+        deadlineAt,
+      });
+
+      await reloadAssistants();
+      setActionNotice(
+        attachedResources.length > 0
+          ? "업무 지시가 등록되었습니다. 첨부 자료 API는 후속 연동 예정입니다."
+          : "업무 지시가 등록되었습니다."
+      );
+      closeTaskModal();
+    } catch (error) {
+      setActionNotice(getErrorMessage(error));
+    } finally {
+      setIsCreatingTask(false);
+    }
   };
 
   const activeTab: "manage" | "contracts" =
@@ -381,7 +476,7 @@ export const useAssistantsManagePage = () => {
     closeAssistantDetailModal,
     saveAssistantDetail,
     retireAssistant,
-    contractRecords,
+    contractRecords: mockContractRecords,
     contractStatusClassMap,
     sendTargetId: resolvedSendTargetId,
     setSendTargetId,
@@ -391,8 +486,20 @@ export const useAssistantsManagePage = () => {
     contractTemplateOptions,
     uploadFileName,
     setUploadFileName,
+    assistantTaskOptions,
+    taskAssigneeId,
+    setTaskAssigneeId,
+    taskTitle,
+    setTaskTitle,
+    taskPriority,
+    setTaskPriority,
+    taskDeadlineDate,
+    setTaskDeadlineDate,
+    taskDeadlineTime,
+    setTaskDeadlineTime,
     taskInstructionContent,
     setTaskInstructionContent,
+    isCreatingTask,
     attachedResources,
     openResourceLibraryModal,
     removeAttachedResource,

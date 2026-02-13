@@ -7,11 +7,11 @@ import {
   useState,
 } from "react";
 
-import { type Assistant } from "@/app/(dashboard)/educators/assistants/_types/assistants";
 import type {
-  AssistantsSummary,
+  Assistant,
   AssistantsDashboardSummary,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants.page.types";
+  AssistantsSummary,
+} from "@/types/assistants";
 import { mapAssistantsApiToView } from "@/services/assistants/assistants.mapper";
 import { fetchAssistantOrdersStatsAPI } from "@/services/assistants/assistantOrders.service";
 import { fetchAssistantsAPI } from "@/services/assistants/assistants.service";

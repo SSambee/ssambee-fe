@@ -53,6 +53,9 @@ export default function AssistantsTaskHistoryPage() {
     priorityClassMap,
     priorityDetailLabelMap,
     priorityDetailClassMap,
+    isHistoryLoading,
+    historyError,
+    loadTaskRecords,
     taskRecords,
     totalCount,
     paginatedTasks,
@@ -93,7 +96,9 @@ export default function AssistantsTaskHistoryPage() {
               <div>
                 <p className="text-sm text-muted-foreground">전체 업무</p>
                 <p className="mt-2 text-3xl font-bold">{taskRecords.length}</p>
-                <p className="mt-2 text-xs text-muted-foreground">연동 대기</p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {isHistoryLoading ? "불러오는 중" : "실데이터"}
+                </p>
               </div>
               <div className="rounded-xl bg-muted p-3 text-muted-foreground">
                 <CalendarClock className="h-5 w-5" />
@@ -108,7 +113,9 @@ export default function AssistantsTaskHistoryPage() {
               <div>
                 <p className="text-sm text-muted-foreground">진행 중</p>
                 <p className="mt-2 text-3xl font-bold">{progressCount}</p>
-                <p className="mt-2 text-xs text-muted-foreground">연동 대기</p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {isHistoryLoading ? "불러오는 중" : "실데이터"}
+                </p>
               </div>
               <div className="rounded-xl bg-muted p-3 text-muted-foreground">
                 <ClipboardList className="h-5 w-5" />
@@ -123,7 +130,9 @@ export default function AssistantsTaskHistoryPage() {
               <div>
                 <p className="text-sm text-muted-foreground">완료</p>
                 <p className="mt-2 text-3xl font-bold">{completedCount}</p>
-                <p className="mt-2 text-xs text-muted-foreground">연동 대기</p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {isHistoryLoading ? "불러오는 중" : "실데이터"}
+                </p>
               </div>
               <div className="rounded-xl bg-muted p-3 text-muted-foreground">
                 <CheckCircle2 className="h-5 w-5" />
@@ -209,7 +218,7 @@ export default function AssistantsTaskHistoryPage() {
             </div>
 
             <div className="text-xs text-muted-foreground">
-              백엔드 API 연동 대기 상태입니다.
+              {historyError ? historyError : "실데이터 기반으로 조회합니다."}
             </div>
           </div>
         </CardContent>
@@ -228,20 +237,30 @@ export default function AssistantsTaskHistoryPage() {
                 <TableRow>
                   <TableHead>업무 제목</TableHead>
                   <TableHead>담당 조교</TableHead>
-                  <TableHead>지시자</TableHead>
                   <TableHead>지시 일자</TableHead>
                   <TableHead>우선순위</TableHead>
                   <TableHead>상태</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedTasks.length === 0 ? (
+                {isHistoryLoading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={5}
                       className="py-10 text-center text-muted-foreground"
                     >
-                      백엔드 API 연동 전입니다. 업무 내역 데이터가 없습니다.
+                      업무 내역을 불러오는 중입니다.
+                    </TableCell>
+                  </TableRow>
+                ) : paginatedTasks.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="py-10 text-center text-muted-foreground"
+                    >
+                      {historyError
+                        ? "업무 내역을 불러오지 못했습니다."
+                        : "조건에 맞는 업무 내역이 없습니다."}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -256,15 +275,16 @@ export default function AssistantsTaskHistoryPage() {
                           >
                             {task.title}
                           </button>
-                          <p className="text-xs text-muted-foreground">
-                            {task.subtitle}
-                          </p>
+                          {task.subtitle ? (
+                            <p className="text-xs text-muted-foreground">
+                              {task.subtitle}
+                            </p>
+                          ) : null}
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">
                         {task.assistantName}
                       </TableCell>
-                      <TableCell>{task.instructorName}</TableCell>
                       <TableCell>{task.issuedAt}</TableCell>
                       <TableCell>
                         <span
@@ -286,6 +306,18 @@ export default function AssistantsTaskHistoryPage() {
           </div>
 
           <Pagination pagination={pagination} onPageChange={setCurrentPage} />
+
+          {historyError ? (
+            <div className="mt-3 flex justify-end">
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={() => void loadTaskRecords()}
+              >
+                다시 시도
+              </Button>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -322,9 +354,11 @@ export default function AssistantsTaskHistoryPage() {
               <p className="text-lg font-bold leading-tight">
                 {selectedTask.title}
               </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {selectedTask.subtitle}
-              </p>
+              {selectedTask.subtitle ? (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {selectedTask.subtitle}
+                </p>
+              ) : null}
             </div>
 
             <div className="space-y-5 text-sm">

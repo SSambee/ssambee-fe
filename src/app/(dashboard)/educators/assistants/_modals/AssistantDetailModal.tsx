@@ -4,7 +4,7 @@ import {
   type Assistant,
   type AssistantDetailDraft,
   type AssistantStatus,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+} from "@/types/assistants";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {

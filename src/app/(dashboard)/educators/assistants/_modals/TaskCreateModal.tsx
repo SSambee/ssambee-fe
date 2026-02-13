@@ -1,6 +1,9 @@
 import { CheckSquare, ClipboardCheck, FileText } from "lucide-react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
-import { type ResourceLibraryItem } from "@/app/(dashboard)/educators/assistants/_types/assistants";
+import { type Assistant, type ResourceLibraryItem } from "@/types/assistants";
+import { DatePickerField } from "@/components/common/input/DatePickerField";
 import TiptapEditor from "@/components/common/editor/TiptapEditor";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,10 +16,51 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { AssistantOrderPriority } from "@/types/assistantOrders";
+
+const normalizeTimeInput = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 4);
+
+  if (digits.length <= 2) {
+    return digits;
+  }
+
+  if (digits.length === 3) {
+    const firstTwo = Number(digits.slice(0, 2));
+    if (Number.isNaN(firstTwo) || firstTwo > 23) {
+      return `0${digits[0]}:${digits.slice(1)}`;
+    }
+    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+  }
+
+  return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
+};
+
+const deadlineInputClassName =
+  "h-14 rounded-[12px] border-[#d6d9e0] bg-white text-[16px] text-[#8b90a3] placeholder:text-[#8b90a3]";
 
 type TaskCreateModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  instructorName: string;
+  assistantOptions: Assistant[];
+  taskAssigneeId: string;
+  onChangeTaskAssigneeId: (assistantId: string) => void;
+  taskTitle: string;
+  onChangeTaskTitle: (title: string) => void;
+  taskPriority: AssistantOrderPriority;
+  onChangeTaskPriority: (priority: AssistantOrderPriority) => void;
+  taskDeadlineDate: string;
+  onChangeTaskDeadlineDate: (date: string) => void;
+  taskDeadlineTime: string;
+  onChangeTaskDeadlineTime: (time: string) => void;
   taskInstructionContent: string;
   onChangeTaskInstructionContent: (content: string) => void;
   attachedResources: ResourceLibraryItem[];
@@ -24,11 +68,24 @@ type TaskCreateModalProps = {
   onRemoveAttachedResource: (resourceId: string) => void;
   onCancel: () => void;
   onSubmit: () => void;
+  isSubmitting: boolean;
 };
 
 export default function TaskCreateModal({
   open,
   onOpenChange,
+  instructorName,
+  assistantOptions,
+  taskAssigneeId,
+  onChangeTaskAssigneeId,
+  taskTitle,
+  onChangeTaskTitle,
+  taskPriority,
+  onChangeTaskPriority,
+  taskDeadlineDate,
+  onChangeTaskDeadlineDate,
+  taskDeadlineTime,
+  onChangeTaskDeadlineTime,
   taskInstructionContent,
   onChangeTaskInstructionContent,
   attachedResources,
@@ -36,7 +93,22 @@ export default function TaskCreateModal({
   onRemoveAttachedResource,
   onCancel,
   onSubmit,
+  isSubmitting,
 }: TaskCreateModalProps) {
+  const selectedAssistant =
+    assistantOptions.find((assistant) => assistant.id === taskAssigneeId) ??
+    null;
+  const { control, reset } = useForm<{ deadlineDate: string }>({
+    defaultValues: { deadlineDate: taskDeadlineDate },
+  });
+
+  useEffect(() => {
+    reset({ deadlineDate: taskDeadlineDate });
+  }, [reset, taskDeadlineDate]);
+
+  const canSubmit =
+    taskAssigneeId.length > 0 && taskTitle.trim().length > 0 && !isSubmitting;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
@@ -50,7 +122,9 @@ export default function TaskCreateModal({
                 새 업무 지시 등록
               </DialogTitle>
               <DialogDescription className="mt-1">
-                김민수 조교에게 업무를 전달합니다.
+                {selectedAssistant
+                  ? `${selectedAssistant.name} 조교에게 업무를 전달합니다.`
+                  : "조교를 선택하여 업무를 전달합니다."}
               </DialogDescription>
             </div>
           </div>
@@ -62,25 +136,49 @@ export default function TaskCreateModal({
 
         <div className="space-y-2">
           <p className="text-sm font-semibold">대상 조교</p>
-          <div className="flex items-center gap-3 rounded-lg border bg-background px-4 py-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>김</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-semibold">김민수</p>
-              <p className="text-xs text-muted-foreground">010-1234-5678</p>
+          <Select value={taskAssigneeId} onValueChange={onChangeTaskAssigneeId}>
+            <SelectTrigger>
+              <SelectValue placeholder="조교를 선택하세요" />
+            </SelectTrigger>
+            <SelectContent>
+              {assistantOptions.map((assistant) => (
+                <SelectItem key={assistant.id} value={assistant.id}>
+                  {assistant.name} ({assistant.phone})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {selectedAssistant ? (
+            <div className="flex items-center gap-3 rounded-lg border bg-background px-4 py-3">
+              <Avatar className="h-10 w-10">
+                <AvatarFallback>
+                  {selectedAssistant.name.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-semibold">
+                  {selectedAssistant.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {selectedAssistant.phone}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm font-medium">지시자</label>
-            <Input placeholder="강사 담당자" />
+            <Input value={instructorName} readOnly />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">업무명</label>
-            <Input placeholder="예: 중등 2학년 1학기 기말고사 채점" />
+            <Input
+              placeholder="예: 중등 2학년 1학기 기말고사 채점"
+              value={taskTitle}
+              onChange={(event) => onChangeTaskTitle(event.target.value)}
+            />
           </div>
         </div>
 
@@ -88,13 +186,56 @@ export default function TaskCreateModal({
           <div className="space-y-2">
             <label className="text-sm font-medium">우선순위</label>
             <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" className="rounded-full">
+              <Button
+                type="button"
+                variant={taskPriority === "URGENT" ? "default" : "secondary"}
+                className="rounded-full"
+                onClick={() => onChangeTaskPriority("URGENT")}
+              >
+                긴급
+              </Button>
+              <Button
+                type="button"
+                variant={taskPriority === "HIGH" ? "default" : "secondary"}
+                className="rounded-full"
+                onClick={() => onChangeTaskPriority("HIGH")}
+              >
                 높음
               </Button>
-              <Button className="rounded-full">보통</Button>
-              <Button variant="secondary" className="rounded-full">
-                낮음
+              <Button
+                type="button"
+                variant={taskPriority === "NORMAL" ? "default" : "secondary"}
+                className="rounded-full"
+                onClick={() => onChangeTaskPriority("NORMAL")}
+              >
+                보통
               </Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">마감 일시</label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <DatePickerField
+                control={control}
+                name="deadlineDate"
+                placeholder="마감 날짜 선택"
+                className={deadlineInputClassName}
+                onValueChange={onChangeTaskDeadlineDate}
+              />
+              <Input
+                type="text"
+                value={taskDeadlineTime}
+                onChange={(event) =>
+                  onChangeTaskDeadlineTime(
+                    normalizeTimeInput(event.target.value)
+                  )
+                }
+                disabled={!taskDeadlineDate}
+                placeholder="마감 시간"
+                inputMode="numeric"
+                maxLength={5}
+                className={deadlineInputClassName}
+              />
             </div>
           </div>
         </div>
@@ -161,9 +302,13 @@ export default function TaskCreateModal({
           <Button variant="outline" className="rounded-full" onClick={onCancel}>
             취소
           </Button>
-          <Button className="rounded-full" onClick={onSubmit}>
+          <Button
+            className="rounded-full"
+            onClick={onSubmit}
+            disabled={!canSubmit}
+          >
             <CheckSquare className="h-4 w-4" />
-            지시 등록
+            {isSubmitting ? "등록 중..." : "지시 등록"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -19,6 +19,7 @@ type DatePickerBaseProps = {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  onValueChange?: (value: string) => void;
 };
 
 type DatePickerFieldProps<T extends FieldValues> = {
@@ -28,6 +29,7 @@ type DatePickerFieldProps<T extends FieldValues> = {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  onValueChange?: (value: string) => void;
 };
 
 type DatePickerInputProps = {
@@ -37,6 +39,7 @@ type DatePickerInputProps = {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  onValueChange?: (value: string) => void;
 };
 
 const formatDisplayDate = (date: Date) => {
@@ -55,6 +58,7 @@ function DatePickerBase({
   placeholder = "날짜 선택",
   disabled,
   className,
+  onValueChange,
 }: DatePickerBaseProps) {
   const [open, setOpen] = useState(false);
 
@@ -90,7 +94,9 @@ function DatePickerBase({
           selected={selectedDate}
           onSelect={(date) => {
             if (!date) return;
-            onChangeAction(formatValueDate(date));
+            const nextValue = formatValueDate(date);
+            onChangeAction(nextValue);
+            onValueChange?.(nextValue);
             setOpen(false);
           }}
           className="eduops-date-picker"
@@ -121,6 +127,7 @@ export function DatePickerField<T extends FieldValues>({
   placeholder = "날짜 선택",
   disabled,
   className,
+  onValueChange,
 }: DatePickerFieldProps<T>) {
   const { field } = useController({ control, name });
 
@@ -132,6 +139,7 @@ export function DatePickerField<T extends FieldValues>({
       placeholder={placeholder}
       disabled={disabled}
       className={className}
+      onValueChange={onValueChange}
     />
   );
 }
@@ -143,6 +151,7 @@ export function DatePickerInput({
   placeholder = "날짜 선택",
   disabled,
   className,
+  onValueChange,
 }: DatePickerInputProps) {
   return (
     <DatePickerBase
@@ -152,6 +161,7 @@ export function DatePickerInput({
       placeholder={placeholder}
       disabled={disabled}
       className={className}
+      onValueChange={onValueChange}
     />
   );
 }

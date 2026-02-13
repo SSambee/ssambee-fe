@@ -13,11 +13,14 @@ import TaskCreateModal from "@/app/(dashboard)/educators/assistants/_modals/Task
 import {
   createAssistantDetailDraft,
   statusColorMap,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+} from "@/constants/assistants.constants";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 export default function AssistantsPage() {
   useSetBreadcrumb([{ label: "조교 관리" }]);
+  const { user } = useAuthContext();
+  const instructorName = user?.name ?? "담당 강사";
 
   const {
     activeTab,
@@ -56,8 +59,20 @@ export default function AssistantsPage() {
     contractTemplateOptions,
     uploadFileName,
     setUploadFileName,
+    assistantTaskOptions,
+    taskAssigneeId,
+    setTaskAssigneeId,
+    taskTitle,
+    setTaskTitle,
+    taskPriority,
+    setTaskPriority,
+    taskDeadlineDate,
+    setTaskDeadlineDate,
+    taskDeadlineTime,
+    setTaskDeadlineTime,
     taskInstructionContent,
     setTaskInstructionContent,
+    isCreatingTask,
     attachedResources,
     openResourceLibraryModal,
     removeAttachedResource,
@@ -207,6 +222,18 @@ export default function AssistantsPage() {
         onOpenChange={(open) =>
           open ? setActiveModal("task") : closeTaskModal()
         }
+        instructorName={instructorName}
+        assistantOptions={assistantTaskOptions}
+        taskAssigneeId={taskAssigneeId}
+        onChangeTaskAssigneeId={setTaskAssigneeId}
+        taskTitle={taskTitle}
+        onChangeTaskTitle={setTaskTitle}
+        taskPriority={taskPriority}
+        onChangeTaskPriority={setTaskPriority}
+        taskDeadlineDate={taskDeadlineDate}
+        onChangeTaskDeadlineDate={setTaskDeadlineDate}
+        taskDeadlineTime={taskDeadlineTime}
+        onChangeTaskDeadlineTime={setTaskDeadlineTime}
         taskInstructionContent={taskInstructionContent}
         onChangeTaskInstructionContent={setTaskInstructionContent}
         attachedResources={attachedResources}
@@ -214,6 +241,7 @@ export default function AssistantsPage() {
         onRemoveAttachedResource={removeAttachedResource}
         onCancel={closeTaskModal}
         onSubmit={submitTask}
+        isSubmitting={isCreatingTask}
       />
 
       <ResourceLibraryModal
