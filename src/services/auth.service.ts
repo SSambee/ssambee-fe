@@ -5,25 +5,28 @@ import {
   SignupParentUser,
   SignupStudentUser,
 } from "@/types/auth.type";
-import {
-  GENERATED_AUTH_CODES,
-  SUBSCRIBED_PHONE_NUMBERS,
-} from "@/data/auth-form.mock";
+import { SUBSCRIBED_PHONE_NUMBERS } from "@/data/auth-form.mock";
+import type { ApiResponse } from "@/types/api";
 
 import { axiosClient, axiosClientSVC } from "./axiosClient";
 
 // 인증코드 검증 API
 export const verifyAuthCodeAPI = async (signupCode: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const { data } = await axiosClient.get<ApiResponse<{ isValid: boolean }>>(
+    "/assistant-codes/validate",
+    {
+      params: { code: signupCode },
+    }
+  );
 
-  console.log("인증코드 검증 요청:", signupCode);
-
-  // 서버에서 생성된 인증번호와 일치하면
-  if (GENERATED_AUTH_CODES.includes(signupCode)) {
+  if (data?.data?.isValid) {
     return { success: true, message: "인증번호 매칭 완료!" };
-  } else {
-    return { success: false, message: "인증번호가 일치하지 않습니다." };
   }
+
+  return {
+    success: false,
+    message: data?.message ?? "인증번호가 일치하지 않습니다.",
+  };
 };
 
 // 전화번호 인증 API
