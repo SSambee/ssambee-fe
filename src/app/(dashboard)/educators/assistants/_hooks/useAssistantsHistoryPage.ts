@@ -1,66 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import {
+  getDateByPeriod,
+  mapAssistantOrderApiToTask,
+  PAGE_LIMIT,
+  periodOptions,
+  priorityClassMap,
+  priorityDetailClassMap,
+  priorityDetailLabelMap,
+  priorityOptions,
+  statusColorMap,
+  statusOptions,
+  type InstructionTask,
+} from "@/app/(dashboard)/educators/assistants/_hooks/history/history.mapper";
 import { fetchAssistantOrdersAPI } from "@/services/assistants/assistantOrders.service";
-import type { AssistantOrderApi } from "@/types/assistantOrders";
-import { htmlToPlainText } from "@/utils/assistants";
-
-export type TaskStatus = "진행 중" | "완료" | "보류";
-export type TaskPriority = "긴급" | "높음" | "보통";
-
-export type InstructionTask = {
-  id: string;
-  title: string;
-  subtitle: string;
-  assistantName: string;
-  instructorName: string;
-  issuedAt: string;
-  issuedAtTimestamp: number;
-  dueAt: string;
-  priority: TaskPriority;
-  status: TaskStatus;
-  description: string;
-  attachmentCount: number;
-};
-
-const PAGE_LIMIT = 5;
-
-const statusOptions: Array<TaskStatus | "전체"> = [
-  "전체",
-  "진행 중",
-  "완료",
-  "보류",
-];
-const priorityOptions: Array<TaskPriority | "전체"> = [
-  "전체",
-  "긴급",
-  "높음",
-  "보통",
-];
-const periodOptions = ["최근 1개월", "최근 3개월", "전체"] as const;
-
-const statusColorMap: Record<TaskStatus, "blue" | "green" | "gray"> = {
-  "진행 중": "blue",
-  완료: "green",
-  보류: "gray",
-};
-
-const priorityClassMap: Record<TaskPriority, string> = {
-  긴급: "bg-red-50 text-red-600",
-  높음: "bg-red-50 text-red-600",
-  보통: "bg-blue-50 text-blue-600",
-};
-
-const priorityDetailLabelMap: Record<TaskPriority, string> = {
-  긴급: "긴급",
-  높음: "높음",
-  보통: "보통",
-};
-
-const priorityDetailClassMap: Record<TaskPriority, string> = {
-  긴급: "bg-red-100 text-red-600",
-  높음: "bg-red-100 text-red-600",
-  보통: "bg-blue-100 text-blue-700",
-};
+import type {
+  AssistantOrdersListApi,
+  AssistantOrdersListQuery,
+} from "@/types/assistantOrders";
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error && error.message) {
@@ -70,89 +27,86 @@ const getErrorMessage = (error: unknown) => {
   return "업무 지시 내역을 불러오는 중 오류가 발생했습니다.";
 };
 
-const toKoreanDateTime = (value?: string | null) => {
-  if (!value) {
-    return "-";
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hour = String(date.getHours()).padStart(2, "0");
-  const minute = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}. ${month}. ${day} ${hour}:${minute}`;
+const statusQueryMap: Record<
+  Exclude<(typeof statusOptions)[number], "전체">,
+  "PENDING" | "IN_PROGRESS" | "END"
+> = {
+  "진행 중": "IN_PROGRESS",
+  완료: "END",
+  진행전: "PENDING",
 };
 
-const toTimestamp = (value?: string | null) => {
-  if (!value) {
-    return 0;
-  }
-
-  const timestamp = new Date(value).getTime();
-  return Number.isNaN(timestamp) ? 0 : timestamp;
+const priorityQueryMap: Record<
+  Exclude<(typeof priorityOptions)[number], "전체">,
+  "NORMAL" | "HIGH" | "URGENT"
+> = {
+  긴급: "URGENT",
+  높음: "HIGH",
+  보통: "NORMAL",
 };
 
-const normalizePriority = (
-  priority: AssistantOrderApi["priority"]
-): TaskPriority => {
-  if (priority === "URGENT") return "긴급";
-  if (priority === "HIGH") return "높음";
-  if (priority === "NORMAL") return "보통";
-  return "보통";
+const buildHistoryQuery = ({
+  currentPage,
+  searchKeyword,
+  statusFilter,
+  priorityFilter,
+  periodFilter,
+}: {
+  currentPage: number;
+  searchKeyword: string;
+  statusFilter: (typeof statusOptions)[number];
+  priorityFilter: (typeof priorityOptions)[number];
+  periodFilter: (typeof periodOptions)[number];
+}): AssistantOrdersListQuery => {
+  const fromDate = getDateByPeriod(periodFilter);
+  const keyword = searchKeyword.trim();
+
+  return {
+    page: currentPage,
+    limit: PAGE_LIMIT,
+    status: statusFilter === "전체" ? undefined : statusQueryMap[statusFilter],
+    priority:
+      priorityFilter === "전체" ? undefined : priorityQueryMap[priorityFilter],
+    from: fromDate ? fromDate.toISOString() : undefined,
+    to: fromDate ? new Date().toISOString() : undefined,
+    q: keyword.length > 0 ? keyword : undefined,
+  };
 };
 
-const normalizeStatus = (status: AssistantOrderApi["status"]): TaskStatus => {
-  if (status === "END") return "완료";
-  if (status === "IN_PROGRESS") return "진행 중";
-  if (status === "PENDING") return "보류";
-  return "보류";
+const normalizePagination = (
+  response: AssistantOrdersListApi,
+  currentPage: number,
+  currentLimit: number,
+  fallbackTotalCount: number
+) => {
+  const page = response.pagination?.page ?? currentPage;
+  const limit = response.pagination?.limit ?? currentLimit;
+  const totalCount = response.pagination?.totalCount ?? fallbackTotalCount;
+  const totalPage =
+    response.pagination?.totalPage ??
+    Math.max(1, Math.ceil(totalCount / Math.max(limit, 1)));
+
+  return {
+    totalCount,
+    totalPage,
+    currentPage: page,
+    limit,
+    hasNextPage:
+      response.pagination?.hasNextPage ??
+      Math.max(page, 1) < Math.max(totalPage, 1),
+    hasPrevPage: response.pagination?.hasPrevPage ?? Math.max(page, 1) > 1,
+  };
 };
-
-export const mapAssistantOrderApiToTask = (
-  order: AssistantOrderApi
-): InstructionTask => ({
-  id: order.id,
-  title: order.title,
-  subtitle: order.lecture?.title ?? "",
-  assistantName: order.assistant?.name ?? "-",
-  instructorName: order.instructor?.name ?? "-",
-  issuedAt: toKoreanDateTime(order.createdAt),
-  issuedAtTimestamp: toTimestamp(order.createdAt),
-  dueAt: toKoreanDateTime(order.deadlineAt),
-  priority: normalizePriority(order.priority),
-  status: normalizeStatus(order.status),
-  description: htmlToPlainText(order.memo),
-  attachmentCount: order.attachments?.length ?? 0,
-});
-
-function getDateByPeriod(period: (typeof periodOptions)[number]) {
-  if (period === "전체") {
-    return null;
-  }
-
-  const base = new Date();
-  if (period === "최근 1개월") {
-    base.setMonth(base.getMonth() - 1);
-    return base;
-  }
-
-  base.setMonth(base.getMonth() - 3);
-  return base;
-}
 
 export const useAssistantsHistoryPage = () => {
   const [taskRecords, setTaskRecords] = useState<InstructionTask[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [historyNotice, setHistoryNotice] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
   const [statusFilter, setStatusFilter] =
     useState<(typeof statusOptions)[number]>("전체");
   const [priorityFilter, setPriorityFilter] =
@@ -160,118 +114,157 @@ export const useAssistantsHistoryPage = () => {
   const [periodFilter, setPeriodFilter] =
     useState<(typeof periodOptions)[number]>("최근 1개월");
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    totalCount: 0,
+    totalPage: 1,
+    currentPage: 1,
+    limit: PAGE_LIMIT,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+  const [summaryCounts, setSummaryCounts] = useState<{
+    progressCount: number;
+    completedCount: number;
+  }>({
+    progressCount: 0,
+    completedCount: 0,
+  });
+  const requestIdRef = useRef(0);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedSearchKeyword(searchKeyword);
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [searchKeyword]);
 
   const loadTaskRecords = useCallback(async () => {
-    const requestLimit = 100;
-    const maxPageFetch = 20;
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+    const query = buildHistoryQuery({
+      currentPage,
+      searchKeyword: debouncedSearchKeyword,
+      statusFilter,
+      priorityFilter,
+      periodFilter,
+    });
+    const hasAdvancedFilters = Boolean(
+      query.priority ?? query.from ?? query.to ?? query.q
+    );
 
     setIsHistoryLoading(true);
+    setHistoryError(null);
+    setHistoryNotice(null);
 
     try {
-      let page = 1;
-      let hasNextPage = true;
-      const accumulatedOrders: AssistantOrderApi[] = [];
+      let response: AssistantOrdersListApi;
+      let usedAdvancedFilterFallback = false;
 
-      while (hasNextPage && page <= maxPageFetch) {
-        const response = await fetchAssistantOrdersAPI({
-          page,
-          limit: requestLimit,
-        });
-        const orders = response.orders ?? response.items ?? [];
-        accumulatedOrders.push(...orders);
-
-        if (response.pagination) {
-          hasNextPage =
-            response.pagination.hasNextPage &&
-            page < response.pagination.totalPage;
-        } else {
-          hasNextPage = orders.length === requestLimit;
+      try {
+        response = await fetchAssistantOrdersAPI(query);
+      } catch (error) {
+        if (!hasAdvancedFilters) {
+          throw error;
         }
 
-        page += 1;
+        response = await fetchAssistantOrdersAPI({
+          page: query.page,
+          limit: query.limit,
+          status: query.status,
+        });
+        usedAdvancedFilterFallback = true;
       }
 
-      setTaskRecords(accumulatedOrders.map(mapAssistantOrderApiToTask));
-      setHistoryError(
-        hasNextPage
-          ? "업무 내역이 많아 일부만 불러왔습니다. 필터를 적용해 다시 시도해주세요."
-          : null
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
+      const orders = response.orders ?? response.items ?? [];
+      const mappedTasks = orders.map(mapAssistantOrderApiToTask);
+      const normalizedPagination = normalizePagination(
+        response,
+        currentPage,
+        PAGE_LIMIT,
+        mappedTasks.length
       );
+      const notices: string[] = [];
+
+      if (usedAdvancedFilterFallback) {
+        notices.push(
+          "서버 필터 지원 범위를 벗어난 조건이 있어 상태/페이지 기준으로 조회했습니다."
+        );
+      }
+
+      if (!response.stats) {
+        notices.push("통계 응답이 없어 현재 페이지 기준으로 표시합니다.");
+      }
+
+      if (!response.pagination) {
+        notices.push(
+          "페이지네이션 메타가 없어 현재 페이지 데이터 기준으로 계산합니다."
+        );
+      }
+
+      setTaskRecords(mappedTasks);
+      setPagination(normalizedPagination);
+      setHistoryNotice(notices.length > 0 ? notices.join(" ") : null);
+      setSummaryCounts({
+        progressCount:
+          response.stats?.inProgressCount ??
+          mappedTasks.filter((task) => task.status === "진행 중").length,
+        completedCount:
+          response.stats?.completedCount ??
+          mappedTasks.filter((task) => task.status === "완료").length,
+      });
     } catch (error) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setTaskRecords([]);
+      setPagination({
+        totalCount: 0,
+        totalPage: 1,
+        currentPage,
+        limit: PAGE_LIMIT,
+        hasNextPage: false,
+        hasPrevPage: currentPage > 1,
+      });
+      setSummaryCounts({
+        progressCount: 0,
+        completedCount: 0,
+      });
       setHistoryError(getErrorMessage(error));
     } finally {
-      setIsHistoryLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsHistoryLoading(false);
+      }
     }
-  }, []);
+  }, [
+    currentPage,
+    debouncedSearchKeyword,
+    periodFilter,
+    priorityFilter,
+    statusFilter,
+  ]);
 
   useEffect(() => {
     void loadTaskRecords();
   }, [loadTaskRecords]);
 
-  const filteredTasks = useMemo(() => {
-    const lowerKeyword = searchKeyword.trim().toLowerCase();
-    const periodStartDate = getDateByPeriod(periodFilter);
-    const now = new Date();
-
-    return taskRecords.filter((task) => {
-      const keywordMatched =
-        lowerKeyword.length === 0 ||
-        task.title.toLowerCase().includes(lowerKeyword) ||
-        task.subtitle.toLowerCase().includes(lowerKeyword) ||
-        task.assistantName.toLowerCase().includes(lowerKeyword);
-
-      const statusMatched =
-        statusFilter === "전체" || task.status === statusFilter;
-      const priorityMatched =
-        priorityFilter === "전체" || task.priority === priorityFilter;
-
-      const issuedDate =
-        task.issuedAtTimestamp > 0 ? new Date(task.issuedAtTimestamp) : null;
-      const periodMatched =
-        periodStartDate === null ||
-        (issuedDate !== null &&
-          !Number.isNaN(issuedDate.getTime()) &&
-          issuedDate >= periodStartDate &&
-          issuedDate <= now);
-
-      return (
-        keywordMatched && statusMatched && priorityMatched && periodMatched
-      );
-    });
-  }, [periodFilter, priorityFilter, searchKeyword, statusFilter, taskRecords]);
-
-  const totalCount = filteredTasks.length;
-  const totalPage = Math.max(1, Math.ceil(totalCount / PAGE_LIMIT));
-  const safeCurrentPage = Math.min(currentPage, totalPage);
-  const hasNextPage = safeCurrentPage < totalPage;
-  const hasPrevPage = safeCurrentPage > 1;
-
-  const paginatedTasks = useMemo(() => {
-    const startIndex = (safeCurrentPage - 1) * PAGE_LIMIT;
-    return filteredTasks.slice(startIndex, startIndex + PAGE_LIMIT);
-  }, [filteredTasks, safeCurrentPage]);
+  const totalCount = pagination.totalCount;
+  const paginatedTasks = taskRecords;
 
   const selectedTask =
     selectedTaskId === null
       ? null
       : (taskRecords.find((task) => task.id === selectedTaskId) ?? null);
 
-  const progressCount = taskRecords.filter(
-    (task) => task.status === "진행 중"
-  ).length;
-  const completedCount = taskRecords.filter(
-    (task) => task.status === "완료"
-  ).length;
-
-  const pagination = {
-    totalCount,
-    totalPage,
-    currentPage: safeCurrentPage,
-    limit: PAGE_LIMIT,
-    hasNextPage,
-    hasPrevPage,
-  };
+  const progressCount = summaryCounts.progressCount;
+  const completedCount = summaryCounts.completedCount;
 
   const resetPagination = () => {
     setCurrentPage(1);
@@ -287,6 +280,7 @@ export const useAssistantsHistoryPage = () => {
     priorityDetailClassMap,
     isHistoryLoading,
     historyError,
+    historyNotice,
     loadTaskRecords,
     taskRecords,
     totalCount,
@@ -308,3 +302,7 @@ export const useAssistantsHistoryPage = () => {
     resetPagination,
   };
 };
+
+export type AssistantsHistoryPageViewModel = ReturnType<
+  typeof useAssistantsHistoryPage
+>;

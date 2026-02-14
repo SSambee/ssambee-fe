@@ -5,26 +5,7 @@ import type {
   CreateAssistantOrderPayload,
   AssistantOrdersListApi,
   AssistantOrdersListQuery,
-  AssistantOrdersStatsApi,
-  AssistantOrdersStatsPeriod,
 } from "@/types/assistantOrders";
-
-export const fetchAssistantOrdersStatsAPI = async (
-  period: AssistantOrdersStatsPeriod = "week"
-): Promise<AssistantOrdersStatsApi> => {
-  const { data } = await axiosClient.get<ApiResponse<AssistantOrdersStatsApi>>(
-    "/assistant-order/stats",
-    {
-      params: { period },
-    }
-  );
-
-  if (!data?.data) {
-    throw new Error("업무 지시 통계 응답이 비어 있습니다.");
-  }
-
-  return data.data;
-};
 
 export const fetchAssistantOrdersAPI = async (
   query: AssistantOrdersListQuery = {}

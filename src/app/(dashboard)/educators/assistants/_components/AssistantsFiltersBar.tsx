@@ -15,11 +15,15 @@ import {
 type AssistantsFiltersBarProps = {
   activeStatusFilter: ActiveStatusFilter;
   onChangeActiveStatusFilter: (status: ActiveStatusFilter) => void;
+  searchKeyword: string;
+  onChangeSearchKeyword: (value: string) => void;
 };
 
 export default function AssistantsFiltersBar({
   activeStatusFilter,
   onChangeActiveStatusFilter,
+  searchKeyword,
+  onChangeSearchKeyword,
 }: AssistantsFiltersBarProps) {
   return (
     <Card>
@@ -27,7 +31,12 @@ export default function AssistantsFiltersBar({
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 min-w-[240px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="조교 이름 또는 연락처 검색" className="pl-9" />
+            <Input
+              value={searchKeyword}
+              onChange={(event) => onChangeSearchKeyword(event.target.value)}
+              placeholder="조교 이름 또는 연락처 검색"
+              className="pl-9"
+            />
           </div>
 
           <div className="w-[140px]">

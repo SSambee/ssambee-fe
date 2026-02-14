@@ -2,12 +2,10 @@ export type AssistantOrderStatus = "PENDING" | "IN_PROGRESS" | "END";
 
 export type AssistantOrderPriority = "NORMAL" | "HIGH" | "URGENT";
 
-export type AssistantOrdersStatsPeriod = "week" | "month" | "all";
-
 export type AssistantOrdersStatsApi = {
   totalCount: number;
-  periodCount: number;
-  period: AssistantOrdersStatsPeriod | string;
+  inProgressCount: number;
+  completedCount: number;
 };
 
 export type AssistantOrderRelationApi = {
@@ -42,19 +40,24 @@ export type AssistantOrdersPaginationApi = {
   page: number;
   limit: number;
   totalCount: number;
-  totalPage: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
+  totalPage?: number;
+  hasNextPage?: boolean;
+  hasPrevPage?: boolean;
 };
 
 export type AssistantOrdersListApi = {
   orders?: AssistantOrderApi[];
   items?: AssistantOrderApi[];
   pagination?: AssistantOrdersPaginationApi;
+  stats?: AssistantOrdersStatsApi;
 };
 
 export type AssistantOrdersListQuery = {
   status?: AssistantOrderStatus | string;
+  priority?: AssistantOrderPriority | string;
+  from?: string;
+  to?: string;
+  q?: string;
   page?: number;
   limit?: number;
 };

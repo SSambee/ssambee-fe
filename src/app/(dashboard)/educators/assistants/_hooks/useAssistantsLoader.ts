@@ -13,7 +13,7 @@ import type {
   AssistantsSummary,
 } from "@/types/assistants";
 import { mapAssistantsApiToView } from "@/services/assistants/assistants.mapper";
-import { fetchAssistantOrdersStatsAPI } from "@/services/assistants/assistantOrders.service";
+import { fetchAssistantOrdersAPI } from "@/services/assistants/assistantOrders.service";
 import { fetchAssistantsAPI } from "@/services/assistants/assistants.service";
 import type { AssistantOrdersStatsApi } from "@/types/assistantOrders";
 import type { AssistantApi } from "@/types/assistants";
@@ -108,10 +108,11 @@ export const useAssistantsLoader = ({
         fetchAssistantsAPI("rejected"),
       ]);
 
-      const [orderStats, summary] = await Promise.all([
-        fetchAssistantOrdersStatsAPI("week").catch(() => null),
+      const [orderStatsResponse, summary] = await Promise.all([
+        fetchAssistantOrdersAPI({ page: 1, limit: 1 }).catch(() => null),
         Promise.resolve(buildSummary(signedAssistants, pendingAssistants)),
       ]);
+      const orderStats = orderStatsResponse?.stats ?? null;
 
       const allAssistants = toUniqueAssistants([
         ...signedAssistants,

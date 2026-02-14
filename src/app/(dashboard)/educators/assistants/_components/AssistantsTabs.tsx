@@ -7,6 +7,7 @@ export type AssistantsTabKey = "manage" | "contracts" | "approval" | "history";
 type AssistantsTabsProps = {
   active: AssistantsTabKey;
   onTabClick?: (tab: AssistantsTabKey) => void;
+  disabledTabs?: AssistantsTabKey[];
 };
 
 const tabs: Array<{ key: AssistantsTabKey; label: string; href: string }> = [
@@ -31,10 +32,13 @@ const tabs: Array<{ key: AssistantsTabKey; label: string; href: string }> = [
 export default function AssistantsTabs({
   active,
   onTabClick,
+  disabledTabs = [],
 }: AssistantsTabsProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       {tabs.map((tab) => {
+        const isDisabled = disabledTabs.includes(tab.key);
+
         if (tab.key === active) {
           return (
             <Button key={tab.key} className="rounded-full">
@@ -50,6 +54,7 @@ export default function AssistantsTabs({
             type="button"
             variant="outline"
             className="rounded-full"
+            disabled={isDisabled}
             onClick={() => onTabClick(tab.key)}
           >
             {tab.label}

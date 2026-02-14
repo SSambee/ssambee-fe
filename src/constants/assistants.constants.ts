@@ -4,7 +4,9 @@ import type {
   AssistantDetailDraft,
   AssistantStatus,
   ContractStatus,
+  ResourceLibraryCategory,
 } from "@/types/assistants";
+import type { MaterialsType } from "@/types/materials.type";
 
 export const DEFAULT_ACTIVE_STATUS_FILTER: ActiveStatusFilter = "근무중";
 
@@ -51,5 +53,21 @@ export const resourceCategoryOptions = [
   "평가자료",
   "운영문서",
 ] as const;
+
+// 자료실 원본 분류(MaterialsType)를 assistants 화면용 카테고리로 정규화한다.
+export const materialsTypeToResourceCategoryMap: Record<
+  MaterialsType,
+  ResourceLibraryCategory
+> = {
+  PAPER: "평가자료",
+  VIDEO: "수업자료",
+  REQUEST: "운영문서",
+  OTHER: "운영문서",
+};
+
+// assistants 리소스 모달에서는 이 함수를 통해서만 카테고리 매핑을 사용한다.
+export const getResourceLibraryCategoryByMaterialsType = (
+  materialsType: MaterialsType
+): ResourceLibraryCategory => materialsTypeToResourceCategoryMap[materialsType];
 
 export const PAGE_LIMIT = 5;
