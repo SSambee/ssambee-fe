@@ -195,3 +195,7 @@ export const useAssistantsApprovalPage = () => {
     handleSignAction,
   };
 };
+
+export type AssistantsApprovalPageViewModel = ReturnType<
+  typeof useAssistantsApprovalPage
+>;
