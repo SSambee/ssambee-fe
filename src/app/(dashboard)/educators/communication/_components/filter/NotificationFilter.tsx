@@ -1,12 +1,14 @@
 import { Input } from "@/components/ui/input";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { CONTENT_TYPE_OPTIONS } from "@/constants/communication.default";
-import { PostType } from "@/types/communication/instructorPost";
-import { CommonPostQuery } from "@/types/communication/commonPost";
+import {
+  PostFilterQuery,
+  PostTypeFilter,
+} from "@/types/communication/commonPost";
 
 type NotificationFilterProps = {
-  query: CommonPostQuery;
-  setQuery: React.Dispatch<React.SetStateAction<CommonPostQuery>>;
+  query: PostFilterQuery;
+  setQuery: React.Dispatch<React.SetStateAction<PostFilterQuery>>;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
 };
@@ -40,7 +42,7 @@ export default function NotificationFilter({
               onChange={(value) =>
                 setQuery((prev) => ({
                   ...prev,
-                  postType: value === "ALL" ? null : (value as PostType),
+                  postType: value === "ALL" ? null : (value as PostTypeFilter),
                 }))
               }
             />

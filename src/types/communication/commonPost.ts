@@ -1,6 +1,21 @@
 import { AnswerStatus, InquiryWriterType } from "./studentPost";
 import { PostType } from "./instructorPost";
 
+// UI 필터 확장 타입
+export type AnswerStatusFilter = AnswerStatus | "ALL";
+export type InquiryWriterTypeFilter = InquiryWriterType | "ALL";
+export type PostTypeFilter = PostType | "ALL";
+
+// TabSection - Query 상태 타입
+export interface PostFilterQuery extends Omit<
+  CommonPostQuery,
+  "answerStatus" | "writerType" | "postType"
+> {
+  answerStatus: AnswerStatusFilter | null;
+  writerType: InquiryWriterTypeFilter | null;
+  postType: PostTypeFilter | null;
+}
+
 export type CommonPostQuery = {
   page: number;
   limit: number;

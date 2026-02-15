@@ -12,8 +12,11 @@ import {
 } from "@/types/communication/studentPost";
 import { PostType } from "@/types/communication/instructorPost";
 import { useDebounce } from "@/hooks/useDebounce";
-import { PaginationType } from "@/types/students.type";
-import { CommonPostQuery } from "@/types/communication/commonPost";
+import {
+  CommonPostQuery,
+  PaginationType,
+  PostFilterQuery,
+} from "@/types/communication/commonPost";
 
 import InquiryFilter from "../filter/InquiryFilter";
 import NotificationFilter from "../filter/NotificationFilter";
@@ -35,12 +38,12 @@ export default function TabSection() {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // 요청 쿼리
-  const [query, setQuery] = useState<CommonPostQuery>({
+  const [query, setQuery] = useState<PostFilterQuery>({
     page: 1,
     limit: PAGE_LIMIT,
-    answerStatus: null,
-    writerType: null,
-    postType: null,
+    answerStatus: "ALL",
+    writerType: "ALL",
+    postType: "ALL",
   });
 
   // 탭 상태
@@ -52,14 +55,8 @@ export default function TabSection() {
       page: query.page,
       limit: query.limit,
       search: debouncedSearchTerm || undefined,
-      answerStatus:
-        query.answerStatus === ("ALL" as AnswerStatus)
-          ? null
-          : query.answerStatus,
-      writerType:
-        query.writerType === ("ALL" as InquiryWriterType)
-          ? null
-          : query.writerType,
+      answerStatus: query.answerStatus === "ALL" ? null : query.answerStatus,
+      writerType: query.writerType === "ALL" ? null : query.writerType,
     });
 
   // 강사 게시글 목록 조회
@@ -68,7 +65,7 @@ export default function TabSection() {
       page: query.page,
       limit: query.limit,
       search: debouncedSearchTerm || undefined,
-      postType: query.postType === ("ALL" as PostType) ? null : query.postType,
+      postType: query.postType === "ALL" ? null : query.postType,
     });
 
   // 탭 선택에 따른 현재 표시 데이터

@@ -5,14 +5,14 @@ import {
   WRITER_TYPE_OPTIONS,
 } from "@/constants/communication.default";
 import {
-  AnswerStatus,
-  InquiryWriterType,
-} from "@/types/communication/studentPost";
-import { CommonPostQuery } from "@/types/communication/commonPost";
+  InquiryWriterTypeFilter,
+  AnswerStatusFilter,
+  PostFilterQuery,
+} from "@/types/communication/commonPost";
 
 type InquiryFilterProps = {
-  query: CommonPostQuery;
-  setQuery: React.Dispatch<React.SetStateAction<CommonPostQuery>>;
+  query: PostFilterQuery;
+  setQuery: React.Dispatch<React.SetStateAction<PostFilterQuery>>;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
 };
@@ -46,7 +46,7 @@ export default function InquiryFilter({
               onChange={(value) =>
                 setQuery((prev) => ({
                   ...prev,
-                  writerType: value as InquiryWriterType,
+                  writerType: value as InquiryWriterTypeFilter,
                 }))
               }
             />
@@ -59,7 +59,7 @@ export default function InquiryFilter({
               onChange={(value) =>
                 setQuery((prev) => ({
                   ...prev,
-                  answerStatus: value as AnswerStatus,
+                  answerStatus: value as AnswerStatusFilter,
                 }))
               }
             />
