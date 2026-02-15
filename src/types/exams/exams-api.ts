@@ -21,6 +21,7 @@ export type ExamApi = {
   lectureId: string;
   instructorId?: string | null;
   title: string;
+  description?: string | null;
   subject?: string | null;
   cutoffScore: number;
   source?: string | null;
@@ -76,6 +77,7 @@ export type CreateExamPayload = {
 
 export type UpdateExamPayload = {
   title?: string;
+  description?: string | null;
   subject?: string | null;
   cutoffScore?: number;
   source?: string | null;

@@ -9,6 +9,10 @@ Font.register({
       fontWeight: 400,
     },
     {
+      src: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Medium.otf",
+      fontWeight: 500,
+    },
+    {
       src: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Bold.otf",
       fontWeight: 700,
     },
@@ -17,11 +21,14 @@ Font.register({
 
 // 공통 색상 상수
 export const colors = {
-  black: "#18181b",
+  black: "#1e212b",
+  darkGray: "#4a4d5c",
+  gray: "#6b6f80",
+  lightGray: "#8b90a3",
+  border: "#d6d9e0",
+  lightBg: "#f4f6fa",
   white: "#ffffff",
-  gray: "#71717a",
-  border: "#e4e4e7",
-  lightBg: "#f4f4f5",
+  primary: "#4b72f7",
   success: "#16a34a",
   error: "#dc2626",
 };
@@ -32,68 +39,80 @@ export const colors = {
 export const premiumStyles = StyleSheet.create({
   // 페이지
   page: {
-    padding: 20,
+    padding: 30,
     fontFamily: "Pretendard",
     fontSize: 9,
     backgroundColor: colors.white,
+    color: colors.black,
   },
   // 상단 영역 (헤더 + 출결/복습테스트)
   topSection: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 8,
+    gap: 16,
+    marginBottom: 20,
+    height: 118,
   },
   // 헤더
   header: {
     backgroundColor: colors.black,
-    padding: 12,
-    borderRadius: 6,
+    padding: 16,
+    borderRadius: 12,
     flex: 1,
+    justifyContent: "center",
   },
   headerYear: {
     color: colors.white,
-    fontSize: 24,
+    fontSize: 42,
     fontWeight: 700,
+    marginBottom: 8,
+    letterSpacing: -1,
   },
   headerTitle: {
     color: colors.white,
     fontSize: 16,
-    fontWeight: 700,
-    marginTop: 2,
+    fontWeight: 500,
+    opacity: 0.9,
   },
   // 출결/복습테스트 테이블
   attendanceTable: {
-    width: 200,
+    width: 130,
+    justifyContent: "center",
   },
   // 공통 테이블 스타일
   table: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 4,
+    borderRadius: 8,
     overflow: "hidden",
   },
   tableHeader: {
-    backgroundColor: colors.black,
+    backgroundColor: colors.lightBg,
     flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   tableHeaderCell: {
-    color: colors.white,
+    color: colors.darkGray,
     fontWeight: 700,
-    padding: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     textAlign: "center",
     flex: 1,
-    fontSize: 8,
+    fontSize: 9,
   },
   tableRow: {
     flexDirection: "row",
     borderTopWidth: 1,
     borderTopColor: colors.border,
+    backgroundColor: colors.white,
   },
   tableCell: {
-    padding: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     textAlign: "center",
     flex: 1,
-    fontSize: 9,
+    fontSize: 11,
+    fontWeight: 600,
   },
   tableCellBorder: {
     borderLeftWidth: 1,
@@ -102,83 +121,101 @@ export const premiumStyles = StyleSheet.create({
   // 2열 레이아웃
   row: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 8,
+    gap: 16,
+    marginBottom: 12,
   },
   col: {
     flex: 1,
   },
   // 학생 정보
-  infoSection: {
-    flex: 1,
-  },
-  infoRow: {
+  infoSectionTitleRow: {
     flexDirection: "row",
-    marginBottom: 2,
+    alignItems: "center",
+    marginBottom: 8,
   },
-  infoLabel: {
-    backgroundColor: colors.black,
-    color: colors.white,
-    paddingVertical: 5,
-    paddingHorizontal: 8,
-    borderRadius: 3,
-    width: 55,
-    textAlign: "center",
+  infoSectionTitleBar: {
+    width: 3,
+    height: 14,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+    marginRight: 6,
+  },
+  infoSectionTitleText: {
+    fontSize: 11,
     fontWeight: 700,
-    fontSize: 8,
+    color: colors.black,
   },
-  infoValue: {
+  infoSectionCard: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    overflow: "hidden",
+    backgroundColor: colors.lightBg,
+  },
+  infoGridRow: {
+    flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    paddingVertical: 5,
-    paddingHorizontal: 8,
-    flex: 1,
-    fontSize: 9,
   },
-  infoLabelSmall: {
-    backgroundColor: colors.black,
-    color: colors.white,
-    paddingVertical: 5,
-    paddingHorizontal: 6,
-    borderRadius: 3,
-    width: 45,
-    textAlign: "center",
-    fontWeight: 700,
+  infoGridCell: {
+    flex: 1,
+    backgroundColor: colors.white,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  infoGridCellDivider: {
+    borderRightWidth: 1,
+    borderRightColor: colors.border,
+  },
+  infoGridCellFull: {
+    backgroundColor: colors.white,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  infoGridLabel: {
+    color: colors.gray,
     fontSize: 8,
-    marginLeft: 8,
+    fontWeight: 500,
+    marginBottom: 4,
+  },
+  infoGridValue: {
+    color: colors.black,
+    fontSize: 11,
+    fontWeight: 700,
   },
   // 카드 스타일
   card: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 4,
+    borderRadius: 6,
     overflow: "hidden",
+    backgroundColor: colors.white,
   },
   cardHeader: {
-    backgroundColor: colors.black,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: colors.lightBg,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   cardHeaderText: {
-    color: colors.white,
+    color: colors.black,
     fontWeight: 700,
-    textAlign: "center",
     fontSize: 9,
   },
   cardContent: {
-    padding: 8,
+    padding: 12,
   },
   // 응시 결과 점수
   scoreRow: {
     flexDirection: "row",
+    paddingVertical: 6,
   },
   scoreCell: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 6,
+    justifyContent: "center",
+    paddingVertical: 8,
   },
   scoreCellBorder: {
     borderLeftWidth: 1,
@@ -188,67 +225,99 @@ export const premiumStyles = StyleSheet.create({
     fontSize: 8,
     color: colors.gray,
     marginBottom: 4,
+    fontWeight: 500,
   },
   scoreValue: {
+    fontSize: 20,
+    fontWeight: 700,
+    color: colors.black,
+  },
+  scoreValueSmall: {
     fontSize: 18,
     fontWeight: 700,
+    color: colors.black,
   },
-  // 회차별 성적
-  historyRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 2,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  historyRowLast: {
-    borderBottomWidth: 0,
-  },
-  historyRound: {
-    fontSize: 9,
-    color: colors.gray,
-  },
-  historyScore: {
-    fontSize: 9,
-    fontWeight: 700,
+  // 차트 영역
+  chartContainer: {
+    height: 170,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 6,
   },
   // 전달사항
   messageText: {
     fontSize: 9,
-    lineHeight: 1.6,
+    lineHeight: 1.8,
+    color: colors.darkGray,
+  },
+  // 카테고리 테이블
+  categoryTable: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 6,
+    overflow: "hidden",
+  },
+  categoryTableHeader: {
+    flexDirection: "row",
+    backgroundColor: colors.lightBg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 8,
+  },
+  categoryHeaderCell: {
+    fontSize: 8,
+    fontWeight: 700,
+    color: colors.darkGray,
+    textAlign: "center",
+  },
+  categoryTableRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 8,
+  },
+  categoryCell: {
+    fontSize: 9,
+    color: colors.black,
+    textAlign: "center",
   },
   // 페이지 2 스타일
   page2Header: {
-    marginBottom: 12,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.black,
+    paddingBottom: 8,
   },
   page2Subtitle: {
-    fontSize: 8,
+    fontSize: 9,
     color: colors.gray,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   page2Title: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 700,
+    color: colors.black,
   },
   // 문항 테이블
   questionTable: {
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
     borderTopWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 4,
+    borderTopColor: colors.black,
   },
   questionHeaderRow: {
     flexDirection: "row",
-    backgroundColor: colors.black,
+    backgroundColor: colors.lightBg,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    height: 28,
+    alignItems: "center",
   },
   questionHeaderCell: {
-    color: colors.white,
+    color: colors.darkGray,
     fontWeight: 700,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
     textAlign: "center",
     fontSize: 8,
   },
@@ -256,15 +325,16 @@ export const premiumStyles = StyleSheet.create({
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    height: 28,
+    alignItems: "center",
   },
   questionRowAlt: {
-    backgroundColor: colors.lightBg,
+    backgroundColor: "#f7f8fa",
   },
   questionCell: {
-    paddingVertical: 5,
-    paddingHorizontal: 4,
     textAlign: "center",
     fontSize: 8,
+    color: colors.darkGray,
   },
   questionCellO: {
     color: colors.success,
@@ -281,7 +351,7 @@ export const premiumStyles = StyleSheet.create({
   },
   footerText: {
     fontSize: 8,
-    color: colors.gray,
+    color: colors.lightGray,
   },
 });
 
@@ -291,78 +361,89 @@ export const premiumStyles = StyleSheet.create({
 export const simpleStyles = StyleSheet.create({
   // 페이지
   page: {
-    padding: 30,
+    padding: 34,
     fontFamily: "Pretendard",
     fontSize: 10,
     backgroundColor: colors.white,
+    color: colors.black,
   },
   // 헤더
   header: {
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    paddingBottom: 15,
+    marginBottom: 16,
+    backgroundColor: colors.black,
+    padding: 18,
+    borderRadius: 8,
   },
   headerLabel: {
-    fontSize: 8,
-    color: colors.gray,
+    fontSize: 10,
+    color: colors.primary,
     letterSpacing: 1,
-    marginBottom: 4,
+    marginBottom: 6,
+    fontWeight: 700,
+    textTransform: "uppercase",
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 700,
-    marginBottom: 4,
+    marginBottom: 6,
+    color: colors.white,
   },
   headerSubtitle: {
-    fontSize: 10,
-    color: colors.gray,
+    fontSize: 11,
+    color: colors.lightGray,
+    fontWeight: 500,
   },
   // 통계 카드 영역
   statsContainer: {
     flexDirection: "row",
     gap: 10,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   statCard: {
     flex: 1,
     backgroundColor: colors.lightBg,
-    borderRadius: 6,
+    borderRadius: 8,
     padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   statLabel: {
-    fontSize: 9,
+    fontSize: 10,
     color: colors.gray,
-    marginBottom: 4,
+    marginBottom: 5,
+    fontWeight: 500,
   },
   statValue: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 700,
+    color: colors.black,
   },
   // 전달 사항
   messageSection: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 6,
+    borderRadius: 8,
     overflow: "hidden",
   },
   messageHeader: {
-    backgroundColor: colors.black,
+    backgroundColor: colors.lightBg,
     paddingVertical: 8,
     paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   messageHeaderText: {
-    color: colors.white,
-    fontSize: 10,
+    color: colors.black,
+    fontSize: 11,
     fontWeight: 700,
-    textAlign: "center",
   },
   messageContent: {
-    padding: 15,
-    minHeight: 100,
+    padding: 14,
+    minHeight: 110,
   },
   messageText: {
     fontSize: 10,
     lineHeight: 1.6,
+    color: colors.darkGray,
   },
 });

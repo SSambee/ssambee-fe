@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { EXAMS_UI_ONLY } from "@/constants/exams.constants";
 import { useDeleteExam } from "@/hooks/exams/useDeleteExam";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 import { useExamsStore } from "@/stores/exams";
 import type { Exam } from "@/types/exams";
 
@@ -41,6 +42,7 @@ export const useExamsListState = ({
   } = useExamsStore();
 
   const deleteExamMutation = useDeleteExam();
+  const { showAlert } = useDialogAlert();
 
   const examLectureMap = useMemo(() => {
     return new Map(exams.map((exam) => [exam.id, exam.lectureId]));
@@ -140,7 +142,10 @@ export const useExamsListState = ({
         firstError?.reason instanceof Error
           ? firstError.reason.message
           : "시험 삭제 중 오류가 발생했습니다.";
-      alert(`${failedIds.length}건 삭제 실패: ${message}`);
+      await showAlert({
+        title: "시험 삭제 실패",
+        description: `${failedIds.length}건 삭제 실패: ${message}`,
+      });
       return;
     }
 

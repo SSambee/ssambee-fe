@@ -28,8 +28,10 @@ export const examKeys = {
     [...examKeys.lists(), { lectureId }] as const,
   details: () => [...examKeys.all, "detail"] as const,
   detail: (examId: string) => [...examKeys.details(), examId] as const,
-  gradeDetail: (examId: string, lectureEnrollmentId: string) =>
-    [...examKeys.details(), examId, "grade", lectureEnrollmentId] as const,
+  grades: (examId: string) =>
+    [...examKeys.details(), examId, "grades"] as const,
+  gradeDetail: (gradeId: string) =>
+    [...examKeys.details(), "grade", gradeId] as const,
   statistics: (examId: string) =>
     [...examKeys.details(), examId, "statistics"] as const,
 };

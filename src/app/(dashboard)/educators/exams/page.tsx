@@ -13,7 +13,7 @@ export default function ExamsPage() {
 
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <ExamsHeader />
+      <ExamsHeader exams={exams} />
       <ExamsStats exams={exams} isLoading={isLoading} />
       <ExamsList
         exams={exams}

@@ -2,14 +2,16 @@
 
 import { useMemo, useState } from "react";
 
-import { useExamDetail } from "@/hooks/exams/useExamDetail";
-import { useStudentGradeWithAnswers } from "@/hooks/grades/useStudentGradeWithAnswers";
 import type { GradingQuestion, GradingStudent } from "@/types/grading";
 
 import type { AnswerState, QuestionMeta } from "./types";
+import {
+  useGradingPrimaryResources,
+  useGradingStudentAnswerResource,
+} from "./useGradingDataResources";
 
 type UseGradingDataResult = {
-  examDetail: ReturnType<typeof useExamDetail>["data"];
+  examDetail: ReturnType<typeof useGradingPrimaryResources>["examDetail"];
   isPending: boolean;
   isError: boolean;
   examName: string;
@@ -26,17 +28,13 @@ type UseGradingDataResult = {
 };
 
 export const useGradingData = (examId: string): UseGradingDataResult => {
-  const {
-    data: examDetail,
-    isPending,
-    isError,
-  } = useExamDetail(examId, Boolean(examId));
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+  const { examDetail, isPending, isError, gradeIdByEnrollment } =
+    useGradingPrimaryResources(examId);
 
   const lectureName = examDetail?.lecture?.title ?? "수업 미지정";
   const examName = examDetail?.title ?? "시험";
   const examSubtitle = examDetail?.source ?? "출처 미지정";
-
-  const [selectedStudentId, setSelectedStudentId] = useState("");
 
   const questions = useMemo<GradingQuestion[]>(() => {
     return (
@@ -138,11 +136,11 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
     (enrollment) => enrollment.lectureEnrollmentId === activeStudentId
   );
 
-  const { data: studentGradeDetail } = useStudentGradeWithAnswers(
-    examId,
+  const { studentGradeDetail } = useGradingStudentAnswerResource({
     activeStudentId,
-    Boolean(activeEnrollment?.hasGrade)
-  );
+    activeStudentHasGrade: Boolean(activeEnrollment?.hasGrade),
+    gradeIdByEnrollment,
+  });
 
   const fetchedAnswersByStudent = useMemo(() => {
     if (!studentGradeDetail || !examDetail) return null;

@@ -53,7 +53,24 @@ export type ExamGradeApi = {
 
 export type ExamGradeReportApi = {
   attendanceRate?: number | null;
+  assignments?: ExamGradeReportAssignmentApi[] | null;
   questions?: ExamGradeReportQuestionApi[] | null;
+  instructor?: {
+    name?: string | null;
+    academy?: string | null;
+    subject?: string | null;
+  };
+  gradeReport?: {
+    description?: string | null;
+  };
+};
+
+export type ExamGradeReportAssignmentApi = {
+  assignmentId: string;
+  title: string;
+  categoryName: string;
+  resultIndex?: number | null;
+  resultLabel?: string | null;
 };
 
 export type ExamGradeReportQuestionApi = {

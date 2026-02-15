@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   MessageSquare,
   FileText,
@@ -19,228 +18,62 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { pdf } from "@react-pdf/renderer";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { KakaoNotificationModal } from "@/components/common/modals/KakaoNotificationModal";
-import { fetchLectureEnrollmentDetailAPI } from "@/services/lectures/lectures.service";
-import type { QuestionResult, ScoreHistory } from "@/types/report";
-import { formatYMDFromISO } from "@/utils/date";
 
-import { PremiumReportPdf } from "./PremiumReportPdf";
-
-type ExamData = {
-  id: string;
-  examId: string;
-  studentId: string;
-  examName: string;
-  examDate: string;
-  score: number;
-  rank: number;
-  totalStudents: number;
-  averageScore: number;
-  attendance: string;
-  nextClass: string;
-  memo: string;
-  questionResults?: QuestionResult[];
-  studentName: string;
-  className: string;
-  phone?: string;
-  parentPhone?: string;
-};
+import { formatAverageScore } from "../_utils/report-format";
+import type { ReportTemplateExamData } from "../_types/report-template";
+import { usePremiumReportTemplate } from "../_hooks/usePremiumReportTemplate";
 
 type PremiumReportTemplateProps = {
-  examData: ExamData;
+  examData: ReportTemplateExamData;
 };
 
 export function PremiumReportTemplate({
   examData,
 }: PremiumReportTemplateProps) {
-  const [scoreHistory, setScoreHistory] = useState<ScoreHistory[]>([]);
-  const [isScoreHistoryLoading, setIsScoreHistoryLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [reviewTest, setReviewTest] = useState("");
-  const [weaknessType, setWeaknessType] = useState("");
-  const [homeworkWord, setHomeworkWord] = useState("");
-  const [homeworkTask, setHomeworkTask] = useState("");
-  const [homeworkExtra, setHomeworkExtra] = useState("");
-  const [message, setMessage] = useState("");
-  const [isSaved, setIsSaved] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const attendanceRate = examData.attendance || "-";
-  const questionResults = examData.questionResults ?? [];
+  const {
+    scoreHistory,
+    isScoreHistoryLoading,
+    currentPage,
+    setCurrentPage,
+    personalMessage,
+    isStudentSaved,
+    isStudentSaving,
+    isEditing,
+    isModalOpen,
+    setIsModalOpen,
+    isGeneratingPdf,
+    commonMessage,
+    attendanceRate,
+    questionResults,
+    canSendOrDownload,
+    includedCategoryRows,
+    includedCategoryNames,
+    missingCategoryCount,
+    schoolName,
+    instructorName,
+    examType,
+    singlePointOnly,
+    totalPages,
+    recipients,
+    handleSaveStudent,
+    handleEdit,
+    handlePersonalMessageChange,
+    handleOpenKakaoModal,
+    handleSendReport,
+    handleDownloadPdf,
+  } = usePremiumReportTemplate(examData);
 
-  const formatMonthDay = (iso?: string | null) => {
-    const ymd = formatYMDFromISO(iso);
-    if (!ymd) return "";
-    const [, month, day] = ymd.split("-");
-    return `${Number(month)}/${Number(day)}`;
-  };
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadScoreHistory = async () => {
-      if (!examData.studentId) {
-        setScoreHistory([]);
-        return;
-      }
-
-      setIsScoreHistoryLoading(true);
-      try {
-        const detail = await fetchLectureEnrollmentDetailAPI(
-          examData.studentId
-        );
-
-        const mapped = detail.grades
-          .map((item) => ({
-            round: formatMonthDay(item.exam.examDate) || item.exam.title,
-            score: item.grade.score,
-            sortKey: item.exam.examDate
-              ? new Date(item.exam.examDate).getTime()
-              : 0,
-          }))
-          .sort((a, b) => a.sortKey - b.sortKey)
-          .map(({ round, score }) => ({ round, score }));
-
-        if (!cancelled) {
-          setScoreHistory(mapped);
-        }
-      } catch (error) {
-        console.error("성적 추이 로드 실패:", error);
-        if (!cancelled) {
-          setScoreHistory([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsScoreHistoryLoading(false);
-        }
-      }
-    };
-
-    void loadScoreHistory();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [examData.studentId]);
-
-  const singlePointOnly = scoreHistory.length === 1;
-
-  const totalPages = 2;
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    const payload = {
-      examId: examData.examId,
-      lectureEnrollmentId: examData.studentId,
-      template: "premium" as const,
-      message,
-      reviewTest,
-      homeworkWord,
-      homeworkTask,
-      homeworkExtra,
-      weaknessType,
-      attendanceRate,
-    };
-    // TODO: 백엔드 저장 연결 후 console 로그 제거
-    console.info("[성적표 저장 payload]", payload);
-    // TODO: 실제 API 호출로 대체
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsSaving(false);
-    setIsSaved(true);
-    setIsEditing(false);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setIsSaved(false);
-  };
-
-  const handleOpenKakaoModal = () => {
-    if (!isSaved) {
-      alert("먼저 저장해주세요.");
-      return;
-    }
-    setIsModalOpen(true);
-  };
-
-  const handleDownloadPdf = async () => {
-    setIsGeneratingPdf(true);
-    try {
-      // PDF 데이터 준비
-      const pdfData = {
-        studentName: examData.studentName,
-        className: examData.className,
-        examName: examData.examName,
-        examDate: examData.examDate,
-        score: examData.score,
-        rank: examData.rank,
-        totalStudents: examData.totalStudents,
-        averageScore: examData.averageScore,
-        attendance: attendanceRate,
-        reviewTest,
-        homeworkWord,
-        homeworkTask,
-        homeworkExtra,
-        weaknessType,
-        message,
-      };
-
-      // PDF 생성
-      const blob = await pdf(
-        <PremiumReportPdf
-          data={pdfData}
-          questionResults={questionResults}
-          scoreHistory={scoreHistory}
-        />
-      ).toBlob();
-
-      const sanitize = (str: string) => str.replace(/[/\\?%*:|"<>]/g, "_");
-
-      // 다운로드
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${sanitize(examData.studentName)}_${sanitize(
-        examData.examName
-      )}_프리미엄리포트.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("PDF 생성 실패:", error);
-      if (error instanceof Error) {
-        alert(`PDF 생성에 실패했습니다: ${error.message}`);
-      } else {
-        alert("PDF 생성에 실패했습니다.");
-      }
-    } finally {
-      setIsGeneratingPdf(false);
-    }
-  };
-
-  // 모달에 전달할 수신자 정보
-  const recipients = [
-    {
-      id: examData.id,
-      name: examData.studentName,
-      examName: examData.examName,
-      score: examData.score,
-      className: examData.className,
-      phone: examData.phone,
-      parentPhone: examData.parentPhone,
-    },
-  ];
+  const reportYear =
+    examData.examDate.match(/^(\d{4})/)?.[1] ??
+    String(new Date().getFullYear());
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 font-sans text-zinc-800">
       {/* 카카오톡 발송 모달 */}
       <KakaoNotificationModal
         open={isModalOpen}
@@ -248,86 +81,112 @@ export function PremiumReportTemplate({
         recipients={recipients}
         title="성적표 발송"
         subtitle="프리미엄 리포트 카카오톡 발송"
-        defaultMessage={message}
+        defaultMessage={commonMessage}
+        onSend={handleSendReport}
       />
       {/* 상단 헤더 */}
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">프리미엄 리포트</p>
-          <h2 className="text-2xl font-bold">
-            {examData.studentName} · {examData.score}점
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between border-b border-zinc-200 pb-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-800">
+              프리미엄 리포트
+            </span>
+            <span className="text-xs text-zinc-400">
+              {examData.examDate} 시행
+            </span>
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+            {examData.studentName}{" "}
+            <span className="text-zinc-300 font-light">|</span>{" "}
+            <span className="text-indigo-600">{examData.score}점</span>
           </h2>
-          <p className="text-sm text-muted-foreground">
-            {examData.className} | {examData.rank} / {examData.totalStudents}
-          </p>
+          <div className="flex items-center gap-3 text-sm font-medium text-zinc-500">
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+              {examData.className}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+              석차 {examData.rank} / {examData.totalStudents}
+            </span>
+          </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Button
             variant="outline"
-            className="gap-2"
+            className="h-10 w-full gap-2 border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 sm:w-auto shadow-sm transition-all"
             onClick={handleOpenKakaoModal}
-            disabled={!isSaved}
+            disabled={!canSendOrDownload}
           >
-            <MessageSquare className="h-4 w-4" />
+            <MessageSquare className="h-4 w-4 text-yellow-500" />
             카카오톡 발송
           </Button>
           <Button
             variant="outline"
-            className="gap-2"
+            className="h-10 w-full gap-2 border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 hover:text-zinc-900 sm:w-auto shadow-sm transition-all"
             onClick={handleDownloadPdf}
-            disabled={!isSaved || isGeneratingPdf}
+            disabled={!canSendOrDownload || isGeneratingPdf}
           >
-            <FileText className="h-4 w-4" />
-            {isGeneratingPdf ? "생성 중..." : "성적표 PDF"}
+            <FileText className="h-4 w-4 text-red-500" />
+            {isGeneratingPdf ? "생성 중..." : "PDF 다운로드"}
           </Button>
         </div>
       </div>
 
       {/* 페이지 전환 + 저장 버튼 */}
-      <div className="flex items-center justify-center gap-4">
-        <Button
-          variant="outline"
-          onClick={() => setCurrentPage(1)}
-          disabled={currentPage === 1}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm font-medium">
-          {currentPage} / {totalPages} 페이지
-        </span>
-        <Button
-          variant="outline"
-          onClick={() => setCurrentPage(2)}
-          disabled={currentPage === 2}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <div className="ml-4 flex gap-2 border-l pl-4">
+      <div className="sticky top-4 z-10 mx-auto flex max-w-fit flex-col items-center gap-4 rounded-full border border-zinc-200 bg-white/80 px-6 py-2 shadow-lg backdrop-blur-md sm:flex-row sm:justify-center">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className="h-8 w-8 rounded-full p-0 hover:bg-zinc-100"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span className="min-w-[80px] text-center text-sm font-semibold text-zinc-600">
+            {currentPage} / {totalPages} 페이지
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage(2)}
+            disabled={currentPage === 2}
+            className="h-8 w-8 rounded-full p-0 hover:bg-zinc-100"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
+
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <Button
             variant="outline"
             onClick={handleEdit}
             disabled={isEditing}
-            className="gap-2"
+            className="gap-1.5 text-zinc-600 hover:text-zinc-900"
           >
-            <Pencil className="h-4 w-4" />
-            수정
+            <Pencil className="h-3.5 w-3.5" />
+            수정 모드
           </Button>
           <Button
-            onClick={handleSave}
-            disabled={isSaving || !isEditing}
-            className={`gap-2 ${isSaved && !isEditing ? "bg-green-600 hover:bg-green-700" : ""}`}
+            onClick={handleSaveStudent}
+            disabled={isStudentSaving || !isEditing || !examData.gradeId}
+            className={`gap-1.5 transition-all ${
+              isStudentSaved && !isEditing
+                ? "bg-green-600 hover:bg-green-700 text-white shadow-md shadow-green-200"
+                : "bg-zinc-900 hover:bg-zinc-800 text-white shadow-md shadow-zinc-200"
+            }`}
           >
-            {isSaved && !isEditing ? (
+            {isStudentSaved && !isEditing ? (
               <>
-                <Check className="h-4 w-4" />
-                저장완료
+                <Check className="h-3.5 w-3.5" />
+                저장 완료
               </>
             ) : (
               <>
-                <Save className="h-4 w-4" />
-                {isSaving ? "저장 중..." : "저장"}
+                <Save className="h-3.5 w-3.5" />
+                {isStudentSaving ? "저장 중..." : "리포트 저장"}
               </>
             )}
           </Button>
@@ -336,364 +195,472 @@ export function PremiumReportTemplate({
 
       {/* 페이지 1: 메인 정보 */}
       {currentPage === 1 && (
-        <Card>
-          <CardContent className="space-y-6 p-6">
-            {/* 리포트 타이틀 + 출결/과제 */}
-            <div className="grid grid-cols-[1fr_300px] gap-6">
-              {/* 좌측: 리포트 타이틀 */}
-              <div className="rounded-lg bg-zinc-900 p-6 text-white">
-                {/* TODO: 연도/강사명/리포트 제목을 데이터 기반으로 치환 */}
-                <p className="text-4xl font-bold">2026</p>
-                <p className="text-3xl font-bold">강사이름영어</p>
-                <p className="text-3xl font-bold">주간 리포트</p>
-              </div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card className="overflow-hidden border-zinc-200 bg-white shadow-xl shadow-zinc-200/50">
+            <CardContent className="space-y-8 p-6 sm:p-10">
+              {/* 리포트 타이틀 + 출결/과제 */}
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-10">
+                {/* 좌측: 리포트 타이틀 */}
+                <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-zinc-900 p-8 text-white shadow-2xl shadow-zinc-900/20">
+                  <div className="absolute right-0 top-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-zinc-800/50 blur-3xl" />
+                  <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-64 w-64 rounded-full bg-indigo-900/50 blur-3xl" />
 
-              {/* 우측: 출결 + 복습테스트 (입력 가능) */}
-              <div className="space-y-4">
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr className="bg-zinc-900 text-white">
-                      <th className="border p-2">출석률 </th>
-                      <th className="border p-2">
-                        복습테스트{" "}
-                        <span className="text-xs opacity-70">(직접 입력)</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border p-3 text-center text-sm">
+                  <div className="relative z-10 space-y-1">
+                    <p className="text-5xl font-black tracking-tighter sm:text-6xl text-zinc-100">
+                      {reportYear}
+                    </p>
+                    <p className="text-2xl font-medium text-zinc-400">
+                      주간 리포트
+                    </p>
+                  </div>
+                  <div className="relative z-10 mt-8">
+                    <div className="h-1 w-12 bg-indigo-500 mb-4" />
+                    <p className="text-3xl font-bold sm:text-4xl tracking-tight">
+                      {instructorName}
+                    </p>
+                    <p className="text-lg text-zinc-400 mt-1">
+                      주간 학습 성취도 분석
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="group relative overflow-hidden rounded-2xl border border-zinc-100 bg-zinc-50 p-6 transition-all hover:border-indigo-100 hover:bg-indigo-50/30 hover:shadow-lg hover:shadow-indigo-100/50">
+                    <div className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+                      출석률
+                    </div>
+                    <div className="mt-2 flex items-baseline gap-2">
+                      <span className="text-4xl font-black text-zinc-900">
                         {attendanceRate}
-                      </td>
-                      <td className="border p-0">
-                        <input
-                          type="text"
-                          value={reviewTest}
-                          onChange={(e) => {
-                            setReviewTest(e.target.value);
-                            setIsSaved(false);
-                          }}
-                          disabled={!isEditing}
-                          aria-label="복습테스트"
-                          className="w-full bg-transparent p-3 text-center outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                          placeholder="입력"
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* 학생 정보 + 과제 사항 */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* 학생 정보 */}
-              <div className="space-y-2">
-                <div className="grid grid-cols-[100px_1fr_80px_1fr] gap-2 text-sm">
-                  <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
-                    학생 이름
-                  </span>
-                  <span className="border-b px-2 py-1.5">
-                    {examData.studentName}
-                  </span>
-                  <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
-                    수강일자
-                  </span>
-                  <span className="border-b px-2 py-1.5">
-                    {examData.examDate}
-                  </span>
-                </div>
-                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                  <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
-                    학원명
-                  </span>
-                  <span className="border-b px-2 py-1.5"></span>
-                </div>
-                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                  <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
-                    수강반
-                  </span>
-                  <span className="border-b px-2 py-1.5">
-                    {examData.className}
-                  </span>
-                </div>
-                <div className="grid grid-cols-[100px_1fr] gap-2 text-sm">
-                  <span className="rounded bg-zinc-900 px-2 py-1.5 text-center text-white">
-                    시험 종류
-                  </span>
-                  <span className="border-b px-2 py-1.5">복습테스트</span>
-                </div>
-              </div>
-
-              {/* 과제 사항 (입력 가능) */}
-              <table className="h-fit w-full border-collapse text-sm">
-                <thead>
-                  <tr className="bg-zinc-900 text-white">
-                    <th className="border p-2" colSpan={3}>
-                      과제 사항{" "}
-                      <span className="text-xs opacity-70">(직접 입력)</span>
-                    </th>
-                  </tr>
-                  <tr className="bg-zinc-800 text-white">
-                    <th className="border p-2">단어</th>
-                    <th className="border p-2">과제</th>
-                    <th className="border p-2">추가 과제</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border p-0">
-                      <input
-                        type="text"
-                        value={homeworkWord}
-                        onChange={(e) => {
-                          setHomeworkWord(e.target.value);
-                          setIsSaved(false);
-                        }}
-                        disabled={!isEditing}
-                        aria-label="단어 과제"
-                        className="w-full bg-transparent p-3 text-center outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                        placeholder="입력"
-                      />
-                    </td>
-                    <td className="border p-0">
-                      <input
-                        type="text"
-                        value={homeworkTask}
-                        onChange={(e) => {
-                          setHomeworkTask(e.target.value);
-                          setIsSaved(false);
-                        }}
-                        disabled={!isEditing}
-                        aria-label="과제"
-                        className="w-full bg-transparent p-3 text-center outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                        placeholder="입력"
-                      />
-                    </td>
-                    <td className="border p-0">
-                      <input
-                        type="text"
-                        value={homeworkExtra}
-                        onChange={(e) => {
-                          setHomeworkExtra(e.target.value);
-                          setIsSaved(false);
-                        }}
-                        disabled={!isEditing}
-                        aria-label="추가 과제"
-                        className="w-full bg-transparent p-3 text-center outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                        placeholder="입력"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {/* 응시 결과 + 취약 유형 */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* 응시 결과 */}
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="bg-zinc-900 text-white">
-                    <th className="border p-2" colSpan={3}>
-                      응시 결과
-                    </th>
-                  </tr>
-                  <tr>
-                    <th className="border bg-muted p-2">원점수</th>
-                    <th className="border bg-muted p-2">석차</th>
-                    <th className="border bg-muted p-2">평균점수</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border p-3 text-center text-lg font-bold">
-                      {examData.score}점
-                    </td>
-                    <td className="border p-3 text-center text-lg font-bold">
-                      {examData.rank}/{examData.totalStudents}등
-                    </td>
-                    <td className="border p-3 text-center text-lg font-bold">
-                      {examData.averageScore}점
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {/* 취약 유형 (입력 가능) */}
-              <div className="rounded-lg border">
-                <div className="rounded-t-lg bg-zinc-900 p-2 text-center text-white">
-                  취약 유형{" "}
-                  <span className="text-xs opacity-70">(직접 입력)</span>
-                </div>
-                <div className="p-2">
-                  <Textarea
-                    value={weaknessType}
-                    onChange={(e) => {
-                      setWeaknessType(e.target.value);
-                      setIsSaved(false);
-                    }}
-                    disabled={!isEditing}
-                    placeholder="취약 유형을 입력하세요 (예: 빈칸, 어법)"
-                    className="min-h-[80px] resize-none border-0 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-70"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 회차별 성적추이 + 전달 사항 */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* 회차별 성적추이 */}
-              <div className="rounded-lg border">
-                <div className="rounded-t-lg bg-zinc-900 p-2 text-center text-white">
-                  회차별 성적추이
-                </div>
-                <div className="h-[200px] p-4">
-                  {isScoreHistoryLoading ? (
-                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                      성적 추이를 불러오는 중입니다.
+                      </span>
+                      <span className="text-sm font-medium text-zinc-500">
+                        출석률
+                      </span>
                     </div>
-                  ) : scoreHistory.length === 0 ? (
-                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                      표시할 성적 추이가 없습니다.
+                    <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-zinc-200">
+                      <div
+                        className="h-full bg-indigo-600 transition-all duration-1000 ease-out"
+                        style={{
+                          width: attendanceRate === "-" ? "0%" : attendanceRate,
+                        }}
+                      />
                     </div>
-                  ) : (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={scoreHistory}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                        <XAxis
-                          dataKey="round"
-                          tick={{ fontSize: 12 }}
-                          tickLine={false}
-                        />
-                        <YAxis
-                          domain={[0, 100]}
-                          ticks={[0, 20, 40, 60, 80, 100]}
-                          tick={{ fontSize: 12 }}
-                          tickLine={false}
-                          axisLine={false}
-                        />
-                        <Tooltip
-                          formatter={(value) => [`${value}점`, "점수"]}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            border: "1px solid #e5e5e5",
-                            borderRadius: "8px",
-                          }}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="score"
-                          stroke="#f59e0b"
-                          strokeWidth={2}
-                          dot={
-                            singlePointOnly
-                              ? { fill: "#f59e0b", strokeWidth: 0, r: 5 }
-                              : { fill: "#f59e0b", strokeWidth: 2, r: 4 }
-                          }
-                          activeDot={singlePointOnly ? { r: 5 } : { r: 6 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  )}
+                  </div>
+
+                  <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-5 text-xs text-zinc-500">
+                    {includedCategoryRows.length === 0 ? (
+                      <p className="text-center py-2">
+                        이 시험에 포함된 카테고리가 없습니다.
+                        <br />
+                        시험관리에서 포함 설정을 먼저 해주세요.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex justify-between border-b border-dashed border-zinc-200 pb-2">
+                          <span className="font-medium text-zinc-700">
+                            입력 대상
+                          </span>
+                          <span>{includedCategoryNames.join(", ")}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium text-zinc-700">
+                            미입력 항목
+                          </span>
+                          <span
+                            className={
+                              missingCategoryCount > 0
+                                ? "text-red-500 font-bold"
+                                : "text-green-500"
+                            }
+                          >
+                            {missingCategoryCount}개
+                          </span>
+                        </div>
+                        <p className="pt-2 text-zinc-400 leading-relaxed">
+                          * 좌측 과제/카테고리 입력에서 항목별 결과를
+                          선택해주세요.
+                          <br />* `임시저장` 후 상단 `현재 학생 최종저장`을
+                          클릭하세요.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* 전달 사항 (입력 가능) */}
-              <div className="rounded-lg border">
-                <div className="rounded-t-lg bg-zinc-900 p-2 text-center text-white">
-                  전달 사항{" "}
-                  <span className="text-xs opacity-70">(직접 입력)</span>
+              {/* 학생 정보 + 과제 사항 */}
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                {/* 학생 정보 */}
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                    <span className="h-4 w-1 rounded-full bg-indigo-600" />
+                    학생 정보
+                  </h3>
+                  <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-1">
+                    <div className="grid grid-cols-2 gap-px bg-zinc-200 overflow-hidden rounded-lg">
+                      <div className="bg-white p-4">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                          이름
+                        </p>
+                        <p className="mt-1 font-bold text-zinc-900">
+                          {examData.studentName}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                          응시일
+                        </p>
+                        <p className="mt-1 font-medium text-zinc-900">
+                          {examData.examDate}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                          수강반
+                        </p>
+                        <p className="mt-1 font-medium text-zinc-900">
+                          {examData.className}
+                        </p>
+                      </div>
+                      <div className="bg-white p-4">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                          학원명
+                        </p>
+                        <p className="mt-1 font-medium text-zinc-900">
+                          {schoolName}
+                        </p>
+                      </div>
+                      <div className="col-span-2 bg-white p-4">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                          시험 유형
+                        </p>
+                        <p className="mt-1 font-medium text-zinc-900">
+                          {examType}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-2">
-                  <Textarea
-                    value={message}
-                    onChange={(e) => {
-                      setMessage(e.target.value);
-                      setIsSaved(false);
-                    }}
-                    disabled={!isEditing}
-                    placeholder="전달 사항을 입력하세요"
-                    className="min-h-[168px] resize-none border-0 focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-70"
-                  />
+
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                    <span className="h-4 w-1 rounded-full bg-indigo-600" />
+                    카테고리 분석
+                  </h3>
+                  <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+                    {includedCategoryRows.length === 0 ? (
+                      <div className="p-8 text-center text-sm text-zinc-400">
+                        데이터가 없습니다.
+                      </div>
+                    ) : (
+                      <table className="w-full text-sm">
+                        <thead className="bg-zinc-50">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                              카테고리
+                            </th>
+                            <th className="px-4 py-3 text-right text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                              결과
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-100">
+                          {includedCategoryRows.map((row) => (
+                            <tr
+                              key={row.id}
+                              className="group hover:bg-zinc-50/80 transition-colors"
+                            >
+                              <td className="px-4 py-3 font-medium text-zinc-700">
+                                {row.name}
+                              </td>
+                              <td className="px-4 py-3 text-right font-bold text-indigo-600">
+                                {row.value}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+
+              {/* 응시 결과 + 취약 유형 */}
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                {/* 응시 결과 */}
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                    <span className="h-4 w-1 rounded-full bg-indigo-600" />
+                    성적 요약
+                  </h3>
+                  <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
+                    <div className="grid grid-cols-3 divide-x divide-zinc-100">
+                      <div className="p-6 text-center hover:bg-zinc-50 transition-colors">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                          원점수
+                        </p>
+                        <p className="text-3xl font-black text-zinc-900">
+                          {examData.score}
+                        </p>
+                      </div>
+                      <div className="p-6 text-center hover:bg-zinc-50 transition-colors">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                          석차
+                        </p>
+                        <p className="text-3xl font-black text-zinc-900">
+                          {examData.rank}
+                          <span className="text-lg text-zinc-400 font-medium">
+                            /{examData.totalStudents}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="p-6 text-center hover:bg-zinc-50 transition-colors">
+                        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                          평균점수
+                        </p>
+                        <p className="text-3xl font-black text-zinc-900">
+                          {formatAverageScore(examData.averageScore)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                    <span className="h-4 w-1 rounded-full bg-indigo-600" />
+                    학생 개인 전달사항
+                  </h3>
+                  <div className="relative">
+                    <Textarea
+                      value={personalMessage}
+                      onChange={(e) =>
+                        handlePersonalMessageChange(e.target.value)
+                      }
+                      disabled={!isEditing}
+                      placeholder="학생 개인에게 전달할 피드백을 입력하세요..."
+                      className="min-h-[120px] w-full resize-none rounded-xl border-zinc-200 bg-yellow-50/30 p-4 text-zinc-800 placeholder:text-zinc-400 focus:border-indigo-500 focus:ring-indigo-500/20 disabled:opacity-70 disabled:bg-zinc-50"
+                    />
+                    <div className="absolute bottom-3 right-3">
+                      <Pencil className="h-4 w-4 text-zinc-300" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 회차별 성적추이 + 전달 사항 */}
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                {/* 회차별 성적추이 */}
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                    <span className="h-4 w-1 rounded-full bg-indigo-600" />
+                    회차별 성적 추이
+                  </h3>
+                  <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+                    <div className="h-[200px] w-full">
+                      {isScoreHistoryLoading ? (
+                        <div className="flex h-full items-center justify-center text-sm text-zinc-400 animate-pulse">
+                          데이터 로딩 중...
+                        </div>
+                      ) : scoreHistory.length === 0 ? (
+                        <div className="flex h-full items-center justify-center text-sm text-zinc-400">
+                          표시할 성적 추이가 없습니다.
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={scoreHistory}>
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              stroke="#f4f4f5"
+                              vertical={false}
+                            />
+                            <XAxis
+                              dataKey="round"
+                              tick={{ fontSize: 11, fill: "#71717a" }}
+                              tickLine={false}
+                              axisLine={{ stroke: "#e4e4e7" }}
+                              dy={10}
+                            />
+                            <YAxis
+                              domain={[0, 100]}
+                              ticks={[0, 20, 40, 60, 80, 100]}
+                              tick={{ fontSize: 11, fill: "#71717a" }}
+                              tickLine={false}
+                              axisLine={false}
+                              dx={-10}
+                            />
+                            <Tooltip
+                              formatter={(value) => [`${value}점`, "점수"]}
+                              contentStyle={{
+                                backgroundColor: "#fff",
+                                border: "1px solid #e4e4e7",
+                                borderRadius: "8px",
+                                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                                fontSize: "12px",
+                                fontWeight: "500",
+                              }}
+                              cursor={{ stroke: "#e4e4e7", strokeWidth: 1 }}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="score"
+                              stroke="#4f46e5"
+                              strokeWidth={3}
+                              dot={
+                                singlePointOnly
+                                  ? { fill: "#4f46e5", strokeWidth: 0, r: 6 }
+                                  : {
+                                      fill: "#fff",
+                                      stroke: "#4f46e5",
+                                      strokeWidth: 2,
+                                      r: 4,
+                                    }
+                              }
+                              activeDot={{
+                                r: 6,
+                                fill: "#4f46e5",
+                                stroke: "#fff",
+                                strokeWidth: 2,
+                              }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
+                    <span className="h-4 w-1 rounded-full bg-indigo-600" />
+                    시험 공통 전달사항
+                  </h3>
+                  <div className="relative h-full">
+                    <div className="min-h-[200px] w-full rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-sm leading-relaxed text-zinc-700 shadow-inner">
+                      {commonMessage ? (
+                        <div className="whitespace-pre-wrap">
+                          {commonMessage}
+                        </div>
+                      ) : (
+                        <div className="flex h-full flex-col items-center justify-center text-zinc-400">
+                          <p>등록된 공통 전달사항이 없습니다.</p>
+                          <p className="text-xs mt-1">
+                            좌측 템플릿 설정에서 입력해주세요.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* 페이지 2: 문항별 응시 결과 */}
       {currentPage === 2 && (
-        <Card>
-          <CardContent className="p-6">
-            {/* 문항별 응시 결과 헤더 */}
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {examData.studentName} · {examData.examName}
-                </p>
-                <h3 className="text-xl font-bold">문항별 응시 결과</h3>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card className="overflow-hidden border-zinc-200 bg-white shadow-xl shadow-zinc-200/50">
+            <CardContent className="p-6 sm:p-10">
+              {/* 문항별 응시 결과 헤더 */}
+              <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-zinc-100 pb-6">
+                <div>
+                  <p className="text-sm font-medium text-zinc-500 mb-1">
+                    {examData.studentName} · {examData.examName}
+                  </p>
+                  <h3 className="text-2xl font-bold text-zinc-900">
+                    문항별 상세 분석
+                  </h3>
+                </div>
+                <div className="flex items-center gap-3 rounded-lg bg-zinc-50 px-4 py-2">
+                  <span className="text-sm font-medium text-zinc-500">
+                    총 문항
+                  </span>
+                  <span className="text-xl font-bold text-zinc-900">
+                    {questionResults.length}
+                  </span>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">총 문항</p>
-                <p className="text-2xl font-bold">
-                  {questionResults.length}문항
-                </p>
-              </div>
-            </div>
 
-            {/* 문항별 응시 결과 테이블 */}
-            <div className="rounded-lg border">
-              <div className="rounded-t-lg bg-zinc-900 p-3 text-center text-white">
-                문항별 응시 결과
-              </div>
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="bg-muted">
-                    <th className="w-16 border p-3">No.</th>
-                    <th className="border p-3 text-left">문항내용</th>
-                    <th className="w-20 border p-3">유형</th>
-                    <th className="w-24 border p-3">출처</th>
-                    <th className="w-16 border p-3">O/X</th>
-                    <th className="w-20 border p-3">오답률</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {questionResults.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="border p-4 text-center text-sm text-muted-foreground"
-                      >
-                        표시할 문항별 응시 결과가 없습니다.
-                      </td>
-                    </tr>
-                  ) : (
-                    questionResults.map((q) => (
-                      <tr key={q.no}>
-                        <td className="border p-2 text-center">{q.no}</td>
-                        <td className="border p-2 text-left">{q.content}</td>
-                        <td className="border p-2 text-center">{q.type}</td>
-                        <td className="border p-2 text-center">{q.source}</td>
-                        <td
-                          className={`border p-2 text-center font-bold ${
-                            q.ox === "X" ? "text-red-500" : "text-blue-500"
-                          }`}
-                        >
-                          {q.ox}
-                        </td>
-                        <td className="border p-2 text-center">
-                          {q.errorRate}
-                        </td>
+              {/* 문항별 응시 결과 테이블 */}
+              <div className="overflow-hidden rounded-xl border border-zinc-200 shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="min-w-[760px] w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-zinc-50/80 border-b border-zinc-200">
+                        <th className="w-16 px-4 py-3 text-center font-semibold text-zinc-500">
+                          No.
+                        </th>
+                        <th className="px-4 py-3 text-left font-semibold text-zinc-500">
+                          문항 내용
+                        </th>
+                        <th className="w-24 px-4 py-3 text-center font-semibold text-zinc-500">
+                          유형
+                        </th>
+                        <th className="w-28 px-4 py-3 text-center font-semibold text-zinc-500">
+                          출처
+                        </th>
+                        <th className="w-20 px-4 py-3 text-center font-semibold text-zinc-500">
+                          결과
+                        </th>
+                        <th className="w-24 px-4 py-3 text-center font-semibold text-zinc-500">
+                          오답률
+                        </th>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100 bg-white">
+                      {questionResults.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={6}
+                            className="px-4 py-12 text-center text-sm text-zinc-400"
+                          >
+                            표시할 문항별 응시 결과가 없습니다.
+                          </td>
+                        </tr>
+                      ) : (
+                        questionResults.map((q) => (
+                          <tr
+                            key={q.no}
+                            className="group hover:bg-zinc-50 transition-colors"
+                          >
+                            <td className="px-4 py-3 text-center font-medium text-zinc-400 group-hover:text-zinc-700">
+                              {q.no}
+                            </td>
+                            <td className="px-4 py-3 text-left text-zinc-700 font-medium">
+                              {q.content}
+                            </td>
+                            <td className="px-4 py-3 text-center text-zinc-500 text-xs">
+                              {q.type}
+                            </td>
+                            <td className="px-4 py-3 text-center text-zinc-500 text-xs">
+                              {q.source}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span
+                                className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                                  q.ox === "X"
+                                    ? "bg-red-100 text-red-600"
+                                    : "bg-blue-100 text-blue-600"
+                                }`}
+                              >
+                                {q.ox}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center text-zinc-600 font-medium">
+                              {q.errorRate}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

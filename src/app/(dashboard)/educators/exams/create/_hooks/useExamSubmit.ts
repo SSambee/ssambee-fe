@@ -4,6 +4,7 @@ import type { UseFormReturn } from "react-hook-form";
 
 import { useCreateExam } from "@/hooks/exams/useCreateExam";
 import { useUpdateExam } from "@/hooks/exams/useUpdateExam";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 import {
   mapExamFormToCreatePayload,
   mapExamFormToUpdatePayload,
@@ -23,13 +24,18 @@ export const useExamSubmit = ({
   selectedExamId,
   activeLectureId,
 }: UseExamSubmitParams) => {
+  const { showAlert } = useDialogAlert();
+
   const createExamMutation = useCreateExam({
     onSuccess: () => {},
     onError: (error) => {
       if (error.message.includes("문번은 중복")) {
         form.setError("questions", { message: error.message });
       }
-      alert(error.message);
+      void showAlert({
+        title: "시험 저장 실패",
+        description: error.message,
+      });
     },
   });
 
@@ -39,7 +45,10 @@ export const useExamSubmit = ({
       if (error.message.includes("문번은 중복")) {
         form.setError("questions", { message: error.message });
       }
-      alert(error.message);
+      void showAlert({
+        title: "시험 수정 실패",
+        description: error.message,
+      });
     },
   });
 

@@ -48,7 +48,7 @@ type KakaoNotificationModalProps = {
     recipients: NotificationRecipient[],
     message: string,
     targetType: TargetType
-  ) => void;
+  ) => void | Promise<void>;
 };
 
 export function KakaoNotificationModal({
@@ -63,6 +63,7 @@ export function KakaoNotificationModal({
   // TODO: defaultMessage 변경 시 message 상태 동기화(useEffect) 필요
   const [message, setMessage] = useState(defaultMessage);
   const [targetType, setTargetType] = useState<TargetType>("all");
+  const [isSending, setIsSending] = useState(false);
 
   // 발송 대상에 따른 수신자 수 계산
   const targetInfo = useMemo(() => {
@@ -79,9 +80,18 @@ export function KakaoNotificationModal({
     }
   }, [recipients, targetType]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (onSend) {
-      onSend(recipients, message, targetType);
+      setIsSending(true);
+      try {
+        await onSend(recipients, message, targetType);
+        handleClose();
+      } catch (error) {
+        console.error("Failed to send notification:", error);
+        // Keep modal open on failure
+      } finally {
+        setIsSending(false);
+      }
     } else {
       // 기본 동작
       const targetLabel =
@@ -91,8 +101,8 @@ export function KakaoNotificationModal({
             ? "학생"
             : "학부모";
       alert(`${targetLabel}에게 카카오톡 발송이 완료되었습니다.`);
+      handleClose();
     }
-    handleClose();
   };
 
   const handleClose = () => {
@@ -101,8 +111,13 @@ export function KakaoNotificationModal({
     setTargetType("all");
   };
 
+  const handleDialogOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen && isSending) return;
+    onOpenChange(nextOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader className="space-y-1 text-left">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -230,16 +245,22 @@ export function KakaoNotificationModal({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} disabled={isSending}>
             취소
           </Button>
           <Button
             onClick={handleSend}
             className="gap-2"
-            disabled={targetInfo.count === 0}
+            disabled={targetInfo.count === 0 || isSending}
           >
-            <MessageSquare className="h-4 w-4" />
-            {targetInfo.label} 발송 ({targetInfo.count}명)
+            {isSending ? (
+              "전송 중..."
+            ) : (
+              <>
+                <MessageSquare className="h-4 w-4" />
+                {targetInfo.label} 발송 ({targetInfo.count}명)
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

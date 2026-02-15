@@ -15,20 +15,29 @@ type CheckModalProps = {
   title: string;
   description: string;
   onConfirm: () => void;
+  onCancel?: () => void;
   confirmText?: string;
   cancelText?: string;
+  hideCancel?: boolean;
 };
 
 export const CheckModal = ({
   title,
   description,
   onConfirm,
+  onCancel,
   confirmText = "확인",
   cancelText = "취소",
+  hideCancel = false,
 }: CheckModalProps) => {
   const { isOpen, closeModal } = useModal();
 
-  const handleClose = () => {
+  const handleCancel = () => {
+    onCancel?.();
+    closeModal();
+  };
+
+  const handleCloseOnly = () => {
     closeModal();
   };
 
@@ -36,7 +45,7 @@ export const CheckModal = ({
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (!open) handleClose();
+        if (!open) handleCancel();
       }}
     >
       <DialogContent className="max-w-md">
@@ -48,20 +57,22 @@ export const CheckModal = ({
         </DialogHeader>
 
         <DialogFooter className="p-6 pt-2 flex flex-row justify-end gap-2">
-          <Button
-            variant="outline"
-            className="cursor-pointer"
-            onClick={handleClose}
-          >
-            {cancelText}
-          </Button>
+          {!hideCancel ? (
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={handleCancel}
+            >
+              {cancelText}
+            </Button>
+          ) : null}
 
           <Button
             variant="default"
             className="cursor-pointer"
             onClick={() => {
               onConfirm();
-              handleClose();
+              handleCloseOnly();
             }}
           >
             {confirmText}

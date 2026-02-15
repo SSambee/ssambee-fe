@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -14,12 +13,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useReportStore } from "@/stores/report.store";
+
+import { useReportSearchSection } from "../_hooks/useReportSearchSection";
 
 export function ReportSearchSection() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [warningOpen, setWarningOpen] = useState(false);
-  const [warningExamName, setWarningExamName] = useState("");
   const {
     classes,
     exams,
@@ -30,33 +27,16 @@ export function ReportSearchSection() {
     isLoadingClasses,
     isLoadingExams,
     isLoadingStudents,
-    loadClasses,
-    selectClass,
-    selectExam,
-    selectStudent,
-  } = useReportStore();
-
-  useEffect(() => {
-    loadClasses();
-  }, [loadClasses]);
-
-  const handleExamClick = (
-    examId: string,
-    examName: string,
-    ready: boolean
-  ) => {
-    if (!ready) {
-      setWarningExamName(examName);
-      setWarningOpen(true);
-      return;
-    }
-    void selectExam(examId);
-  };
-
-  // 검색어로 수업 필터링
-  const filteredClasses = classes.filter((cls) =>
-    cls.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    handleClassClick,
+    handleExamClick,
+    handleStudentClick,
+    filteredClasses,
+    searchTerm,
+    setSearchTerm,
+    warningOpen,
+    setWarningOpen,
+    warningExamName,
+  } = useReportSearchSection();
 
   return (
     <>
@@ -97,7 +77,7 @@ export function ReportSearchSection() {
                   {filteredClasses.map((cls) => (
                     <button
                       key={cls.id}
-                      onClick={() => void selectClass(cls.id)}
+                      onClick={() => handleClassClick(cls.id)}
                       className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted ${
                         selectedClassId === cls.id
                           ? "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -201,7 +181,7 @@ export function ReportSearchSection() {
                   {students.map((student) => (
                     <button
                       key={student.id}
-                      onClick={() => void selectStudent(student.id)}
+                      onClick={() => handleStudentClick(student.id)}
                       className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted ${
                         selectedStudentId === student.id
                           ? "bg-primary text-primary-foreground hover:bg-primary/90"

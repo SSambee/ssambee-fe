@@ -7,6 +7,10 @@ import type {
   SubmitGradingPayload,
 } from "@/types/grades";
 
+type StudentGradeDetailApi = {
+  grade: StudentGradeWithAnswersApi;
+};
+
 export const fetchExamGradesAPI = async (
   examId: string
 ): Promise<ExamGradeApi[]> => {
@@ -30,31 +34,36 @@ export const submitGradingAPI = async (
 };
 
 export const fetchStudentGradeWithAnswersAPI = async (
-  examId: string,
-  lectureEnrollmentId: string
+  gradeId: string
 ): Promise<StudentGradeWithAnswersApi> => {
-  const { data } = await axiosClient.get<
-    ApiResponse<StudentGradeWithAnswersApi>
-  >(`/exams/${examId}/grades/lectureEnrollments/${lectureEnrollmentId}`);
+  const { data } = await axiosClient.get<ApiResponse<StudentGradeDetailApi>>(
+    `/grades/${gradeId}`
+  );
 
-  if (!data?.data) {
+  const grade = data?.data?.grade;
+
+  if (!grade) {
     throw new Error("학생 답안 정보를 찾을 수 없습니다.");
   }
 
-  return data.data;
+  return grade;
 };
 
 export const fetchExamGradeReportAPI = async (
-  examId: string,
-  lectureEnrollmentId: string
+  gradeId: string
 ): Promise<ExamGradeReportApi> => {
-  const { data } = await axiosClient.get<ApiResponse<ExamGradeReportApi>>(
-    `/exams/${examId}/grades/lectureEnrollments/${lectureEnrollmentId}/report`
-  );
+  try {
+    const { data } = await axiosClient.get<ApiResponse<ExamGradeReportApi>>(
+      `/grades/${gradeId}/report`
+    );
 
-  if (!data?.data) {
-    throw new Error("성적표 리포트 정보를 찾을 수 없습니다.");
+    if (!data?.data) {
+      return {};
+    }
+
+    return data.data;
+  } catch (error) {
+    console.warn("[grades][report-load] failed", { gradeId, error });
+    return {};
   }
-
-  return data.data;
 };

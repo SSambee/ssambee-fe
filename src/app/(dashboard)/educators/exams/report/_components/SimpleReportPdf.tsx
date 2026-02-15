@@ -2,13 +2,16 @@
 
 import { Document, Page, Text, View } from "@react-pdf/renderer";
 
-import { simpleStyles as styles } from "./report-pdf.styles";
+import { formatAverageScore } from "../_utils/report-format";
+
+import { colors, simpleStyles as styles } from "./report-pdf.styles";
 
 type SimpleReportPdfProps = {
   data: {
     studentName: string;
     examName: string;
     className: string;
+    instructorName?: string;
     examDate: string;
     score: number;
     averageScore: number;
@@ -25,13 +28,40 @@ export function SimpleReportPdf({ data }: SimpleReportPdfProps) {
       <Page size="A4" style={styles.page}>
         {/* 헤더 */}
         <View style={styles.header}>
-          <Text style={styles.headerLabel}>SIMPLE REPORT</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              marginBottom: 8,
+            }}
+          >
+            <Text style={styles.headerLabel}>심플 리포트</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.lightGray }]}>
+              {data.examDate}
+            </Text>
+          </View>
           <Text style={styles.headerTitle}>
             {data.studentName} · {data.examName}
           </Text>
-          <Text style={styles.headerSubtitle}>
-            {data.className} | {data.examDate}
-          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 6,
+              marginTop: 2,
+              opacity: 0.8,
+            }}
+          >
+            <Text style={[styles.headerSubtitle, { color: colors.white }]}>
+              {data.className}
+            </Text>
+            <Text style={[styles.headerSubtitle, { color: colors.gray }]}>
+              |
+            </Text>
+            <Text style={[styles.headerSubtitle, { color: colors.white }]}>
+              {data.instructorName || "담당 강사"}
+            </Text>
+          </View>
         </View>
 
         {/* 통계 카드 */}
@@ -42,7 +72,9 @@ export function SimpleReportPdf({ data }: SimpleReportPdfProps) {
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>평균점수</Text>
-            <Text style={styles.statValue}>{data.averageScore}점</Text>
+            <Text style={styles.statValue}>
+              {formatAverageScore(data.averageScore)}점
+            </Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>석차</Text>
@@ -59,10 +91,12 @@ export function SimpleReportPdf({ data }: SimpleReportPdfProps) {
         {/* 전달 사항 */}
         <View style={styles.messageSection}>
           <View style={styles.messageHeader}>
-            <Text style={styles.messageHeaderText}>전달사항</Text>
+            <Text style={styles.messageHeaderText}>시험 공통 전달사항</Text>
           </View>
           <View style={styles.messageContent}>
-            <Text style={styles.messageText}>{data.message || ""}</Text>
+            <Text style={styles.messageText}>
+              {data.message || "등록된 공통 전달사항이 없습니다."}
+            </Text>
           </View>
         </View>
       </Page>
