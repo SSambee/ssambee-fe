@@ -11,3 +11,12 @@ export type CommonPostQuery = {
   // 강사 게시글 전용
   postType?: PostType | null;
 };
+
+export type PaginationType = {
+  totalCount: number;
+  totalPage: number;
+  currentPage: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+};

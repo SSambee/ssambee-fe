@@ -1,5 +1,7 @@
 import { MaterialsType } from "../materials.type";
 
+import { PaginationType } from "./commonPost";
+
 export type PostType = "NOTICE" | "SHARE"; // 게시글 분류
 export type PostScope = "GLOBAL" | "LECTURE" | "SELECTED"; // 강사 게시글 스코프
 export type TargetRole = "ALL" | "STUDENT" | "PARENT"; // 알림 수신 대상
@@ -33,15 +35,6 @@ export type CreateInstructorPostRequest = {
 
 // 강사 게시글 수정
 export type UpdateInstructorPostRequest = Partial<CreateInstructorPostRequest>;
-
-export type PaginationType = {
-  totalCount: number;
-  totalPage: number;
-  currentPage: number;
-  limit: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-};
 
 // 강사 게시글 목록 전체 조회
 export type GetInstructorPostsResponse = {

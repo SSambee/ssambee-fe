@@ -1,5 +1,7 @@
 import { MaterialsType } from "../materials.type";
 
+import { PaginationType } from "./commonPost";
+
 export type InquiryWriterType = "STUDENT" | "PARENT"; // 문의 작성자
 export type AnswerStatus = "BEFORE" | "REGISTERED" | "COMPLETED"; // 답변 상태
 export type AuthorRole = "STUDENT" | "PARENT"; // 작성자 역할
@@ -22,15 +24,6 @@ export type CreateStudentPostRequest = {
 
 // 학생 문의 수정
 export type UpdateStudentPostRequest = Partial<CreateStudentPostRequest>;
-
-export type PaginationType = {
-  totalCount: number;
-  totalPage: number;
-  currentPage: number;
-  limit: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-};
 
 // 학생 문의 전체 조회
 export type GetStudentPostsResponse = {
