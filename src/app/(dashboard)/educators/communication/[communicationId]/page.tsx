@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   Paperclip,
@@ -19,39 +19,62 @@ import { Input } from "@/components/ui/input";
 import Title from "@/components/common/header/Title";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import TiptapEditor from "@/components/common/editor/TiptapEditor";
-import { CONTENT_TYPE_LABEL } from "@/constants/communication.default";
+import { formatYMDFromISO } from "@/utils/date";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-  MOCK_INSTRUCTOR_POSTS,
-  MOCK_LEARNER_INQUIRIES,
-} from "@/data/communication.mock";
+  useCreateInstructorPostComment,
+  useInstructorPostDetail,
+  useStudentPostMutations,
+} from "@/hooks/useInstructorPost";
+import { useInstructorPostMutations } from "@/hooks/useInstructorPost";
+import { useStudentPostDetail } from "@/hooks/useInstructorPost";
+import { InstructorPostDetailComment } from "@/types/communication/instructorPost";
+import { StudentPostDetailComment } from "@/types/communication/studentPost";
 
 export default function CommunicationDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const communicationId = params.communicationId as string;
+  const type = searchParams.get("type") as "notice" | "inquiry";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 게시글 찾기
-  const instructorPost = MOCK_INSTRUCTOR_POSTS.find(
-    (post) => post.id === communicationId
-  );
-  const learnerInquiry = MOCK_LEARNER_INQUIRIES.find(
-    (inquiry) => inquiry.id === communicationId
-  );
+  // 강사 게시글 / 학생 문의 구분
+  const isNoticePost = type === "notice";
 
-  const postData = instructorPost || learnerInquiry;
-  const isInstructorPost = !!instructorPost;
-  const isMyPost = isInstructorPost;
+  // 강사 게시글/학생 문의 상세 데이터 조회
+  const { data: noticePostData, isLoading: isLoadingNotice } =
+    useInstructorPostDetail(communicationId, { enabled: isNoticePost });
+
+  const { data: inquiryPostData, isLoading: isLoadingInquiry } =
+    useStudentPostDetail(communicationId, { enabled: !isNoticePost });
+
+  // Mutations
+  const { updateNoticeMutation, deleteNoticeMutation } =
+    useInstructorPostMutations();
+  // 강사 게시글 관련 mutations
+  const { createInstructorPostComment } = useCreateInstructorPostComment();
+  // 학생 문의 답변 관련 mutations
+  const { createStudentPostCommentMutation } = useStudentPostMutations();
 
   // 상태 관리
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(postData?.title || "");
-  const [editContent, setEditContent] = useState(postData?.contents || "");
-
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
   const [answerContent, setAnswerContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  if (!postData) {
+  if (isLoadingNotice || isLoadingInquiry) {
+    return (
+      <div className="container mx-auto px-8 py-8">
+        <p>로딩 중...</p>
+      </div>
+    );
+  }
+
+  const currentData = isNoticePost ? noticePostData : inquiryPostData;
+
+  if (!currentData) {
     return (
       <div className="container mx-auto px-8 py-8">
         <p>게시글을 찾을 수 없습니다.</p>
@@ -65,43 +88,76 @@ export default function CommunicationDetailPage() {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
-    console.log({
-      postId: communicationId,
-      title: editTitle,
-      contents: editContent,
-    });
-    alert("수정되었습니다.");
-    setIsEditing(false);
+
+    if (isNoticePost) {
+      updateNoticeMutation.mutate(
+        {
+          postId: communicationId,
+          payload: { title: editTitle, content: editContent },
+        },
+        { onSuccess: () => setIsEditing(false) }
+      );
+    }
+  };
+
+  // 게시글 수정 시작
+  const handleStartEdit = () => {
+    if (isNoticePost && noticePostData) {
+      setEditTitle(noticePostData.title);
+      setEditContent(noticePostData.content);
+    } else if (!isNoticePost && inquiryPostData) {
+      setEditTitle(inquiryPostData.title);
+      setEditContent(inquiryPostData.content);
+    }
+    setIsEditing(true);
   };
 
   // 게시글 수정 취소
   const handleCancelEdit = () => {
-    setEditTitle(postData.title);
-    setEditContent(postData.contents);
-    setIsEditing(false);
-  };
-
-  // 답변 등록
-  const handleSubmitAnswer = () => {
-    if (!answerContent.trim()) {
-      alert("답변 내용을 입력해주세요.");
-      return;
+    if (isNoticePost && noticePostData) {
+      setEditTitle(noticePostData.title);
+      setEditContent(noticePostData.content);
     }
-    console.log({
-      postId: communicationId,
-      content: answerContent,
-      file: selectedFile,
-    });
-    alert("답변이 등록되었습니다.");
-    setAnswerContent("");
-    setSelectedFile(null);
+    setIsEditing(false);
   };
 
   // 게시글 삭제
   const handleDelete = () => {
-    if (confirm("정말 삭제하시겠습니까?")) {
-      alert("삭제되었습니다.");
-      router.push("/educators/communication");
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    if (isNoticePost) {
+      deleteNoticeMutation.mutate(communicationId, {
+        onSuccess: () => router.push("/educators/communication"),
+      });
+    }
+  };
+
+  // 답변/댓글 등록
+  const handleSubmitAnswer = () => {
+    if (!answerContent.trim()) {
+      alert(
+        isNoticePost ? "댓글 내용을 입력해주세요." : "답변 내용을 입력해주세요."
+      );
+      return;
+    }
+
+    const handleSuccess = () => {
+      setAnswerContent(""); // Tiptap 에디터 내용 초기화
+      setSelectedFile(null); // 첨부 파일 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // 파일 인풋 DOM 초기화
+      }
+    };
+
+    if (isNoticePost) {
+      createInstructorPostComment.mutate(
+        { postId: communicationId, payload: { content: answerContent } },
+        { onSuccess: handleSuccess }
+      );
+    } else {
+      createStudentPostCommentMutation.mutate(
+        { postId: communicationId, payload: { content: answerContent } },
+        { onSuccess: handleSuccess }
+      );
     }
   };
 
@@ -112,10 +168,9 @@ export default function CommunicationDetailPage() {
 
   return (
     <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
-      {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Title
-          title={isInstructorPost ? "공지사항 상세" : "문의 상세"}
+          title={isNoticePost ? "공지사항 상세" : "문의 상세"}
           description={
             isEditing
               ? "게시글을 수정 중입니다."
@@ -124,15 +179,16 @@ export default function CommunicationDetailPage() {
         />
 
         <div className="flex gap-2">
-          {isMyPost && !isEditing && (
+          {!isEditing && currentData.isMine && (
             <>
               <Button
                 variant="outline"
-                onClick={() => setIsEditing(true)}
+                onClick={handleStartEdit}
                 className="h-[50px] rounded-lg text-base"
               >
                 <Edit className="h-4 w-4 mr-2" /> 수정
               </Button>
+
               <Button
                 variant="outline"
                 onClick={handleDelete}
@@ -142,6 +198,7 @@ export default function CommunicationDetailPage() {
               </Button>
             </>
           )}
+
           {isEditing && (
             <>
               <Button
@@ -150,6 +207,7 @@ export default function CommunicationDetailPage() {
               >
                 <Save className="h-4 w-4 mr-2" /> 저장
               </Button>
+
               <Button
                 variant="outline"
                 onClick={handleCancelEdit}
@@ -159,6 +217,7 @@ export default function CommunicationDetailPage() {
               </Button>
             </>
           )}
+
           <Button
             variant="outline"
             onClick={() => router.back()}
@@ -170,7 +229,6 @@ export default function CommunicationDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 게시글 정보 (모바일: 맨 위 / 데스크탑: 오른쪽) */}
         <div className="space-y-6 lg:order-2">
           <Card>
             <CardContent className="p-6 space-y-4">
@@ -179,57 +237,86 @@ export default function CommunicationDetailPage() {
                 <div>
                   <Label className="text-sm text-muted-foreground">분류</Label>
                   <div className="mt-1">
-                    {isInstructorPost ? (
-                      <StatusLabel
-                        color={
-                          CONTENT_TYPE_LABEL[instructorPost.postType].color
-                        }
-                      >
-                        {CONTENT_TYPE_LABEL[instructorPost.postType].label}
-                      </StatusLabel>
+                    {isNoticePost ? (
+                      <StatusLabel color="blue">공지</StatusLabel>
                     ) : (
                       <StatusLabel color="gray">문의</StatusLabel>
                     )}
                   </div>
                 </div>
+
+                {isNoticePost && noticePostData && (
+                  <div>
+                    <Label className="text-sm text-muted-foreground">
+                      대상
+                    </Label>
+
+                    <p className="mt-1 text-base">
+                      {noticePostData?.scope === "GLOBAL"
+                        ? "전체 클래스"
+                        : noticePostData?.scope === "LECTURE"
+                          ? "특정 클래스"
+                          : "특정 학생"}
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <Label className="text-sm text-muted-foreground">
+                    작성자
+                  </Label>
+                  <p className="mt-1 text-base">
+                    {isNoticePost
+                      ? /* 공지사항: 조교 ID가 있으면 조교 이름, 없으면 강사 이름 */
+                        noticePostData?.authorAssistantId
+                        ? `${noticePostData.authorAssistant?.user.name}`
+                        : `${noticePostData?.instructor?.user.name}`
+                      : /* 문의사항: 문의를 올린 학생 이름 */
+                        inquiryPostData?.enrollment?.studentName}
+                  </p>
+                </div>
+
                 <div>
                   <Label className="text-sm text-muted-foreground">
                     작성일
                   </Label>
-                  <p className="mt-1 text-base">{postData.date}</p>
+                  <p className="mt-1 text-base">
+                    {formatYMDFromISO(currentData.createdAt)}
+                  </p>
                 </div>
-                {!isInstructorPost && learnerInquiry && (
-                  <div className="col-span-2 lg:col-span-1">
+
+                {!isNoticePost && inquiryPostData && (
+                  <div>
                     <Label className="text-sm text-muted-foreground">
-                      작성자
+                      작성자 역할
                     </Label>
                     <p className="mt-1 text-base">
-                      {learnerInquiry.writer.name} (
-                      {learnerInquiry.writer.type === "STUDENT"
+                      {inquiryPostData.authorRole === "STUDENT"
                         ? "학생"
                         : "학부모"}
-                      )
                     </p>
                   </div>
                 )}
               </div>
 
-              {!isInstructorPost && (
+              {/* {!isNoticePost && (
                 <div className="pt-2">
                   <Button
                     variant="outline"
-                    onClick={() => alert("답변 완료 처리되었습니다.")}
+                    onClick={handleCompleteAnswer}
+                    disabled={updateStatusMutation.isPending}
                     className="h-[50px] w-full rounded-lg text-base bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200 font-medium transition-colors"
                   >
-                    답변 완료 처리
+                    {updateStatusMutation.isPending
+                      ? "처리 중..."
+                      : "답변 완료 처리"}
                   </Button>
                 </div>
-              )}
+              )} */}
             </CardContent>
           </Card>
         </div>
 
-        {/* 게시글 본문 및 답변 영역 (모바일: 아래 / 데스크탑: 왼쪽/중앙) */}
         <div className="lg:col-span-2 lg:order-1 space-y-6">
           <Card>
             <CardContent className="p-6">
@@ -237,6 +324,7 @@ export default function CommunicationDetailPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="title">제목</Label>
+
                     <Input
                       id="title"
                       value={editTitle}
@@ -244,71 +332,141 @@ export default function CommunicationDetailPage() {
                       className="text-lg font-bold h-12"
                     />
                   </div>
+
                   <TiptapEditor
                     content={editContent}
                     onChange={setEditContent}
-                    className="min-h-[400px]"
+                    className="min-h-[200px]"
                   />
                 </div>
               ) : (
-                <div className="min-h-[300px]">
-                  <h2 className="text-2xl font-bold mb-4">{postData.title}</h2>
+                <div className="min-h-[200px]">
+                  <h2 className="text-2xl font-bold mb-4">
+                    {noticePostData?.title || inquiryPostData?.title || ""}
+                  </h2>
+
                   <div className="border-t pt-4">
-                    <TiptapEditor content={postData.contents} readOnly={true} />
+                    <TiptapEditor
+                      content={
+                        noticePostData?.content ||
+                        inquiryPostData?.content ||
+                        ""
+                      }
+                      readOnly={true}
+                    />
                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* 답변 목록 */}
-          {postData.answers && postData.answers.length > 0 && (
+          {/* 답변/댓글 목록 */}
+
+          {((isNoticePost && (noticePostData?.comments?.length ?? 0) > 0) ||
+            (!isNoticePost &&
+              (inquiryPostData?.comments?.length ?? 0) > 0)) && (
             <Card>
               <CardContent className="p-6 space-y-4">
                 <h3 className="font-semibold text-lg">
-                  {isInstructorPost ? "댓글" : "답변"} (
-                  {postData.answers.length})
+                  {isNoticePost ? "댓글" : "답변"} (
+                  {currentData.comments?.length || 0})
                 </h3>
+
                 <div className="space-y-4">
-                  {postData.answers.map((answer) => (
-                    <div
-                      key={answer.id}
-                      className="border rounded-lg p-4 space-y-2"
-                    >
-                      <div className="flex items-center justify-between font-medium">
-                        <span>{answer.writer}</span>
-                        <span className="text-sm text-muted-foreground">
-                          {answer.date}
-                        </span>
+                  {currentData.comments?.map(
+                    (
+                      comment:
+                        | InstructorPostDetailComment
+                        | StudentPostDetailComment
+                    ) => (
+                      <div
+                        key={comment.id}
+                        className="border rounded-lg p-6 space-y-2"
+                      >
+                        <div className="flex items-center justify-between font-medium">
+                          <div className="flex items-center justify-center gap-2">
+                            <Avatar>
+                              <AvatarFallback>
+                                {(
+                                  (comment as InstructorPostDetailComment)
+                                    .instructor?.user?.name ||
+                                  (comment as InstructorPostDetailComment)
+                                    .assistant?.user?.name ||
+                                  "U"
+                                ).slice(0, 1)}
+                              </AvatarFallback>
+                            </Avatar>
+
+                            <span className="text-sm text-center text-neutral-600 whitespace-nowrap">
+                              {(comment as InstructorPostDetailComment)
+                                .instructor
+                                ? `강사 | ${(comment as InstructorPostDetailComment).instructor?.user?.name}`
+                                : (comment as InstructorPostDetailComment)
+                                      .assistant
+                                  ? `조교 | ${(comment as InstructorPostDetailComment).assistant?.user?.name}`
+                                  : "작성자 정보 없음"}
+                            </span>
+                            <span className="text-sm text-neutral-300 whitespace-nowrap">
+                              {formatYMDFromISO(comment.createdAt)}
+                            </span>
+                          </div>
+
+                          {comment.isMine && (
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="outline"
+                                className="h-8 w-8 p-0 text-slate-400 hover:text-blue-600"
+                                onClick={() => {
+                                  /* 댓글 수정 함수 호출 */
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="h-8 w-8 p-0 text-slate-400 hover:text-red-600"
+                                onClick={() => {
+                                  /* 댓글 삭제 함수 호출 */
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        <TiptapEditor
+                          content={comment.content}
+                          readOnly={true}
+                          className="pt-2 px-2"
+                        />
                       </div>
-                      <TiptapEditor content={answer.contents} readOnly={true} />
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* 답변 작성 및 첨부파일 UX 개선 */}
           <Card>
             <CardContent className="p-6 space-y-4">
               <h3 className="font-semibold text-lg">
-                {isInstructorPost ? "댓글 작성" : "답변 작성"}
+                {isNoticePost ? "댓글 작성" : "답변 작성"}
               </h3>
+
               <div className="space-y-3">
                 <TiptapEditor
                   content={answerContent}
                   onChange={setAnswerContent}
                   placeholder={
-                    isInstructorPost
+                    isNoticePost
                       ? "댓글을 입력하세요..."
                       : "답변 내용을 입력하세요..."
                   }
                   className="h-[200px]"
                 />
 
-                {/* 첨부파일 정보 (버튼보다 위) */}
-                {!isInstructorPost && selectedFile && (
+                {!isNoticePost && selectedFile && (
                   <div className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-white rounded-lg border shadow-sm">
@@ -341,7 +499,7 @@ export default function CommunicationDetailPage() {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    {!isInstructorPost && (
+                    {!isNoticePost && (
                       <Button
                         type="button"
                         variant="outline"
@@ -357,7 +515,7 @@ export default function CommunicationDetailPage() {
                     onClick={handleSubmitAnswer}
                     className="bg-slate-900 text-white hover:bg-slate-800 px-8 h-10 transition-all active:scale-95"
                   >
-                    {isInstructorPost ? "댓글 등록" : "답변 등록"}
+                    {isNoticePost ? "댓글 등록" : "답변 등록"}
                   </Button>
                 </div>
               </div>
