@@ -6,6 +6,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { useLecturesList } from "@/hooks/lectures/useLecturesList";
 import { useExamsByLecture } from "@/hooks/exams/useExamsByLecture";
 import { useExamDetail } from "@/hooks/exams/useExamDetail";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 import { mapExamDetailToFormInput } from "@/services/exams/exams.mapper";
 import { EXAM_FORM_DEFAULTS } from "@/constants/exams.constants";
 import type { ExamFormInput } from "@/validation/exam.validation";
@@ -22,6 +23,7 @@ export const useExamSelectionState = ({
   const [selectedLectureId, setSelectedLectureId] = useState<string>("");
   const [selectedExamId, setSelectedExamId] = useState<string>("new");
   const [isEditMode, setIsEditMode] = useState(true);
+  const { showConfirm } = useDialogAlert();
   const lastSyncedRef = useRef<{ examId?: string; lectureSubject?: string }>(
     {}
   );
@@ -91,12 +93,16 @@ export const useExamSelectionState = ({
     replaceQuestions(mapped.questions);
   }, [examDetail, form, isEditing, isEditMode, lecturesData, replaceQuestions]);
 
-  const handleLectureSelection = (value: string) => {
+  const handleLectureSelection = async (value: string) => {
     if (!value || value === activeLectureId) return;
     if (form.formState.isDirty) {
-      const confirmed = confirm(
-        "작성 중인 내용이 있습니다. 수업을 변경하면 내용이 초기화됩니다. 계속할까요?"
-      );
+      const confirmed = await showConfirm({
+        title: "수업 변경 확인",
+        description:
+          "작성 중인 내용이 있습니다. 수업을 변경하면 내용이 초기화됩니다. 계속할까요?",
+        confirmText: "변경",
+        cancelText: "취소",
+      });
       if (!confirmed) return;
     }
 

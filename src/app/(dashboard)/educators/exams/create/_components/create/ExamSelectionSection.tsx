@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -39,6 +41,20 @@ export function ExamSelectionSection({
     const ymd = formatDateYMD(iso);
     return ymd ? ymd.split("-").join(". ") : "날짜 미지정";
   };
+
+  const sortedExams = useMemo(() => {
+    const parseTime = (value?: string) => {
+      if (!value) return 0;
+      const time = new Date(value).getTime();
+      return Number.isNaN(time) ? 0 : time;
+    };
+
+    return [...exams].sort((a, b) => {
+      const bTime = parseTime(b.examDate ?? b.createdAt);
+      const aTime = parseTime(a.examDate ?? a.createdAt);
+      return bTime - aTime;
+    });
+  }, [exams]);
 
   return (
     <Card>
@@ -91,12 +107,12 @@ export function ExamSelectionSection({
                   <SelectItem value="__loading__" disabled>
                     시험 목록을 불러오는 중입니다.
                   </SelectItem>
-                ) : exams.length === 0 ? (
+                ) : sortedExams.length === 0 ? (
                   <SelectItem value="__empty__" disabled>
                     등록된 시험이 없습니다.
                   </SelectItem>
                 ) : (
-                  exams.map((exam) => (
+                  sortedExams.map((exam) => (
                     <SelectItem key={exam.id} value={exam.id}>
                       {exam.title} ·{" "}
                       {renderDate(exam.examDate ?? exam.createdAt)}
