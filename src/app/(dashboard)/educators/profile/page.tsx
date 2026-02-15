@@ -63,16 +63,16 @@ export default function ProfilePage() {
       });
   };
 
-  if (isPending || !profile) {
-    return <div className="p-8 text-center">프로필을 불러오는 중...</div>;
-  }
-
   if (isError) {
     return (
       <div className="p-8 text-center text-red-500">
         프로필 정보를 불러오지 못했습니다.
       </div>
     );
+  }
+
+  if (isPending || !profile) {
+    return <div className="p-8 text-center">프로필을 불러오는 중...</div>;
   }
 
   return (

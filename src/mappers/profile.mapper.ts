@@ -40,7 +40,7 @@ export const mapMyProfileApiToView = (payload: MyProfileApiResponse) => {
     academyName: toSafeString(payload.academy, "-"),
     subjects: payload.subject ? [payload.subject] : [],
     bio: payload.bio ?? "",
-    createdAt: payload.createdAt ?? new Date().toISOString(),
+    createdAt: payload.createdAt ?? "",
     role: mapProfileRole(payload.userType),
   };
 
