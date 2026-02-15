@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { createElement, useCallback, useMemo, useState } from "react";
 
+import { CheckModal } from "@/components/common/modals/CheckModal";
 import { useAuthContext } from "@/providers/AuthProvider";
+import { useModal } from "@/providers/ModalProvider";
 import { mapLectureStatusToApi } from "@/services/lectures/lectures.service";
 import { Lecture, LectureStatus } from "@/types/lectures";
 import { useLectureDetail } from "@/hooks/lectures/useLectureDetail";
@@ -18,6 +20,22 @@ export const useLectureDetailModal = ({
   open,
 }: UseLectureDetailModalParams) => {
   const { user } = useAuthContext();
+  const { openModal } = useModal();
+
+  const openAlertModal = useCallback(
+    (title: string, description: string) => {
+      openModal(
+        createElement(CheckModal, {
+          title,
+          description,
+          confirmText: "확인",
+          cancelText: "닫기",
+          onConfirm: () => {},
+        })
+      );
+    },
+    [openModal]
+  );
 
   const baseLecture = useMemo<Lecture>(
     () => lecture ?? DEFAULT_LECTURE,
@@ -81,11 +99,14 @@ export const useLectureDetailModal = ({
 
   const handleSaveEdit = useCallback(() => {
     if (scheduleEdit.hasInvalidSchedule()) {
-      alert("시간표의 요일/시작/종료 시간을 모두 입력해주세요.");
+      openAlertModal(
+        "시간표 입력 오류",
+        "시간표의 요일/시작/종료 시간을 모두 입력해주세요."
+      );
       return;
     }
     if (!lectureId) {
-      alert("강의 ID가 없습니다.");
+      openAlertModal("강의 ID 오류", "강의 ID가 없습니다.");
       return;
     }
 
@@ -111,11 +132,17 @@ export const useLectureDetailModal = ({
           setIsEditing(false);
         },
         onError: () => {
-          alert("수정 중 오류가 발생했습니다.");
+          openAlertModal("저장 실패", "수정 중 오류가 발생했습니다.");
         },
       }
     );
-  }, [editForm, lectureId, scheduleEdit, updateLectureMutation]);
+  }, [
+    editForm,
+    lectureId,
+    openAlertModal,
+    scheduleEdit,
+    updateLectureMutation,
+  ]);
 
   const scheduleSummary = useCallback(
     () => scheduleEdit.scheduleSummary(mergedLecture.schedule, isEditing),

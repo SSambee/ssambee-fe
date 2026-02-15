@@ -107,10 +107,18 @@ export const useLectureCreateForm = ({
       return;
     }
 
-    if (confirm("작성 중인 내용을 취소하시겠습니까?")) {
-      resetCreateState();
-      onBack();
-    }
+    openModal(
+      createElement(CheckModal, {
+        title: "작성 취소",
+        description: "작성 중인 내용을 취소하시겠습니까?",
+        confirmText: "확인",
+        cancelText: "취소",
+        onConfirm: () => {
+          resetCreateState();
+          onBack();
+        },
+      })
+    );
   };
 
   return { handleSave, handleCancel };
