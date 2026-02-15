@@ -1,15 +1,61 @@
 "use client";
 
+import { ReactNode } from "react";
+import {
+  BookOpen,
+  CalendarDays,
+  Clock3,
+  Headphones,
+  LoaderCircle,
+  Users,
+} from "lucide-react";
+
 import { Lecture, LectureStatus } from "@/types/lectures";
-import { InfoRow } from "@/components/common/InfoRow";
 import { DAY_ORDER } from "@/constants/lectures.constants";
+
+type DetailRowProps = {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+};
+
+function DetailRow({ icon, label, value }: DetailRowProps) {
+  return (
+    <div className="flex min-h-10 w-full items-center gap-10 py-2">
+      <div className="flex w-[120px] shrink-0 items-center gap-[10px]">
+        <span className="text-[#c6cad4]">{icon}</span>
+        <p className="text-[18px] font-semibold leading-[26px] tracking-[-0.18px] text-[#8b90a3]">
+          {label}
+        </p>
+      </div>
+      <div className="min-w-0 flex-1 text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-[rgba(22,22,27,0.88)]">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+const STATUS_CHIP_STYLES: Record<LectureStatus, string> = {
+  개강전: "bg-[#e1e7fe] text-[#3863f6]",
+  진행중: "bg-[#fee2e2] text-[#ef4444]",
+  완료: "bg-[#e9ebf0] text-[#8b90a3]",
+};
+
+const formatDateLabel = (value?: string) => {
+  if (!value) return "-";
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [yyyy, mm, dd] = value.split("-");
+    return `${yyyy}. ${mm}. ${dd}`;
+  }
+
+  return value;
+};
 
 type LectureDetailReadOnlyProps = {
   lecture: Lecture;
   currentStudents: number;
   scheduleSummary: string;
-  subjectOverride?: string;
-  schoolYearOverride?: string;
   statusOverride?: LectureStatus | "";
   startDateOverride?: string;
   instructorOverride?: string;
@@ -19,8 +65,6 @@ export function LectureDetailReadOnly({
   lecture,
   currentStudents,
   scheduleSummary,
-  subjectOverride,
-  schoolYearOverride,
   statusOverride,
   startDateOverride,
   instructorOverride,
@@ -63,22 +107,64 @@ export function LectureDetailReadOnly({
         })()
       : scheduleSummary;
 
+  const statusValue = statusOverride ? statusOverride : lecture.status;
+  const instructorName = instructorOverride || lecture.instructor || "-";
+  const instructorInitial = instructorName.slice(0, 1);
+
   return (
-    <div className="space-y-4">
-      <InfoRow label="수업명">{lecture.name}</InfoRow>
-      <InfoRow label="등록 학생">{currentStudents}명</InfoRow>
-      <InfoRow label="과목">{subjectOverride || lecture.subject}</InfoRow>
-      <InfoRow label="학년">{schoolYearOverride || lecture.schoolYear}</InfoRow>
-      <InfoRow label="수업 상태">
-        {statusOverride ? statusOverride : (lecture.status ?? "-")}
-      </InfoRow>
-      <InfoRow label="개강일">
-        {startDateOverride || lecture.startDate || "-"}
-      </InfoRow>
-      <InfoRow label="시간표">{scheduleDetail}</InfoRow>
-      <InfoRow label="담당 강사">
-        {instructorOverride || lecture.instructor}
-      </InfoRow>
+    <div className="flex flex-col gap-3">
+      <DetailRow
+        icon={<BookOpen className="h-6 w-6" />}
+        label="수업명"
+        value={lecture.name}
+      />
+
+      <DetailRow
+        icon={<Users className="h-6 w-6" />}
+        label="총 인원"
+        value={`${currentStudents}명`}
+      />
+
+      <DetailRow
+        icon={<LoaderCircle className="h-6 w-6" />}
+        label="수업 상태"
+        value={
+          statusValue ? (
+            <span
+              className={`inline-flex items-center rounded-[6px] px-2 py-1 text-[14px] font-semibold leading-5 tracking-[-0.14px] ${STATUS_CHIP_STYLES[statusValue]}`}
+            >
+              {statusValue}
+            </span>
+          ) : (
+            "-"
+          )
+        }
+      />
+
+      <DetailRow
+        icon={<CalendarDays className="h-6 w-6" />}
+        label="개강일"
+        value={formatDateLabel(startDateOverride || lecture.startDate)}
+      />
+
+      <DetailRow
+        icon={<Clock3 className="h-6 w-6" />}
+        label="시간표"
+        value={scheduleDetail}
+      />
+
+      <DetailRow
+        icon={<Headphones className="h-6 w-6" />}
+        label="담당 강사"
+        value={
+          <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#f4f6fa] bg-[#eef2ff] text-sm font-semibold text-[#4b72f7]">
+              {instructorInitial}
+            </div>
+            <span className="text-[#8b90a3]">{instructorName}</span>
+          </div>
+        }
+      />
     </div>
   );
 }

@@ -9,8 +9,8 @@ import {
   STATUS_SETTING_OPTIONS,
   STUDENT_STATUS_LABEL,
 } from "@/constants/students.default";
-import { GetEnrollmentList, StudentStatus } from "@/types/students.type";
 import noProfileImage from "@/assets/images/no-profile.jpg";
+import { GetEnrollmentList, StudentStatus } from "@/types/students.type";
 import { formatYMDFromISO, getTodayYMD } from "@/utils/date";
 import { phoneNumberFormatter } from "@/utils/phone";
 
