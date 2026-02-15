@@ -32,6 +32,11 @@ export function DashboardHeader() {
   const { user } = useAuthContext();
   const { signout } = useAuth();
   const router = useRouter();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const getRoleLabel = (userType: string) => {
     switch (userType) {
@@ -111,35 +116,52 @@ export function DashboardHeader() {
           </Breadcrumb>
         )}
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="flex cursor-pointer items-center gap-4">
-            <Avatar className="size-12 border-[1.5px] border-neutral-50 bg-white">
-              <AvatarImage src={user?.image || undefined} alt={displayName} />
-              <AvatarFallback className="bg-neutral-50 text-sm text-neutral-400">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
-              {displayName}
-            </span>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-50">
-          <DropdownMenuItem
-            onClick={handleProfileClick}
-            className="cursor-pointer"
-          >
-            <User className="mr-2 h-4 w-4" />
-            <span>내 프로필</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>로그아웃</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {isMounted ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="flex cursor-pointer items-center gap-4"
+            >
+              <Avatar className="size-12 border-[1.5px] border-neutral-50 bg-white">
+                <AvatarImage src={user?.image || undefined} alt={displayName} />
+                <AvatarFallback className="bg-neutral-50 text-sm text-neutral-400">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
+                {displayName}
+              </span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-50">
+            <DropdownMenuItem
+              onClick={handleProfileClick}
+              className="cursor-pointer"
+            >
+              <User className="mr-2 h-4 w-4" />
+              <span>내 프로필</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>로그아웃</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <div className="flex items-center gap-4">
+          <Avatar className="size-12 border-[1.5px] border-neutral-50 bg-white">
+            <AvatarImage src={user?.image || undefined} alt={displayName} />
+            <AvatarFallback className="bg-neutral-50 text-sm text-neutral-400">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
+            {displayName}
+          </span>
+        </div>
+      )}
     </header>
   );
 }

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 type AssistantsHeaderProps = {
   activeTab: AssistantsTabKey;
   onTabClick: (tab: AssistantsTabKey) => void;
+  disabledTabs?: AssistantsTabKey[];
   onOpenTaskModal: () => void;
   actionNotice: string | null;
 };
@@ -16,6 +17,7 @@ type AssistantsHeaderProps = {
 export default function AssistantsHeader({
   activeTab,
   onTabClick,
+  disabledTabs,
   onOpenTaskModal,
   actionNotice,
 }: AssistantsHeaderProps) {
@@ -27,7 +29,11 @@ export default function AssistantsHeader({
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <AssistantsTabs active={activeTab} onTabClick={onTabClick} />
+        <AssistantsTabs
+          active={activeTab}
+          onTabClick={onTabClick}
+          disabledTabs={disabledTabs}
+        />
         <Button
           variant="outline"
           className="rounded-full"

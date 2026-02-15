@@ -1,13 +1,7 @@
-import {
-  type Assistant,
-  type AssistantsListView,
-  type AssistantsPagination,
-} from "@/app/(dashboard)/educators/assistants/_types/assistants";
+import { type Assistant, type AssistantsPagination } from "@/types/assistants";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import { Pagination } from "@/components/common/pagination/Pagination";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -18,7 +12,7 @@ import {
 } from "@/components/ui/table";
 
 type AssistantsTableProps = {
-  listView: AssistantsListView;
+  statusLabel: string;
   totalCount: number;
   assistants: Assistant[];
   statusColorMap: Record<Assistant["status"], "green" | "yellow" | "gray">;
@@ -28,7 +22,7 @@ type AssistantsTableProps = {
 };
 
 export default function AssistantsTable({
-  listView,
+  statusLabel,
   totalCount,
   assistants,
   statusColorMap,
@@ -41,57 +35,48 @@ export default function AssistantsTable({
       <CardContent className="pt-6">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>
-            {listView === "active" ? "재직" : "퇴사"} 조교 {totalCount}명
+            {statusLabel} 조교 {totalCount}명
           </span>
         </div>
 
         <div className="mt-4 rounded-lg border">
-          <Table>
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">
-                  <Checkbox />
-                </TableHead>
-                <TableHead>조교명</TableHead>
-                <TableHead>담당 과목</TableHead>
-                <TableHead>연락처</TableHead>
-                <TableHead>배정 클래스</TableHead>
-                <TableHead>최근 업무</TableHead>
-                <TableHead>상태</TableHead>
+                <TableHead className="w-[40%] px-4">조교명</TableHead>
+                <TableHead className="w-[35%] px-4">연락처</TableHead>
+                <TableHead className="w-[25%] px-4">상태</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
+              {assistants.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    조교가 없습니다.
+                  </TableCell>
+                </TableRow>
+              )}
               {assistants.map((assistant) => (
                 <TableRow key={assistant.id}>
-                  <TableCell>
-                    <Checkbox />
+                  <TableCell className="px-4">
+                    <button
+                      type="button"
+                      className="font-medium text-primary underline-offset-2 hover:underline"
+                      onClick={() => onOpenAssistantDetail(assistant.id)}
+                    >
+                      {assistant.name}
+                    </button>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9">
-                        <AvatarFallback>
-                          {assistant.name.slice(0, 1)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <button
-                        type="button"
-                        className="font-medium text-primary underline-offset-2 hover:underline"
-                        onClick={() => onOpenAssistantDetail(assistant.id)}
-                      >
-                        {assistant.name}
-                      </button>
-                    </div>
+                  <TableCell className="px-4 text-foreground/90">
+                    {assistant.phone}
                   </TableCell>
-                  <TableCell>
-                    <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-                      {assistant.subject}
-                    </span>
-                  </TableCell>
-                  <TableCell>{assistant.phone}</TableCell>
-                  <TableCell>{assistant.className}</TableCell>
-                  <TableCell>{assistant.task}</TableCell>
-                  <TableCell>
-                    <StatusLabel color={statusColorMap[assistant.status]}>
+                  <TableCell className="px-4">
+                    <StatusLabel
+                      color={statusColorMap[assistant.status] ?? "gray"}
+                    >
                       {assistant.status}
                     </StatusLabel>
                   </TableCell>

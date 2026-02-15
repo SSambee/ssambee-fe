@@ -34,7 +34,10 @@ export function StudentCreateModal() {
 
   // 강의 목록 불러오기
   const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
-  const lectureOptions = lectures.map((l) => ({ label: l.title, value: l.id }));
+  const lectureOptions = lectures.map((lecture) => ({
+    label: lecture.title,
+    value: lecture.id,
+  }));
 
   const {
     register,
@@ -196,8 +199,11 @@ export function StudentCreateModal() {
                   optionSize="sm"
                   className="text-base px-4 h-[58px] w-full"
                   options={lectureOptions}
-                  onChange={(val) =>
-                    setValue("assignedClass", val, { shouldValidate: true })
+                  onChange={(value) =>
+                    setValue("assignedClass", value, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
                   }
                 />
                 {errors.assignedClass && (

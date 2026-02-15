@@ -1,21 +1,10 @@
-export const editableStatusOptions = ["근무전", "근무중"] as const;
+import type {
+  Assistant,
+  ContractRecord,
+  ResourceLibraryItem,
+} from "@/types/assistants";
 
-export type AssistantStatus = (typeof editableStatusOptions)[number] | "퇴사";
-
-export type Assistant = {
-  id: string;
-  name: string;
-  email: string;
-  subject: string;
-  phone: string;
-  className: string;
-  task: string;
-  memo: string;
-  status: AssistantStatus;
-  badge: string;
-};
-
-export const assistants: Assistant[] = [
+export const mockAssistants: Assistant[] = [
   {
     id: "1",
     name: "김민수",
@@ -78,38 +67,7 @@ export const assistants: Assistant[] = [
   },
 ];
 
-export type AssistantDetailDraft = {
-  status: AssistantStatus;
-  memo: string;
-};
-
-export const createAssistantDetailDraft = (
-  assistant?: Assistant
-): AssistantDetailDraft => ({
-  status: assistant?.status ?? "근무중",
-  memo: assistant?.memo ?? "",
-});
-
-export const statusColorMap: Record<
-  AssistantStatus,
-  "green" | "yellow" | "gray"
-> = {
-  근무전: "yellow",
-  근무중: "green",
-  퇴사: "gray",
-};
-
-export type ContractStatus = "서명 완료" | "서명 대기" | "재전송 필요";
-
-export type ContractRecord = {
-  id: string;
-  assistantId: string;
-  updatedAt: string;
-  fileName: string;
-  status: ContractStatus;
-};
-
-export const contractRecords: ContractRecord[] = [
+export const mockContractRecords: ContractRecord[] = [
   {
     id: "contract-1",
     assistantId: "1",
@@ -133,29 +91,7 @@ export const contractRecords: ContractRecord[] = [
   },
 ];
 
-export const contractStatusClassMap: Record<ContractStatus, string> = {
-  "서명 완료": "bg-emerald-100 text-emerald-700",
-  "서명 대기": "bg-amber-100 text-amber-700",
-  "재전송 필요": "bg-rose-100 text-rose-700",
-};
-
-export const contractTemplateOptions = [
-  "표준 근로계약서 (2024)",
-  "단기 근로계약서 (파트타임)",
-  "조교 계약 연장 양식",
-] as const;
-
-export type ResourceLibraryCategory = "수업자료" | "평가자료" | "운영문서";
-
-export type ResourceLibraryItem = {
-  id: string;
-  title: string;
-  category: ResourceLibraryCategory;
-  updatedAt: string;
-  sizeLabel: string;
-};
-
-export const resourceLibraryItems: ResourceLibraryItem[] = [
+export const mockResourceLibraryItems: ResourceLibraryItem[] = [
   {
     id: "resource-1",
     title: "중2 수학 1학기 기말고사 채점 가이드.pdf",
@@ -192,23 +128,3 @@ export const resourceLibraryItems: ResourceLibraryItem[] = [
     sizeLabel: "390KB",
   },
 ];
-
-export const resourceCategoryOptions = [
-  "전체",
-  "수업자료",
-  "평가자료",
-  "운영문서",
-] as const;
-
-export const PAGE_LIMIT = 5;
-
-export type AssistantsListView = "active" | "retired";
-
-export type AssistantsPagination = {
-  totalCount: number;
-  totalPage: number;
-  currentPage: number;
-  limit: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-};

@@ -1,43 +1,70 @@
 "use client";
 
+import { memo } from "react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { Plus } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { scheduleCategoryOptions } from "@/data/schedules.mock";
-import type { CalendarEvent } from "@/app/(dashboard)/educators/schedules/_hooks/useScheduleEvents";
-import type { ScheduleFilters } from "@/app/(dashboard)/educators/schedules/_hooks/useScheduleEvents";
+import type {
+  ScheduleCalendarEvent,
+  ScheduleCategoryOption,
+  ScheduleFilters,
+} from "@/types/schedules";
 
 type ScheduleSidebarProps = {
+  categories: ScheduleCategoryOption[];
   filters: ScheduleFilters;
   onFilterChange: (
     updater: ScheduleFilters | ((prev: ScheduleFilters) => ScheduleFilters)
   ) => void;
-  todayEvents: CalendarEvent[];
+  todayEvents: ScheduleCalendarEvent[];
+  onSelectTodayEvent: (event: ScheduleCalendarEvent) => void;
   categoryLabelMap: Record<string, string>;
+  isCategoryActionLocked: boolean;
+  onOpenCreateCategoryModal: () => void;
 };
 
-export function ScheduleSidebar({
+function ScheduleSidebarComponent({
+  categories,
   filters,
   onFilterChange,
   todayEvents,
+  onSelectTodayEvent,
   categoryLabelMap,
+  isCategoryActionLocked,
+  onOpenCreateCategoryModal,
 }: ScheduleSidebarProps) {
   return (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-5 space-y-4">
-          <div>
-            <p className="text-sm font-semibold">일정 필터</p>
-            <p className="text-xs text-muted-foreground">
-              표시할 일정 유형을 선택하세요.
-            </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold">일정 필터</p>
+              <p className="text-xs text-muted-foreground">
+                표시할 일정 유형을 선택하세요.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="default"
+              className="h-8 w-8 p-0"
+              aria-label="분류 추가"
+              onClick={onOpenCreateCategoryModal}
+              disabled={isCategoryActionLocked}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
+
           <div className="space-y-3">
-            {scheduleCategoryOptions.map((option) => (
+            {categories.map((option) => (
               <label
-                key={option.value}
+                key={option.id}
                 className="flex items-center justify-between text-sm"
               >
                 <span className="flex items-center gap-2">
@@ -45,14 +72,14 @@ export function ScheduleSidebar({
                     className="h-2 w-2 rounded-full"
                     style={{ backgroundColor: option.color }}
                   />
-                  {option.label}
+                  {option.name}
                 </span>
                 <Checkbox
-                  checked={filters[option.value]}
+                  checked={filters[option.id] ?? true}
                   onCheckedChange={(checked) =>
                     onFilterChange((prev) => ({
                       ...prev,
-                      [option.value]: Boolean(checked),
+                      [option.id]: Boolean(checked),
                     }))
                   }
                 />
@@ -77,7 +104,12 @@ export function ScheduleSidebar({
               </p>
             ) : (
               todayEvents.map((event) => (
-                <div key={event.id} className="flex gap-3">
+                <button
+                  key={event.id}
+                  type="button"
+                  className="flex w-full gap-3 rounded-md text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={() => onSelectTodayEvent(event)}
+                >
                   <div className="flex h-10 w-10 flex-col items-center justify-center rounded-lg bg-brand-25 text-brand-700">
                     <span className="text-[10px] font-semibold">
                       {format(event.start, "M월", { locale: ko })}
@@ -91,21 +123,20 @@ export function ScheduleSidebar({
                       {event.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {event.timeLabel} · {categoryLabelMap[event.category]}
+                      {event.timeLabel} ·{" "}
+                      {categoryLabelMap[event.categoryKey] ??
+                        event.categoryName}
                     </p>
                   </div>
-                </div>
+                </button>
               ))
             )}
           </div>
-          <button
-            type="button"
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            전체 일정 보기 →
-          </button>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+export const ScheduleSidebar = memo(ScheduleSidebarComponent);
+ScheduleSidebar.displayName = "ScheduleSidebar";
