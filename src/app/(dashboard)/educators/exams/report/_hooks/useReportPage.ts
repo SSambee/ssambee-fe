@@ -1,17 +1,59 @@
 "use client";
 
-import { useReportPageActions } from "./useReportPageActions";
-import { useReportPageResources } from "./useReportPageResources";
-import { useReportPageState } from "./useReportPageState";
+import { useReportStore } from "@/stores/report.store";
 
 export const useReportPage = () => {
-  const state = useReportPageState();
-  const resources = useReportPageResources();
-  const actions = useReportPageActions();
+  const {
+    classes,
+    exams,
+    students,
+    selectedClassId,
+    selectedExamId,
+    selectedStudentId,
+    selectedTemplate,
+    commonMessage,
+    isCommonSaved,
+    commonSaveResult,
+    isLoadingClasses,
+    isLoadingExams,
+    isLoadingStudents,
+    isCommonSaving,
+    loadClasses,
+    loadExamCommonMessage,
+    selectClass,
+    selectExam,
+    selectStudent,
+    selectTemplate,
+    setCommonMessage,
+    saveExamCommonMessage,
+    getSelectedStudent,
+    clearSelection,
+  } = useReportStore();
 
   return {
-    ...state,
-    ...resources,
-    ...actions,
+    classes,
+    exams,
+    students,
+    selectedClassId,
+    selectedExamId,
+    selectedStudentId,
+    selectedTemplate,
+    commonMessage,
+    isCommonSaved,
+    commonSaveResult,
+    isLoadingClasses,
+    isLoadingExams,
+    isLoadingStudents,
+    isCommonSaving,
+    loadClasses,
+    loadExamCommonMessage,
+    selectClass,
+    selectExam,
+    selectStudent,
+    selectTemplate,
+    setCommonMessage,
+    saveExamCommonMessage,
+    getSelectedStudent,
+    clearSelection,
   };
 };

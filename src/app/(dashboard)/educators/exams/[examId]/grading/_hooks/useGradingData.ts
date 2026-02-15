@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import type { GradingQuestion, GradingStudent } from "@/types/grading";
 
@@ -9,7 +9,6 @@ import {
   useGradingPrimaryResources,
   useGradingStudentAnswerResource,
 } from "./useGradingDataResources";
-import { useGradingDataState } from "./useGradingDataState";
 
 type UseGradingDataResult = {
   examDetail: ReturnType<typeof useGradingPrimaryResources>["examDetail"];
@@ -29,7 +28,7 @@ type UseGradingDataResult = {
 };
 
 export const useGradingData = (examId: string): UseGradingDataResult => {
-  const state = useGradingDataState();
+  const [selectedStudentId, setSelectedStudentId] = useState("");
   const { examDetail, isPending, isError, gradeIdByEnrollment } =
     useGradingPrimaryResources(examId);
 
@@ -128,9 +127,9 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
   }, [examDetail, examId]);
 
   const activeStudentId =
-    state.selectedStudentId &&
-    baseStudents.some((student) => student.id === state.selectedStudentId)
-      ? state.selectedStudentId
+    selectedStudentId &&
+    baseStudents.some((student) => student.id === selectedStudentId)
+      ? selectedStudentId
       : (baseStudents[0]?.id ?? "");
 
   const activeEnrollment = examDetail?.enrollments?.find(
@@ -189,9 +188,9 @@ export const useGradingData = (examId: string): UseGradingDataResult => {
     questionMetaMap,
     baseStudents,
     baseAnswersByStudent: finalAnswersByStudent,
-    selectedStudentId: state.selectedStudentId,
+    selectedStudentId,
     activeStudentId,
-    setSelectedStudentId: state.setSelectedStudentId,
+    setSelectedStudentId,
   };
 };
 
