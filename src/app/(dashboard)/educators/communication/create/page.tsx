@@ -2,19 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import Title from "@/components/common/header/Title";
 import {
   PostType,
   PostScope,
   TargetRole,
 } from "@/types/communication/instructorPost";
-import { InputForm } from "@/components/common/input/InputForm";
-import TiptapEditor from "@/components/common/editor/TiptapEditor";
 import { useInstructorPostMutations } from "@/hooks/useInstructorPost";
 import { useModal } from "@/providers/ModalProvider";
 import { Materials } from "@/types/materials.type";
@@ -22,6 +18,7 @@ import { Materials } from "@/types/materials.type";
 import PostTypeSelect from "./_components/setting/PostTypeSelect";
 import PostSetting from "./_components/setting/PostSetting";
 import AddResourceModal from "./_components/modal/AddResourceModal";
+import CreateContent from "./_components/content/CreateContent";
 
 export default function CreateInstructorPostPage() {
   const router = useRouter();
@@ -116,7 +113,6 @@ export default function CreateInstructorPostPage() {
 
   return (
     <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
-      {/* 헤더 */}
       <div className="flex items-center justify-between gap-4">
         <Title title="게시글 등록" description="새로운 게시글을 작성합니다." />
 
@@ -148,94 +144,19 @@ export default function CreateInstructorPostPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardContent className="p-6 space-y-4">
-              <h3 className="font-semibold text-lg">게시글 작성</h3>
-
-              <div className="space-y-2">
-                <InputForm
-                  label="제목"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">내용</Label>
-                <TiptapEditor
-                  content={content}
-                  onChange={setContent}
-                  placeholder="내용을 입력하세요"
-                  className="min-h-[400px]"
-                />
-              </div>
-
-              {selectedPostType === "NOTICE" && (
-                <div className="space-y-2">
-                  <p className="text-xs text-muted-foreground">
-                    * 현재 공지사항에는 첨부파일을 추가할 수 없습니다. (추후
-                    업데이트 예정)
-                  </p>
-                </div>
-              )}
-
-              {/* 첨부파일 (자료 공유 시에만 표시) */}
-              {selectedPostType === "SHARE" && (
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium">첨부파일</Label>
-                  <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                    {selectedMaterials.length > 0 ? (
-                      <div className="mb-4 space-y-2 text-left">
-                        {selectedMaterials.map((m) => (
-                          <div
-                            key={m.id}
-                            className="flex items-center justify-between bg-muted p-2 rounded-md text-sm"
-                          >
-                            <span>{m.title}</span>
-                            <Button
-                              variant="outline"
-                              type="button"
-                              onClick={() => {
-                                const filtered = selectedMaterials.filter(
-                                  (item) => item.id !== m.id
-                                );
-                                setSelectedMaterials(filtered);
-                              }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center mb-2">
-                        학습 자료실에서 자료를 선택하세요
-                      </p>
-                    )}
-                    <Button
-                      variant="outline"
-                      onClick={handleOpenAddResourceModal}
-                    >
-                      자료실에서 선택
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    * 자료 공유는 학습 자료실에 미리 업로드한 파일만 첨부할 수
-                    있습니다.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button variant="outline" onClick={() => router.back()}>
-                  취소
-                </Button>
-                <Button onClick={handleSubmit} disabled={isSubmitting}>
-                  {isSubmitting ? "등록 중..." : "게시글 등록"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <CreateContent
+            title={title}
+            setTitle={setTitle}
+            content={content}
+            setContent={setContent}
+            selectedPostType={selectedPostType}
+            selectedMaterials={selectedMaterials}
+            setSelectedMaterials={setSelectedMaterials}
+            handleOpenAddResourceModal={handleOpenAddResourceModal}
+            handleSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            onCancel={() => router.back()}
+          />
         </div>
       </div>
     </div>

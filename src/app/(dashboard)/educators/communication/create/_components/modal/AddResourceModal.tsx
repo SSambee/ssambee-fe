@@ -79,7 +79,6 @@ export default function AddResourceModal({
           </DialogDescription>
         </DialogHeader>
 
-        {/* 필터 및 검색 바 */}
         <div className="mt-4 grid gap-3 md:grid-cols-[1fr_180px]">
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -104,7 +103,6 @@ export default function AddResourceModal({
           </Select>
         </div>
 
-        {/* 검색 결과 요약 */}
         <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
           <span>
             {isLoading
@@ -114,7 +112,6 @@ export default function AddResourceModal({
           <span>선택 {tempSelected.length}건</span>
         </div>
 
-        {/* 리스트 영역 */}
         <div className="mt-2 flex-1 overflow-y-auto space-y-2 rounded-lg border bg-background p-2">
           {isLoading ? (
             <div className="rounded-md px-4 py-10 text-center text-sm text-muted-foreground">
@@ -167,7 +164,6 @@ export default function AddResourceModal({
           )}
         </div>
 
-        {/* 푸터 영역 */}
         <DialogFooter className="mt-6 gap-2">
           <Button
             type="button"

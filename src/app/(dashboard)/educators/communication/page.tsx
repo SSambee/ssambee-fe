@@ -24,10 +24,8 @@ export default function CommunicationListPage() {
         </Button>
       </div>
 
-      {/* 통계 */}
       <CommunicationStats />
 
-      {/* 탭 & 필터 & 테이블 */}
       <TabSection />
     </div>
   );
