@@ -8,6 +8,7 @@ export const useMaterials = (params: {
   limit: number;
   type: MaterialsType | "ALL";
   sort: "latest" | "oldest";
+  search?: string | undefined;
 }) => {
   const queryClient = useQueryClient();
 
@@ -86,5 +87,43 @@ export const useMaterialDetail = (id: string) => {
     queryKey: ["material", id],
     queryFn: () => materialsService.getMaterialDetail(id),
     enabled: !!id,
+  });
+};
+
+// 자료 다운로드
+export const useDownloadMaterial = () => {
+  return useMutation({
+    mutationFn: (materialsId: string) =>
+      materialsService.getDownloadUrl(materialsId),
+    onSuccess: (response) => {
+      // 서버 응답 구조가 { status, data: { url, type }, message } 이므로
+      // response.data에서 추출해야 합니다.
+      const { url, type } = response.data;
+
+      if (!url) {
+        alert("유효한 URL이 없습니다.");
+        return;
+      }
+
+      if (
+        type === "youtube" ||
+        url.includes("youtube.com") ||
+        url.includes("youtu.be")
+      ) {
+        window.open(url, "_blank");
+      } else {
+        // S3 Presigned URL의 경우 브라우저가 직접 다운로드하게 하려면 <a> 태그 사용
+        const link = document.createElement("a");
+        link.href = url;
+        // 서버에서 이미 response-content-disposition=attachment -> 클릭하면 다운로드
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    },
+    onError: () => {
+      alert("다운로드 정보를 가져오는데 실패했습니다.");
+    },
   });
 };

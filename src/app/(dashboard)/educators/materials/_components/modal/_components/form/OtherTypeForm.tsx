@@ -104,7 +104,7 @@ export default function OtherTypeForm({
             initialData.id
           );
           if (isMounted) {
-            setDisplayImageUrl(response.url);
+            setDisplayImageUrl(response.data.url);
           }
         } catch (err) {
           console.error("이미지 URL 가져오기 실패:", err);

@@ -1,68 +1,102 @@
 import StatusLabel from "@/components/common/label/StatusLabel";
-import { InstructorWritePost } from "@/types/communication.type";
-import {
-  CONTENT_TYPE_LABEL,
-  NOTICE_TYPE_LABEL,
-} from "@/constants/communication.default";
+import { GetInstructorPostsResponse } from "@/types/communication/instructorPost";
 import { ColumnDefinition } from "@/components/common/table/DataTable";
+import { formatYMDFromISO } from "@/utils/date";
+import { NOTICE_TYPE_LABEL } from "@/constants/communication.default";
 
-export const INSTRUCTOR_POST_COLUMNS: ColumnDefinition<InstructorWritePost>[] =
-  [
-    {
-      key: "postType",
-      label: "분류",
-      render: (row) => (
-        <div className="w-[50px] flex items-center">
-          <StatusLabel color={CONTENT_TYPE_LABEL[row.postType].color}>
-            {CONTENT_TYPE_LABEL[row.postType].label}
-          </StatusLabel>
-        </div>
-      ),
-    },
-    {
-      key: "title",
-      label: "제목",
-      render: (row) => (
+type NoticeRow = GetInstructorPostsResponse["list"][number];
+
+export const NOTICE_POST_COLUMNS: ColumnDefinition<NoticeRow>[] = [
+  {
+    key: "scope",
+    label: "분류",
+    render: (row) => (
+      <div className="w-[50px] flex items-center">
+        <StatusLabel color={row.isImportant ? "blue" : "green"}>
+          {row.isImportant ? "공지" : "자료"}
+        </StatusLabel>
+      </div>
+    ),
+  },
+  {
+    key: "title",
+    label: "제목",
+    render: (row) => {
+      const commentCount = row._count.comments;
+      return (
         <div className="flex items-center gap-2">
           <span className="max-w-[350px] truncate font-medium">
             {row.title}
           </span>
-          {row.answers && row.answers.length > 0 && (
+          {!!commentCount && commentCount > 0 && (
             <span className="text-blue-700 text-xs font-bold">
-              [{row.answers.length}]
+              [{commentCount}]
             </span>
           )}
         </div>
-      ),
+      );
     },
-    {
-      key: "className",
-      label: "클래스",
-      render: (row) => (
+  },
+  {
+    key: "lectureId",
+    label: "클래스",
+    render: (row) => {
+      return (
         <span className="text-sm">
-          {row.classId === null ? "전체 클래스" : row.className || "-"}
+          {row.scope === "LECTURE" ? row.lectureTitle : "미지정"}
         </span>
-      ),
+      );
     },
-    {
-      key: "readPermission",
-      label: "열람 권한",
-      render: (row) => {
+  },
+  {
+    key: "authorRole",
+    label: "열람 권한",
+    render: (row) => {
+      const info =
+        NOTICE_TYPE_LABEL[row.targetRole as keyof typeof NOTICE_TYPE_LABEL] ??
+        NOTICE_TYPE_LABEL.ALL;
+
+      return (
+        <div className="w-[50px] flex items-center">
+          <StatusLabel noBackground color={info.color}>
+            {info.label}
+          </StatusLabel>
+        </div>
+      );
+    },
+  },
+  {
+    key: "instructor",
+    label: "작성자",
+    render: (row) => {
+      // 조교 ID가 있고, 조교 객체 정보가 있는 경우 -> 조교 이름 출력
+      if (row.authorAssistantId && row.authorAssistant) {
         return (
-          <span className="text-sm">
-            {NOTICE_TYPE_LABEL[row.readPermission].label}
+          <span className="flex items-center gap-1">
+            <span className="text-xs px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded mr-1">
+              조교
+            </span>
+            {row.authorAssistant.user.name}
           </span>
         );
-      },
+      }
+
+      // 그 외 기본값 -> 강사 이름 출력
+      return (
+        <span className="flex items-center gap-1">
+          <span className="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded mr-1">
+            강사
+          </span>
+          {row.instructor?.user?.name || "관리자"}
+        </span>
+      );
     },
-    {
-      key: "name",
-      label: "작성자",
-      render: (row) => <span>{row.name}</span>,
+  },
+  {
+    key: "createdAt",
+    label: "작성일",
+    render: (row) => {
+      return <span>{formatYMDFromISO(row.createdAt)}</span>;
     },
-    {
-      key: "date",
-      label: "작성일",
-      render: (row) => <span>{row.date}</span>,
-    },
-  ];
+  },
+];

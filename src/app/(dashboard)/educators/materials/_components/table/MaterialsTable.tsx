@@ -63,7 +63,7 @@ export default function MaterialsTable({
       const response = await materialsService.getDownloadUrl(material.id);
 
       // 파일이든 YouTube든 새 탭에서 열기
-      window.open(response.url, "_blank");
+      window.open(response.data.url, "_blank");
     } catch (error) {
       console.error("다운로드 링크를 가져오는데 실패했습니다.", error);
       alert("다운로드 링크를 가져오는데 실패했습니다.");

@@ -28,7 +28,7 @@ export default function DataTable<T extends { id: string }>({
   emptyMessage = "기록이 없습니다.",
 }: CommonDataTableProps<T>) {
   return (
-    <div className="border rounded-lg overflow-x-auto min-h-[180px] bg-white">
+    <div className="border rounded-lg overflow-x-auto min-h-[60px] bg-white">
       <Table>
         <TableHeader className="whitespace-nowrap h-[45px]">
           <TableRow className="bg-muted/30">

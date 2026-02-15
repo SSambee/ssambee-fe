@@ -1,48 +1,66 @@
 import StatusLabel from "@/components/common/label/StatusLabel";
-import { LearnersWriteInquiry } from "@/types/communication.type";
 import { INQUIRY_STATUS_LABEL } from "@/constants/communication.default";
+import { GetStudentPostsResponse } from "@/types/communication/studentPost";
+import { formatYMDFromISO } from "@/utils/date";
+import { ColumnDefinition } from "@/components/common/table/DataTable";
 
-export const INQUIRY_TABLE_COLUMNS = [
-  {
-    key: "status",
-    label: "상태",
-    render: (row: LearnersWriteInquiry) => (
-      <div className="w-[50px] flex items-center">
-        <StatusLabel color={INQUIRY_STATUS_LABEL[row.status].color}>
-          {INQUIRY_STATUS_LABEL[row.status].label}
-        </StatusLabel>
-      </div>
-    ),
-  },
+type InquiryRow = GetStudentPostsResponse["list"][number];
+
+export const INQUIRY_TABLE_COLUMNS: ColumnDefinition<InquiryRow>[] = [
   {
     key: "title",
     label: "제목",
-    render: (row: LearnersWriteInquiry) => (
-      <div className="flex items-center gap-2">
-        <span className="max-w-[350px] truncate font-medium">{row.title}</span>
-        {row.answers && row.answers.length > 0 && (
-          <span className="text-blue-700 text-xs font-bold">
-            [{row.answers.length}]
+    render: (row: InquiryRow) => {
+      const commentCount = row._count.comments;
+      return (
+        <div className="flex items-center gap-2">
+          <span className="max-w-[350px] truncate font-medium">
+            {row.title}
           </span>
-        )}
-      </div>
-    ),
+          {!!commentCount && commentCount > 0 && (
+            <span className="text-blue-700 text-xs font-bold">
+              [{commentCount}]
+            </span>
+          )}
+        </div>
+      );
+    },
   },
   {
-    key: "writer",
+    key: "status",
+    label: "상태",
+    render: (row: InquiryRow) => {
+      const statusKey = row.status as keyof typeof INQUIRY_STATUS_LABEL;
+      const statusInfo = INQUIRY_STATUS_LABEL[statusKey];
+
+      return (
+        <div className="w-[50px] flex items-center">
+          <StatusLabel showDot color={statusInfo.color}>
+            {statusInfo.label}
+          </StatusLabel>
+        </div>
+      );
+    },
+  },
+  {
+    key: "author",
     label: "작성자",
-    render: (row: LearnersWriteInquiry) => (
-      <div className="flex flex-col">
-        <span className="font-medium">{row.writer.name}</span>
-        <span className="text-xs text-muted-foreground">
-          {row.writer.type === "STUDENT" ? "학생" : "학부모"}
-        </span>
-      </div>
-    ),
+    render: (row: InquiryRow) => {
+      return (
+        <div className="flex flex-col">
+          <span className="font-medium">{row.enrollment.studentName}</span>
+          <span className="text-xs text-muted-foreground">
+            {row.authorRole === "STUDENT" ? "학생" : "학부모"}
+          </span>
+        </div>
+      );
+    },
   },
   {
-    key: "date",
+    key: "createdAt",
     label: "작성일",
-    render: (row: LearnersWriteInquiry) => <span>{row.date}</span>,
+    render: (row: InquiryRow) => {
+      return <span>{formatYMDFromISO(row.createdAt)}</span>;
+    },
   },
 ];

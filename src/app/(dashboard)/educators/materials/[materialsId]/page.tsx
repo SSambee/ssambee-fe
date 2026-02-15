@@ -15,8 +15,11 @@ import {
 } from "@/types/materials.type";
 import { useModal } from "@/providers/ModalProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
-import { useMaterialDetail, useMaterials } from "@/hooks/useMaterials";
-import { materialsService } from "@/services/materials.service";
+import {
+  useDownloadMaterial,
+  useMaterialDetail,
+  useMaterials,
+} from "@/hooks/useMaterials";
 
 import PaperTypeForm from "../_components/modal/_components/form/PaperTypeForm";
 import VideoTypeForm from "../_components/modal/_components/form/VideoTypeForm";
@@ -38,6 +41,8 @@ export default function MaterialsDetailPage() {
   const { data: material, isLoading } = useMaterialDetail(
     materialsId as string
   );
+
+  const { mutate: downloadMutation } = useDownloadMaterial();
 
   const [mode, setMode] = useState<FormMode>("view");
   const [formData, setFormData] = useState<
@@ -143,15 +148,7 @@ export default function MaterialsDetailPage() {
   };
 
   const handleDownload = async () => {
-    try {
-      const response = await materialsService.getDownloadUrl(material.id);
-
-      // 파일이든 YouTube든 새 탭에서 열기
-      window.open(response.url, "_blank");
-    } catch (error) {
-      console.error("다운로드 링크를 가져오는데 실패했습니다.", error);
-      alert("다운로드 링크를 가져오는데 실패했습니다.");
-    }
+    downloadMutation(material.id);
   };
 
   const renderForm = () => {

@@ -26,6 +26,7 @@ export type MaterialQueryParams = {
   type?: MaterialsType | "ALL";
   lectureId?: string;
   sort?: "latest" | "oldest";
+  search?: string;
 };
 
 export type MaterialsPagination = {
@@ -63,6 +64,10 @@ export type MaterialsDetailResponse = {
 };
 
 export type DownloadResponse = {
-  url: string;
-  type: "file" | "youtube";
+  status: string;
+  data: {
+    url: string;
+    type: "file" | "youtube";
+  };
+  message: string;
 };

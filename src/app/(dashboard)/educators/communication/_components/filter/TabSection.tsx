@@ -1,49 +1,117 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import DataTable, {
-  ColumnDefinition,
-} from "@/components/common/table/DataTable";
+import DataTable from "@/components/common/table/DataTable";
 import { Pagination } from "@/components/common/pagination/Pagination";
+import { useInstructorPosts, useStudentPosts } from "@/hooks/useInstructorPost";
+import { useDebounce } from "@/hooks/useDebounce";
 import {
-  MOCK_INSTRUCTOR_POSTS,
-  MOCK_LEARNER_INQUIRIES,
-} from "@/data/communication.mock";
-import { LearnersWriteInquiry } from "@/types/communication.type";
+  PaginationType,
+  PostFilterQuery,
+} from "@/types/communication/commonPost";
 
 import InquiryFilter from "../filter/InquiryFilter";
 import NotificationFilter from "../filter/NotificationFilter";
-import { INSTRUCTOR_POST_COLUMNS } from "../table/NoticeTableColumns";
+import { NOTICE_POST_COLUMNS } from "../table/NoticeTableColumns";
 import { INQUIRY_TABLE_COLUMNS } from "../table/InquiryTableColumns";
+
+const PAGE_LIMIT = 10;
 
 export default function TabSection() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"INQUIRY" | "NOTICE">("INQUIRY");
+  const searchParams = useSearchParams();
 
-  const isInquiry = activeTab === "INQUIRY";
+  const rawTab = searchParams.get("tab");
+  const initialTab: "INQUIRY" | "NOTICE" =
+    rawTab === "INQUIRY" || rawTab === "NOTICE" ? rawTab : "INQUIRY";
+  const [activeTab, setActiveTab] = useState<"INQUIRY" | "NOTICE">(initialTab);
 
-  const currentData = isInquiry
-    ? MOCK_LEARNER_INQUIRIES
-    : MOCK_INSTRUCTOR_POSTS;
+  // 검색어 상태 및 디바운스
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const currentColumns = isInquiry
-    ? INQUIRY_TABLE_COLUMNS
-    : INSTRUCTOR_POST_COLUMNS;
+  // 요청 쿼리
+  const [query, setQuery] = useState<PostFilterQuery>({
+    page: 1,
+    limit: PAGE_LIMIT,
+    answerStatus: "ALL",
+    writerType: "ALL",
+    postType: "ALL",
+  });
+
+  // 탭 상태
+  const isInquiryTab = activeTab === "INQUIRY";
+
+  // 문의 목록 조회
+  const {
+    data: studentPostsData,
+    isLoading: isLoadingStudentPosts,
+    isError: isErrorStudentPosts,
+  } = useStudentPosts({
+    page: query.page,
+    limit: query.limit,
+    search: debouncedSearchTerm || undefined,
+    answerStatus: query.answerStatus === "ALL" ? null : query.answerStatus,
+    writerType: query.writerType === "ALL" ? null : query.writerType,
+  });
+
+  // 강사 게시글 목록 조회
+  const {
+    data: instructorPostsData,
+    isLoading: isLoadingInstructorPosts,
+    isError: isErrorInstructorPosts,
+  } = useInstructorPosts({
+    page: query.page,
+    limit: query.limit,
+    search: debouncedSearchTerm || undefined,
+    postType: query.postType === "ALL" ? null : query.postType,
+  });
+
+  // 탭 선택에 따른 현재 표시 데이터
+  const currentResponse = isInquiryTab ? studentPostsData : instructorPostsData;
+
+  const isLoading = isInquiryTab
+    ? isLoadingStudentPosts
+    : isLoadingInstructorPosts;
+
+  const isError = isInquiryTab ? isErrorStudentPosts : isErrorInstructorPosts;
+
+  const pagination: PaginationType = currentResponse?.pagination ?? {
+    totalCount: 0,
+    totalPage: 1,
+    currentPage: 1,
+    limit: PAGE_LIMIT,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
+
+  const handleTabChange = (tab: "INQUIRY" | "NOTICE") => {
+    setActiveTab(tab);
+    router.replace(`/educators/communication?tab=${tab}`, { scroll: false });
+    setSearchTerm("");
+
+    setQuery({
+      page: 1,
+      limit: PAGE_LIMIT,
+      answerStatus: null,
+      writerType: null,
+      postType: null,
+    }); // 탭 변경 시 페이지 & 쿼리 초기화
+  };
 
   return (
     <div className="space-y-6">
-      {/* 탭 메뉴 */}
       <div className="flex border-b border-gray-200">
         {[
           { id: "INQUIRY", label: "문의글" },
-          { id: "NOTICE", label: "내 공지사항" },
+          { id: "NOTICE", label: "공지사항" },
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as "INQUIRY" | "NOTICE")}
-            className={`px-6 py-3 text-base font-medium transition-colors relative ${
+            onClick={() => handleTabChange(tab.id as "INQUIRY" | "NOTICE")}
+            className={`px-6 py-3 text-base font-medium transition-colors relative cursor-pointer ${
               activeTab === tab.id
                 ? "text-blue-600"
                 : "text-gray-500 hover:text-gray-700"
@@ -57,31 +125,63 @@ export default function TabSection() {
         ))}
       </div>
 
-      {/* 필터 영역 */}
-      {isInquiry ? <InquiryFilter /> : <NotificationFilter />}
+      {isInquiryTab ? (
+        <InquiryFilter
+          query={query}
+          setQuery={setQuery}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
+      ) : (
+        <NotificationFilter
+          query={query}
+          setQuery={setQuery}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
+      )}
 
-      {/* 테이블 영역 */}
       <div className="min-h-[550px]">
-        <DataTable
-          data={currentData as LearnersWriteInquiry[]}
-          columns={currentColumns as ColumnDefinition<LearnersWriteInquiry>[]}
-          onRowClick={(row) =>
-            router.push(`/educators/communication/${row.id}`)
-          }
-        />
-
-        {/* 페이지네이션 */}
-        <Pagination
-          pagination={{
-            totalCount: currentData.length,
-            totalPage: Math.ceil(currentData.length / 10),
-            currentPage: 1,
-            limit: 10,
-            hasNextPage: currentData.length > 10,
-            hasPrevPage: false,
-          }}
-          onPageChange={() => {}}
-        />
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[550px]">
+            <p className="text-muted-foreground">로딩 중...</p>
+          </div>
+        ) : isError ? (
+          <div className="flex items-center justify-center h-[550px]">
+            <p className="text-muted-foreground">오류가 발생했습니다.</p>
+          </div>
+        ) : (
+          <>
+            {isInquiryTab ? (
+              // 문의글 전용 테이블
+              <DataTable
+                data={studentPostsData?.list ?? []}
+                columns={INQUIRY_TABLE_COLUMNS}
+                onRowClick={(row) =>
+                  router.push(`/educators/communication/${row.id}?type=inquiry`)
+                }
+              />
+            ) : (
+              // 공지사항 전용 테이블
+              <DataTable
+                data={instructorPostsData?.list ?? []}
+                columns={NOTICE_POST_COLUMNS}
+                onRowClick={(row) =>
+                  router.push(`/educators/communication/${row.id}?type=notice`)
+                }
+              />
+            )}
+            <Pagination
+              pagination={pagination}
+              onPageChange={(page) =>
+                setQuery((prev) => ({
+                  ...prev,
+                  page,
+                }))
+              }
+            />
+          </>
+        )}
       </div>
     </div>
   );

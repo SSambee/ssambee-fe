@@ -19,13 +19,6 @@ export const CONTENT_TYPE_OPTIONS = [
   { label: "자료 공유", value: "SHARE" },
 ];
 
-// 열람 권한 옵션
-export const READ_PERMISSION_OPTIONS = [
-  { label: "전체", value: "ALL" },
-  { label: "학생", value: "STUDENT" },
-  { label: "학부모", value: "PARENT" },
-];
-
 // 알림 대상 옵션
 export const NOTICE_TYPE_OPTIONS = [
   { label: "전체", value: "ALL" },
@@ -36,7 +29,7 @@ export const NOTICE_TYPE_OPTIONS = [
 export const NOTICE_TYPE_LABEL = {
   ALL: { label: "전체", color: "gray" },
   STUDENT: { label: "학생", color: "blue" },
-  PARENT: { label: "학부모", color: "green" },
+  PARENT: { label: "학부모", color: "yellow" },
 } as const;
 
 // color label

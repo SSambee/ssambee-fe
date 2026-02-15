@@ -47,13 +47,11 @@ export const materialsService = {
     await axiosClient.delete(`/materials/${materialId}`);
   },
 
-  // 다운로드 URL 생성
-  getDownloadUrl: async (id: string) => {
-    const { data } = await axiosClient.get<{
-      status: string;
-      data: DownloadResponse;
-      message: string;
-    }>(`/materials/${id}/download`);
-    return data.data;
+  // 자료 다운로드
+  getDownloadUrl: async (materialsId: string) => {
+    const { data } = await axiosClient.get<DownloadResponse>(
+      `/materials/${materialsId}/download`
+    );
+    return data;
   },
 };
