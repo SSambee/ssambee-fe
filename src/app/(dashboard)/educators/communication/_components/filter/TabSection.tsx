@@ -23,8 +23,9 @@ export default function TabSection() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initialTab =
-    (searchParams.get("tab") as "INQUIRY" | "NOTICE") || "INQUIRY";
+  const rawTab = searchParams.get("tab");
+  const initialTab: "INQUIRY" | "NOTICE" =
+    rawTab === "INQUIRY" || rawTab === "NOTICE" ? rawTab : "INQUIRY";
   const [activeTab, setActiveTab] = useState<"INQUIRY" | "NOTICE">(initialTab);
 
   // 검색어 상태 및 디바운스
@@ -44,23 +45,29 @@ export default function TabSection() {
   const isInquiryTab = activeTab === "INQUIRY";
 
   // 문의 목록 조회
-  const { data: studentPostsData, isLoading: isLoadingStudentPosts } =
-    useStudentPosts({
-      page: query.page,
-      limit: query.limit,
-      search: debouncedSearchTerm || undefined,
-      answerStatus: query.answerStatus === "ALL" ? null : query.answerStatus,
-      writerType: query.writerType === "ALL" ? null : query.writerType,
-    });
+  const {
+    data: studentPostsData,
+    isLoading: isLoadingStudentPosts,
+    isError: isErrorStudentPosts,
+  } = useStudentPosts({
+    page: query.page,
+    limit: query.limit,
+    search: debouncedSearchTerm || undefined,
+    answerStatus: query.answerStatus === "ALL" ? null : query.answerStatus,
+    writerType: query.writerType === "ALL" ? null : query.writerType,
+  });
 
   // 강사 게시글 목록 조회
-  const { data: instructorPostsData, isLoading: isLoadingInstructorPosts } =
-    useInstructorPosts({
-      page: query.page,
-      limit: query.limit,
-      search: debouncedSearchTerm || undefined,
-      postType: query.postType === "ALL" ? null : query.postType,
-    });
+  const {
+    data: instructorPostsData,
+    isLoading: isLoadingInstructorPosts,
+    isError: isErrorInstructorPosts,
+  } = useInstructorPosts({
+    page: query.page,
+    limit: query.limit,
+    search: debouncedSearchTerm || undefined,
+    postType: query.postType === "ALL" ? null : query.postType,
+  });
 
   // 탭 선택에 따른 현재 표시 데이터
   const currentResponse = isInquiryTab ? studentPostsData : instructorPostsData;
@@ -68,6 +75,8 @@ export default function TabSection() {
   const isLoading = isInquiryTab
     ? isLoadingStudentPosts
     : isLoadingInstructorPosts;
+
+  const isError = isInquiryTab ? isErrorStudentPosts : isErrorInstructorPosts;
 
   const pagination: PaginationType = currentResponse?.pagination ?? {
     totalCount: 0,
@@ -136,6 +145,10 @@ export default function TabSection() {
         {isLoading ? (
           <div className="flex items-center justify-center h-[550px]">
             <p className="text-muted-foreground">로딩 중...</p>
+          </div>
+        ) : isError ? (
+          <div className="flex items-center justify-center h-[550px]">
+            <p className="text-muted-foreground">오류가 발생했습니다.</p>
           </div>
         ) : (
           <>
