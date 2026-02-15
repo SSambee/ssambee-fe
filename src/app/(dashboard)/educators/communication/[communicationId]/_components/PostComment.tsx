@@ -1,4 +1,3 @@
-// _components/PostComment.tsx
 import { Edit, Trash2, X, Paperclip, Save } from "lucide-react";
 import { useState } from "react";
 
@@ -14,7 +13,7 @@ import {
 } from "@/types/communication/studentPost";
 import { InstructorPostDetailComment } from "@/types/communication/instructorPost";
 
-interface PostCommentProps {
+type PostCommentProps = {
   isNoticePost: boolean;
   currentData:
     | GetInstructorPostDetailResponse
@@ -29,7 +28,7 @@ interface PostCommentProps {
   handleSubmitAnswer: () => void;
   onUpdateComment: (commentId: string, content: string) => void;
   onDeleteComment: (commentId: string) => void;
-}
+};
 
 export default function PostComment({
   isNoticePost,

@@ -1,11 +1,8 @@
-// CommunicationDetailPage.tsx
 "use client";
 
 import { useState, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { ArrowLeft, Edit, Trash2, Save, X } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
 import {
   useCreateInstructorPostComment,
@@ -20,6 +17,7 @@ import { GetStudentPostDetailResponse } from "@/types/communication/studentPost"
 import PostInfo from "./_components/PostInfo";
 import PostContent from "./_components/PostContent";
 import PostComment from "./_components/PostComment";
+import PostAction from "./_components/PostAction";
 
 export default function CommunicationDetailPage() {
   const router = useRouter();
@@ -214,50 +212,15 @@ export default function CommunicationDetailPage() {
               : "게시글의 상세 내용을 확인하세요."
           }
         />
-        <div className="flex gap-2">
-          {!isEditing && currentData.isMine && (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleStartEdit}
-                className="h-[50px] rounded-lg text-base"
-              >
-                <Edit className="h-4 w-4 mr-2" /> 수정
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleDelete}
-                className="h-[50px] rounded-lg text-base text-red-600"
-              >
-                <Trash2 className="h-4 w-4 mr-2" /> 삭제
-              </Button>
-            </>
-          )}
-          {isEditing && (
-            <>
-              <Button
-                onClick={handleSaveEdit}
-                className="h-[50px] rounded-lg text-base bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Save className="h-4 w-4 mr-2" /> 저장
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleCancelEdit}
-                className="h-[50px] rounded-lg text-base"
-              >
-                <X className="h-4 w-4 mr-2" /> 취소
-              </Button>
-            </>
-          )}
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="h-[50px] rounded-lg"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" /> 뒤로가기
-          </Button>
-        </div>
+        <PostAction
+          isEditing={isEditing}
+          isMine={currentData.isMine ?? false}
+          handleStartEdit={handleStartEdit}
+          handleDelete={handleDelete}
+          handleSaveEdit={handleSaveEdit}
+          handleCancelEdit={handleCancelEdit}
+          handleBack={() => router.back()}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

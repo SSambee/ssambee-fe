@@ -1,4 +1,3 @@
-// _components/PostContent.tsx
 import { Paperclip, FileText } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +7,7 @@ import TiptapEditor from "@/components/common/editor/TiptapEditor";
 import { GetInstructorPostDetailResponse } from "@/types/communication/instructorPost";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 
-interface PostContentProps {
+type PostContentProps = {
   isEditing: boolean;
   editTitle: string;
   setEditTitle: (val: string) => void;
@@ -23,7 +22,7 @@ interface PostContentProps {
   handleAttachmentClick: (
     file: NonNullable<GetStudentPostDetailResponse["attachments"]>[number]
   ) => void;
-}
+};
 
 export default function PostContent({
   isEditing,

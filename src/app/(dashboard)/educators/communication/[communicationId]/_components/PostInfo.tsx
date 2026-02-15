@@ -1,4 +1,3 @@
-// _components/PostInfo.tsx
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import StatusLabel from "@/components/common/label/StatusLabel";
@@ -6,7 +5,7 @@ import { formatYMDFromISO } from "@/utils/date";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import { GetInstructorPostDetailResponse } from "@/types/communication/instructorPost";
 
-interface PostInfoProps {
+type PostInfoProps = {
   isNoticePost: boolean;
   noticePostData: GetInstructorPostDetailResponse | undefined;
   inquiryPostData: GetStudentPostDetailResponse | undefined;
@@ -14,7 +13,7 @@ interface PostInfoProps {
     | GetInstructorPostDetailResponse
     | GetStudentPostDetailResponse
     | undefined;
-}
+};
 
 export default function PostInfo({
   isNoticePost,
