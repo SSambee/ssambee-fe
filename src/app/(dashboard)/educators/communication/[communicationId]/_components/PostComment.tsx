@@ -45,7 +45,6 @@ export default function PostComment({
 }: PostCommentProps) {
   return (
     <div className="space-y-6">
-      {/* 댓글 목록 */}
       {(currentData?.comments?.length ?? 0) > 0 && (
         <Card>
           <CardContent className="p-6 space-y-4">
@@ -68,7 +67,6 @@ export default function PostComment({
         </Card>
       )}
 
-      {/* 댓글 작성 창 (기존 유지) */}
       <Card>
         <CardContent className="p-6 space-y-4">
           <h3 className="font-semibold text-lg">
@@ -132,7 +130,7 @@ export default function PostComment({
               </div>
               <Button
                 onClick={handleSubmitAnswer}
-                className="bg-slate-900 text-white hover:bg-slate-800 px-8 h-10 transition-all active:scale-95"
+                className="h-11 px-8 rounded-xl text-[14px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
               >
                 {isNoticePost ? "댓글 등록" : "답변 등록"}
               </Button>
@@ -168,24 +166,37 @@ function CommentItem({
   };
 
   // 작성자 표시 정보
-  const authorInfo = (comment as InstructorPostDetailComment).instructor
-    ? `강사 | ${(comment as InstructorPostDetailComment).instructor?.user?.name}`
-    : (comment as InstructorPostDetailComment).assistant
-      ? `조교 | ${(comment as InstructorPostDetailComment).assistant?.user?.name}`
-      : (comment as StudentPostDetailComment).enrollment?.studentName
-        ? `학생 | ${(comment as StudentPostDetailComment).enrollment?.studentName}`
+  const instructor = (comment as InstructorPostDetailComment).instructor;
+  const assistant = (comment as InstructorPostDetailComment).assistant;
+  const student = (comment as StudentPostDetailComment).enrollment;
+
+  const role = instructor
+    ? "강사"
+    : assistant
+      ? "조교"
+      : student
+        ? "학생"
         : "알 수 없음";
+  const name = instructor
+    ? instructor.user.name
+    : assistant
+      ? assistant.user.name
+      : student?.studentName || "알 수 없음";
 
   return (
-    <div className="border rounded-lg p-6 space-y-2 bg-white">
+    <div className="border rounded-4xl p-6 space-y-2 bg-white">
       <div className="flex items-center justify-between font-medium">
         <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-9 w-9">
             <AvatarFallback className="text-xs">
-              {authorInfo.split("|").pop()?.trim().slice(0, 1)}
+              {name.slice(0, 1)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm text-neutral-600">{authorInfo}</span>
+          <span className="text-sm font-semibold text-slate-700">{name}</span>
+          <span className="text-sm text-slate-400">|</span>
+          <span className="text-[11px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded font-bold">
+            {role}
+          </span>
           <span className="text-sm text-neutral-300">
             {formatYMDFromISO(comment.createdAt)}
           </span>

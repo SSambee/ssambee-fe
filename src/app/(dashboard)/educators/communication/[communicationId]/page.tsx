@@ -122,7 +122,9 @@ export default function CommunicationDetailPage() {
 
   // 댓글 작성
   const handleSubmitAnswer = () => {
-    if (!answerContent.trim()) {
+    const plainText = answerContent.replace(/<[^>]*>/g, "").trim();
+
+    if (!plainText) {
       alert(
         isNoticePost ? "댓글 내용을 입력해주세요." : "답변 내용을 입력해주세요."
       );

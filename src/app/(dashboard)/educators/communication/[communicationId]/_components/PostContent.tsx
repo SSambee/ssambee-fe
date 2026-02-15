@@ -37,7 +37,7 @@ export default function PostContent({
 }: PostContentProps) {
   return (
     <Card>
-      <CardContent className="p-6">
+      <CardContent className="p-8">
         {isEditing ? (
           <div className="space-y-4">
             <div className="space-y-2">
