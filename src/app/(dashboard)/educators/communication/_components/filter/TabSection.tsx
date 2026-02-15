@@ -6,14 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import DataTable from "@/components/common/table/DataTable";
 import { Pagination } from "@/components/common/pagination/Pagination";
 import { useInstructorPosts, useStudentPosts } from "@/hooks/useInstructorPost";
-import {
-  AnswerStatus,
-  InquiryWriterType,
-} from "@/types/communication/studentPost";
-import { PostType } from "@/types/communication/instructorPost";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
-  CommonPostQuery,
   PaginationType,
   PostFilterQuery,
 } from "@/types/communication/commonPost";
