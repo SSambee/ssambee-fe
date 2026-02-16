@@ -5,22 +5,24 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import DataTable from "@/components/common/table/DataTable";
 import { Pagination } from "@/components/common/pagination/Pagination";
-import { useInstructorPosts, useStudentPosts } from "@/hooks/useInstructorPost";
 import { useDebounce } from "@/hooks/useDebounce";
 import {
   PaginationType,
   PostFilterQuery,
 } from "@/types/communication/commonPost";
+import {
+  useInstructorPostsSVC,
+  useStudentPostsSVC,
+} from "@/hooks/SVC/useCommunicationSVC";
 
-import NotificationFilter from "../filter/NotificationFilter";
-import { NOTICE_POST_COLUMNS } from "../table/NoticeTableColumns";
-import { INQUIRY_TABLE_COLUMNS } from "../table/InquiryTableColumns";
-
-import InquiryFilter from "./InquiryFilter";
+import InquiryFilterSVC from "../filter/InquiryFilterSVC";
+import NotificationFilterSVC from "../filter/NotificationFilterSVC";
+import { NOTICE_TABLE_COLUMNS_SVC } from "../table/NotificationTableColumnsSVC";
+import { INQUIRY_TABLE_COLUMNS_SVC } from "../table/InquiryTableColumnsSVC";
 
 const PAGE_LIMIT = 10;
 
-export default function TabSection() {
+export default function TabSectionSVC() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -50,7 +52,7 @@ export default function TabSection() {
     data: studentPostsData,
     isLoading: isLoadingStudentPosts,
     isError: isErrorStudentPosts,
-  } = useStudentPosts(
+  } = useStudentPostsSVC(
     {
       page: query.page,
       limit: query.limit,
@@ -61,12 +63,12 @@ export default function TabSection() {
     { enabled: isInquiryTab }
   );
 
-  // 강사 게시글 목록 조회
+  // 강사 공지 목록 조회
   const {
     data: instructorPostsData,
     isLoading: isLoadingInstructorPosts,
     isError: isErrorInstructorPosts,
-  } = useInstructorPosts(
+  } = useInstructorPostsSVC(
     {
       page: query.page,
       limit: query.limit,
@@ -96,7 +98,7 @@ export default function TabSection() {
 
   const handleTabChange = (tab: "INQUIRY" | "NOTICE") => {
     setActiveTab(tab);
-    router.replace(`/educators/communication?tab=${tab}`, { scroll: false });
+    router.replace(`/learners/communication?tab=${tab}`, { scroll: false });
     setSearchTerm("");
 
     setQuery({
@@ -133,14 +135,14 @@ export default function TabSection() {
       </div>
 
       {isInquiryTab ? (
-        <InquiryFilter
+        <InquiryFilterSVC
           query={query}
           setQuery={setQuery}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
       ) : (
-        <NotificationFilter
+        <NotificationFilterSVC
           query={query}
           setQuery={setQuery}
           searchTerm={searchTerm}
@@ -163,18 +165,18 @@ export default function TabSection() {
               // 문의글 전용 테이블
               <DataTable
                 data={studentPostsData?.list ?? []}
-                columns={INQUIRY_TABLE_COLUMNS}
+                columns={INQUIRY_TABLE_COLUMNS_SVC}
                 onRowClick={(row) =>
-                  router.push(`/educators/communication/${row.id}?type=inquiry`)
+                  router.push(`/learners/communication/${row.id}?type=inquiry`)
                 }
               />
             ) : (
               // 공지사항 전용 테이블
               <DataTable
                 data={instructorPostsData?.list ?? []}
-                columns={NOTICE_POST_COLUMNS}
+                columns={NOTICE_TABLE_COLUMNS_SVC}
                 onRowClick={(row) =>
-                  router.push(`/educators/communication/${row.id}?type=notice`)
+                  router.push(`/learners/communication/${row.id}?type=notice`)
                 }
               />
             )}

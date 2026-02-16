@@ -35,8 +35,8 @@ export const NOTICE_TYPE_LABEL = {
 // color label
 export const INQUIRY_STATUS_LABEL = {
   BEFORE: { label: "답변 전", color: "red" },
-  REGISTERED: { label: "답변 등록", color: "green" },
-  COMPLETED: { label: "답변 완료", color: "blue" },
+  REGISTERED: { label: "답변 등록", color: "blue" },
+  COMPLETED: { label: "답변 완료", color: "green" },
 } as const;
 
 export const CONTENT_TYPE_LABEL = {
