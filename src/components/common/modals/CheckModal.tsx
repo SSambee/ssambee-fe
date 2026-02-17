@@ -41,10 +41,6 @@ export const CheckModal = ({
     closeModal();
   };
 
-  const handleCloseOnly = () => {
-    closeModal();
-  };
-
   const handleConfirm = async () => {
     if (isConfirming) return;
     setIsConfirming(true);
@@ -56,7 +52,6 @@ export const CheckModal = ({
       console.error("확인 동작 실패:", error);
     } finally {
       setIsConfirming(false);
-      
     }
   };
 
