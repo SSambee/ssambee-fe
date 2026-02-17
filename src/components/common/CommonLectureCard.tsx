@@ -35,7 +35,8 @@ export function CommonLectureCard({
   return (
     <Card
       className={cn(
-        "relative flex cursor-pointer flex-col overflow-hidden rounded-[18px] border border-[#d6d9e0] bg-white text-[#040405] shadow-[0_0_14px_rgba(138,138,138,0.08)] transition-colors hover:bg-[#fcfcfd]",
+        "relative flex flex-col overflow-hidden rounded-[18px] border border-[#d6d9e0] bg-white text-[#040405] shadow-[0_0_14px_rgba(138,138,138,0.08)] transition-colors",
+        onClick && "cursor-pointer hover:bg-[#fcfcfd]",
         className
       )}
       onClick={onClick}

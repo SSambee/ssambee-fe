@@ -11,16 +11,19 @@ import { useLecturesUiStore } from "@/stores/lectures";
 
 const LOAD_MORE_STEP = 2;
 
-const createTodayLabel = () => {
+const createTodayInfo = () => {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}.${month}.${day}`;
+  return {
+    label: `${now.getFullYear()}.${month}.${day}`,
+    dayIndex: now.getDay(),
+  };
 };
 
 export const useLecturesPage = () => {
   const router = useRouter();
-  const todayLabel = useMemo(() => createTodayLabel(), []);
+  const todayInfo = useMemo(() => createTodayInfo(), []);
 
   useSetBreadcrumb([{ label: "수업 관리" }]);
 
@@ -50,8 +53,7 @@ export const useLecturesPage = () => {
   const totalCount =
     lecturesQuery.data?.pagination?.totalCount ?? lectures.length;
 
-  const todayDayIndex = new Date().getDay();
-  const todayQuery = useLecturesToday(todayDayIndex);
+  const todayQuery = useLecturesToday(todayInfo.dayIndex);
   const todaySchedules = todayQuery.data?.schedules ?? [];
 
   return {
@@ -59,7 +61,7 @@ export const useLecturesPage = () => {
       limit,
       searchInput,
       totalCount,
-      todayLabel,
+      todayLabel: todayInfo.label,
     },
     list: {
       lectures,

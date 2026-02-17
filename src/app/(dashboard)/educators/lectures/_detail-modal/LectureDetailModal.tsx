@@ -207,10 +207,22 @@ export function LectureDetailModal({
                       : "border-transparent"
                   }`}
                 >
-                  <span className="text-[18px] font-semibold leading-[26px] tracking-[-0.18px] text-[rgba(22,22,27,0.88)]">
+                  <span
+                    className={`text-[18px] font-semibold leading-[26px] tracking-[-0.18px] ${
+                      activeTab === "students"
+                        ? "text-[rgba(22,22,27,0.88)]"
+                        : "text-[rgba(22,22,27,0.16)]"
+                    }`}
+                  >
                     등록 학생
                   </span>
-                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[#e1e7fe] px-2 text-[16px] font-semibold leading-6 tracking-[-0.16px] text-[#2554f5]">
+                  <span
+                    className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-[16px] leading-6 tracking-[-0.16px] ${
+                      activeTab === "students"
+                        ? "bg-[#e1e7fe] font-semibold text-[#2554f5]"
+                        : "bg-[#e9ebf0] font-medium text-[#b0b4c2]"
+                    }`}
+                  >
                     {studentList.length}
                   </span>
                 </button>

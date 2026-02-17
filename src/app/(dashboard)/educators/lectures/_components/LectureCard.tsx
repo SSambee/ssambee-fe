@@ -43,12 +43,9 @@ export function LectureCard({ lecture }: LectureCardProps) {
       createElement(CheckModal, {
         title: "수업을 삭제할까요?",
         description: `${lecture.name} 수업이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.`,
-        confirmText: isDeleting ? "삭제 중..." : "삭제",
+        confirmText: "삭제",
         cancelText: "취소",
-        onConfirm: () => {
-          if (isDeleting) return;
-          deleteLecture(lecture.id);
-        },
+        onConfirm: () => deleteLecture(lecture.id),
       })
     );
   };
@@ -71,6 +68,7 @@ export function LectureCard({ lecture }: LectureCardProps) {
           variant="outline"
           className="h-9 w-9 rounded-full border-0 bg-[#d6d9e0] p-0 text-white hover:bg-[#c8ccd6] hover:text-white"
           aria-label={`${lecture.name} 삭제`}
+          disabled={isDeleting}
           onClick={(e) => {
             e.stopPropagation();
             openDeleteConfirmModal();

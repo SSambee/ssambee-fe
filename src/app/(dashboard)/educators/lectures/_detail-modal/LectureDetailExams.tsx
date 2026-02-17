@@ -65,7 +65,7 @@ export function LectureDetailExams({
                 <div className="mt-1 flex items-center gap-2 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#8b90a3]">
                   <span>{examMeta}</span>
                   <span className="h-[3px] w-[3px] rounded-full bg-[#dadde3]" />
-                  <span>{examDate} 수정</span>
+                  <span>{examDate} 등록</span>
                 </div>
               </div>
             </div>
