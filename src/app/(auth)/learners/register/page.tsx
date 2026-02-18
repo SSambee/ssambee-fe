@@ -7,6 +7,7 @@ import RegisterForm from "@/components/auth/form/RegisterForm";
 import AuthLayout from "@/components/auth/layout/AuthLayout";
 import { LearnerRole, RoleOption } from "@/types/auth.type";
 import SchoolInfoForm from "@/components/auth/form/SchoolInfoForm";
+import ParentPhoneForm from "@/components/auth/form/ParentPhoneForm";
 
 const LEARNER_ROLES: RoleOption<LearnerRole>[] = [
   { label: "학생", value: "STUDENT" },
@@ -40,6 +41,7 @@ export default function ParentRegisterPage() {
               requireSchoolInfo={true}
               roleType="LEARNERS"
               userType="STUDENT"
+              extraFields={<ParentPhoneForm />}
             />
           </div>
         )}

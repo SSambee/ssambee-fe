@@ -10,7 +10,11 @@ import {
   registerRequestSchema,
 } from "@/validation/auth.validation";
 import { RegisterFormData, RegisterUser, Role } from "@/types/auth.type";
-import { useAuthStore, useSchoolStore } from "@/stores/registered.store";
+import {
+  useAuthStore,
+  useParentPhoneStore,
+  useSchoolStore,
+} from "@/stores/registered.store";
 import { REGISTER_FORM_DEFAULTS } from "@/constants/auth.defaults";
 // import { verifyPhoneAPI } from "@/services/auth.service";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +32,7 @@ type RegisterFormProps = {
   requireSchoolInfo?: boolean; // 학원 정보 필요 여부 - 학생
   roleType: "EDUCATORS" | "LEARNERS"; // 사용자 타입 (라우팅용: educators, learners)
   userType: Role;
+  extraFields?: React.ReactNode; // 추가 필드
 };
 
 export default function RegisterForm({
@@ -35,6 +40,7 @@ export default function RegisterForm({
   requireSchoolInfo = false,
   roleType,
   userType,
+  extraFields,
 }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
@@ -49,8 +55,11 @@ export default function RegisterForm({
     resetAuth,
   } = useAuthStore();
 
+  // 학생용
   const { school, schoolYear, isSchoolInfoValid, resetSchoolInfo } =
     useSchoolStore();
+  const { parentPhoneNumber, isParentPhoneValid, resetParentPhone } =
+    useParentPhoneStore();
 
   const {
     register,
@@ -92,7 +101,8 @@ export default function RegisterForm({
   useEffect(() => {
     resetAuth();
     resetSchoolInfo();
-  }, [resetAuth, resetSchoolInfo]);
+    resetParentPhone();
+  }, [resetAuth, resetSchoolInfo, resetParentPhone]);
 
   // 전화번호 인증 버튼
   // const handleVerifyPhone = async () => {
@@ -126,6 +136,14 @@ export default function RegisterForm({
   //   }
   // };
 
+  // 회원가입 버튼 활성화 조건
+  const isSubmitDisabled =
+    !isValid ||
+    loading ||
+    (requireAuthCode && !isCodeVerified) ||
+    (requireSchoolInfo && !isSchoolInfoValid) ||
+    (userType === "STUDENT" && !isParentPhoneValid);
+
   // 회원가입 제출
   const onSubmit = async (data: RegisterFormData) => {
     // if (!isPhoneVerified) {
@@ -142,9 +160,15 @@ export default function RegisterForm({
       return;
     }
 
-    // 학교 정보 검증 - 외부 폼
+    // 학생용 외부 폼 - 학교 정보 검증
     if (requireSchoolInfo && !isSchoolInfoValid) {
       alert("학교 정보를 모두 입력해주세요.");
+      return;
+    }
+
+    // 학생용 외부 폼 - 학부모 전화번호 검증
+    if (userType === "STUDENT" && !isParentPhoneValid) {
+      alert("학부모 전화번호를 올바르게 입력해주세요.");
       return;
     }
 
@@ -162,17 +186,12 @@ export default function RegisterForm({
       ...baseData,
       ...(signupCode ? { signupCode } : {}),
       ...(requireSchoolInfo ? { school, schoolYear } : {}),
+      ...(userType === "STUDENT" ? { parentPhoneNumber } : {}),
       userType,
     };
 
     await signup(submitData);
   };
-
-  const isSubmitDisabled =
-    !isValid ||
-    loading ||
-    (requireAuthCode && !isCodeVerified) ||
-    (requireSchoolInfo && !isSchoolInfoValid);
 
   return (
     <div className="space-y-6">
@@ -209,6 +228,8 @@ export default function RegisterForm({
               clearErrors("phoneNumber");
             }}
           />
+
+          {extraFields}
 
           {/* <button
             type="button"

@@ -1,6 +1,10 @@
 import { create } from "zustand";
 
-import { AuthStore, SchoolInfoStore } from "@/types/auth.type";
+import {
+  AuthStore,
+  ParentPhoneStore,
+  SchoolInfoStore,
+} from "@/types/auth.type";
 
 export const useAuthStore = create<AuthStore>((set) => ({
   isPhoneVerified: false, // 전화번호 인증 완료 여부
@@ -32,4 +36,14 @@ export const useSchoolStore = create<SchoolInfoStore>((set) => ({
       schoolYear: "",
       isSchoolInfoValid: false,
     }),
+}));
+
+export const useParentPhoneStore = create<ParentPhoneStore>((set) => ({
+  parentPhoneNumber: "", // 학부모 전화번호
+  isParentPhoneValid: false, // 학부모 전화번호 검증 완료 여부
+
+  setParentPhone: (data) => set(data),
+  setParentPhoneValid: (valid) => set({ isParentPhoneValid: valid }),
+  resetParentPhone: () =>
+    set({ parentPhoneNumber: "", isParentPhoneValid: false }),
 }));

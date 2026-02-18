@@ -69,3 +69,11 @@ export const schoolInfoSchema = z.object({
   school: z.string().trim().min(1, "학교명을 입력해주세요"),
   schoolYear: z.string().min(1, "학년을 선택해주세요"),
 });
+
+export const parentPhoneSchema = z.object({
+  parentPhoneNumber: z
+    .string()
+    .trim()
+    .min(1, "학부모 연락처를 입력해주세요")
+    .regex(KR_PHONE_REGEX, "전화번호 형식이 올바르지 않습니다"),
+});
