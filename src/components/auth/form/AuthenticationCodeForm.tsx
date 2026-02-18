@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useState } from "react";
 
 import { authCodeSchema } from "@/validation/auth.validation";
-import { useAuthStore } from "@/stores/registered.store";
+import { useAuthCodeStore } from "@/stores/registered.store";
 import { AuthCodeFormData } from "@/types/auth.type";
 import { AUTH_CODE_FORM_DEFAULTS } from "@/constants/auth.defaults";
 import { verifyAuthCodeAPI } from "@/services/auth.service";
@@ -13,7 +13,7 @@ import { InputForm } from "@/components/common/input/InputForm";
 
 export default function AuthenticationCodeForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { isCodeVerified, setAuthCode, setCodeVerified } = useAuthStore();
+  const { isCodeVerified, setAuthCode, setCodeVerified } = useAuthCodeStore();
 
   const {
     register,

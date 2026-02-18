@@ -1,23 +1,20 @@
 import { create } from "zustand";
 
 import {
-  AuthStore,
+  AuthCodeStore,
   ParentPhoneStore,
   SchoolInfoStore,
 } from "@/types/auth.type";
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  isPhoneVerified: false, // 전화번호 인증 완료 여부
+export const useAuthCodeStore = create<AuthCodeStore>((set) => ({
   signupCode: "", // 인증 코드 입력값 -> 회원가입 데이터 객체에 포함시키기 위함
   isCodeVerified: false, // 인증 코드 서버 검증 완료 여부
 
-  setPhoneVerified: (verified) => set({ isPhoneVerified: verified }),
   setAuthCode: (code) => set({ signupCode: code }),
   setCodeVerified: (verified) => set({ isCodeVerified: verified }),
 
-  resetAuth: () =>
+  resetAuthCode: () =>
     set({
-      isPhoneVerified: false,
       signupCode: "",
       isCodeVerified: false,
     }),

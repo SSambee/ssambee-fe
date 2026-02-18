@@ -36,6 +36,7 @@ export type RegisterUser = RegisterRequestFormData & {
   signupCode?: string;
   school?: string;
   schoolYear?: string;
+  parentPhoneNumber?: string;
   userType: Role;
 };
 
@@ -60,19 +61,14 @@ export type SignupParentUser = RegisterRequestFormData & {
 
 // store 타입-----------------------------------------------
 // 인증 코드 & 전화번호
-export type AuthStore = {
-  // 전화번호 인증
-  isPhoneVerified: boolean;
-
-  // 인증 코드
+export type AuthCodeStore = {
   signupCode?: string; // 입력값
   isCodeVerified: boolean; // 서버 검증 성공 여부
 
   // 상태 업데이트 함수
-  setPhoneVerified: (verified: boolean) => void;
   setAuthCode: (code: string) => void; // 인증코드 저장
   setCodeVerified: (verified: boolean) => void; // 서버 검증 성공 여부
-  resetAuth: () => void;
+  resetAuthCode: () => void;
 };
 
 // 학생용 - 학교 정보

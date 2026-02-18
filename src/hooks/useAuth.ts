@@ -75,6 +75,7 @@ export function useAuth() {
             userType: "STUDENT",
             school: data.school,
             schoolYear: data.schoolYear,
+            parentPhoneNumber: data.parentPhoneNumber,
           } as SignupStudentUser);
           break;
 

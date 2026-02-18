@@ -42,6 +42,31 @@ export const verifyAuthCodeAPI = async (signupCode: string) => {
   }
 };
 
+// 이메일 인증 API
+export const verifyEmailAPI = async (email: string) => {
+  try {
+    const { data } = await axiosClient.post<ApiResponse<{ isValid: boolean }>>(
+      "/auth/email-verification",
+      { email }
+    );
+
+    return {
+      success: data?.data?.isValid,
+      message: data?.message ?? "사용 가능한 이메일입니다.",
+    };
+  } catch (error) {
+    const axiosError = error as AxiosError<{ message?: string }>;
+
+    return {
+      success: false,
+      message:
+        axiosError.response?.data?.message ??
+        axiosError.message ??
+        "이메일 인증 중 오류가 발생했습니다.",
+    };
+  }
+};
+
 // 전화번호 인증 API
 // export const verifyPhoneAPI = async (phoneNumber: string) => {
 //   await new Promise((resolve) => setTimeout(resolve, 1000));
