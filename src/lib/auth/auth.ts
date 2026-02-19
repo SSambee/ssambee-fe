@@ -27,14 +27,6 @@ type SessionProfile = {
   signStatus: SignStatus;
 };
 
-type SessionResponse = {
-  success: boolean;
-  data?: {
-    user: SessionUser;
-    profile: SessionProfile;
-  };
-};
-
 // 서버 컴포넌트에서 세션 쿠키 존재 여부 확인
 // 세션 쿠키가 하나라도 존재하면 true
 export async function hasSession(): Promise<boolean> {
@@ -127,11 +119,15 @@ export async function requireAuthWithRole(options: {
     redirect(loginPath);
   }
 
-  const signStatus = user.profile?.signStatus;
+  // 역할이 조교일 때만 진행
+  const rolesNeedApproval: Role[] = ["ASSISTANT"];
 
-  if (signStatus !== "SIGNED") {
-    // 서명 대기/거절/만료 상태라면 서명 페이지(또는 승인 대기 페이지)로 이동
-    redirect("/pending-approval");
+  if (rolesNeedApproval.includes(user.userType)) {
+    const signStatus = user.profile?.signStatus;
+    if (signStatus !== "SIGNED") {
+      // 서명 대기/거절/만료 상태라면 서명 페이지(또는 승인 대기 페이지)로 이동
+      redirect("/pending-approval");
+    }
   }
 
   // Role 체크
