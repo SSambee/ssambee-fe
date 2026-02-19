@@ -214,8 +214,6 @@ export default function RegisterForm({
       userType,
     };
 
-    console.log("🚀 API 전송 직전 최종 데이터:", submitData);
-
     await signup(submitData);
   };
 
@@ -297,14 +295,14 @@ export default function RegisterForm({
             type="button"
             onClick={handleVerifyEmail}
             disabled={!isEmailInputValid || emailLoading}
-            className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors ${
+            className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer ${
               emailLoading
                 ? "bg-gray-200 text-gray-500 cursor-wait"
                 : !isEmailInputValid
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  ? "bg-gray-200 text-gray-500"
                   : isValid
                     ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer shadow-md"
-                    : "bg-blue-100 text-blue-300 cursor-not-allowed"
+                    : "bg-blue-100 text-blue-300"
             }`}
           >
             {emailLoading
