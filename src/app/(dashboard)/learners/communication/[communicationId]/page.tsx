@@ -135,7 +135,7 @@ export default function CommunicationDetailPageSVC() {
     if (!confirm("정말 삭제하시겠습니까?")) return;
     if (!isNoticePost) {
       deletePostSVC.mutate(communicationId, {
-        onSuccess: () => router.push("/educators/communication"),
+        onSuccess: () => router.push("/learners/communication"),
       });
     }
   };
