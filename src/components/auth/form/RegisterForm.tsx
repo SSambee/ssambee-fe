@@ -295,14 +295,14 @@ export default function RegisterForm({
             type="button"
             onClick={handleVerifyEmail}
             disabled={!isEmailInputValid || emailLoading}
-            className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors cursor-pointer ${
+            className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors ${
               emailLoading
                 ? "bg-gray-200 text-gray-500 cursor-wait"
-                : !isEmailInputValid
-                  ? "bg-gray-200 text-gray-500"
-                  : isValid
+                : isEmailVerified
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : isEmailInputValid
                     ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer shadow-md"
-                    : "bg-blue-100 text-blue-300"
+                    : "bg-blue-100 text-blue-300 cursor-not-allowed"
             }`}
           >
             {emailLoading
