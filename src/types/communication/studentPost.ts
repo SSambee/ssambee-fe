@@ -34,11 +34,9 @@ export type ChildInfo = {
 export type GetMyChildrenResponse = ChildInfo[];
 
 // 학생 문의 생성
-export type CreateStudentPostRequest = {
-  title: string;
-  content: string;
-  lectureId: string;
-};
+export type CreateStudentPostRequest =
+  | { title: string; content: string; lectureId: string; file?: File }
+  | FormData;
 
 // 학부모 문의 생성
 export type CreateStudentParentPostRequest = CreateStudentPostRequest & {

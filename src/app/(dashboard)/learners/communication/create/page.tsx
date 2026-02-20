@@ -11,8 +11,12 @@ import {
   useCreateStudentPostSVC,
   useGetMyChildrenSVC,
 } from "@/hooks/SVC/useCommunicationSVC";
-import { AuthorRole } from "@/types/communication/studentPost";
+import {
+  AuthorRole,
+  CreateStudentPostRequest,
+} from "@/types/communication/studentPost";
 import { useAuthContext } from "@/providers/AuthProvider";
+import { CreateStudentParentPostRequest } from "@/types/communication/studentPost";
 
 import CreateContentSVC from "./_components/content/CreateContentSVC";
 import WriterTypeSelect from "./_components/setting/WriterTypeSelect";
@@ -28,6 +32,7 @@ export default function CreateInquiryPostPageSVC() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedLectureId, setSelectedLectureId] = useState("");
+  const [attachment, setAttachment] = useState<File | undefined>(undefined);
 
   // 유저 정보에 따른 작성자 역할 고정
   const authorRole: AuthorRole =
@@ -55,26 +60,41 @@ export default function CreateInquiryPostPageSVC() {
       return;
     }
 
-    const baseData = {
-      title,
-      content,
-      lectureId: selectedLectureId,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+    formData.append("lectureId", selectedLectureId);
+
+    if (attachment) {
+      formData.append("file", attachment);
+    }
+
+    // const baseData = {
+    //   title,
+    //   content,
+    //   lectureId: selectedLectureId,
+    //   file: attachment,
+    // };
 
     const onSuccessAction = {
       onSuccess: () => router.push(`/learners/communication`),
     };
 
     if (user?.userType === "PARENT") {
+      // 학부모일 경우 추가 데이터 삽입
+      if (effectiveChildId) {
+        formData.append("childLinkId", effectiveChildId);
+      }
+
       parentMutation.mutate(
-        {
-          ...baseData,
-          childLinkId: authorRole === "PARENT" ? effectiveChildId : "",
-        },
+        formData as CreateStudentParentPostRequest,
         onSuccessAction
       );
     } else {
-      studentMutation.mutate(baseData, onSuccessAction);
+      studentMutation.mutate(
+        formData as CreateStudentPostRequest,
+        onSuccessAction
+      );
     }
   };
 
@@ -114,6 +134,8 @@ export default function CreateInquiryPostPageSVC() {
             handleSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             onCancel={() => router.back()}
+            attachment={attachment} // 현재 파일 상태 (미리보기용)
+            setAttachment={setAttachment} // 파일 변경 함수 (추가/삭제 공용)
           />
         </div>
       </div>

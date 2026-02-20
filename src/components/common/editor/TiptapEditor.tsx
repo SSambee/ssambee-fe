@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, Italic, List, ListOrdered, Undo, Redo } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  List,
+  ListOrdered,
+  Undo,
+  Redo,
+  Paperclip,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -16,15 +24,19 @@ type TiptapEditorProps = {
   readOnly?: boolean; // 읽기 전용(내부적으로 위험한 스크립트를 파싱 단계에서 차단함)
   placeholder?: string;
   className?: string;
+  onFileUpload?: (file: File) => void;
 };
 
 export default function TiptapEditor({
   content,
   onChange,
+  onFileUpload,
   placeholder = "내용을 입력하세요",
   className = "",
   readOnly = false, // 기본값은 편집 가능 모드
 }: TiptapEditorProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -48,6 +60,14 @@ export default function TiptapEditor({
       },
     },
   });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && onFileUpload) {
+      onFileUpload(file);
+      event.target.value = "";
+    }
+  };
 
   useEffect(() => {
     if (!editor) return;
@@ -106,6 +126,21 @@ export default function TiptapEditor({
         </ToolbarButton>
 
         <div className="w-px h-6 bg-gray-300 mx-1 self-center" />
+
+        {onFileUpload && (
+          <>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden" // 화면에서 숨김
+            />
+            <ToolbarButton onClick={() => fileInputRef.current?.click()}>
+              <Paperclip className="h-4 w-4" />
+            </ToolbarButton>
+            <div className="w-px h-6 bg-gray-300 mx-1 self-center" />
+          </>
+        )}
 
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}

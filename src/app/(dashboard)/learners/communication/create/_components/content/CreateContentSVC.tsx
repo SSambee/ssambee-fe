@@ -1,3 +1,5 @@
+import { Paperclip } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,8 @@ type CreateContentSVCProps = {
   setTitle: (val: string) => void;
   content: string;
   setContent: (val: string) => void;
+  attachment: File | undefined;
+  setAttachment: (file: File | undefined) => void;
   handleSubmit: () => void;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -22,6 +26,8 @@ export default function CreateContentSVC({
   handleSubmit,
   isSubmitting,
   onCancel,
+  attachment,
+  setAttachment,
 }: CreateContentSVCProps) {
   return (
     <Card>
@@ -43,8 +49,27 @@ export default function CreateContentSVC({
             onChange={setContent}
             placeholder="내용을 입력하세요"
             className="min-h-[400px]"
+            onFileUpload={setAttachment}
           />
         </div>
+        {attachment && (
+          <div className="flex items-center justify-between p-3 bg-slate-50 border border-dashed border-slate-200 rounded-lg">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="text-blue-600 font-medium">
+                <Paperclip className="h-4 w-4" />
+              </span>
+              <span className="text-sm text-slate-600 truncate">
+                {attachment.name}
+              </span>
+            </div>
+            <button
+              onClick={() => setAttachment(undefined)}
+              className="text-xs text-red-500 hover:underline ml-4"
+            >
+              삭제
+            </button>
+          </div>
+        )}
 
         <div className="flex justify-end gap-2 pt-4">
           <Button
