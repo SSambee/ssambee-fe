@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
@@ -23,7 +24,15 @@ export default function LearnersCommunicationPage() {
         </Button>
       </div>
 
-      <TabSectionSVC />
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-[550px]">
+            <p className="text-muted-foreground">로딩 중...</p>
+          </div>
+        }
+      >
+        <TabSectionSVC />
+      </Suspense>
     </div>
   );
 }

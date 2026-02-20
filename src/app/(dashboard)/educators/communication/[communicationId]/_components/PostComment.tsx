@@ -163,23 +163,26 @@ function CommentItem({
     setIsEditing(false);
   };
 
-  // 작성자 표시 정보
-  const instructor = (comment as CommonPostComment).instructor;
-  const assistant = (comment as CommonPostComment).assistant;
-  const student = (comment as CommonPostComment).enrollment;
+  // 작성자 표기
+  const { authorRole, instructor, assistant, enrollment } = comment;
 
-  const role = instructor
-    ? "강사"
-    : assistant
-      ? "조교"
-      : student
-        ? "학생"
-        : "알 수 없음";
-  const name = instructor
-    ? instructor.user.name
-    : assistant
-      ? assistant.user.name
-      : student?.studentName || "알 수 없음";
+  let roleLabel = "";
+  let displayName = "";
+
+  if (authorRole === "INSTRUCTOR") {
+    roleLabel = "강사";
+    displayName = instructor?.user.name || "강사";
+  } else if (authorRole === "ASSISTANT") {
+    roleLabel = "조교";
+    displayName = assistant?.user.name || "조교";
+  } else if (authorRole === "STUDENT") {
+    roleLabel = "학생";
+    displayName = enrollment?.studentName || "학생";
+  } else if (authorRole === "PARENT") {
+    roleLabel = "학부모";
+    const studentName = enrollment?.studentName || "학생";
+    displayName = `${studentName} 학부모`;
+  }
 
   return (
     <div className="border rounded-4xl p-6 space-y-2 bg-white">
@@ -187,13 +190,15 @@ function CommentItem({
         <div className="flex items-center gap-2">
           <Avatar className="h-9 w-9">
             <AvatarFallback className="text-xs">
-              {name.slice(0, 1)}
+              {displayName.slice(0, 1)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-semibold text-slate-700">{name}</span>
+          <span className="text-sm font-semibold text-slate-700">
+            {displayName}
+          </span>
           <span className="text-sm text-slate-400">|</span>
           <span className="text-[11px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded font-bold">
-            {role}
+            {roleLabel}
           </span>
           <span className="text-sm text-neutral-300">
             {formatYMDFromISO(comment.createdAt)}

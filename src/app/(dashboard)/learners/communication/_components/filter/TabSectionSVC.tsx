@@ -104,9 +104,9 @@ export default function TabSectionSVC() {
     setQuery({
       page: 1,
       limit: PAGE_LIMIT,
-      answerStatus: null,
-      writerType: null,
-      postType: null,
+      answerStatus: "ALL",
+      writerType: "ALL",
+      postType: "ALL",
     }); // 탭 변경 시 페이지 & 쿼리 초기화
   };
 

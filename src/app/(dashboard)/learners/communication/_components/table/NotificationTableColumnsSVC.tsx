@@ -76,7 +76,7 @@ export const NOTICE_TABLE_COLUMNS_SVC: ColumnDefinition<NoticeRow>[] = [
             <span className="text-xs px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded mr-1">
               조교
             </span>
-            {row.authorAssistant.user.name}
+            {row.authorAssistant.user?.name || "조교"}
           </span>
         );
       }

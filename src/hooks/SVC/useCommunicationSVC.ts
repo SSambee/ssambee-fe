@@ -134,6 +134,22 @@ export const useInstructorPostCommentMutationsSVC = () => {
   };
 };
 
+// 문의 등록 시 지정 강의 목록 조회
+export const useGetLecturesTargetSVC = () => {
+  return useQuery({
+    queryKey: ["lectures"],
+    queryFn: () => myPostServiceSVC.getLecturesSVC(),
+  });
+};
+
+// 학부모용 자녀 조회
+export const useGetMyChildrenSVC = () => {
+  return useQuery({
+    queryKey: ["myChildren"],
+    queryFn: () => myPostServiceSVC.getMyChildrenSVC(),
+  });
+};
+
 // 문의 목록 조회
 export const useStudentPostsSVC = (
   params: CommonPostQuery,
@@ -159,27 +175,32 @@ export const useStudentPostDetailSVC = (
   });
 };
 
-// 학생/학부모 문의 생성
+// 학생 문의 생성
 export const useCreateStudentPostSVC = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      payload: CreateStudentPostRequest | CreateStudentParentPostRequest
-    ) => {
-      // payload에 childLinkId가 있으면 학부모용 서비스 호출
-      if ("childLinkId" in payload) {
-        return myPostServiceSVC.createStudentParentPostSVC(payload);
-      }
-      return myPostServiceSVC.createStudentPostSVC(payload);
-    },
+    mutationFn: (payload: CreateStudentPostRequest) =>
+      myPostServiceSVC.createStudentPostSVC(payload),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["studentPosts"],
-          refetchType: "active",
-        }),
-      ]);
+      await queryClient.invalidateQueries({ queryKey: ["studentPosts"] });
+      alert("문의가 등록되었습니다.");
+    },
+    onError: () => {
+      alert("문의 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+    },
+  });
+};
+
+// 학부모 문의 생성
+export const useCreateParentPostSVC = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateStudentParentPostRequest) =>
+      myPostServiceSVC.createStudentParentPostSVC(payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["studentPosts"] });
       alert("문의가 등록되었습니다.");
     },
     onError: () => {
@@ -334,7 +355,7 @@ export const useStudentPostCommentMutationsSVC = () => {
     }: {
       postId: string;
       commentId: string;
-    }) => myPostServiceSVC.deleteStudentPostComment(postId, commentId),
+    }) => myPostServiceSVC.deleteStudentPostCommentSVC(postId, commentId),
     onSuccess: async (_, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({

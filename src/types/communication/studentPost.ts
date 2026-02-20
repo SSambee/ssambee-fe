@@ -12,6 +12,29 @@ export type UpdateStudentPostStatusRequest = {
   status: AnswerStatus;
 };
 
+// 문의 등록 시 지정 강의 목록 조회
+export type GetLecturesResponse = {
+  lectures: {
+    id: string;
+    title: string;
+    instructorId: string;
+    lectureTimes: {
+      id: string;
+      lectureId: string;
+      day: string;
+      startTime: string;
+      endTime: string;
+    }[];
+  }[];
+};
+
+// 학부모용 자녀 조회
+export type ChildInfo = {
+  id: string;
+  name: string;
+};
+export type GetMyChildrenResponse = ChildInfo[];
+
 // 학생 문의 생성
 export type CreateStudentPostRequest = {
   title: string;

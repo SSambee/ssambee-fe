@@ -16,6 +16,8 @@ import {
   CreateStudentPostRequest,
   CreateStudentParentPostRequest,
   UpdateStudentPostRequest,
+  GetLecturesResponse,
+  GetMyChildrenResponse,
 } from "@/types/communication/studentPost";
 import { UpdateStudentPostStatusRequest } from "@/types/communication/studentPost";
 
@@ -73,11 +75,26 @@ export const instructorPostServiceSVC = {
 };
 
 export const myPostServiceSVC = {
+  // 문의 등록 시 지정 강의 목록 조회
+  getLecturesSVC: async () => {
+    const { data } = await axiosClientSVC.get<ApiResponse<GetLecturesResponse>>(
+      "/student-posts/my-lectures"
+    );
+    return data.data.lectures;
+  },
+
   // 학생용 문의 생성
   createStudentPostSVC: async (payload: CreateStudentPostRequest) => {
     const { data } = await axiosClientSVC.post<
       ApiResponse<GetStudentPostDetailResponse>
     >("/student-posts", payload);
+    return data.data;
+  },
+
+  //학부모용 자녀 조회
+  getMyChildrenSVC: async () => {
+    const { data } =
+      await axiosClientSVC.get<ApiResponse<GetMyChildrenResponse>>("/children");
     return data.data;
   },
 
@@ -165,7 +182,7 @@ export const myPostServiceSVC = {
   },
 
   // 내 문의 댓글 삭제
-  deleteStudentPostComment: async (postId: string, commentId: string) => {
+  deleteStudentPostCommentSVC: async (postId: string, commentId: string) => {
     const { data } = await axiosClientSVC.delete<
       ApiResponse<CommonPostComment>
     >(`/student-posts/${postId}/comments/${commentId}`);

@@ -25,7 +25,9 @@ export default function CommunicationDetailPageSVC() {
   const params = useParams();
   const searchParams = useSearchParams();
   const communicationId = params.communicationId as string;
-  const type = searchParams.get("type") as "notice" | "inquiry";
+  const typeParam = searchParams.get("type");
+  const type: "notice" | "inquiry" =
+    typeParam === "notice" ? "notice" : "inquiry";
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isNoticePost = type === "notice";
@@ -215,10 +217,12 @@ export default function CommunicationDetailPageSVC() {
   ) => {
     const { material } = file;
     if (material.type === "VIDEO" && material.fileUrl) {
-      window.open(material.fileUrl ?? "", "_blank");
+      window.open(material.fileUrl, "_blank");
       return;
     }
-    downloadMaterial(material.id ?? "");
+    if (material.id) {
+      downloadMaterial(material.id);
+    }
   };
 
   return (
