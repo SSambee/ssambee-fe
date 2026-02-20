@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import TiptapEditor from "@/components/common/editor/TiptapEditor";
 import { GetInstructorPostDetailResponse } from "@/types/communication/instructorPost";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
+import { CommonPostAttachment } from "@/types/communication/commonPost";
 
 type PostContentProps = {
   isEditing: boolean;
@@ -19,9 +20,7 @@ type PostContentProps = {
     | GetInstructorPostDetailResponse
     | GetStudentPostDetailResponse
     | undefined;
-  handleAttachmentClick: (
-    file: NonNullable<GetStudentPostDetailResponse["attachments"]>[number]
-  ) => void;
+  handleAttachmentClick: (file: CommonPostAttachment) => void;
 };
 
 export default function PostContent({
@@ -79,33 +78,24 @@ export default function PostContent({
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {currentData?.attachments?.map(
-                      (
-                        file: NonNullable<
-                          GetStudentPostDetailResponse["attachments"]
-                        >[number]
-                      ) => (
-                        <div
-                          key={file.material.id}
-                          className="group flex items-center justify-between p-3 rounded-xl border bg-slate-50/50 hover:bg-white hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer"
-                          onClick={() => handleAttachmentClick(file)}
-                        >
-                          <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="p-2 bg-white rounded-lg border group-hover:border-blue-100">
-                              <FileText className="h-5 w-5 text-blue-500" />
-                            </div>
-                            <div className="flex flex-col overflow-hidden">
-                              <span className="text-sm font-medium truncate">
-                                {file.material.title}{" "}
-                                <span className="text-xs text-slate-400">
-                                  | {file.material.type}
-                                </span>
-                              </span>
-                            </div>
+                    {currentData?.attachments?.map((file) => (
+                      <div
+                        key={file.id} // file.material.id -> file.id
+                        className="group flex items-center justify-between p-3 rounded-xl border bg-slate-50/50 hover:bg-white hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer"
+                        onClick={() => handleAttachmentClick(file)}
+                      >
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <div className="p-2 bg-white rounded-lg border group-hover:border-blue-100">
+                            <FileText className="h-5 w-5 text-blue-500" />
+                          </div>
+                          <div className="flex flex-col overflow-hidden">
+                            <span className="text-sm font-medium truncate">
+                              {file.filename}
+                            </span>
                           </div>
                         </div>
-                      )
-                    )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

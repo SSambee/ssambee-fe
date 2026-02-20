@@ -5,7 +5,6 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 
 import Title from "@/components/common/header/Title";
 import { useDownloadMaterial } from "@/hooks/useMaterials";
-import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import {
   useInstructorPostCommentMutationsSVC,
   useInstructorPostDetailSVC,
@@ -14,6 +13,7 @@ import {
   useUpdateStudentPostStatusSVC,
 } from "@/hooks/SVC/useCommunicationSVC";
 import { useStudentPostDetailSVC } from "@/hooks/SVC/useCommunicationSVC";
+import { CommonPostAttachment } from "@/types/communication/commonPost";
 
 import PostActionSVC from "./_components/PostActionSVC";
 import PostInfoSVC from "./_components/PostInfoSVC";
@@ -56,7 +56,7 @@ export default function CommunicationDetailPageSVC() {
   const updateStatusSVC = useUpdateStudentPostStatusSVC();
 
   // 자료 다운로드
-  const { mutate: downloadMaterial } = useDownloadMaterial();
+  const { mutate: downloadMaterial } = useDownloadMaterial("LEARNERS");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -212,17 +212,16 @@ export default function CommunicationDetailPageSVC() {
   };
 
   // 자료 다운로드
-  const handleAttachmentClick = (
-    file: NonNullable<GetStudentPostDetailResponse["attachments"]>[number]
-  ) => {
-    const { material } = file;
-    if (material.type === "VIDEO" && material.fileUrl) {
-      window.open(material.fileUrl, "_blank");
+  const handleAttachmentClick = (file: CommonPostAttachment) => {
+    const isVideo =
+      file.fileUrl?.includes("youtube.com") ||
+      file.fileUrl?.includes("youtu.be");
+
+    if (isVideo) {
+      window.open(file.fileUrl, "_blank");
       return;
     }
-    if (material.id) {
-      downloadMaterial(material.id);
-    }
+    downloadMaterial(file.materialId ?? "");
   };
 
   return (

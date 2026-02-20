@@ -1,6 +1,4 @@
-import { MaterialsType } from "../materials.type";
-
-import { PaginationType } from "./commonPost";
+import { CommonPostAttachment, PaginationType } from "./commonPost";
 import { CommonPostComment } from "./commonPost";
 
 export type InquiryWriterType = "STUDENT" | "PARENT"; // 문의 작성자
@@ -89,17 +87,7 @@ export type GetStudentPostDetailResponse = {
     studentName: string;
   };
   comments?: CommonPostComment[];
-  attachments?: {
-    id: string;
-    materialId: string;
-    material: {
-      id: string;
-      title: string;
-      fileUrl: string | null;
-      type: MaterialsType;
-      externalDownloadUrl: string | null;
-    };
-  }[];
+  attachments?: CommonPostAttachment[];
 };
 
 // 학생 문의 상세 댓글

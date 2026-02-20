@@ -91,13 +91,17 @@ export const useMaterialDetail = (id: string) => {
 };
 
 // 자료 다운로드
-export const useDownloadMaterial = () => {
+type DownloadRole = "EDUCATORS" | "LEARNERS";
+
+export const useDownloadMaterial = (role: DownloadRole) => {
   return useMutation({
-    mutationFn: (materialsId: string) =>
-      materialsService.getDownloadUrl(materialsId),
+    mutationFn: (materialsId: string) => {
+      return role === "EDUCATORS"
+        ? materialsService.getDownloadUrl(materialsId)
+        : materialsService.getStudentDownloadUrl(materialsId);
+    },
     onSuccess: (response) => {
-      // 서버 응답 구조가 { status, data: { url, type }, message } 이므로
-      // response.data에서 추출해야 합니다.
+      // 서버 응답 구조 { status, data: { url, type }, message }
       const { url, type } = response.data;
 
       if (!url) {

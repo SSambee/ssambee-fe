@@ -54,5 +54,14 @@ export type CommonPostComment = {
     appStudentId: string;
     appParentLink: string;
   };
-  attachments?: [];
+  attachments?: CommonPostAttachment[];
+};
+
+export type CommonPostAttachment = {
+  id: string;
+  filename: string;
+  fileUrl: string;
+  materialId?: string;
+  studentPostId?: string | null;
+  createdAt: string;
 };

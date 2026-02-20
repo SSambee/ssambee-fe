@@ -1,6 +1,10 @@
 import { MaterialsType } from "../materials.type";
 
-import { CommonPostComment, PaginationType } from "./commonPost";
+import {
+  CommonPostAttachment,
+  CommonPostComment,
+  PaginationType,
+} from "./commonPost";
 
 export type PostType = "NOTICE" | "SHARE"; // 게시글 분류
 export type PostScope = "GLOBAL" | "LECTURE" | "SELECTED"; // 강사 게시글 스코프
@@ -109,17 +113,7 @@ export type GetInstructorPostDetailResponse = {
   authorAssistant: {
     user: { name: string };
   } | null;
-  attachments?: {
-    id: string;
-    materialId: string;
-    material: {
-      id: string;
-      title: string;
-      fileUrl: string | null;
-      type: MaterialsType;
-      externalDownloadUrl: string | null;
-    };
-  }[];
+  attachments?: CommonPostAttachment[];
   targets: {
     id: string;
     enrollmentId: string;

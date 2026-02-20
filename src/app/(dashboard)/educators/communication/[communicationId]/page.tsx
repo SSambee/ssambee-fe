@@ -12,7 +12,7 @@ import {
   useStudentPostDetail,
 } from "@/hooks/useInstructorPost";
 import { useDownloadMaterial } from "@/hooks/useMaterials";
-import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
+import { CommonPostAttachment } from "@/types/communication/commonPost";
 
 import PostInfo from "./_components/PostInfo";
 import PostContent from "./_components/PostContent";
@@ -51,7 +51,7 @@ export default function CommunicationDetailPage() {
     deleteStudentPostCommentMutation,
   } = useStudentPostMutations();
   // 자료 다운로드
-  const { mutate: downloadMaterial } = useDownloadMaterial();
+  const { mutate: downloadMaterial } = useDownloadMaterial("EDUCATORS");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
@@ -192,15 +192,16 @@ export default function CommunicationDetailPage() {
   };
 
   // 자료 다운로드
-  const handleAttachmentClick = (
-    file: NonNullable<GetStudentPostDetailResponse["attachments"]>[number]
-  ) => {
-    const { material } = file;
-    if (material.type === "VIDEO" && material.fileUrl) {
-      window.open(material.fileUrl ?? "", "_blank");
+  const handleAttachmentClick = (file: CommonPostAttachment) => {
+    const isVideo =
+      file.fileUrl?.includes("youtube.com") ||
+      file.fileUrl?.includes("youtu.be");
+
+    if (isVideo) {
+      window.open(file.fileUrl, "_blank");
       return;
     }
-    downloadMaterial(material.id ?? "");
+    downloadMaterial(file.materialId ?? "");
   };
 
   return (
