@@ -4,7 +4,7 @@ import { Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function PendingApprovalPage() {
-  const { signout } = useAuth();
+  const { signout, loading } = useAuth();
 
   const handleSignOut = async () => {
     await signout("MGMT");
@@ -26,9 +26,10 @@ export default function PendingApprovalPage() {
         </p>
         <button
           onClick={handleSignOut}
+          disabled={loading}
           className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-[14px] bg-[#4B72F7] py-4 text-[17px] font-bold text-white transition-all hover:bg-[#3859D4] active:scale-[0.98] disabled:bg-[#4B72F7]/50 cursor-pointer"
         >
-          로그아웃
+          {loading ? "로그아웃 중..." : "로그아웃"}
         </button>
       </div>
     </div>

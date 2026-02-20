@@ -42,7 +42,7 @@ export default function ParentPhoneForm() {
       {...register("parentPhoneNumber", {
         onChange: (e) => {
           const formatted = phoneNumberFormatter(e.target.value);
-          setValue("parentPhoneNumber", formatted);
+          setValue("parentPhoneNumber", formatted, { shouldValidate: true });
         },
       })}
       showReset={!!parentPhoneNumber}

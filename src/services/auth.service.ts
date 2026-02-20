@@ -51,7 +51,7 @@ export const verifyEmailAPI = async (email: string) => {
     );
 
     return {
-      success: data?.data?.isValid,
+      success: !!data?.data?.isValid,
       message: data?.message ?? "사용 가능한 이메일입니다.",
     };
   } catch (error) {

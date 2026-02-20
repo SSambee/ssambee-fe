@@ -47,7 +47,7 @@ async function getCookieHeader(): Promise<string> {
 //서버 컴포넌트에서 세션 정보 가져오기 (MGMT: 강사/조교, SVC: 학생/학부모)
 export async function getServerSession(
   role: "MGMT" | "SVC" = "MGMT"
-): Promise<(SessionUser & { profile: SessionProfile }) | null> {
+): Promise<(SessionUser & { profile?: SessionProfile }) | null> {
   try {
     const baseURL = role === "MGMT" ? API_BASE_URL : API_BASE_URL_SVC;
     const cookieHeader = await getCookieHeader();
@@ -102,7 +102,7 @@ export async function requireAuthWithRole(options: {
   allowedRoles: Role[];
   role: "MGMT" | "SVC";
   fallbackPath: string;
-}): Promise<SessionUser & { profile: SessionProfile }> {
+}): Promise<SessionUser & { profile?: SessionProfile | null }> {
   const { loginPath, allowedRoles, role, fallbackPath } = options;
 
   // 쿠키 체크
