@@ -1,4 +1,4 @@
-import { Paperclip } from "lucide-react";
+import { Paperclip, X } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -53,21 +53,22 @@ export default function CreateContentSVC({
           />
         </div>
         {attachment && (
-          <div className="flex items-center justify-between p-3 bg-slate-50 border border-dashed border-slate-200 rounded-lg">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="text-blue-600 font-medium">
-                <Paperclip className="h-4 w-4" />
-              </span>
-              <span className="text-sm text-slate-600 truncate">
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="p-2 bg-white rounded-lg border shadow-sm shrink-0">
+                <Paperclip className="h-5 w-5 text-blue-500" />
+              </div>
+              <span className="text-sm font-medium text-slate-700 truncate max-w-[300px]">
                 {attachment.name}
               </span>
             </div>
-            <button
+            <Button
+              variant="outline"
               onClick={() => setAttachment(undefined)}
-              className="text-xs text-red-500 hover:underline ml-4"
+              className="h-8 w-8 p-0 border-slate-200 hover:text-red-500 hover:bg-red-50 transition-colors"
             >
-              삭제
-            </button>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         )}
 

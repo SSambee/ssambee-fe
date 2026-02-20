@@ -170,7 +170,7 @@ export default function RequestTypeForm({
                     구글 드라이브 링크
                   </label>
                   <div className="border rounded-lg p-3 bg-blue-50 border-blue-100 flex items-center justify-between">
-                    <span className="text-sm text-blue-700 truncate mr-4">
+                    <span className="text-sm truncate mr-4">
                       {initialData.externalDownloadUrl}
                     </span>
                     <a

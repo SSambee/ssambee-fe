@@ -7,8 +7,10 @@ import TiptapEditor from "@/components/common/editor/TiptapEditor";
 import { GetInstructorPostDetailResponse } from "@/types/communication/instructorPost";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import { CommonPostAttachment } from "@/types/communication/commonPost";
+import { decodeUtf8 } from "@/utils/decodeUtf";
 
 type PostContentSVCProps = {
+  isNoticePost: boolean;
   isEditing: boolean;
   editTitle: string;
   setEditTitle: (val: string) => void;
@@ -24,6 +26,7 @@ type PostContentSVCProps = {
 };
 
 export default function PostContentSVC({
+  isNoticePost,
   isEditing,
   editTitle,
   setEditTitle,
@@ -69,7 +72,7 @@ export default function PostContentSVC({
             </div>
             {!!currentData?.attachments?.length &&
               currentData.attachments.length > 0 && (
-                <div className="mt-8 pt-6 border-t">
+                <div className="mt-24 pt-6 border-t">
                   <div className="flex items-center gap-2 mb-4">
                     <Paperclip className="h-4 w-4 text-blue-600" />
                     <span className="font-semibold text-sm">첨부된 자료</span>
@@ -90,7 +93,9 @@ export default function PostContentSVC({
                           </div>
                           <div className="flex flex-col overflow-hidden">
                             <span className="text-sm font-medium truncate">
-                              {file.filename}
+                              {isNoticePost
+                                ? file.filename
+                                : decodeUtf8(file.filename)}
                             </span>
                           </div>
                         </div>

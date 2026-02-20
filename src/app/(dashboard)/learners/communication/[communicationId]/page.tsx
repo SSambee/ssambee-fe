@@ -262,6 +262,7 @@ export default function CommunicationDetailPageSVC() {
 
         <div className="lg:col-span-2 lg:order-1 space-y-6">
           <PostContentSVC
+            isNoticePost={isNoticePost}
             isEditing={isEditing}
             editTitle={editTitle}
             setEditTitle={setEditTitle}

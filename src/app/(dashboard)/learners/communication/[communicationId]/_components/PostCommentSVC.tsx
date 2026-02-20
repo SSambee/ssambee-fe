@@ -113,7 +113,7 @@ export default function PostCommentSVC({
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                {!isNoticePost && (
+                {/* {!isNoticePost && (
                   <Button
                     type="button"
                     variant="outline"
@@ -123,7 +123,7 @@ export default function PostCommentSVC({
                     <Paperclip className="h-4 w-4" />
                     {selectedFile ? "파일 변경" : "파일 첨부"}
                   </Button>
-                )}
+                )} */}
               </div>
               <Button
                 onClick={handleSubmitAnswer}

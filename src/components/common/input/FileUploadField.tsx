@@ -5,6 +5,7 @@ import { X, Upload } from "lucide-react";
 import Image from "next/image";
 
 import { cn } from "@/lib/utils";
+import { decodeUtf8 } from "@/utils/decodeUtf";
 
 type FileUploadFieldProps = {
   label: string;
@@ -61,13 +62,8 @@ export default function FileUploadField({
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                {file ? file.name : "기존 이미지"}
+                {file ? decodeUtf8(file.name) : "기존 이미지"}
               </p>
-              {file && (
-                <p className="text-xs text-gray-500">
-                  {(file.size / 1024).toFixed(2)} KB
-                </p>
-              )}
             </div>
             <button
               type="button"
