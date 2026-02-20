@@ -1,6 +1,9 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
+
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 import { useModal } from "@/providers/ModalProvider";
 import { useMyLearnerProfile } from "@/hooks/profile/useMyLearnerProfile";
 import type { LearnersProfileUpdateFormData } from "@/validation/learners-profile.validation";
@@ -18,6 +21,54 @@ export default function LearnersProfilePage() {
   const { openModal, closeModal } = useModal();
   const { profile, isPending, isError, updateProfile, isUpdating } =
     useMyLearnerProfile();
+  const { showAlert } = useDialogAlert();
+
+  const profileRef = useRef(profile);
+  const isUpdatingRef = useRef(isUpdating);
+  const updateProfileRef = useRef(updateProfile);
+  const closeModalRef = useRef(closeModal);
+  const showAlertRef = useRef(showAlert);
+
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
+
+  useEffect(() => {
+    isUpdatingRef.current = isUpdating;
+  }, [isUpdating]);
+
+  useEffect(() => {
+    updateProfileRef.current = updateProfile;
+  }, [updateProfile]);
+
+  useEffect(() => {
+    closeModalRef.current = closeModal;
+  }, [closeModal]);
+
+  useEffect(() => {
+    showAlertRef.current = showAlert;
+  }, [showAlert]);
+
+  const handleProfileUpdate = useCallback(
+    async (data: LearnersProfileUpdateFormData) => {
+      if (!profileRef.current || isUpdatingRef.current) return;
+
+      try {
+        await updateProfileRef.current(data);
+        closeModalRef.current();
+      } catch (error) {
+        const normalizedError =
+          error instanceof Error ? error : new Error(String(error));
+        console.error("프로필 업데이트 실패:", normalizedError.message);
+
+        await showAlertRef.current({
+          title: "오류",
+          description: `프로필 업데이트에 실패했습니다. ${normalizedError.message}`,
+        });
+      }
+    },
+    []
+  );
 
   const handleEditClick = () => {
     if (!profile) return;
@@ -40,20 +91,6 @@ export default function LearnersProfilePage() {
     if (!profile) return;
 
     openModal(<PhoneChangeModal currentPhone={profile.phone} />);
-  };
-
-  const handleProfileUpdate = (data: LearnersProfileUpdateFormData) => {
-    if (!profile || isUpdating) return;
-
-    updateProfile(data)
-      .then(() => {
-        closeModal();
-      })
-      .catch((error) => {
-        const normalizedError =
-          error instanceof Error ? error : new Error(String(error));
-        console.error("프로필 업데이트 실패:", normalizedError.message);
-      });
   };
 
   if (isError) {
