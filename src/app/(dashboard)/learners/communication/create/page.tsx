@@ -9,6 +9,7 @@ import Title from "@/components/common/header/Title";
 import {
   useCreateParentPostSVC,
   useCreateStudentPostSVC,
+  useGetMyChildrenSVC,
 } from "@/hooks/SVC/useCommunicationSVC";
 import { AuthorRole } from "@/types/communication/studentPost";
 import { useAuthContext } from "@/providers/AuthProvider";
@@ -31,6 +32,10 @@ export default function CreateInquiryPostPageSVC() {
   // 유저 정보에 따른 작성자 역할 고정
   const authorRole: AuthorRole =
     user?.userType === "PARENT" ? "PARENT" : "STUDENT";
+
+  const { data: myChildren } = useGetMyChildrenSVC();
+
+  const effectiveChildId = myChildren?.[0]?.id || "";
 
   // 게시글 등록
   const handleSubmit = () => {
@@ -64,7 +69,7 @@ export default function CreateInquiryPostPageSVC() {
       parentMutation.mutate(
         {
           ...baseData,
-          childLinkId: "linked-child-id", // TODO: 추가하기
+          childLinkId: authorRole === "PARENT" ? effectiveChildId : "",
         },
         onSuccessAction
       );

@@ -142,6 +142,14 @@ export const useGetLecturesTargetSVC = () => {
   });
 };
 
+// 학부모용 자녀 조회
+export const useGetMyChildrenSVC = () => {
+  return useQuery({
+    queryKey: ["myChildren"],
+    queryFn: () => myPostServiceSVC.getMyChildrenSVC(),
+  });
+};
+
 // 문의 목록 조회
 export const useStudentPostsSVC = (
   params: CommonPostQuery,

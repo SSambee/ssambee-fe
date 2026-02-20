@@ -17,6 +17,7 @@ import {
   CreateStudentParentPostRequest,
   UpdateStudentPostRequest,
   GetLecturesResponse,
+  GetMyChildrenResponse,
 } from "@/types/communication/studentPost";
 import { UpdateStudentPostStatusRequest } from "@/types/communication/studentPost";
 
@@ -87,6 +88,13 @@ export const myPostServiceSVC = {
     const { data } = await axiosClientSVC.post<
       ApiResponse<GetStudentPostDetailResponse>
     >("/student-posts", payload);
+    return data.data;
+  },
+
+  //학부모용 자녀 조회
+  getMyChildrenSVC: async () => {
+    const { data } =
+      await axiosClientSVC.get<ApiResponse<GetMyChildrenResponse>>("/children");
     return data.data;
   },
 

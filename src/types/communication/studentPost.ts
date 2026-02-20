@@ -28,6 +28,13 @@ export type GetLecturesResponse = {
   }[];
 };
 
+// 학부모용 자녀 조회
+export type ChildInfo = {
+  id: string;
+  name: string;
+};
+export type GetMyChildrenResponse = ChildInfo[];
+
 // 학생 문의 생성
 export type CreateStudentPostRequest = {
   title: string;
