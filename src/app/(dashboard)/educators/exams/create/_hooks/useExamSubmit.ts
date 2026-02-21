@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import type { UseFormReturn } from "react-hook-form";
 
 import { useCreateExam } from "@/hooks/exams/useCreateExam";
@@ -24,10 +25,13 @@ export const useExamSubmit = ({
   selectedExamId,
   activeLectureId,
 }: UseExamSubmitParams) => {
+  const router = useRouter();
   const { showAlert } = useDialogAlert();
 
   const createExamMutation = useCreateExam({
-    onSuccess: () => {},
+    onSuccess: () => {
+      router.push("/educators/exams");
+    },
     onError: (error) => {
       if (error.message.includes("문번은 중복")) {
         form.setError("questions", { message: error.message });
@@ -40,7 +44,9 @@ export const useExamSubmit = ({
   });
 
   const updateExamMutation = useUpdateExam({
-    onSuccess: () => {},
+    onSuccess: () => {
+      router.push("/educators/exams");
+    },
     onError: (error) => {
       if (error.message.includes("문번은 중복")) {
         form.setError("questions", { message: error.message });

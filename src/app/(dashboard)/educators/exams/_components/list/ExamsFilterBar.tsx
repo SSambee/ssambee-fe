@@ -21,10 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Lecture } from "@/types/lectures";
+
 import type {
   ExamsSortOrder,
   ExamsStatusFilter,
-} from "@/app/(dashboard)/educators/exams/_hooks/useExamsListState";
+} from "../../_hooks/useExamsListState";
 
 type ExamsFilterBarProps = {
   statusFilter: ExamsStatusFilter;

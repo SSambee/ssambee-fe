@@ -1,10 +1,11 @@
 "use client";
 
-import { ExamsHeader } from "@/app/(dashboard)/educators/exams/_components/ExamsHeader";
-import { ExamsStats } from "@/app/(dashboard)/educators/exams/_components/ExamsStats";
-import { ExamsList } from "@/app/(dashboard)/educators/exams/_components/ExamsList";
-import { useExamsPage } from "@/app/(dashboard)/educators/exams/_hooks/useExamsPage";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
+
+import { ExamsHeader } from "./_components/ExamsHeader";
+import { ExamsStats } from "./_components/ExamsStats";
+import { ExamsList } from "./_components/ExamsList";
+import { useExamsPage } from "./_hooks/useExamsPage";
 
 export default function ExamsPage() {
   useSetBreadcrumb([{ label: "시험 관리" }]);

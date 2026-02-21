@@ -1,13 +1,14 @@
 "use client";
 
 import Title from "@/components/common/header/Title";
-import { ExamSelectionSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamSelectionSection";
-import { ExamInfoSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamInfoSection";
-import { ExamScoreSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamScoreSection";
-import { ExamQuestionsSection } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamQuestionsSection";
-import { ExamStickyFooter } from "@/app/(dashboard)/educators/exams/create/_components/create/ExamStickyFooter";
-import { useExamCreateForm } from "@/app/(dashboard)/educators/exams/create/_hooks/useExamCreateForm";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
+
+import { ExamSelectionSection } from "./_components/create/ExamSelectionSection";
+import { ExamInfoSection } from "./_components/create/ExamInfoSection";
+import { ExamScoreSection } from "./_components/create/ExamScoreSection";
+import { ExamQuestionsSection } from "./_components/create/ExamQuestionsSection";
+import { ExamStickyFooter } from "./_components/create/ExamStickyFooter";
+import { useExamCreateForm } from "./_hooks/useExamCreateForm";
 
 export default function CreateExamPage() {
   useSetBreadcrumb([

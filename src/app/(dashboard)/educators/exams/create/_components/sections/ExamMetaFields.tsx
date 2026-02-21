@@ -56,7 +56,7 @@ export function ExamMetaFields({
         >
           과목 <span className="text-red-500">*</span>
         </label>
-        {/* TODO: Select는 blur 이벤트가 없어 onOpenChange에서 닫힐 때 field.onBlur() 호출 필요 (blur 검증/포커스 관리) */}
+        {/* TODO새: Select는 blur 이벤트가 없어 onOpenChange에서 닫힐 때 field.onBlur() 호출 필요 (blur 검증/포커스 관리) */}
         <Controller
           name="subject"
           control={control}

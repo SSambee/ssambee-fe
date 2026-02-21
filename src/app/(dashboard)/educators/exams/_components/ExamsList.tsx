@@ -2,7 +2,8 @@
 
 import type { Exam } from "@/types/exams";
 import type { Lecture } from "@/types/lectures";
-import { useExamsListState } from "@/app/(dashboard)/educators/exams/_hooks/useExamsListState";
+
+import { useExamsListState } from "../_hooks/useExamsListState";
 
 import { ExamsFilterBar } from "./list/ExamsFilterBar";
 import { ExamsPaginationBar } from "./list/ExamsPaginationBar";
