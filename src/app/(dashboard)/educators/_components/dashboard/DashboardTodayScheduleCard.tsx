@@ -25,7 +25,10 @@ export function DashboardTodayScheduleCard({
         </div>
         <Button
           variant={null}
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+          disabled
+          aria-label="더보기 (준비 중)"
+          title="준비 중인 기능입니다"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
