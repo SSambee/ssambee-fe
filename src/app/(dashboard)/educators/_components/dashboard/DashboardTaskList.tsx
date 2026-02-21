@@ -9,6 +9,12 @@ type DashboardTaskListProps = {
   tasks: DashboardTask[];
 };
 
+const statusBadgeClasses: Record<DashboardTask["status"], string> = {
+  "진행 중": "bg-[#fef3c7] text-[#d97706]",
+  대기: "bg-[#f1f5f9] text-[#64748b]",
+  완료: "bg-[#dcfce7] text-[#16a34a]",
+};
+
 export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
   return (
     <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
@@ -23,7 +29,10 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
         </div>
         <Button
           variant={null}
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+          disabled
+          aria-label="더보기 (준비 중)"
+          title="준비 중인 기능입니다"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
@@ -46,7 +55,8 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
                 </div>
                 <span
                   className={cn(
-                    "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold bg-[#dcfce7] text-[#16a34a]"
+                    "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold",
+                    statusBadgeClasses[task.status]
                   )}
                 >
                   {task.status}
