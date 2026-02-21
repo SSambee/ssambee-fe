@@ -1,5 +1,7 @@
 "use client";
 
+import { useCallback } from "react";
+
 import type { GradingStudent } from "@/types/grading";
 import type { SubmitGradingPayload } from "@/types/grades";
 import { resolveAnswers, saveDraft } from "@/utils/grading-answers";
@@ -33,121 +35,151 @@ export const useGradingAnswersActions = ({
   >;
   resources: GradingAnswersResources;
 }) => {
-  const updateAnswersForStudent = (
-    studentId: string,
-    updater: (current: AnswerState[]) => AnswerState[]
-  ) => {
-    state.setAnswerOverridesByStudent((prev) => {
-      const current = resolveAnswers(
-        studentId,
-        prev,
-        baseAnswersByStudent,
-        defaultAnswers
+  const {
+    selectedAnswers,
+    currentScore,
+    correctCount,
+    setAnswerOverridesByStudent,
+    setEditingByStudent,
+    setStudentOverrides,
+  } = state;
+  const { submitGradingMutation, completeGradingMutation } = resources;
+
+  const updateAnswersForStudent = useCallback(
+    (studentId: string, updater: (current: AnswerState[]) => AnswerState[]) => {
+      setAnswerOverridesByStudent((prev) => {
+        const current = resolveAnswers(
+          studentId,
+          prev,
+          baseAnswersByStudent,
+          defaultAnswers
+        );
+        const next = updater(current);
+        return { ...prev, [studentId]: next };
+      });
+    },
+    [baseAnswersByStudent, defaultAnswers, setAnswerOverridesByStudent]
+  );
+
+  const handleSelectObjectiveAnswer = useCallback(
+    (questionNumber: number, answer: number) => {
+      if (!activeStudentId) return;
+      const question = questionMetaMap.get(questionNumber);
+      const correctAnswer = question?.correctAnswer ?? "";
+      const submittedAnswer = String(answer);
+      const isCorrect = submittedAnswer === String(correctAnswer);
+
+      updateAnswersForStudent(activeStudentId, (current) =>
+        current.map((item) =>
+          item.questionNumber === questionNumber
+            ? { ...item, submittedAnswer, isCorrect }
+            : item
+        )
       );
-      const next = updater(current);
-      return { ...prev, [studentId]: next };
-    });
-  };
+    },
+    [activeStudentId, questionMetaMap, updateAnswersForStudent]
+  );
 
-  const handleSelectObjectiveAnswer = (
-    questionNumber: number,
-    answer: number
-  ) => {
+  const handleEssayAnswerChange = useCallback(
+    (questionNumber: number, value: string) => {
+      if (!activeStudentId) return;
+      updateAnswersForStudent(activeStudentId, (current) =>
+        current.map((item) =>
+          item.questionNumber === questionNumber
+            ? {
+                ...item,
+                submittedAnswer: value,
+                isCorrect: value.trim().length === 0 ? false : item.isCorrect,
+              }
+            : item
+        )
+      );
+    },
+    [activeStudentId, updateAnswersForStudent]
+  );
+
+  const handleEssayCorrectChange = useCallback(
+    (questionNumber: number, isCorrect: boolean) => {
+      if (!activeStudentId) return;
+      updateAnswersForStudent(activeStudentId, (current) =>
+        current.map((item) =>
+          item.questionNumber === questionNumber ? { ...item, isCorrect } : item
+        )
+      );
+    },
+    [activeStudentId, updateAnswersForStudent]
+  );
+
+  const triggerSave = useCallback(
+    (onSuccess?: () => void) => {
+      if (!activeStudentId || selectedAnswers.length === 0) return;
+      const answersPayload = selectedAnswers.map((answer) => ({
+        questionNumber: answer.questionNumber,
+        submittedAnswer: answer.submittedAnswer,
+        isCorrect: answer.isCorrect,
+      }));
+
+      const payload: SubmitGradingPayload = {
+        lectureEnrollmentId: activeStudentId,
+        answers: answersPayload,
+        totalScore: currentScore,
+        correctCount,
+      };
+
+      submitGradingMutation.mutate(
+        { examId, payload },
+        {
+          onSuccess: () => {
+            onSuccess?.();
+          },
+        }
+      );
+    },
+    [
+      activeStudentId,
+      correctCount,
+      currentScore,
+      examId,
+      selectedAnswers,
+      submitGradingMutation,
+    ]
+  );
+
+  const triggerTempSave = useCallback(() => {
     if (!activeStudentId) return;
-    const question = questionMetaMap.get(questionNumber);
-    const correctAnswer = question?.correctAnswer ?? "";
-    const submittedAnswer = String(answer);
-    const isCorrect = submittedAnswer === String(correctAnswer);
-
-    updateAnswersForStudent(activeStudentId, (current) =>
-      current.map((item) =>
-        item.questionNumber === questionNumber
-          ? { ...item, submittedAnswer, isCorrect }
-          : item
-      )
-    );
-  };
-
-  const handleEssayAnswerChange = (questionNumber: number, value: string) => {
-    if (!activeStudentId) return;
-    updateAnswersForStudent(activeStudentId, (current) =>
-      current.map((item) =>
-        item.questionNumber === questionNumber
-          ? {
-              ...item,
-              submittedAnswer: value,
-              isCorrect: value.trim().length === 0 ? false : item.isCorrect,
-            }
-          : item
-      )
-    );
-  };
-
-  const handleEssayCorrectChange = (
-    questionNumber: number,
-    isCorrect: boolean
-  ) => {
-    if (!activeStudentId) return;
-    updateAnswersForStudent(activeStudentId, (current) =>
-      current.map((item) =>
-        item.questionNumber === questionNumber ? { ...item, isCorrect } : item
-      )
-    );
-  };
-
-  const triggerSave = (onSuccess?: () => void) => {
-    if (!activeStudentId || state.selectedAnswers.length === 0) return;
-    const answersPayload = state.selectedAnswers.map((answer) => ({
-      questionNumber: answer.questionNumber,
-      submittedAnswer: answer.submittedAnswer,
-      isCorrect: answer.isCorrect,
-    }));
-
-    const payload: SubmitGradingPayload = {
-      lectureEnrollmentId: activeStudentId,
-      answers: answersPayload,
-      totalScore: state.currentScore,
-      correctCount: state.correctCount,
-    };
-
-    resources.submitGradingMutation.mutate(
-      { examId, payload },
-      {
-        onSuccess: () => {
-          onSuccess?.();
-        },
-      }
-    );
-  };
-
-  const triggerTempSave = () => {
-    if (!activeStudentId) return;
-    saveDraft(examId, activeStudentId, state.selectedAnswers);
-    state.setEditingByStudent((prev) => ({
+    saveDraft(examId, activeStudentId, selectedAnswers);
+    setEditingByStudent((prev) => ({
       ...prev,
       [activeStudentId]: true,
     }));
-    state.setStudentOverrides((prev) => ({
+    setStudentOverrides((prev) => ({
       ...prev,
       [activeStudentId]: {
         ...(prev[activeStudentId] ?? ({} as Partial<GradingStudent>)),
         hasDraft: true,
-        score: state.currentScore,
+        score: currentScore,
       },
     }));
-  };
+  }, [
+    activeStudentId,
+    currentScore,
+    examId,
+    selectedAnswers,
+    setEditingByStudent,
+    setStudentOverrides,
+  ]);
 
-  const triggerEdit = () => {
+  const triggerEdit = useCallback(() => {
     if (!activeStudentId) return;
-    state.setEditingByStudent((prev) => ({
+    setEditingByStudent((prev) => ({
       ...prev,
       [activeStudentId]: true,
     }));
-  };
+  }, [activeStudentId, setEditingByStudent]);
 
-  const triggerComplete = () => {
-    resources.completeGradingMutation.mutate({ examId, payload: {} });
-  };
+  const triggerComplete = useCallback(() => {
+    completeGradingMutation.mutate({ examId, payload: {} });
+  }, [completeGradingMutation, examId]);
 
   return {
     handleSelectObjectiveAnswer,
