@@ -112,7 +112,7 @@ export const useGradingPage = () => {
   const canSave =
     Boolean(activeStudentId) && answers.selectedAnswers.length > 0;
   const canTempSave = Boolean(activeStudentId);
-  const canSaveAndNext = Boolean(activeStudentId) && isEditing;
+  const canSaveAndNext = canSave && isEditing;
 
   const handleSave = () => {
     if (!canSave) return;

@@ -192,6 +192,14 @@ export const useMiniTestsPageActions = ({
         "최종 저장이 완료되었습니다. 수정 버튼으로 다시 편집할 수 있습니다."
       );
       setIsCategoryApplyFeedback(true);
+    } catch (error) {
+      console.error("Failed to save mini test results", error);
+      setFeedbackMessage("저장에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      setIsCategoryApplyFeedback(true);
+      await showAlert({
+        title: "저장 실패",
+        description: "미니테스트 결과 저장 중 오류가 발생했습니다.",
+      });
     } finally {
       setIsSaving(false);
     }

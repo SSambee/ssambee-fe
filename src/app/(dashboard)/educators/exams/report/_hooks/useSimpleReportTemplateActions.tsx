@@ -134,6 +134,7 @@ export const useSimpleReportTemplateActions = ({
       return;
     }
 
+    state.setIsGeneratingPdf(true);
     try {
       const blob = await pdf(
         <SimpleReportPdf data={buildPdfData()} />
@@ -165,7 +166,8 @@ export const useSimpleReportTemplateActions = ({
         title: "발송 실패",
         description: "성적표 업로드 및 발송 중 오류가 발생했습니다.",
       });
-      throw error;
+    } finally {
+      state.setIsGeneratingPdf(false);
     }
   };
 

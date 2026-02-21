@@ -59,6 +59,7 @@ export function MiniTestsResultModal({
                     onResultSearchTermChange(event.target.value)
                   }
                   placeholder="학생 검색"
+                  aria-label="학생 검색"
                   className="h-9 pl-8 text-sm"
                 />
               </div>

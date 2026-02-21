@@ -11,9 +11,9 @@ const HTML_TAG_PATTERN = /<[^>]+>/;
 const decodeBasicEntities = (value: string) =>
   value
     .replaceAll("&nbsp;", " ")
+    .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">")
-    .replaceAll("&amp;", "&")
     .replaceAll("&quot;", '"')
     .replaceAll("&#039;", "'");
 
@@ -42,15 +42,14 @@ export const plainTextToHtml = (text: string) => {
 
 export const htmlToPlainText = (html: string) => {
   if (typeof window === "undefined") {
-    return html.replace(/<[^>]*>/g, "");
+    return decodeBasicEntities(html.replace(/<[^>]*>/g, "")).replaceAll(
+      "\u00A0",
+      " "
+    );
   }
 
-  const container = document.createElement("div");
-  container.innerHTML = html;
-  return (container.innerText || container.textContent || "").replaceAll(
-    "\u00A0",
-    " "
-  );
+  const parsed = new DOMParser().parseFromString(html, "text/html");
+  return (parsed.body.textContent || "").replaceAll("\u00A0", " ");
 };
 
 export const htmlToReadableText = (value: string) => {

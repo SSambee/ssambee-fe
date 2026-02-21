@@ -17,6 +17,7 @@ declare const jest: {
 
 declare const describe: (name: string, fn: () => void) => void;
 declare const beforeEach: (fn: () => void) => void;
+declare const afterEach: (fn: () => void) => void;
 declare const it: (name: string, fn: () => Promise<void> | void) => void;
 declare const expect: {
   (actual: unknown): {
@@ -27,6 +28,8 @@ declare const expect: {
 
 const mockedPost = jest.fn() as MockFn<[string, unknown], Promise<unknown>>;
 const mockedGet = jest.fn() as MockFn<[string], Promise<unknown>>;
+const originalPost = axiosClient.post;
+const originalGet = axiosClient.get;
 
 // 검증 범위:
 // - 성적표 발송 준비 플로우에서 업로드 엔드포인트를 사용하는지 확인.
@@ -37,6 +40,12 @@ describe("report service", () => {
     mockedGet.mockReset();
     (axiosClient as unknown as { post: typeof mockedPost }).post = mockedPost;
     (axiosClient as unknown as { get: typeof mockedGet }).get = mockedGet;
+  });
+
+  afterEach(() => {
+    (axiosClient as unknown as { post: typeof originalPost }).post =
+      originalPost;
+    (axiosClient as unknown as { get: typeof originalGet }).get = originalGet;
   });
 
   it("calls report file upload endpoint", async () => {

@@ -38,6 +38,7 @@ export const useExamsCategoryModal = (exams: Exam[]) => {
     isCreatingAssignment: state.isCreatingAssignment,
     isUpdatingCategory: state.isUpdatingCategory,
     isDeletingCategory: state.isDeletingCategory,
+    deletingCategoryId: state.deletingCategoryId,
     isDeletingAssignment: state.isDeletingAssignment,
     deletingAssignmentId: state.deletingAssignmentId,
     isSavingAssignments: state.isSavingAssignments,

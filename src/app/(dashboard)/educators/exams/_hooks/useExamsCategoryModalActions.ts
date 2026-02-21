@@ -234,17 +234,18 @@ export const useExamsCategoryModalActions = ({
         prev.filter((assignment) => assignment.id !== assignmentId)
       );
 
-      state.setExamAssignmentMap((prev) => {
-        const next = Object.fromEntries(
-          Object.entries(prev).map(([examId, assignmentIds]) => [
+      const nextExamAssignmentMap = Object.fromEntries(
+        Object.entries(state.examAssignmentMap).map(
+          ([examId, assignmentIds]) => [
             examId,
             assignmentIds.filter((id) => id !== assignmentId),
-          ])
-        );
-
-        state.setBaselineExamAssignmentMapSerialized(JSON.stringify(next));
-        return next;
-      });
+          ]
+        )
+      );
+      state.setExamAssignmentMap(nextExamAssignmentMap);
+      state.setBaselineExamAssignmentMapSerialized(
+        JSON.stringify(nextExamAssignmentMap)
+      );
 
       return true;
     } catch (error) {
@@ -353,6 +354,7 @@ export const useExamsCategoryModalActions = ({
     if (!shouldDelete) return false;
 
     state.setIsDeletingCategory(true);
+    state.setDeletingCategoryId(id);
 
     try {
       await deleteAssignmentCategoryAPI(id);
@@ -360,6 +362,33 @@ export const useExamsCategoryModalActions = ({
       state.setCategories((prev) =>
         prev.filter((category) => category.id !== id)
       );
+
+      const removedAssignmentIds = state.availableAssignments
+        .filter((assignment) => assignment.categoryId === id)
+        .map((assignment) => assignment.id);
+
+      state.setAvailableAssignments((prev) =>
+        prev.filter((assignment) => assignment.categoryId !== id)
+      );
+
+      if (removedAssignmentIds.length > 0) {
+        const removedSet = new Set(removedAssignmentIds);
+        const nextExamAssignmentMap = Object.fromEntries(
+          Object.entries(state.examAssignmentMap).map(
+            ([examId, assignmentIds]) => [
+              examId,
+              assignmentIds.filter(
+                (assignmentId) => !removedSet.has(assignmentId)
+              ),
+            ]
+          )
+        );
+
+        state.setExamAssignmentMap(nextExamAssignmentMap);
+        state.setBaselineExamAssignmentMapSerialized(
+          JSON.stringify(nextExamAssignmentMap)
+        );
+      }
 
       return true;
     } catch (error) {
@@ -371,6 +400,7 @@ export const useExamsCategoryModalActions = ({
       return false;
     } finally {
       state.setIsDeletingCategory(false);
+      state.setDeletingCategoryId(null);
     }
   };
 

@@ -256,7 +256,8 @@ export function MiniTestsCategoryModal({ vm }: MiniTestsCategoryModalProps) {
                                       vm.isBusy || vm.isCategoryMutationBlocked
                                     }
                                   >
-                                    {vm.isDeletingCategory ? (
+                                    {vm.isDeletingCategory &&
+                                    vm.deletingCategoryId === category.id ? (
                                       <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
                                     ) : (
                                       <Trash2 className="mr-1 h-3.5 w-3.5" />

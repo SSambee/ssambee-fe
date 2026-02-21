@@ -56,6 +56,9 @@ export const useExamsCategoryModalState = ({ exams }: { exams: Exam[] }) => {
   const [isCreatingAssignment, setIsCreatingAssignment] = useState(false);
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(
+    null
+  );
   const [isDeletingAssignment, setIsDeletingAssignment] = useState(false);
   const [deletingAssignmentId, setDeletingAssignmentId] = useState<
     string | null
@@ -353,6 +356,8 @@ export const useExamsCategoryModalState = ({ exams }: { exams: Exam[] }) => {
     setIsUpdatingCategory,
     isDeletingCategory,
     setIsDeletingCategory,
+    deletingCategoryId,
+    setDeletingCategoryId,
     isDeletingAssignment,
     setIsDeletingAssignment,
     deletingAssignmentId,
