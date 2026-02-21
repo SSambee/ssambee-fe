@@ -41,14 +41,15 @@ export const plainTextToHtml = (text: string) => {
 };
 
 export const htmlToPlainText = (html: string) => {
+  const normalizedHtml = html.replace(/<\s*br\s*\/?>/gi, "\n");
+
   if (typeof window === "undefined") {
-    return decodeBasicEntities(html.replace(/<[^>]*>/g, "")).replaceAll(
-      "\u00A0",
-      " "
-    );
+    return decodeBasicEntities(
+      normalizedHtml.replace(/<[^>]*>/g, "")
+    ).replaceAll("\u00A0", " ");
   }
 
-  const parsed = new DOMParser().parseFromString(html, "text/html");
+  const parsed = new DOMParser().parseFromString(normalizedHtml, "text/html");
   return (parsed.body.textContent || "").replaceAll("\u00A0", " ");
 };
 

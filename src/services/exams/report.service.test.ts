@@ -13,6 +13,8 @@ type MockFn<TArgs extends unknown[] = unknown[], TResult = unknown> = {
 
 declare const jest: {
   fn: () => MockFn;
+  spyOn: (target: object, method: string) => MockFn;
+  restoreAllMocks: () => void;
 };
 
 declare const describe: (name: string, fn: () => void) => void;
@@ -26,26 +28,28 @@ declare const expect: {
   any: (type: unknown) => unknown;
 };
 
-const mockedPost = jest.fn() as MockFn<[string, unknown], Promise<unknown>>;
-const mockedGet = jest.fn() as MockFn<[string], Promise<unknown>>;
-const originalPost = axiosClient.post;
-const originalGet = axiosClient.get;
+let mockedPost: MockFn<[string, unknown], Promise<unknown>>;
+let mockedGet: MockFn<[string], Promise<unknown>>;
 
 // 검증 범위:
 // - 성적표 발송 준비 플로우에서 업로드 엔드포인트를 사용하는지 확인.
 // - 성적표 발송 준비 플로우에서 다운로드 URL 엔드포인트를 사용하는지 확인.
 describe("report service", () => {
   beforeEach(() => {
+    mockedPost = jest.spyOn(axiosClient, "post") as MockFn<
+      [string, unknown],
+      Promise<unknown>
+    >;
+    mockedGet = jest.spyOn(axiosClient, "get") as MockFn<
+      [string],
+      Promise<unknown>
+    >;
     mockedPost.mockReset();
     mockedGet.mockReset();
-    (axiosClient as unknown as { post: typeof mockedPost }).post = mockedPost;
-    (axiosClient as unknown as { get: typeof mockedGet }).get = mockedGet;
   });
 
   afterEach(() => {
-    (axiosClient as unknown as { post: typeof originalPost }).post =
-      originalPost;
-    (axiosClient as unknown as { get: typeof originalGet }).get = originalGet;
+    jest.restoreAllMocks();
   });
 
   it("calls report file upload endpoint", async () => {
