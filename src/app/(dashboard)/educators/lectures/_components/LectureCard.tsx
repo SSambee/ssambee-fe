@@ -10,6 +10,7 @@ import { useLectureDetailModalStore } from "@/stores/lectures";
 import { useDeleteLecture } from "@/hooks/lectures/useDeleteLecture";
 import { CommonLectureCard } from "@/components/common/CommonLectureCard";
 import { useModal } from "@/providers/ModalProvider";
+import { useAuthContext } from "@/providers/AuthProvider";
 
 type LectureCardProps = {
   lecture: Lecture;
@@ -44,6 +45,21 @@ function DeleteLectureConfirmModal({
   );
 }
 
+function DeleteLectureForbiddenModal() {
+  return (
+    <CheckModal
+      title="삭제 권한이 없습니다"
+      description={`조교 계정은 수업을 삭제할 수 없습니다.
+강사 계정으로 진행해주세요.`}
+      confirmText="확인"
+      hideCancel
+      onConfirm={async () => {
+        return;
+      }}
+    />
+  );
+}
+
 export function LectureCard({ lecture }: LectureCardProps) {
   const openDetailModal = useLectureDetailModalStore((state) => state.open);
   const closeModal = useLectureDetailModalStore((state) => state.close);
@@ -51,6 +67,7 @@ export function LectureCard({ lecture }: LectureCardProps) {
     (state) => state.selectedLectureId
   );
   const isModalOpen = useLectureDetailModalStore((state) => state.isOpen);
+  const { user } = useAuthContext();
   const { openModal } = useModal();
   const hasSchedule = lecture.schedule.days.length > 0;
   const scheduleDays = hasSchedule
@@ -60,6 +77,11 @@ export function LectureCard({ lecture }: LectureCardProps) {
   const instructorInitial = lecture.instructor?.slice(0, 1) ?? "-";
 
   const openDeleteConfirmModal = () => {
+    if (user?.userType === "ASSISTANT") {
+      openModal(createElement(DeleteLectureForbiddenModal));
+      return;
+    }
+
     openModal(
       createElement(DeleteLectureConfirmModal, {
         lecture,
