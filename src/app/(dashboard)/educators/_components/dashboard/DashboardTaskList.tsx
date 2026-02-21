@@ -1,7 +1,7 @@
-import { ClipboardList } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { DashboardTask } from "@/types/dashboard";
 
@@ -9,70 +9,68 @@ type DashboardTaskListProps = {
   tasks: DashboardTask[];
 };
 
-const statusBadgeClasses = {
-  "진행 중": "bg-amber-100 text-amber-700",
-  대기: "bg-slate-100 text-slate-700",
-  완료: "bg-emerald-100 text-emerald-700",
-} as const;
-
 export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100">
-              <ClipboardList className="h-4 w-4 text-violet-600" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold">강사 업무 지시 내역</p>
-              <p className="text-xs text-muted-foreground">
-                조교 업무 진행률을 확인하세요
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" className="h-8 px-3 text-xs" disabled>
-            업무내역
-          </Button>
+    <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl font-bold tracking-tight text-[#4a4d5c] xl:text-2xl">
+            강사 업무 지시 내역
+          </h2>
+          <p className="text-base font-medium tracking-tight text-[#16161b]/28 xl:text-lg">
+            조교 업무 진행률을 확인하세요
+          </p>
         </div>
+        <Button
+          variant={null}
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+        >
+          더보기
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Button>
+      </div>
 
-        <div className="mt-5 space-y-4">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="rounded-lg border border-muted/60 bg-muted/20 p-4"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold">{task.title}</p>
-                  <p className="text-xs text-muted-foreground">{task.note}</p>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {tasks.map((task) => (
+          <div
+            key={task.id}
+            className="overflow-hidden rounded-[20px] border border-[#eaecf2]"
+          >
+            <div className="bg-white px-6 pb-4 pt-6">
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex flex-col gap-1">
+                  <p className="text-xl font-semibold text-[#040405]">
+                    {task.title}
+                  </p>
+                  <p className="text-base text-[#16161b]/40">{task.note}</p>
                 </div>
                 <span
                   className={cn(
-                    "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                    statusBadgeClasses[task.status]
+                    "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold bg-[#dcfce7] text-[#16a34a]"
                   )}
                 >
                   {task.status}
                 </span>
               </div>
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span>대상 조교: {task.target}</span>
-                <span>{task.progress}%</span>
-              </div>
-              <div className="mt-2 h-2 w-full rounded-full bg-muted">
-                <div
-                  className={cn(
-                    "h-2 rounded-full",
-                    task.status === "완료" ? "bg-emerald-500" : "bg-violet-500"
-                  )}
-                  style={{ width: `${task.progress}%` }}
-                />
+            </div>
+            <div className="border-t border-[#eaecf2] bg-white px-6 py-4">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#eaecf2] bg-white">
+                  <StudentProfileAvatar
+                    size={32}
+                    seedKey={task.target}
+                    label={`${task.target} 프로필 이미지`}
+                  />
+                </div>
+                <div className="flex items-center gap-1.5 text-lg font-medium text-[#8b90a3]">
+                  <span>담당 조교</span>
+                  <span>{task.target}</span>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

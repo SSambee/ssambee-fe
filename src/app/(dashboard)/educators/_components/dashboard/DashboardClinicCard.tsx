@@ -1,6 +1,6 @@
-import { ShieldCheck } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { DashboardClinicItem } from "@/types/dashboard";
 
 type DashboardClinicCardProps = {
@@ -9,37 +9,40 @@ type DashboardClinicCardProps = {
 
 export function DashboardClinicCard({ clinics }: DashboardClinicCardProps) {
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-100">
-            <ShieldCheck className="h-4 w-4 text-rose-600" />
-          </span>
-          <div>
-            <p className="text-sm font-semibold">클리닉</p>
-            <p className="text-xs text-muted-foreground">
-              예정된 클리닉 일정을 확인하세요
+    <div className="w-full rounded-[24px] border border-[#eaecf2] bg-white px-6 pb-8 pt-8 shadow-none sm:pl-8 xl:w-[440px]">
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-[20px] font-bold leading-7 tracking-[-0.2px] text-[#040405]">
+            클리닉
+          </h2>
+          <p className="text-[14px] font-medium leading-5 tracking-[-0.14px] text-[rgba(22,22,27,0.28)]">
+            예정된 클리닉 일정을 확인하세요
+          </p>
+        </div>
+        <Button
+          variant={null}
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+        >
+          더보기
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        {clinics.map((clinic) => (
+          <div
+            key={clinic.id}
+            className="flex flex-col gap-1 rounded-xl border border-[#eaecf2] bg-[#fcfcfd] px-6 py-5"
+          >
+            <p className="text-[16px] font-semibold leading-6 tracking-[-0.16px] text-[#8b90a3]">
+              {clinic.date}
+            </p>
+            <p className="truncate text-[16px] font-semibold leading-6 tracking-[-0.16px] text-[#4a4d5c]">
+              {clinic.title}
             </p>
           </div>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {clinics.map((clinic) => (
-            <div
-              key={clinic.id}
-              className="rounded-lg border border-muted/60 bg-muted/20 px-4 py-3"
-            >
-              <p className="text-xs text-muted-foreground">{clinic.date}</p>
-              <p className="text-sm font-semibold text-foreground">
-                {clinic.title}
-              </p>
-              {clinic.meta ? (
-                <p className="text-xs text-muted-foreground">{clinic.meta}</p>
-              ) : null}
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
 }

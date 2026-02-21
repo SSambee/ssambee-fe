@@ -1,7 +1,6 @@
-import { MessageSquare } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -17,90 +16,99 @@ type DashboardInquiryTableProps = {
   inquiries: DashboardInquiry[];
 };
 
-const typeBadgeClasses = {
-  학생: "bg-emerald-100 text-emerald-700",
-  학부모: "bg-sky-100 text-sky-700",
-} as const;
-
-const statusBadgeClasses = {
-  "진행 중": "bg-amber-100 text-amber-700",
-  대기: "bg-slate-100 text-slate-700",
-  완료: "bg-emerald-100 text-emerald-700",
-  "답변 완료": "bg-indigo-100 text-indigo-700",
-} as const;
-
 export function DashboardInquiryTable({
   inquiries,
 }: DashboardInquiryTableProps) {
   return (
-    <Card className="shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold">
-                최근 문의 요청 사항 (학생/학부모)
-              </p>
-              <p className="text-xs text-muted-foreground">
-                최근 문의 요청을 확인하세요
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" className="h-8 px-3 text-xs" disabled>
-            전체보기
-          </Button>
+    <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl font-bold tracking-tight text-[#4a4d5c] xl:text-2xl">
+            최근 문의 요청사항
+          </h2>
+          <p className="text-base font-medium tracking-tight text-[#16161b]/28 xl:text-lg">
+            최근 문의 요청을 확인하세요
+          </p>
         </div>
+        <Button
+          variant={null}
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+        >
+          더보기
+          <ChevronRight className="h-3.5 w-3.5" />
+        </Button>
+      </div>
 
-        <div className="mt-5">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[90px]">구분</TableHead>
-                <TableHead className="w-[120px]">이름</TableHead>
-                <TableHead>문의 내용</TableHead>
-                <TableHead className="w-[120px]">등록일</TableHead>
-                <TableHead className="w-[100px]">상태</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inquiries.map((inquiry) => (
-                <TableRow key={inquiry.id}>
-                  <TableCell>
-                    <span
-                      className={cn(
-                        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                        typeBadgeClasses[inquiry.type]
-                      )}
-                    >
+      <div className="overflow-x-auto rounded-[20px] border border-[#eaecf2]">
+        <Table className="min-w-[820px]">
+          <TableHeader className="bg-[#fcfcfd]">
+            <TableRow className="border-[#eaecf2] hover:bg-transparent">
+              <TableHead className="h-[66px] w-[400px] pl-10 text-lg font-semibold text-[#8b90a3]">
+                내용
+              </TableHead>
+              <TableHead className="h-[66px] w-[140px] text-center text-lg font-semibold text-[#8b90a3]">
+                작성자
+              </TableHead>
+              <TableHead className="h-[66px] w-[140px] text-center text-lg font-semibold text-[#8b90a3]">
+                등록일
+              </TableHead>
+              <TableHead className="h-[66px] w-[140px] text-center text-lg font-semibold text-[#8b90a3]">
+                상태
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {inquiries.map((inquiry) => (
+              <TableRow
+                key={inquiry.id}
+                className="h-[72px] border-[#eaecf2] hover:bg-transparent"
+              >
+                <TableCell className="pl-10">
+                  <div className="flex items-center gap-1">
+                    <span className="text-lg font-medium text-[#16161b]/88">
+                      {inquiry.message}
+                    </span>
+                    <span className="text-base font-bold text-[#3863f6]">
+                      (1)
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className="text-lg font-medium text-[#16161b]/88">
+                      {inquiry.name}
+                    </span>
+                    <span className="text-base text-[#16161b]/40">
                       {inquiry.type}
                     </span>
-                  </TableCell>
-                  <TableCell className="font-medium">{inquiry.name}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {inquiry.message}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {inquiry.createdAt}
-                  </TableCell>
-                  <TableCell>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center text-lg font-medium text-[#16161b]/88">
+                  {inquiry.createdAt}
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center">
                     <span
                       className={cn(
-                        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                        statusBadgeClasses[inquiry.status]
+                        "inline-flex h-9 w-20 items-center justify-center rounded-lg text-sm font-semibold",
+                        inquiry.status === "답변 완료" ||
+                          inquiry.status === "완료"
+                          ? "bg-[#dcfce7] text-[#16a34a]"
+                          : "bg-[#fef3c7] text-[#d97706]"
                       )}
                     >
-                      {inquiry.status}
+                      {inquiry.status === "답변 완료" ||
+                      inquiry.status === "완료"
+                        ? "답변 등록"
+                        : "대기 중"}
                     </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </section>
   );
 }

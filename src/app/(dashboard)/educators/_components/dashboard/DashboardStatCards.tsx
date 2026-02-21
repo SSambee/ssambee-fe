@@ -1,6 +1,3 @@
-import { BookOpen, FileText, Users } from "lucide-react";
-
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { DashboardStat } from "@/types/dashboard";
 
@@ -8,65 +5,56 @@ type DashboardStatCardsProps = {
   stats: DashboardStat[];
 };
 
-const statConfig = {
-  students: {
-    icon: Users,
-    cardClass: "border-emerald-100 bg-emerald-50/60",
-    iconClass: "text-emerald-600 bg-emerald-100",
-  },
-  lectures: {
-    icon: BookOpen,
-    cardClass: "border-sky-100 bg-sky-50/60",
-    iconClass: "text-sky-600 bg-sky-100",
-  },
-  exams: {
-    icon: FileText,
-    cardClass: "border-amber-100 bg-amber-50/60",
-    iconClass: "text-amber-600 bg-amber-100",
-  },
-} as const;
-
 export function DashboardStatCards({ stats }: DashboardStatCardsProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {stats.map((stat) => {
-        const config = statConfig[stat.key];
-        const Icon = config.icon;
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+      {stats.map((stat, index) => {
+        const isPrimary = index === 0;
+        const isSecondary = index === 1;
+        const isTertiary = index === 2;
 
         return (
-          <Card
+          <div
             key={stat.id}
-            className={cn("min-h-[120px] shadow-sm", config.cardClass)}
+            className={cn(
+              "flex h-[160px] w-full items-end justify-between rounded-[24px] border border-[#eaecf2] px-8 pb-6 pt-8 xl:px-10",
+              isPrimary && "bg-[#4b72f7]",
+              isSecondary && "bg-[#6b6f80]",
+              isTertiary && "bg-white"
+            )}
           >
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <div className="flex items-end gap-2">
-                    <span className="text-2xl font-semibold text-foreground lg:text-3xl">
-                      {stat.value}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      {stat.unit}
-                    </span>
-                  </div>
-                  {stat.note ? (
-                    <p className="text-xs text-muted-foreground">{stat.note}</p>
-                  ) : null}
-                </div>
-                <span
-                  className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-full",
-                    config.iconClass
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+            <div className="flex flex-col gap-1 h-full items-start">
+              <p
+                className={cn(
+                  "text-xl font-semibold tracking-tight",
+                  isTertiary ? "text-[#4a4d5c]" : "text-white/88"
+                )}
+              >
+                {stat.label}
+              </p>
+              <p
+                className={cn(
+                  "text-base font-semibold tracking-tight",
+                  isTertiary ? "text-[#8b90a3]" : "text-white/40"
+                )}
+              >
+                {stat.note}
+              </p>
+            </div>
+            <div
+              className={cn(
+                "flex items-end gap-1 font-bold",
+                isTertiary ? "text-[#4a4d5c]" : "text-white"
+              )}
+            >
+              <span className="text-4xl leading-[52px] tracking-tight">
+                {stat.value}
+              </span>
+              <span className="text-[28px] leading-[38px] tracking-tight">
+                {stat.unit}
+              </span>
+            </div>
+          </div>
         );
       })}
     </div>
