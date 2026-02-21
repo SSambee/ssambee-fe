@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   useParams,
   usePathname,
@@ -68,6 +68,8 @@ export const useGradingPage = () => {
       setRequiresRecomplete(false);
     },
   });
+  const { triggerSave, triggerTempSave, triggerEdit, triggerComplete } =
+    answers;
 
   const students = useMemo<GradingStudent[]>(() => {
     if (baseStudents.length === 0) return [];
@@ -116,10 +118,10 @@ export const useGradingPage = () => {
 
   const handleSave = () => {
     if (!canSave) return;
-    answers.triggerSave();
+    triggerSave();
   };
 
-  const handleSaveAndSelectNext = () => {
+  const handleSaveAndSelectNext = useCallback(() => {
     if (!canSave || !activeStudentId) return;
 
     const currentIndex = students.findIndex(
@@ -130,15 +132,15 @@ export const useGradingPage = () => {
         ? students[currentIndex + 1].id
         : null;
 
-    answers.triggerSave(() => {
+    triggerSave(() => {
       if (!nextStudentId) return;
       setSelectedStudentId(nextStudentId);
     });
-  };
+  }, [activeStudentId, canSave, setSelectedStudentId, students, triggerSave]);
 
   const handleTempSave = () => {
     if (!canTempSave) return;
-    answers.triggerTempSave();
+    triggerTempSave();
   };
 
   const handleEdit = () => {
@@ -151,13 +153,13 @@ export const useGradingPage = () => {
           cancelText="취소"
           onConfirm={() => {
             setRequiresRecomplete(true);
-            answers.triggerEdit();
+            triggerEdit();
           }}
         />
       );
       return;
     }
-    answers.triggerEdit();
+    triggerEdit();
   };
 
   const handleComplete = () => {
@@ -169,22 +171,22 @@ export const useGradingPage = () => {
         confirmText="전체 완료"
         cancelText="취소"
         onConfirm={() => {
-          answers.triggerComplete();
+          triggerComplete();
         }}
       />
     );
   };
 
-  const handleSelectPrevStudent = () => {
+  const handleSelectPrevStudent = useCallback(() => {
     if (activeStudentIndex <= 0) return;
     setSelectedStudentId(students[activeStudentIndex - 1].id);
-  };
+  }, [activeStudentIndex, setSelectedStudentId, students]);
 
-  const handleSelectNextStudent = () => {
+  const handleSelectNextStudent = useCallback(() => {
     if (activeStudentIndex < 0 || activeStudentIndex >= students.length - 1)
       return;
     setSelectedStudentId(students[activeStudentIndex + 1].id);
-  };
+  }, [activeStudentIndex, setSelectedStudentId, students]);
 
   return {
     examDetail,
