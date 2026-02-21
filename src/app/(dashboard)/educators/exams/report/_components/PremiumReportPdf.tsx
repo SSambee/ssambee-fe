@@ -11,7 +11,10 @@ import {
   Polyline,
 } from "@react-pdf/renderer";
 
-import { formatAverageScore } from "../_utils/report-format";
+import {
+  formatAccuracyRateFromErrorRate,
+  formatAverageScore,
+} from "@/utils/report-format";
 
 import { colors, premiumStyles as styles } from "./report-pdf.styles";
 
@@ -152,7 +155,7 @@ export function PremiumReportPdf({
           <View style={{ flex: 1 }}>
             <View style={styles.infoSectionTitleRow}>
               <View style={styles.infoSectionTitleBar} />
-              <Text style={styles.infoSectionTitleText}>카테고리 분석</Text>
+              <Text style={styles.infoSectionTitleText}>미니테스트</Text>
             </View>
 
             <View style={styles.card}>
@@ -498,14 +501,21 @@ export function PremiumReportPdf({
           {/* 테이블 헤더 - 각 페이지마다 반복 */}
           <View style={styles.questionHeaderRow} fixed>
             <Text style={[styles.questionHeaderCell, { width: 30 }]}>No</Text>
-            <Text style={[styles.questionHeaderCell, { flex: 1 }]}>
-              문항 내용
-            </Text>
             <Text style={[styles.questionHeaderCell, { width: 60 }]}>유형</Text>
-            <Text style={[styles.questionHeaderCell, { width: 80 }]}>출처</Text>
+            <Text
+              style={[
+                styles.questionHeaderCell,
+                { flex: 1, textAlign: "left", paddingLeft: 8 },
+              ]}
+            >
+              출처
+            </Text>
             <Text style={[styles.questionHeaderCell, { width: 40 }]}>결과</Text>
             <Text style={[styles.questionHeaderCell, { width: 50 }]}>
               오답률
+            </Text>
+            <Text style={[styles.questionHeaderCell, { width: 50 }]}>
+              정답률
             </Text>
           </View>
 
@@ -522,18 +532,15 @@ export function PremiumReportPdf({
               <Text style={[styles.questionCell, { width: 30 }]}>
                 {item.no}
               </Text>
+              <Text style={[styles.questionCell, { width: 60 }]}>
+                {item.type}
+              </Text>
               <Text
                 style={[
                   styles.questionCell,
                   { flex: 1, textAlign: "left", paddingLeft: 8 },
                 ]}
               >
-                {item.content || item.source}
-              </Text>
-              <Text style={[styles.questionCell, { width: 60 }]}>
-                {item.type}
-              </Text>
-              <Text style={[styles.questionCell, { width: 80 }]}>
                 {item.source}
               </Text>
               <Text
@@ -547,6 +554,9 @@ export function PremiumReportPdf({
               </Text>
               <Text style={[styles.questionCell, { width: 50 }]}>
                 {item.errorRate}
+              </Text>
+              <Text style={[styles.questionCell, { width: 50 }]}>
+                {formatAccuracyRateFromErrorRate(item.errorRate)}
               </Text>
             </View>
           ))}

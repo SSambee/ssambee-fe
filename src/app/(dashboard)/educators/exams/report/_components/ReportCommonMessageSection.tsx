@@ -38,7 +38,7 @@ export function ReportCommonMessageSection() {
       <Button
         onClick={handleOpenModal}
         disabled={!selectedExamId}
-        className={`w-full gap-2 ${isCommonSaved ? "bg-green-600 hover:bg-green-700" : ""}`}
+        className="w-full gap-2"
       >
         <Save className="h-4 w-4" />
         {isCommonSaved ? "시험 공통 전달사항 수정" : "시험 공통 전달사항 작성"}

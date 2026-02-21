@@ -49,6 +49,7 @@ type KakaoNotificationModalProps = {
     message: string,
     targetType: TargetType
   ) => void | Promise<void>;
+  mode?: "send" | "prepare";
 };
 
 export function KakaoNotificationModal({
@@ -59,6 +60,7 @@ export function KakaoNotificationModal({
   subtitle = "수업 알림 발송",
   defaultMessage = "",
   onSend,
+  mode = "send",
 }: KakaoNotificationModalProps) {
   // TODO: defaultMessage 변경 시 message 상태 동기화(useEffect) 필요
   const [message, setMessage] = useState(defaultMessage);
@@ -100,7 +102,11 @@ export function KakaoNotificationModal({
           : targetType === "student"
             ? "학생"
             : "학부모";
-      alert(`${targetLabel}에게 카카오톡 발송이 완료되었습니다.`);
+      const suffix =
+        mode === "prepare"
+          ? "발송 준비가 완료되었습니다."
+          : "발송이 완료되었습니다.";
+      alert(`${targetLabel}에게 카카오톡 ${suffix}`);
       handleClose();
     }
   };
@@ -147,7 +153,9 @@ export function KakaoNotificationModal({
                 </label>
               </div>
               <p className="text-sm text-muted-foreground">
-                현재는 카카오톡 발송 기능만 지원됩니다.
+                {mode === "prepare"
+                  ? "현재는 카카오톡 발송 준비 기능만 지원됩니다."
+                  : "현재는 카카오톡 발송 기능만 지원됩니다."}
               </p>
             </div>
 
@@ -254,11 +262,17 @@ export function KakaoNotificationModal({
             disabled={targetInfo.count === 0 || isSending}
           >
             {isSending ? (
-              "전송 중..."
+              mode === "prepare" ? (
+                "준비 중..."
+              ) : (
+                "전송 중..."
+              )
             ) : (
               <>
                 <MessageSquare className="h-4 w-4" />
-                {targetInfo.label} 발송 ({targetInfo.count}명)
+                {mode === "prepare"
+                  ? `${targetInfo.label} 발송 준비 (${targetInfo.count}명)`
+                  : `${targetInfo.label} 발송 (${targetInfo.count}명)`}
               </>
             )}
           </Button>

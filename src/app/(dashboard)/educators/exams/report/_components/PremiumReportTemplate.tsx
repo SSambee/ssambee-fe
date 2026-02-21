@@ -23,9 +23,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { KakaoNotificationModal } from "@/components/common/modals/KakaoNotificationModal";
+import TiptapEditor from "@/components/common/editor/TiptapEditor";
+import type { ReportTemplateExamData } from "@/types/report";
+import {
+  formatAccuracyRateFromErrorRate,
+  formatAverageScore,
+} from "@/utils/report-format";
+import {
+  htmlToReadableText,
+  normalizeReportMessageHtml,
+} from "@/utils/report-message-html";
 
-import { formatAverageScore } from "../_utils/report-format";
-import type { ReportTemplateExamData } from "../_types/report-template";
 import { usePremiumReportTemplate } from "../_hooks/usePremiumReportTemplate";
 
 type PremiumReportTemplateProps = {
@@ -35,6 +43,7 @@ type PremiumReportTemplateProps = {
 export function PremiumReportTemplate({
   examData,
 }: PremiumReportTemplateProps) {
+  const vm = usePremiumReportTemplate(examData);
   const {
     scoreHistory,
     isScoreHistoryLoading,
@@ -66,11 +75,14 @@ export function PremiumReportTemplate({
     handleOpenKakaoModal,
     handleSendReport,
     handleDownloadPdf,
-  } = usePremiumReportTemplate(examData);
+  } = vm;
 
   const reportYear =
     examData.examDate.match(/^(\d{4})/)?.[1] ??
     String(new Date().getFullYear());
+  const commonMessageHtml = normalizeReportMessageHtml(commonMessage);
+  const commonMessageForShare = htmlToReadableText(commonMessageHtml);
+  const hasCommonMessage = commonMessageForShare.trim().length > 0;
 
   return (
     <div className="space-y-8 font-sans text-zinc-800">
@@ -80,9 +92,10 @@ export function PremiumReportTemplate({
         onOpenChange={setIsModalOpen}
         recipients={recipients}
         title="성적표 발송"
-        subtitle="프리미엄 리포트 카카오톡 발송"
-        defaultMessage={commonMessage}
+        subtitle="프리미엄 리포트 카카오톡 발송 준비"
+        defaultMessage={commonMessageForShare}
         onSend={handleSendReport}
+        mode="prepare"
       />
       {/* 상단 헤더 */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between border-b border-zinc-200 pb-6">
@@ -277,10 +290,8 @@ export function PremiumReportTemplate({
                           </span>
                         </div>
                         <p className="pt-2 text-zinc-400 leading-relaxed">
-                          * 좌측 과제/카테고리 입력에서 항목별 결과를
-                          선택해주세요.
-                          <br />* `임시저장` 후 상단 `현재 학생 최종저장`을
-                          클릭하세요.
+                          * 미니테스트에서 항목별 결과를 입력해주세요.
+                          <br />* 상단 `리포트 저장` 버튼을 누르면 반영됩니다.
                         </p>
                       </div>
                     )}
@@ -345,7 +356,7 @@ export function PremiumReportTemplate({
                 <div className="space-y-4">
                   <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900">
                     <span className="h-4 w-1 rounded-full bg-indigo-600" />
-                    카테고리 분석
+                    미니테스트
                   </h3>
                   <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
                     {includedCategoryRows.length === 0 ? (
@@ -537,10 +548,12 @@ export function PremiumReportTemplate({
                   </h3>
                   <div className="relative h-full">
                     <div className="min-h-[200px] w-full rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-sm leading-relaxed text-zinc-700 shadow-inner">
-                      {commonMessage ? (
-                        <div className="whitespace-pre-wrap">
-                          {commonMessage}
-                        </div>
+                      {hasCommonMessage ? (
+                        <TiptapEditor
+                          content={commonMessageHtml}
+                          readOnly
+                          className="text-sm leading-relaxed text-zinc-700"
+                        />
                       ) : (
                         <div className="flex h-full flex-col items-center justify-center text-zinc-400">
                           <p>등록된 공통 전달사항이 없습니다.</p>
@@ -586,19 +599,16 @@ export function PremiumReportTemplate({
               {/* 문항별 응시 결과 테이블 */}
               <div className="overflow-hidden rounded-xl border border-zinc-200 shadow-sm">
                 <div className="overflow-x-auto">
-                  <table className="min-w-[760px] w-full border-collapse text-sm">
+                  <table className="min-w-[700px] w-full border-collapse text-sm">
                     <thead>
                       <tr className="bg-zinc-50/80 border-b border-zinc-200">
                         <th className="w-16 px-4 py-3 text-center font-semibold text-zinc-500">
                           No.
                         </th>
-                        <th className="px-4 py-3 text-left font-semibold text-zinc-500">
-                          문항 내용
-                        </th>
                         <th className="w-24 px-4 py-3 text-center font-semibold text-zinc-500">
                           유형
                         </th>
-                        <th className="w-28 px-4 py-3 text-center font-semibold text-zinc-500">
+                        <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                           출처
                         </th>
                         <th className="w-20 px-4 py-3 text-center font-semibold text-zinc-500">
@@ -606,6 +616,9 @@ export function PremiumReportTemplate({
                         </th>
                         <th className="w-24 px-4 py-3 text-center font-semibold text-zinc-500">
                           오답률
+                        </th>
+                        <th className="w-24 px-4 py-3 text-center font-semibold text-zinc-500">
+                          정답률
                         </th>
                       </tr>
                     </thead>
@@ -628,13 +641,10 @@ export function PremiumReportTemplate({
                             <td className="px-4 py-3 text-center font-medium text-zinc-400 group-hover:text-zinc-700">
                               {q.no}
                             </td>
-                            <td className="px-4 py-3 text-left text-zinc-700 font-medium">
-                              {q.content}
-                            </td>
                             <td className="px-4 py-3 text-center text-zinc-500 text-xs">
                               {q.type}
                             </td>
-                            <td className="px-4 py-3 text-center text-zinc-500 text-xs">
+                            <td className="px-4 py-3 text-left text-zinc-500 text-xs">
                               {q.source}
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -650,6 +660,9 @@ export function PremiumReportTemplate({
                             </td>
                             <td className="px-4 py-3 text-center text-zinc-600 font-medium">
                               {q.errorRate}
+                            </td>
+                            <td className="px-4 py-3 text-center text-zinc-600 font-medium">
+                              {formatAccuracyRateFromErrorRate(q.errorRate)}
                             </td>
                           </tr>
                         ))

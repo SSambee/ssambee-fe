@@ -4,9 +4,8 @@ import { useEffect } from "react";
 
 import { getStudentReport } from "@/services/exams/report.service";
 import { fetchLectureEnrollmentDetailAPI } from "@/services/lectures/lectures.service";
+import type { ReportTemplateExamData } from "@/types/report";
 import { formatYMDFromISO } from "@/utils/date";
-
-import type { ReportTemplateExamData } from "../_types/report-template";
 
 import type { PremiumReportTemplateState } from "./usePremiumReportTemplateState";
 

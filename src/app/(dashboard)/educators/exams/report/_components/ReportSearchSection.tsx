@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 import {
   Dialog,
   DialogContent,
@@ -76,6 +77,7 @@ export function ReportSearchSection() {
                 <div className="space-y-1">
                   {filteredClasses.map((cls) => (
                     <button
+                      type="button"
                       key={cls.id}
                       onClick={() => handleClassClick(cls.id)}
                       className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted ${
@@ -119,6 +121,7 @@ export function ReportSearchSection() {
                 <div className="space-y-1">
                   {exams.map((exam) => (
                     <button
+                      type="button"
                       key={exam.id}
                       onClick={() =>
                         handleExamClick(
@@ -163,7 +166,7 @@ export function ReportSearchSection() {
             )}
           </h3>
           <Card>
-            <CardContent className="max-h-[150px] overflow-y-auto p-2">
+            <CardContent className="max-h-[220px] overflow-y-auto p-2">
               {isLoadingStudents ? (
                 <p className="py-4 text-center text-sm text-muted-foreground">
                   학생 목록을 불러오는 중입니다.
@@ -180,6 +183,7 @@ export function ReportSearchSection() {
                 <div className="space-y-1">
                   {students.map((student) => (
                     <button
+                      type="button"
                       key={student.id}
                       onClick={() => handleStudentClick(student.id)}
                       className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted ${
@@ -189,7 +193,16 @@ export function ReportSearchSection() {
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{student.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <StudentProfileAvatar
+                            size={24}
+                            seedKey={student.id}
+                            label={`${student.name || "학생"} 프로필 이미지`}
+                          />
+                          <span className="font-medium truncate">
+                            {student.name}
+                          </span>
+                        </div>
                         <span className="text-xs opacity-70">
                           {student.score}점
                         </span>

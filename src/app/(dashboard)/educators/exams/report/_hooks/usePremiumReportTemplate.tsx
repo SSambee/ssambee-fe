@@ -1,8 +1,7 @@
 "use client";
 
 import { useDialogAlert } from "@/hooks/useDialogAlert";
-
-import type { ReportTemplateExamData } from "../_types/report-template";
+import type { ReportTemplateExamData } from "@/types/report";
 
 import { usePremiumReportTemplateActions } from "./usePremiumReportTemplateActions";
 import { usePremiumReportTemplateResources } from "./usePremiumReportTemplateResources";

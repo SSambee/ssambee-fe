@@ -1,15 +1,28 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  defaultReportCategoryStorageConfig,
-  readReportCategoryStorageConfig,
-  subscribeReportCategoryStorageConfig,
-} from "@/services/exams/report-category-persistence.service";
-import type { ScoreHistory } from "@/types/report";
+import type {
+  ReportAssignmentResult,
+  ReportTemplateExamData,
+  ScoreHistory,
+} from "@/types/report";
 
-import type { ReportTemplateExamData } from "../_types/report-template";
+export type IncludedCategoryRow = {
+  id: string;
+  name: string;
+  value: string;
+};
+
+export const mapIncludedCategoryRowsFromAssignmentResults = (
+  assignmentResults?: ReportAssignmentResult[]
+): IncludedCategoryRow[] => {
+  return (assignmentResults ?? []).map((assignment) => ({
+    id: assignment.id,
+    name: `${assignment.categoryName} - ${assignment.title}`,
+    value: assignment.value,
+  }));
+};
 
 export const usePremiumReportTemplateState = ({
   examData,
@@ -32,44 +45,15 @@ export const usePremiumReportTemplateState = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const categoryStorage = useSyncExternalStore(
-    subscribeReportCategoryStorageConfig,
-    readReportCategoryStorageConfig,
-    () => defaultReportCategoryStorageConfig
-  );
-
   const attendanceRate = examData.attendance || "-";
   const questionResults = examData.questionResults ?? [];
   const canSendOrDownload = isStudentSaved && isCommonSaved;
 
   const includedCategoryRows = useMemo(() => {
-    if (examData.assignmentResults && examData.assignmentResults.length > 0) {
-      return examData.assignmentResults.map((assignment) => ({
-        id: assignment.id,
-        name: `${assignment.categoryName} - ${assignment.title}`,
-        value: assignment.value,
-      }));
-    }
-
-    const includedIds = categoryStorage.examCategoryMap[examData.examId] ?? [];
-    const studentValues =
-      categoryStorage.studentSelections[examData.examId]?.[
-        examData.studentId
-      ] ?? {};
-
-    return categoryStorage.categories
-      .filter((category) => includedIds.includes(category.id))
-      .map((category) => ({
-        id: category.id,
-        name: category.name,
-        value: studentValues[category.id] ?? "-",
-      }));
-  }, [
-    categoryStorage,
-    examData.assignmentResults,
-    examData.examId,
-    examData.studentId,
-  ]);
+    return mapIncludedCategoryRowsFromAssignmentResults(
+      examData.assignmentResults
+    );
+  }, [examData.assignmentResults]);
 
   const includedCategoryNames = includedCategoryRows.map((row) => row.name);
   const missingCategoryCount = includedCategoryRows.filter(

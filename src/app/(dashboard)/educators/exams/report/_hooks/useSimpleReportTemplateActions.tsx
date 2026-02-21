@@ -10,26 +10,15 @@ import {
   uploadGradeReportFile,
 } from "@/services/exams/report.service";
 import type { ReportTemplateExamData } from "@/types/report";
-import {
-  htmlToReadableText,
-  normalizeReportMessageHtml,
-} from "@/utils/report-message-html";
-import { splitPayloadForSave } from "@/utils/splitPayloadForSave";
 
-import { PremiumReportPdf } from "../_components/PremiumReportPdf";
+import { SimpleReportPdf } from "../_components/SimpleReportPdf";
 
-import type { PremiumReportTemplateState } from "./usePremiumReportTemplateState";
+import type { SimpleReportTemplateState } from "./useSimpleReportTemplateState";
 
 type AlertFn = (payload: {
   title: string;
   description: string;
 }) => Promise<void> | void;
-type ConfirmFn = (payload: {
-  title: string;
-  description: string;
-  confirmText: string;
-  cancelText: string;
-}) => Promise<boolean>;
 
 const sanitizeFileName = (value: string) =>
   value.replace(/[/\\?%*:|"<>]/g, "_");
@@ -40,43 +29,42 @@ const shouldFallbackToLegacyStudentSave = (error: unknown) => {
   return status === 404 || status === 405 || status === 501;
 };
 
-export const usePremiumReportTemplateActions = ({
+export const useSimpleReportTemplateActions = ({
   examData,
-  commonMessage,
+  commonMessageForShare,
   state,
   showAlert,
-  showConfirm,
 }: {
   examData: ReportTemplateExamData;
-  commonMessage: string;
-  state: PremiumReportTemplateState;
+  commonMessageForShare: string;
+  state: SimpleReportTemplateState;
   showAlert: AlertFn;
-  showConfirm: ConfirmFn;
 }) => {
-  const commonMessageForShare = htmlToReadableText(
-    normalizeReportMessageHtml(commonMessage)
-  );
-
   const buildPdfData = () => ({
     studentName: examData.studentName,
-    className: examData.className,
-    schoolName: state.schoolName,
-    instructorName: state.instructorName,
     examName: examData.examName,
+    className: examData.className,
+    instructorName: state.instructorName,
     examDate: examData.examDate,
-    examType: state.examType,
     score: examData.score,
+    averageScore: examData.averageScore,
     rank: examData.rank,
     totalStudents: examData.totalStudents,
-    averageScore: examData.averageScore,
-    attendance: state.attendanceRate,
-    reviewTest: state.reviewTest,
-    homeworkWord: state.homeworkWord,
-    homeworkTask: state.homeworkTask,
-    homeworkExtra: state.homeworkExtra,
-    weaknessType: state.personalMessage,
+    attendance: examData.attendance,
     message: commonMessageForShare,
+    personalMessage: state.personalMessage,
+    miniTestRows: state.miniTestRows,
   });
+
+  const handlePersonalMessageChange = (value: string) => {
+    state.setPersonalMessage(value);
+    state.setIsStudentSaved(false);
+  };
+
+  const handleEdit = () => {
+    state.setIsEditing(true);
+    state.setIsStudentSaved(false);
+  };
 
   const handleSaveStudent = async () => {
     if (!examData.gradeId) {
@@ -87,38 +75,17 @@ export const usePremiumReportTemplateActions = ({
       return;
     }
 
-    if (
-      state.includedCategoryRows.length > 0 &&
-      state.missingCategoryCount > 0
-    ) {
-      const shouldProceed = await showConfirm({
-        title: "미입력 항목 확인",
-        description: `카테고리 ${state.missingCategoryCount}개가 미입력 상태입니다. 현재 학생 최종저장을 진행할까요?`,
-        confirmText: "저장 진행",
-        cancelText: "계속 입력",
-      });
-
-      if (!shouldProceed) {
-        return;
-      }
-    }
-
     state.setIsStudentSaving(true);
 
-    const formState = {
-      examId: examData.examId,
-      lectureEnrollmentId: examData.studentId,
-      template: "premium" as const,
-      message: commonMessage,
-      reviewTest: state.reviewTest,
-      homeworkWord: state.homeworkWord,
-      homeworkTask: state.homeworkTask,
-      homeworkExtra: state.homeworkExtra,
+    const studentPayload = {
+      template: "simple" as const,
+      reviewTest: "",
+      homeworkWord: "",
+      homeworkTask: "",
+      homeworkExtra: "",
       weaknessType: state.personalMessage,
-      attendanceRate: state.attendanceRate,
+      attendanceRate: "",
     };
-
-    const { studentPayload } = splitPayloadForSave(formState);
 
     try {
       try {
@@ -128,18 +95,13 @@ export const usePremiumReportTemplateActions = ({
           throw error;
         }
 
-        console.warn("[report][student-structured-save] fallback to legacy", {
-          gradeId: examData.gradeId,
-          error,
-        });
-
         await saveStudentReport(examData.gradeId, studentPayload);
       }
 
       state.setIsStudentSaved(true);
       state.setIsEditing(false);
     } catch (error) {
-      console.error("[report][student-save] failed", {
+      console.error("[report][simple-student-save] failed", {
         gradeId: examData.gradeId,
         error,
       });
@@ -152,21 +114,11 @@ export const usePremiumReportTemplateActions = ({
     }
   };
 
-  const handleEdit = () => {
-    state.setIsEditing(true);
-    state.setIsStudentSaved(false);
-  };
-
-  const handlePersonalMessageChange = (value: string) => {
-    state.setPersonalMessage(value);
-    state.setIsStudentSaved(false);
-  };
-
   const handleOpenKakaoModal = () => {
     if (!state.canSendOrDownload) {
       void showAlert({
         title: "발송 전 확인",
-        description: "시험 전체 적용과 현재 학생 최종저장을 먼저 완료해주세요.",
+        description: "시험 전체 적용과 현재 학생 저장을 먼저 완료해주세요.",
       });
       return;
     }
@@ -177,27 +129,23 @@ export const usePremiumReportTemplateActions = ({
     if (!state.canSendOrDownload || !examData.gradeId) {
       await showAlert({
         title: "발송 전 확인",
-        description: "시험 전체 적용과 현재 학생 최종저장을 먼저 완료해주세요.",
+        description: "시험 전체 적용과 현재 학생 저장을 먼저 완료해주세요.",
       });
       return;
     }
 
     try {
       const blob = await pdf(
-        <PremiumReportPdf
-          data={buildPdfData()}
-          categoryRows={state.includedCategoryRows}
-          questionResults={state.questionResults}
-          scoreHistory={state.scoreHistory}
-        />
+        <SimpleReportPdf data={buildPdfData()} />
       ).toBlob();
 
       const fileName = `${sanitizeFileName(examData.studentName)}_${sanitizeFileName(
         examData.examName
-      )}_프리미엄리포트.pdf`;
+      )}_심플리포트.pdf`;
       const file = new File([blob], fileName, { type: "application/pdf" });
 
       await uploadGradeReportFile(examData.gradeId, file);
+
       const { downloadUrl } = await getGradeReportFileDownloadUrl(
         examData.gradeId
       );
@@ -222,15 +170,18 @@ export const usePremiumReportTemplateActions = ({
   };
 
   const handleDownloadPdf = async () => {
+    if (!state.canSendOrDownload) {
+      await showAlert({
+        title: "다운로드 전 확인",
+        description: "시험 전체 적용과 현재 학생 저장을 먼저 완료해주세요.",
+      });
+      return;
+    }
+
     state.setIsGeneratingPdf(true);
     try {
       const blob = await pdf(
-        <PremiumReportPdf
-          data={buildPdfData()}
-          categoryRows={state.includedCategoryRows}
-          questionResults={state.questionResults}
-          scoreHistory={state.scoreHistory}
-        />
+        <SimpleReportPdf data={buildPdfData()} />
       ).toBlob();
 
       const url = URL.createObjectURL(blob);
@@ -238,7 +189,7 @@ export const usePremiumReportTemplateActions = ({
       link.href = url;
       link.download = `${sanitizeFileName(examData.studentName)}_${sanitizeFileName(
         examData.examName
-      )}_프리미엄리포트.pdf`;
+      )}_심플리포트.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -275,9 +226,9 @@ export const usePremiumReportTemplateActions = ({
 
   return {
     recipients,
-    handleSaveStudent,
-    handleEdit,
     handlePersonalMessageChange,
+    handleEdit,
+    handleSaveStudent,
     handleOpenKakaoModal,
     handleSendReport,
     handleDownloadPdf,

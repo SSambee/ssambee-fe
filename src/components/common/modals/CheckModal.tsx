@@ -67,7 +67,7 @@ export const CheckModal = ({
           <DialogTitle className="w-full text-[22px] font-semibold leading-[31px] tracking-[-0.22px] text-[#040405]">
             {title}
           </DialogTitle>
-          <p className="w-full text-[16px] font-medium leading-[24px] tracking-[-0.16px] text-[rgba(22,22,27,0.4)]">
+          <p className="w-full whitespace-pre-line text-[16px] font-medium leading-[24px] tracking-[-0.16px] text-[rgba(22,22,27,0.4)]">
             {description}
           </p>
         </DialogHeader>

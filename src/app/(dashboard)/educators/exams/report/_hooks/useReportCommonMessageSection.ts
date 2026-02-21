@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 
 import { useDialogAlert } from "@/hooks/useDialogAlert";
-
 import {
   htmlToPlainText,
-  plainTextToHtml,
-} from "../_utils/report-message-html";
+  normalizeReportMessageHtml,
+} from "@/utils/report-message-html";
 
 import { useReportPage } from "./useReportPage";
 
@@ -39,7 +38,7 @@ export const useReportCommonMessageSection = () => {
       return;
     }
 
-    setDraftMessageHtml(plainTextToHtml(commonMessage));
+    setDraftMessageHtml(normalizeReportMessageHtml(commonMessage));
     setIsModalOpen(true);
   };
 
@@ -53,7 +52,10 @@ export const useReportCommonMessageSection = () => {
     }
 
     try {
-      const messageToSave = htmlToPlainText(draftMessageHtml).trim();
+      const normalizedHtml = normalizeReportMessageHtml(draftMessageHtml);
+      const messageToSave = htmlToPlainText(normalizedHtml).trim()
+        ? normalizedHtml
+        : "";
       const result = await saveExamCommonMessage(messageToSave);
 
       if (!result) return;

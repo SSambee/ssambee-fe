@@ -248,7 +248,7 @@ export const premiumStyles = StyleSheet.create({
   // 전달사항
   messageText: {
     fontSize: 9,
-    lineHeight: 1.8,
+    lineHeight: 1.35,
     color: colors.darkGray,
   },
   // 카테고리 테이블
@@ -443,7 +443,77 @@ export const simpleStyles = StyleSheet.create({
   },
   messageText: {
     fontSize: 10,
-    lineHeight: 1.6,
+    lineHeight: 1.35,
+    color: colors.darkGray,
+  },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  sectionTitleBar: {
+    width: 3,
+    height: 14,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+    marginRight: 6,
+  },
+  sectionTitleText: {
+    fontSize: 11,
+    fontWeight: 700,
+    color: colors.black,
+  },
+  twoColumnRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 12,
+  },
+  column: {
+    flex: 1,
+  },
+  tableHeaderRow: {
+    flexDirection: "row",
+    backgroundColor: colors.lightBg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  tableHeaderName: {
+    flex: 1,
+    fontSize: 9,
+    fontWeight: 700,
+    color: colors.darkGray,
+  },
+  tableHeaderValue: {
+    width: 72,
+    fontSize: 9,
+    fontWeight: 700,
+    color: colors.darkGray,
+    textAlign: "right",
+  },
+  tableDataRow: {
+    flexDirection: "row",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  tableDataName: {
+    flex: 1,
+    fontSize: 9,
+    color: colors.darkGray,
+  },
+  tableDataValue: {
+    width: 72,
+    textAlign: "right",
+    fontSize: 9,
+    fontWeight: 700,
+    color: colors.primary,
+  },
+  noteMessage: {
+    fontSize: 10,
+    lineHeight: 1.35,
     color: colors.darkGray,
   },
 });
