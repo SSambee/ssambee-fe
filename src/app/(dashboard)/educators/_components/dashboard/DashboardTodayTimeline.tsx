@@ -9,6 +9,8 @@ type DashboardTodayTimelineProps = {
   items: DashboardScheduleItem[];
 };
 
+const TEMP_ACTIVE_INDEX_FOR_UI_PHASE = 2;
+
 export function DashboardTodayTimeline({
   dateLabel,
   items,
@@ -26,7 +28,10 @@ export function DashboardTodayTimeline({
         </div>
         <Button
           variant={null}
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+          disabled
+          aria-label="더보기 (준비 중)"
+          title="준비 중인 기능입니다"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
@@ -34,12 +39,14 @@ export function DashboardTodayTimeline({
       </div>
 
       <div className="relative">
-        <div className="absolute bottom-2 left-[5px] top-[11px] w-px bg-[#eaecf2]" />
+        {items.length > 0 ? (
+          <div className="absolute bottom-2 left-[5px] top-[11px] w-px bg-[#eaecf2]" />
+        ) : null}
 
         <div className="space-y-4">
           {items.map((item, index) => {
-            const isActive = index === 2;
-            const isPast = index < 2;
+            const isActive = index === TEMP_ACTIVE_INDEX_FOR_UI_PHASE;
+            const isPast = index < TEMP_ACTIVE_INDEX_FOR_UI_PHASE;
 
             return (
               <div key={item.id} className="relative flex items-center gap-3">

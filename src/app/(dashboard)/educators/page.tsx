@@ -4,6 +4,7 @@ import {
   mockDashboardStats,
   mockDashboardTasks,
   mockDashboardTimeline,
+  mockDashboardTimelineDateLabel,
 } from "@/data/dashboard.mock";
 
 import { DashboardClinicCard } from "./_components/dashboard/DashboardClinicCard";
@@ -27,7 +28,7 @@ export default function EducatorsDashboardPage() {
 
         <div className="space-y-6 xl:justify-self-end">
           <DashboardTodayTimeline
-            dateLabel="2026. 01. 28"
+            dateLabel={mockDashboardTimelineDateLabel}
             items={mockDashboardTimeline}
           />
           <DashboardClinicCard clinics={mockDashboardClinics} />
