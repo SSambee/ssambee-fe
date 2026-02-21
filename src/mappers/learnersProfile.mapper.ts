@@ -15,6 +15,11 @@ const toOptionalString = (value: string | null | undefined) => {
   return trimmed && trimmed.length > 0 ? trimmed : undefined;
 };
 
+const toEditableString = (value: string | null | undefined) => {
+  const trimmed = value?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : "";
+};
+
 export const mapLearnerMyProfileApiToView = (
   payload: LearnerMyProfileApiResponse
 ): LearnerProfile => {
@@ -42,6 +47,10 @@ export const mapLearnerMyProfileApiToView = (
     name: payload.name,
     email: payload.email,
     phone: payload.phoneNumber,
+    parentPhone:
+      payload.userType === "STUDENT"
+        ? toEditableString(payload.parentPhoneNumber)
+        : "",
     image: payload.image ?? null,
     phoneVerified: payload.phoneVerified ?? false,
     userType: payload.userType,
@@ -65,6 +74,7 @@ export const mapLearnersProfileUpdateFormToApi = (
   if (currentProfile.userType === "STUDENT") {
     payload.school = toOptionalString(formData.school);
     payload.schoolYear = toOptionalString(formData.schoolYear);
+    payload.parentPhoneNumber = toOptionalString(formData.parentPhoneNumber);
   }
 
   return payload;

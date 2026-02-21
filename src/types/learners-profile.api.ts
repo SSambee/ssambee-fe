@@ -28,6 +28,7 @@ export type StudentMyProfileApiResponse = LearnerProfileApiBase & {
   userType: "STUDENT";
   school?: string | null;
   schoolYear?: string | null;
+  parentPhoneNumber?: string | null;
   instructors?: LearnerProfileApiInstructor[];
 };
 
@@ -44,4 +45,5 @@ export type UpdateLearnerMyProfilePayload = {
   name?: string;
   school?: string;
   schoolYear?: string;
+  parentPhoneNumber?: string;
 };

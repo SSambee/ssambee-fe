@@ -50,6 +50,16 @@ export function LearnersBasicInfo({
             </Button>
           </div>
         </div>
+
+        {profile.userType === "STUDENT" ? (
+          <div>
+            <Label className="text-sm text-neutral-400">학부모 연락처</Label>
+            <div className="mt-1 flex items-center gap-2 rounded-lg bg-neutral-50 p-3">
+              <Phone className="h-4 w-4 text-neutral-400" />
+              <p className="text-neutral-800">{profile.parentPhone || "-"}</p>
+            </div>
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   );
