@@ -47,8 +47,7 @@ export const useSimpleReportTemplateResources = ({
         setPersonalMessage(loadedPersonalMessage);
         setIsStudentSaved(hasSavedStudentData);
         setIsEditing(!hasSavedStudentData);
-      } catch (error) {
-        console.error("학생 리포트 로드 실패:", error);
+      } catch {
         if (cancelled) return;
         setPersonalMessage("");
         setIsStudentSaved(false);

@@ -89,7 +89,7 @@ export const useMiniTestsPageResources = ({
       return;
     }
 
-    const requestVersion = assignmentDataVersion;
+    const requestKey = `${selectedExamId}:${assignmentDataVersion}`;
     let cancelled = false;
 
     const loadExamAssignmentData = async () => {
@@ -105,10 +105,14 @@ export const useMiniTestsPageResources = ({
         const nextSelections: SelectionByStudent = {};
 
         for (let i = 0; i < students.length; i += 5) {
+          if (cancelled) return;
+
           const chunk = students.slice(i, i + 5);
 
           await Promise.all(
             chunk.map(async (student) => {
+              if (cancelled) return;
+
               if (!student.gradeId) {
                 nextSelections[student.id] = {};
                 return;
@@ -140,8 +144,6 @@ export const useMiniTestsPageResources = ({
         setSelectionsByExam((prev) => {
           if (cancelled) return prev;
 
-          void requestVersion;
-
           return {
             ...prev,
             [selectedExamId]: nextSelections,
@@ -153,7 +155,10 @@ export const useMiniTestsPageResources = ({
           [selectedExamId]: isFinalizedFromReport,
         }));
       } catch (error) {
-        console.error("Failed to load mini-test assignment data", error);
+        console.error("Failed to load mini-test assignment data", {
+          requestKey,
+          error,
+        });
         if (!cancelled) {
           setIncludedAssignments([]);
           setSelectionsByExam((prev) => ({

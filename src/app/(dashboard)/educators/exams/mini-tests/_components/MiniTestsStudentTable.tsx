@@ -85,7 +85,7 @@ export function MiniTestsStudentTable({
                       <div className="flex flex-wrap justify-center gap-1">
                         {assignment.presets.map((preset, presetIndex) => (
                           <button
-                            key={`${assignment.id}-${preset}`}
+                            key={`${assignment.id}-${presetIndex}-${preset}`}
                             type="button"
                             onClick={() =>
                               onSelectionChange(
