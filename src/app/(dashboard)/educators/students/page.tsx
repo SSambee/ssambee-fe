@@ -23,11 +23,11 @@ import { CheckModal } from "@/components/common/modals/CheckModal";
 import { getTodayYMD } from "@/utils/date";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
+import DataTable from "@/components/common/table/DataTable";
 
-import { StudentTableData } from "./_components/table/StudentTableColumns";
 import { StudentFilter } from "./_components/filter/StudentFilter";
 import { StudentActions } from "./_components/action/StudentActions";
-import { StudentTable } from "./_components/table/StudentTable";
+import { STUDENT_TABLE_COLUMNS } from "./_components/table/StudentTableColumns";
 
 const PAGE_LIMIT = 10;
 
@@ -65,24 +65,23 @@ export default function StudentsListPage() {
   const [query, setQuery] = useState<EnrollmentListQuery>({
     page: 1,
     limit: PAGE_LIMIT,
-    keyword: "",
     year: null,
     status: null,
     lecture: null,
     examId: null,
   });
 
-  // 디바운스된 검색어가 바뀔 때만 실제 query의 keyword를 업데이트
-  useEffect(() => {
-    setQuery((prev) => ({
-      ...prev,
-      keyword: debouncedSearchTerm,
-      page: 1, // 검색어가 바뀌면 1페이지로 리셋
-    }));
-  }, [debouncedSearchTerm]);
-
   // 수강생 목록 조회 -> 검색할 때 query.keyword가 0.5초 뒤에 변경됨
-  const { data, isPending, isError } = useEnrollmentList(query);
+  const { data, isPending, isError } = useEnrollmentList({
+    ...query,
+    keyword: debouncedSearchTerm,
+    // 검색어가 존재하면 페이지를 1로, 아니면 query.page 사용 (선택적 로직)
+    page: debouncedSearchTerm
+      ? query.keyword !== debouncedSearchTerm
+        ? 1
+        : query.page
+      : query.page,
+  });
 
   const studentList = data?.list || [];
   const pagination: PaginationType = data?.pagination ?? {
@@ -197,8 +196,10 @@ export default function StudentsListPage() {
   if (isError) return <div>조회 실패</div>;
 
   // 테이블 컬럼 데이터
-  const columns = StudentTableData({
+  const columns = STUDENT_TABLE_COLUMNS({
     selectedStudents: selectedStudentIds,
+    isAllSelected: isCurrentPageAllSelected,
+    onSelectAll: handleSelectAll,
     onToggleStudent: (student) =>
       toggleStudent({
         enrollmentId: student.id,
@@ -237,24 +238,26 @@ export default function StudentsListPage() {
         selectedLectureStatus={selectedLectureInfo?.status}
         onAttendanceClick={handleAttendanceClick}
       />
+      <div>
+        <DataTable
+          data={studentList}
+          columns={columns}
+          emptyMessage={
+            isPending ? "데이터 로딩 중..." : "검색 결과가 없습니다."
+          }
+          onRowClick={(row) => handleNavigate(row.id)}
+        />
 
-      <StudentTable
-        isPending={isPending}
-        studentList={studentList}
-        isCurrentPageAllSelected={isCurrentPageAllSelected}
-        handleSelectAll={handleSelectAll}
-        columns={columns}
-      />
-
-      <Pagination
-        pagination={pagination as PaginationType}
-        onPageChange={(page) =>
-          setQuery((prev) => ({
-            ...prev,
-            page,
-          }))
-        }
-      />
+        <Pagination
+          pagination={pagination as PaginationType}
+          onPageChange={(page) =>
+            setQuery((prev) => ({
+              ...prev,
+              page,
+            }))
+          }
+        />
+      </div>
     </div>
   );
 }
