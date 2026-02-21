@@ -26,7 +26,7 @@ export default function MaterialsPage() {
   };
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <div className="flex items-center justify-between gap-4">
         <Title
           title="학습 자료실"

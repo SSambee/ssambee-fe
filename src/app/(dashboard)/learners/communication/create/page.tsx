@@ -99,7 +99,7 @@ export default function CreateInquiryPostPageSVC() {
   const isSubmitting = studentMutation.isPending || parentMutation.isPending;
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <div className="flex items-center justify-between gap-4">
         <Title title="게시글 등록" description="새로운 게시글을 작성합니다." />
 

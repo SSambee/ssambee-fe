@@ -212,7 +212,7 @@ export default function StudentsListPage() {
   });
 
   return (
-    <div className="container mx-auto px-8 py-8 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <Title
         title="전체 학생 관리"
         description={`총 ${ListTotalCount}명의 학생 정보를 관리하고 있습니다.`}

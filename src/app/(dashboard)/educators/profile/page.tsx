@@ -76,7 +76,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-6 p-4 max-w-[1400px] mx-auto w-full">
+    <div className="container mx-auto space-y-8 p-6">
       <ProfileSummary
         profile={profile}
         onEditClick={handleEditClick}

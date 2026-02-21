@@ -96,7 +96,7 @@ export default function StudentDetailPage() {
   };
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <Title
         title="학생 상세 정보"
         description="학생의 상세 정보를 확인하고 관리합니다."
