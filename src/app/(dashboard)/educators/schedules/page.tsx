@@ -3,7 +3,6 @@
 import { useCallback } from "react";
 import { LayoutGrid, Calendar as CalendarIcon } from "lucide-react";
 
-import { SectionHeader } from "@/components/common/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { useScheduleEvents } from "@/app/(dashboard)/educators/schedules/_hooks/useScheduleEvents";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
@@ -90,65 +89,70 @@ export default function EducatorsSchedulesPage() {
 
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <SectionHeader
-        title="스케줄 관리"
-        description="수업, 시험, 상담 일정을 한눈에 확인하세요."
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-10 gap-2"
-              onClick={openCreateScheduleModal}
-            >
-              <CalendarIcon className="h-4 w-4" />
-              일정 생성
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              className="h-10 gap-2"
-              onClick={() => setTimetableOpen(true)}
-            >
-              <LayoutGrid className="h-4 w-4" />
-              시간표 보기
-            </Button>
-          </div>
-        }
-      />
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
-        <ScheduleCalendar
-          view={view}
-          currentDate={currentDate}
-          events={filteredEvents}
-          onViewChange={setView}
-          onNavigate={setCurrentDate}
-          onSelectEvent={handleStartScheduleEdit}
-        />
-        <ScheduleSidebar
-          categories={categories}
-          filters={filters}
-          onFilterChange={setFilters}
-          todayEvents={todayEvents}
-          onSelectTodayEvent={handleStartScheduleEdit}
-          categoryLabelMap={categoryLabelMap}
-          isCategoryActionLocked={
-            isCategoryCreating || isCategoryUpdating || isCategoryDeleting
-          }
-          onOpenCreateCategoryModal={openCreateCategoryModal}
-        />
-      </div>
-
-      {isSchedulesLoading ? (
-        <p className="text-sm text-muted-foreground">
-          일정을 불러오는 중입니다...
+      <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
+        <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
+          스케줄 관리
+        </h1>
+        <p className="mt-[6px] text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
+          수업, 시험, 상담 일정을 한눈에 확인하세요
         </p>
-      ) : null}
+      </section>
 
-      {loadError ? (
-        <p className="text-sm text-destructive">{loadError}</p>
-      ) : null}
+      <div className="space-y-8">
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none"
+            onClick={openCreateScheduleModal}
+          >
+            <CalendarIcon className="h-5 w-5" />
+            일정 생성
+          </Button>
+          <Button
+            type="button"
+            variant="default"
+            className="h-14 w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
+            onClick={() => setTimetableOpen(true)}
+          >
+            <LayoutGrid className="h-5 w-5" />
+            시간표 보기
+          </Button>
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1fr_380px] xl:items-start">
+          <ScheduleCalendar
+            view={view}
+            currentDate={currentDate}
+            events={filteredEvents}
+            onViewChange={setView}
+            onNavigate={setCurrentDate}
+            onSelectEvent={handleStartScheduleEdit}
+          />
+          <ScheduleSidebar
+            categories={categories}
+            filters={filters}
+            onFilterChange={setFilters}
+            todayEvents={todayEvents}
+            onSelectTodayEvent={handleStartScheduleEdit}
+            categoryLabelMap={categoryLabelMap}
+            isCategoryActionLocked={
+              isCategoryCreating || isCategoryUpdating || isCategoryDeleting
+            }
+            onOpenCreateCategoryModal={openCreateCategoryModal}
+          />
+        </div>
+
+        {isSchedulesLoading ? (
+          <p className="text-sm text-neutral-400">
+            일정을 불러오는 중입니다...
+          </p>
+        ) : null}
+
+        {loadError ? (
+          <p className="text-sm text-destructive">{loadError}</p>
+        ) : null}
+      </div>
 
       <ScheduleCreateModal
         open={createOpen}

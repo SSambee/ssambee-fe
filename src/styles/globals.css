@@ -118,25 +118,34 @@
 
 .eduops-calendar {
   --eduops-calendar-border: #e9ebf0;
-  --eduops-calendar-muted: rgba(22, 22, 27, 0.4);
-  --eduops-calendar-text: rgba(22, 22, 27, 0.88);
-  --eduops-calendar-soft: #f8fafc;
+  --eduops-calendar-muted: #8b90a3;
+  --eduops-calendar-text: #4a4d5c;
+  --eduops-calendar-soft: #fcfcfd;
 }
 
 .eduops-calendar .rbc-month-view,
 .eduops-calendar .rbc-time-view {
   border: 1px solid var(--eduops-calendar-border);
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
   background: #ffffff;
 }
 
 .eduops-calendar .rbc-header {
-  padding: 10px 8px;
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  padding: 12px 8px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--eduops-calendar-muted);
+  background: #f4f6fa;
   border-bottom: 1px solid var(--eduops-calendar-border);
+}
+
+.eduops-calendar .rbc-month-row {
+  min-height: 160px;
 }
 
 .eduops-calendar .rbc-month-row + .rbc-month-row,
@@ -146,55 +155,83 @@
 }
 
 .eduops-calendar .rbc-day-bg {
+  background: #fcfcfd;
   border-left: 1px solid var(--eduops-calendar-border);
 }
 
 .eduops-calendar .rbc-off-range-bg {
-  background: #fbfbfd;
+  background: #f8fafc;
 }
 
 .eduops-calendar .rbc-off-range {
-  color: rgba(148, 163, 184, 0.8);
+  color: rgba(139, 144, 163, 0.88);
 }
 
-.eduops-calendar .rbc-today {
+.eduops-calendar .rbc-date-cell {
+  padding: 12px 0 0;
+  text-align: center;
+}
+
+.eduops-calendar .rbc-date-cell > a {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.18px;
+  color: var(--eduops-calendar-text);
+}
+
+.eduops-calendar .rbc-today,
+.eduops-calendar .rbc-today.rbc-off-range-bg {
   background: var(--eduops-calendar-soft);
 }
 
 .eduops-calendar-day.is-weekend {
-  background: rgba(248, 250, 252, 0.7);
+  background: #fcfcfd;
 }
 
 .eduops-calendar-day.is-today {
-  box-shadow: inset 0 0 0 1px rgba(56, 99, 246, 0.22);
+  box-shadow: inset 0 0 0 2px rgba(112, 143, 249, 0.28);
 }
 
 .eduops-calendar .rbc-event {
-  border: none;
   border-radius: 8px;
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 4px 6px;
   box-shadow: none;
 }
 
-.eduops-calendar-event--exam {
-  background: #fee2e2;
-  color: #b91c1c;
+.eduops-calendar .rbc-event-label {
+  display: none;
 }
 
-.eduops-calendar-event--clinic {
-  background: #dcfce7;
-  color: #166534;
+.eduops-calendar .rbc-event-content {
+  height: auto;
 }
 
-.eduops-calendar-event--misc {
-  background: #fef3c7;
-  color: #92400e;
+.eduops-calendar-event-card {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.eduops-calendar-event-time {
+  display: none;
+}
+
+.eduops-calendar-event-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: -0.13px;
+  color: #4a4d5c;
+}
+
+.eduops-calendar-event-meta {
+  display: none;
 }
 
 .eduops-calendar .rbc-show-more {
-  color: #3863f6;
+  color: #4b72f7;
   font-weight: 600;
 }
 
