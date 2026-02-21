@@ -1,16 +1,21 @@
 "use client";
 
-import { createAssignmentCategoryAPI } from "@/services/exams/assignment-categories.service";
 import {
-  readReportCategoryStorageConfig,
-  saveReportCategoryStorageConfig,
-  type ReportCategory,
-} from "@/services/exams/report-category-persistence.service";
+  createAssignmentCategoryAPI,
+  deleteAssignmentCategoryAPI,
+  updateAssignmentCategoryAPI,
+} from "@/services/exams/assignment-categories.service";
+import {
+  createAssignmentAPI,
+  deleteAssignmentAPI,
+} from "@/services/exams/assignments.service";
+import { updateExamReportAssignmentsAPI } from "@/services/exams/exam-report-assignments.service";
 import type { Exam } from "@/types/exams";
 
 import {
   getClassKey,
   type ExamsCategoryModalState,
+  type ReportCategory,
   type PresetSnippet,
 } from "./useExamsCategoryModalState";
 
@@ -112,18 +117,6 @@ export const useExamsCategoryModalActions = ({
 
       state.setCategories((prev) => [mappedCategory, ...prev]);
 
-      if (state.effectiveExamId) {
-        state.setExamCategoryMap((prev) => ({
-          ...prev,
-          [state.effectiveExamId]: [
-            ...new Set([
-              ...(prev[state.effectiveExamId] ?? []),
-              mappedCategory.id,
-            ]),
-          ],
-        }));
-      }
-
       state.setCategoryName("");
       state.setPresetDrafts([]);
       state.setPresetInput("");
@@ -142,42 +135,305 @@ export const useExamsCategoryModalActions = ({
     }
   };
 
+  const handleCreateAssignment = async () => {
+    const lectureId = state.selectedExam?.lectureId;
+    const title = state.assignmentTitle.trim();
+
+    if (!lectureId) {
+      state.setCreateAssignmentError(
+        "강의가 연결된 시험을 선택한 뒤 과제를 생성해주세요."
+      );
+      return;
+    }
+
+    if (!title) {
+      state.setCreateAssignmentError("과제명을 입력해주세요.");
+      return;
+    }
+
+    if (!state.assignmentCategoryId) {
+      state.setCreateAssignmentError("카테고리를 선택해주세요.");
+      return;
+    }
+
+    state.setIsCreatingAssignment(true);
+    state.setCreateAssignmentError(null);
+
+    try {
+      const created = await createAssignmentAPI(lectureId, {
+        title,
+        categoryId: state.assignmentCategoryId,
+      });
+
+      const matchedCategory = state.categories.find(
+        (category) => category.id === state.assignmentCategoryId
+      );
+
+      state.setAvailableAssignments((prev) => {
+        const next = [
+          ...prev.filter((assignment) => assignment.id !== created.id),
+          {
+            id: created.id,
+            title: created.title,
+            categoryId: created.categoryId,
+            categoryName: matchedCategory?.name ?? "카테고리 미지정",
+            presets: matchedCategory?.presets ?? [],
+          },
+        ];
+
+        return next.sort((a, b) => a.title.localeCompare(b.title, "ko"));
+      });
+
+      if (state.effectiveExamId) {
+        state.setExamAssignmentMap((prev) => ({
+          ...prev,
+          [state.effectiveExamId]: Array.from(
+            new Set([...(prev[state.effectiveExamId] ?? []), created.id])
+          ),
+        }));
+      }
+
+      state.setAssignmentTitle("");
+    } catch (error) {
+      console.error("Failed to create assignment", error);
+      state.setCreateAssignmentError(
+        "과제 생성에 실패했습니다. 잠시 후 다시 시도해주세요."
+      );
+      showAlert({
+        title: "오류",
+        description: "과제 생성에 실패했습니다.",
+      });
+    } finally {
+      state.setIsCreatingAssignment(false);
+    }
+  };
+
+  const handleDeleteAssignment = async ({
+    assignmentId,
+    assignmentTitle,
+  }: {
+    assignmentId: string;
+    assignmentTitle: string;
+  }) => {
+    const shouldDelete = await showConfirm({
+      title: "과제를 삭제할까요?",
+      description: `"${assignmentTitle}" 과제를 삭제하면 모든 시험 포함/결과 데이터에서 제거됩니다.`,
+      confirmText: "삭제",
+      cancelText: "취소",
+    });
+
+    if (!shouldDelete) return false;
+
+    state.setIsDeletingAssignment(true);
+    state.setDeletingAssignmentId(assignmentId);
+
+    try {
+      await deleteAssignmentAPI(assignmentId);
+
+      state.setAvailableAssignments((prev) =>
+        prev.filter((assignment) => assignment.id !== assignmentId)
+      );
+
+      state.setExamAssignmentMap((prev) => {
+        const next = Object.fromEntries(
+          Object.entries(prev).map(([examId, assignmentIds]) => [
+            examId,
+            assignmentIds.filter((id) => id !== assignmentId),
+          ])
+        );
+
+        state.setBaselineExamAssignmentMapSerialized(JSON.stringify(next));
+        return next;
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Failed to delete assignment", error);
+      showAlert({
+        title: "오류",
+        description: "과제 삭제에 실패했습니다.",
+      });
+      return false;
+    } finally {
+      state.setIsDeletingAssignment(false);
+      state.setDeletingAssignmentId(null);
+    }
+  };
+
   const toggleIncluded = (id: string) => {
     if (!state.effectiveExamId) return;
 
-    state.setExamCategoryMap((prev) => {
+    const categoryAssignmentIds = state.availableAssignments
+      .filter((assignment) => assignment.categoryId === id)
+      .map((assignment) => assignment.id);
+
+    if (categoryAssignmentIds.length === 0) return;
+
+    state.setExamAssignmentMap((prev) => {
       const current = prev[state.effectiveExamId] ?? [];
-      const exists = current.includes(id);
+      const currentSet = new Set(current);
+      const shouldExclude = categoryAssignmentIds.every((assignmentId) =>
+        currentSet.has(assignmentId)
+      );
+
+      const nextSet = new Set(current);
+
+      categoryAssignmentIds.forEach((assignmentId) => {
+        if (shouldExclude) {
+          nextSet.delete(assignmentId);
+          return;
+        }
+
+        nextSet.add(assignmentId);
+      });
+
       return {
         ...prev,
-        [state.effectiveExamId]: exists
-          ? current.filter((value) => value !== id)
-          : [...current, id],
+        [state.effectiveExamId]: Array.from(nextSet),
       };
     });
   };
 
+  const handleUpdateCategory = async ({
+    id,
+    name,
+    resultPresets,
+  }: {
+    id: string;
+    name: string;
+    resultPresets: string[];
+  }) => {
+    state.setIsUpdatingCategory(true);
+
+    try {
+      const updatedCategory = await updateAssignmentCategoryAPI(id, {
+        name,
+        resultPresets,
+      });
+
+      state.setCategories((prev) =>
+        prev.map((category) =>
+          category.id === id
+            ? {
+                id: updatedCategory.id,
+                name: updatedCategory.name,
+                presets: updatedCategory.resultPresets,
+              }
+            : category
+        )
+      );
+
+      return true;
+    } catch (error) {
+      console.error("Failed to update category", error);
+      showAlert({
+        title: "오류",
+        description: "카테고리 수정에 실패했습니다.",
+      });
+      return false;
+    } finally {
+      state.setIsUpdatingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async ({
+    id,
+    name,
+  }: {
+    id: string;
+    name: string;
+  }) => {
+    const shouldDelete = await showConfirm({
+      title: "카테고리를 삭제할까요?",
+      description: `\"${name}\" 카테고리를 삭제하면 현재 시험 포함 설정에서도 제거됩니다.`,
+      confirmText: "삭제",
+      cancelText: "취소",
+    });
+
+    if (!shouldDelete) return false;
+
+    state.setIsDeletingCategory(true);
+
+    try {
+      await deleteAssignmentCategoryAPI(id);
+
+      state.setCategories((prev) =>
+        prev.filter((category) => category.id !== id)
+      );
+
+      return true;
+    } catch (error) {
+      console.error("Failed to delete category", error);
+      showAlert({
+        title: "오류",
+        description: "카테고리 삭제에 실패했습니다.",
+      });
+      return false;
+    } finally {
+      state.setIsDeletingCategory(false);
+    }
+  };
+
   const resetDraftInputs = () => {
     state.setCategoryName("");
+    state.setAssignmentTitle("");
     state.setPresetInput("");
     state.setPresetDrafts([]);
     state.setCreateError(null);
+    state.setCreateAssignmentError(null);
     state.setClassSearchQuery("");
     state.setExamSearchQuery("");
     state.setShowIncludedOnly(false);
   };
 
-  const handleSaveModal = () => {
-    saveReportCategoryStorageConfig({
-      categories: state.categories,
-      examCategoryMap: state.examCategoryMap,
-      studentSelections: state.studentSelections,
-    });
-    state.setBaselineCategoriesSerialized(JSON.stringify(state.categories));
-    state.setBaselineExamMapSerialized(JSON.stringify(state.examCategoryMap));
+  const toggleIncludedAssignment = (assignmentId: string) => {
+    if (!state.effectiveExamId) return;
 
-    state.setIsCategoryModalOpen(false);
-    resetDraftInputs();
+    state.setExamAssignmentMap((prev) => {
+      const current = prev[state.effectiveExamId] ?? [];
+      const exists = current.includes(assignmentId);
+
+      return {
+        ...prev,
+        [state.effectiveExamId]: exists
+          ? current.filter((value) => value !== assignmentId)
+          : [...current, assignmentId],
+      };
+    });
+  };
+
+  const handleSaveModal = async (options?: { closeAfterSave?: boolean }) => {
+    const closeAfterSave = options?.closeAfterSave ?? true;
+
+    if (state.effectiveExamId && state.hasPendingAssignmentChanges) {
+      state.setIsSavingAssignments(true);
+
+      try {
+        await updateExamReportAssignmentsAPI(state.effectiveExamId, {
+          assignments: state.includedAssignmentIds,
+        });
+
+        state.setBaselineExamAssignmentMapSerialized(
+          JSON.stringify(state.examAssignmentMap)
+        );
+      } catch (error) {
+        console.error("Failed to save report assignments", error);
+        showAlert({
+          title: "오류",
+          description: "시험별 포함 과제 저장에 실패했습니다.",
+        });
+        return false;
+      } finally {
+        state.setIsSavingAssignments(false);
+      }
+    }
+
+    if (closeAfterSave) {
+      state.setIsCategoryModalOpen(false);
+      resetDraftInputs();
+    }
+
+    return true;
   };
 
   const handleModalOpenChange = async (nextOpen: boolean) => {
@@ -192,7 +448,7 @@ export const useExamsCategoryModalActions = ({
       const shouldClose = await showConfirm({
         title: "미저장 변경사항",
         description:
-          "저장하지 않은 카테고리/포함 설정 변경사항이 있습니다. 닫으시겠습니까?",
+          "저장하지 않은 포함 설정 변경사항이 있습니다. 닫으시겠습니까?",
         confirmText: "닫기",
         cancelText: "계속 수정",
       });
@@ -204,23 +460,16 @@ export const useExamsCategoryModalActions = ({
     resetDraftInputs();
   };
 
-  const handleOpenModal = () => {
-    const latestStorage = readReportCategoryStorageConfig();
-
-    state.setCategories(latestStorage.categories);
-    state.setExamCategoryMap(latestStorage.examCategoryMap);
-    state.setBaselineCategoriesSerialized(
-      JSON.stringify(latestStorage.categories)
-    );
-    state.setBaselineExamMapSerialized(
-      JSON.stringify(latestStorage.examCategoryMap)
-    );
-
+  const handleOpenModal = (preferredExamId?: string) => {
     if (exams.length > 0) {
       const fallbackExam =
+        (preferredExamId
+          ? exams.find((exam) => exam.id === preferredExamId)
+          : undefined) ??
         (state.selectedExamId
           ? exams.find((exam) => exam.id === state.selectedExamId)
-          : undefined) ?? exams[0];
+          : undefined) ??
+        exams[0];
 
       state.setSelectedClassKey(getClassKey(fallbackExam));
       state.setSelectedExamId(fallbackExam.id);
@@ -238,7 +487,12 @@ export const useExamsCategoryModalActions = ({
     removePresetDraft,
     applySnippet,
     handleCreateCategory,
+    handleCreateAssignment,
+    handleDeleteAssignment,
+    handleUpdateCategory,
+    handleDeleteCategory,
     toggleIncluded,
+    toggleIncludedAssignment,
     handleSaveModal,
     handleModalOpenChange,
     handleOpenModal,

@@ -61,9 +61,20 @@ export const loadReportClassSelectionResource = async ({
   enrollments: LectureStudent[];
   nextStatsById: Record<string, ExamStatisticsApi | null>;
 }> => {
+  const enrollmentsPromise = fetchLectureEnrollmentsAPI(classId).catch(
+    (error) => {
+      console.error(
+        "수강생 목록 로드 실패(시험 목록은 계속 진행):",
+        classId,
+        error
+      );
+      return [] as LectureStudent[];
+    }
+  );
+
   const [examsApi, enrollments] = await Promise.all([
     fetchExamsByLectureAPI(classId),
-    fetchLectureEnrollmentsAPI(classId),
+    enrollmentsPromise,
   ]);
 
   const statsEntries = await Promise.all(

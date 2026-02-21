@@ -1,7 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
-import { Check, Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 
 import Title from "@/components/common/header/Title";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
     isCreatingCategory,
     isBusy,
     categories,
+    availableAssignments,
     selectedExam,
     classOptions,
     classSearchQuery,
@@ -72,8 +74,14 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
     toggleIncluded,
     handleSaveModal,
     handleModalOpenChange,
-    handleOpenModal,
   } = useExamsCategoryModal(exams);
+
+  const assignmentCountByCategory = useMemo(() => {
+    return availableAssignments.reduce<Record<string, number>>((acc, row) => {
+      acc[row.categoryId] = (acc[row.categoryId] ?? 0) + 1;
+      return acc;
+    }, {});
+  }, [availableAssignments]);
 
   return (
     <>
@@ -93,12 +101,8 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
           <Button variant="outline" className="rounded-full" asChild>
             <Link href="/educators/exams/clinic">클리닉</Link>
           </Button>
-          <Button
-            variant="outline"
-            className="rounded-full"
-            onClick={handleOpenModal}
-          >
-            카테고리 등록
+          <Button variant="outline" className="rounded-full" asChild>
+            <Link href="/educators/exams/mini-tests">미니테스트</Link>
           </Button>
           <Button className="rounded-full" asChild>
             <Link href="/educators/exams/report">성적표 발송</Link>
@@ -116,7 +120,7 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
           <DialogHeader>
             <DialogTitle>카테고리 등록</DialogTitle>
             <DialogDescription>
-              카테고리 라이브러리를 추가하고, 현재 시험의 성적표 포함 항목을
+              카테고리는 분류/프리셋 라이브러리이며, 성적표 포함은 과제 단위로
               설정합니다.
             </DialogDescription>
           </DialogHeader>
@@ -126,8 +130,8 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
               <div className="space-y-1">
                 <p className="text-sm font-semibold">새 카테고리 추가</p>
                 <p className="text-xs text-muted-foreground">
-                  라이브러리에 새 항목을 만들고, 필요 시 현재 시험에 포함할 수
-                  있습니다.
+                  카테고리 생성 후 해당 카테고리 과제를 만들어야 포함 설정
+                  목록에 표시됩니다.
                 </p>
               </div>
 
@@ -225,10 +229,12 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
 
             <div className="space-y-4 rounded-lg border p-4 xl:col-span-7">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold">시험별 성적표 포함 설정</p>
+                <p className="text-sm font-semibold">
+                  시험별 성적표 포함 설정 (과제 단위)
+                </p>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">
-                    선택한 항목만 성적표 발송 화면에 노출됩니다.
+                    선택한 과제만 성적표 발송 화면에 노출됩니다.
                   </span>
                   <Button
                     type="button"
@@ -344,7 +350,8 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
                       </span>
                       <span>
                         표시 {visibleCategories.length}/{categories.length} ·
-                        포함 카테고리 {includedCategoryIds.length}개
+                        과제 {availableAssignments.length}개 · 포함 카테고리{" "}
+                        {includedCategoryIds.length}개
                       </span>
                     </div>
                   </div>
@@ -365,6 +372,9 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
                 ) : (
                   visibleCategories.map((category) => {
                     const included = includedCategoryIds.includes(category.id);
+                    const linkedCount =
+                      assignmentCountByCategory[category.id] ?? 0;
+                    const isSelectable = linkedCount > 0;
 
                     return (
                       <div
@@ -373,6 +383,9 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
                       >
                         <div className="space-y-1">
                           <p className="text-sm font-medium">{category.name}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            연결 과제 {linkedCount}개
+                          </p>
                           <div className="flex flex-wrap gap-1">
                             {category.presets.map((preset) => (
                               <span
@@ -389,16 +402,15 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
                           type="button"
                           variant={included ? "default" : "outline"}
                           onClick={() => toggleIncluded(category.id)}
-                          disabled={!effectiveExamId || isBusy}
+                          disabled={!effectiveExamId || isBusy || !isSelectable}
+                          title={
+                            isSelectable
+                              ? undefined
+                              : "연결된 과제가 없어 포함할 수 없습니다. 과제를 먼저 생성해주세요."
+                          }
                           className="min-w-[88px]"
                         >
-                          {included ? (
-                            <span className="inline-flex items-center gap-1">
-                              <Check className="h-3.5 w-3.5" /> 포함
-                            </span>
-                          ) : (
-                            "제외"
-                          )}
+                          {included ? "제외하기" : "포함하기"}
                         </Button>
                       </div>
                     );
@@ -425,7 +437,9 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
             </Button>
             <Button
               type="button"
-              onClick={handleSaveModal}
+              onClick={() => {
+                void handleSaveModal();
+              }}
               disabled={isBusy || !hasPendingChanges}
             >
               포함 설정 저장

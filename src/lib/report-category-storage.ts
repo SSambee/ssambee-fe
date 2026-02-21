@@ -11,10 +11,13 @@ export type ReportStudentSelections = Record<
   Record<string, Record<string, string>>
 >;
 
+export type ReportExamFinalizedMap = Record<string, boolean>;
+
 export type ReportCategoryStorage = {
   categories: ReportCategory[];
   examCategoryMap: ExamCategoryMap;
   studentSelections: ReportStudentSelections;
+  examFinalizedMap: ReportExamFinalizedMap;
 };
 
 const STORAGE_KEY = "eduops.report.category-config.v1";
@@ -37,6 +40,7 @@ export const defaultReportCategoryStorage: ReportCategoryStorage = {
   categories: defaultReportCategories,
   examCategoryMap: {},
   studentSelections: {},
+  examFinalizedMap: {},
 };
 
 let cachedRawStorage: string | null = null;
@@ -88,6 +92,13 @@ export const readReportCategoryStorage = (): ReportCategoryStorage => {
           : defaultReportCategoryStorage.categories,
       examCategoryMap: parsed.examCategoryMap,
       studentSelections: parsed.studentSelections,
+      examFinalizedMap:
+        typeof (parsed as Partial<ReportCategoryStorage>).examFinalizedMap ===
+          "object" &&
+        (parsed as Partial<ReportCategoryStorage>).examFinalizedMap !== null
+          ? ((parsed as Partial<ReportCategoryStorage>)
+              .examFinalizedMap as ReportExamFinalizedMap)
+          : {},
     };
 
     return cachedSnapshot;

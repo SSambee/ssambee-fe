@@ -26,3 +26,10 @@ export const EXAM_FORM_DEFAULTS: ExamFormInput = {
   autoScore: true,
   questions: [],
 };
+
+export const MAX_VISIBLE_STUDENTS = 10;
+export const MAX_INCLUDED_ASSIGNMENTS = 4;
+export const TABLE_HEADER_HEIGHT_PX = 56;
+export const TABLE_ROW_HEIGHT_PX = 60;
+export const STUDENT_TABLE_MAX_HEIGHT_PX =
+  TABLE_HEADER_HEIGHT_PX + MAX_VISIBLE_STUDENTS * TABLE_ROW_HEIGHT_PX;

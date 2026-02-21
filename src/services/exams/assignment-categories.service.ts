@@ -26,3 +26,20 @@ export const createAssignmentCategoryAPI = async (payload: {
   );
   return response.data.data;
 };
+
+export const updateAssignmentCategoryAPI = async (
+  id: string,
+  payload: { name: string; resultPresets: string[] }
+): Promise<AssignmentCategory> => {
+  const response = await axiosClient.patch<ApiResponse<AssignmentCategory>>(
+    `/assignment-categories/${id}`,
+    payload
+  );
+  return response.data.data;
+};
+
+export const deleteAssignmentCategoryAPI = async (
+  id: string
+): Promise<void> => {
+  await axiosClient.delete(`/assignment-categories/${id}`);
+};

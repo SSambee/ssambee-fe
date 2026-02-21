@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import type {
-  ExamCategoryMap,
-  ReportCategory,
-  ReportStudentSelections,
-} from "@/services/exams/report-category-persistence.service";
 import type { Exam } from "@/types/exams";
 
 export type PresetSnippet = {
   label: string;
   values: string[];
+};
+
+export type ReportCategory = {
+  id: string;
+  name: string;
+  presets: string[];
 };
 
 type ClassOption = {
@@ -20,10 +21,14 @@ type ClassOption = {
   examCount: number;
 };
 
-export type ReportCategoryModalStorage = {
-  categories: ReportCategory[];
-  examCategoryMap: ExamCategoryMap;
-  studentSelections: ReportStudentSelections;
+type ExamItemMap = Record<string, string[]>;
+
+export type ReportAssignmentOption = {
+  id: string;
+  title: string;
+  categoryId: string;
+  categoryName: string;
+  presets: string[];
 };
 
 export const PRESET_SNIPPETS: PresetSnippet[] = [
@@ -43,44 +48,50 @@ const isExamInClass = (exam: Exam, classKey: string) => {
   return `name:${exam.lectureName}` === classKey;
 };
 
-export const useExamsCategoryModalState = ({
-  exams,
-  initialStorage,
-}: {
-  exams: Exam[];
-  initialStorage: ReportCategoryModalStorage;
-}) => {
+export const useExamsCategoryModalState = ({ exams }: { exams: Exam[] }) => {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isFetchingCategories, setIsFetchingCategories] = useState(false);
+  const [isFetchingAssignments, setIsFetchingAssignments] = useState(false);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-  const [categories, setCategories] = useState<ReportCategory[]>(
-    initialStorage.categories
-  );
-  const [examCategoryMap, setExamCategoryMap] = useState<ExamCategoryMap>(
-    initialStorage.examCategoryMap
-  );
-  const [studentSelections] = useState<ReportStudentSelections>(
-    initialStorage.studentSelections
-  );
+  const [isCreatingAssignment, setIsCreatingAssignment] = useState(false);
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
+  const [isDeletingCategory, setIsDeletingCategory] = useState(false);
+  const [isDeletingAssignment, setIsDeletingAssignment] = useState(false);
+  const [deletingAssignmentId, setDeletingAssignmentId] = useState<
+    string | null
+  >(null);
+  const [isSavingAssignments, setIsSavingAssignments] = useState(false);
+  const [categories, setCategories] = useState<ReportCategory[]>([]);
+  const [availableAssignments, setAvailableAssignments] = useState<
+    ReportAssignmentOption[]
+  >([]);
+  const [examAssignmentMap, setExamAssignmentMap] = useState<ExamItemMap>({});
   const [selectedClassKey, setSelectedClassKey] = useState<string>("");
   const [classSearchQuery, setClassSearchQuery] = useState("");
   const [selectedExamId, setSelectedExamId] = useState<string>("");
   const [examSearchQuery, setExamSearchQuery] = useState("");
   const [showIncludedOnly, setShowIncludedOnly] = useState(false);
   const [categoryName, setCategoryName] = useState("");
+  const [assignmentTitle, setAssignmentTitle] = useState("");
+  const [assignmentCategoryId, setAssignmentCategoryId] = useState("");
   const [presetInput, setPresetInput] = useState("");
   const [presetDrafts, setPresetDrafts] = useState<string[]>([]);
   const [createError, setCreateError] = useState<string | null>(null);
-  const [baselineCategoriesSerialized, setBaselineCategoriesSerialized] =
-    useState(() => JSON.stringify(initialStorage.categories));
-  const [baselineExamMapSerialized, setBaselineExamMapSerialized] = useState(
-    () => JSON.stringify(initialStorage.examCategoryMap)
-  );
+  const [createAssignmentError, setCreateAssignmentError] = useState<
+    string | null
+  >(null);
+  const [
+    baselineExamAssignmentMapSerialized,
+    setBaselineExamAssignmentMapSerialized,
+  ] = useState(() => JSON.stringify({}));
 
   const normalizedCategoryName = categoryName.trim();
+  const normalizedAssignmentTitle = assignmentTitle.trim();
   const canCreateCategory =
     normalizedCategoryName.length > 0 &&
     (presetDrafts.length > 0 || presetInput.trim().length > 0);
+  const canCreateAssignment =
+    normalizedAssignmentTitle.length > 0 && assignmentCategoryId.length > 0;
 
   const classOptions = useMemo<ClassOption[]>(() => {
     const map = new Map<string, ClassOption>();
@@ -155,13 +166,27 @@ export const useExamsCategoryModalState = ({
     ? effectiveExamId
     : undefined;
 
-  const includedCategoryIds = useMemo(
+  const includedAssignmentIds = useMemo(
     () =>
       effectiveExamId.length > 0
-        ? (examCategoryMap[effectiveExamId] ?? [])
+        ? (examAssignmentMap[effectiveExamId] ?? [])
         : [],
-    [effectiveExamId, examCategoryMap]
+    [effectiveExamId, examAssignmentMap]
   );
+
+  const includedCategoryIds = useMemo(() => {
+    if (effectiveExamId.length === 0) return [];
+
+    const includedSet = new Set(includedAssignmentIds);
+
+    return Array.from(
+      new Set(
+        availableAssignments
+          .filter((assignment) => includedSet.has(assignment.id))
+          .map((assignment) => assignment.categoryId)
+      )
+    );
+  }, [availableAssignments, effectiveExamId, includedAssignmentIds]);
 
   const visibleCategories = useMemo(
     () =>
@@ -173,18 +198,59 @@ export const useExamsCategoryModalState = ({
     [categories, includedCategoryIds, showIncludedOnly]
   );
 
-  const currentCategoriesSerialized = useMemo(
-    () => JSON.stringify(categories),
-    [categories]
+  const visibleAssignments = useMemo(
+    () =>
+      showIncludedOnly
+        ? availableAssignments.filter((assignment) =>
+            includedAssignmentIds.includes(assignment.id)
+          )
+        : availableAssignments,
+    [availableAssignments, includedAssignmentIds, showIncludedOnly]
   );
-  const currentExamMapSerialized = useMemo(
-    () => JSON.stringify(examCategoryMap),
-    [examCategoryMap]
+
+  const currentExamAssignmentMapSerialized = useMemo(
+    () => JSON.stringify(examAssignmentMap),
+    [examAssignmentMap]
   );
-  const hasPendingChanges =
-    currentCategoriesSerialized !== baselineCategoriesSerialized ||
-    currentExamMapSerialized !== baselineExamMapSerialized;
-  const isBusy = isFetchingCategories || isCreatingCategory;
+  const baselineExamAssignmentMap = useMemo<ExamItemMap>(() => {
+    try {
+      const parsed = JSON.parse(baselineExamAssignmentMapSerialized);
+      if (!parsed || typeof parsed !== "object") return {};
+      return parsed as ExamItemMap;
+    } catch {
+      return {};
+    }
+  }, [baselineExamAssignmentMapSerialized]);
+  const hasPendingAssignmentChanges =
+    currentExamAssignmentMapSerialized !== baselineExamAssignmentMapSerialized;
+  const pendingAssignmentDeltaCount = useMemo(() => {
+    if (!effectiveExamId) return 0;
+
+    const currentSet = new Set(examAssignmentMap[effectiveExamId] ?? []);
+    const baselineSet = new Set(
+      baselineExamAssignmentMap[effectiveExamId] ?? []
+    );
+    let delta = 0;
+
+    currentSet.forEach((id) => {
+      if (!baselineSet.has(id)) delta += 1;
+    });
+    baselineSet.forEach((id) => {
+      if (!currentSet.has(id)) delta += 1;
+    });
+
+    return delta;
+  }, [baselineExamAssignmentMap, effectiveExamId, examAssignmentMap]);
+  const hasPendingChanges = hasPendingAssignmentChanges;
+  const isBusy =
+    isFetchingCategories ||
+    isFetchingAssignments ||
+    isCreatingCategory ||
+    isCreatingAssignment ||
+    isUpdatingCategory ||
+    isDeletingCategory ||
+    isDeletingAssignment ||
+    isSavingAssignments;
 
   const duplicatedCategoryName = useMemo(
     () =>
@@ -249,18 +315,56 @@ export const useExamsCategoryModalState = ({
     }
   }, [examsInSelectedClass, isCategoryModalOpen, selectedExamId]);
 
+  useEffect(() => {
+    if (!isCategoryModalOpen) return;
+
+    if (categories.length === 0) {
+      if (assignmentCategoryId.length > 0) {
+        queueMicrotask(() => {
+          setAssignmentCategoryId("");
+        });
+      }
+      return;
+    }
+
+    const hasSelectedCategory = categories.some(
+      (category) => category.id === assignmentCategoryId
+    );
+
+    if (!hasSelectedCategory) {
+      queueMicrotask(() => {
+        setAssignmentCategoryId(categories[0].id);
+      });
+    }
+  }, [assignmentCategoryId, categories, isCategoryModalOpen]);
+
   return {
     isCategoryModalOpen,
     setIsCategoryModalOpen,
     isFetchingCategories,
     setIsFetchingCategories,
+    isFetchingAssignments,
+    setIsFetchingAssignments,
     isCreatingCategory,
     setIsCreatingCategory,
+    isCreatingAssignment,
+    setIsCreatingAssignment,
+    isUpdatingCategory,
+    setIsUpdatingCategory,
+    isDeletingCategory,
+    setIsDeletingCategory,
+    isDeletingAssignment,
+    setIsDeletingAssignment,
+    deletingAssignmentId,
+    setDeletingAssignmentId,
+    isSavingAssignments,
+    setIsSavingAssignments,
     categories,
     setCategories,
-    examCategoryMap,
-    setExamCategoryMap,
-    studentSelections,
+    availableAssignments,
+    setAvailableAssignments,
+    examAssignmentMap,
+    setExamAssignmentMap,
     selectedClassKey,
     setSelectedClassKey,
     classSearchQuery,
@@ -273,17 +377,22 @@ export const useExamsCategoryModalState = ({
     setShowIncludedOnly,
     categoryName,
     setCategoryName,
+    assignmentTitle,
+    setAssignmentTitle,
+    assignmentCategoryId,
+    setAssignmentCategoryId,
     presetInput,
     setPresetInput,
     presetDrafts,
     setPresetDrafts,
     createError,
     setCreateError,
-    baselineCategoriesSerialized,
-    setBaselineCategoriesSerialized,
-    baselineExamMapSerialized,
-    setBaselineExamMapSerialized,
+    createAssignmentError,
+    setCreateAssignmentError,
+    baselineExamAssignmentMapSerialized,
+    setBaselineExamAssignmentMapSerialized,
     canCreateCategory,
+    canCreateAssignment,
     classOptions,
     classSelectValue,
     filteredClassOptions,
@@ -294,7 +403,11 @@ export const useExamsCategoryModalState = ({
     effectiveExamId,
     includedCategoryIds,
     visibleCategories,
+    includedAssignmentIds,
+    visibleAssignments,
     hasPendingChanges,
+    hasPendingAssignmentChanges,
+    pendingAssignmentDeltaCount,
     isBusy,
     duplicatedCategoryName,
     normalizedCategoryName,
