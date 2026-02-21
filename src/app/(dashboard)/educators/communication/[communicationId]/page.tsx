@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { JSONContent } from "@tiptap/react";
 
 import Title from "@/components/common/header/Title";
 import {
@@ -55,8 +56,8 @@ export default function CommunicationDetailPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [answerContent, setAnswerContent] = useState("");
+  const [editContent, setEditContent] = useState<JSONContent>({});
+  const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   if (isLoadingNotice || isLoadingInquiry) {
@@ -80,10 +81,10 @@ export default function CommunicationDetailPage() {
   const handleStartEdit = () => {
     if (isNoticePost && noticePostData) {
       setEditTitle(noticePostData.title);
-      setEditContent(noticePostData.content);
+      setEditContent(JSON.parse(noticePostData.content));
     } else if (!isNoticePost && inquiryPostData) {
       setEditTitle(inquiryPostData.title);
-      setEditContent(inquiryPostData.content);
+      setEditContent(JSON.parse(inquiryPostData.content));
     }
     setIsEditing(true);
   };
@@ -95,15 +96,24 @@ export default function CommunicationDetailPage() {
 
   // 게시글 수정 저장
   const handleSaveEdit = () => {
-    if (!editTitle.trim() || !editContent.trim()) {
+    const isContentEmpty =
+      !editContent.content || editContent.content.length === 0;
+
+    if (!editTitle.trim() || isContentEmpty) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
+
+    const payloadContent = JSON.stringify(editContent);
+
     if (isNoticePost) {
       updateNoticeMutation.mutate(
         {
           postId: communicationId,
-          payload: { title: editTitle, content: editContent },
+          payload: {
+            title: editTitle,
+            content: payloadContent,
+          },
         },
         { onSuccess: () => setIsEditing(false) }
       );
@@ -122,48 +132,53 @@ export default function CommunicationDetailPage() {
 
   // 댓글 작성
   const handleSubmitAnswer = () => {
-    const plainText = answerContent.replace(/<[^>]*>/g, "").trim();
+    const isContentEmpty =
+      !answerContent ||
+      !answerContent.content ||
+      answerContent.content.length === 0;
 
-    if (!plainText) {
+    if (isContentEmpty) {
       alert(
         isNoticePost ? "댓글 내용을 입력해주세요." : "답변 내용을 입력해주세요."
       );
       return;
     }
     const handleSuccess = () => {
-      setAnswerContent("");
+      setAnswerContent({});
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
+    const payload = { content: JSON.stringify(answerContent) };
+
     if (isNoticePost) {
       createInstructorPostCommentMutation.mutate(
-        { postId: communicationId, payload: { content: answerContent } },
+        { postId: communicationId, payload },
         { onSuccess: handleSuccess }
       );
     } else {
       createStudentPostCommentMutation.mutate(
-        { postId: communicationId, payload: { content: answerContent } },
+        { postId: communicationId, payload },
         { onSuccess: handleSuccess }
       );
     }
   };
 
   //댓글 수정
-  const handleUpdateComment = (commentId: string, content: string) => {
-    if (!content.trim()) return alert("내용을 입력해주세요.");
+  const handleUpdateComment = (commentId: string, content: JSONContent) => {
+    const payload = { content: JSON.stringify(content) };
 
     if (isNoticePost) {
       updateInstructorPostCommentMutation.mutate({
         postId: communicationId,
         commentId,
-        payload: { content },
+        payload,
       });
     } else {
       updateStudentPostCommentMutation.mutate({
         postId: communicationId,
         commentId,
-        payload: { content },
+        payload,
       });
     }
   };

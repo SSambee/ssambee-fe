@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { JSONContent } from "@tiptap/react";
 
 import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
@@ -25,8 +26,7 @@ export default function CreateInstructorPostPage() {
   const { openModal } = useModal();
 
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
+  const [content, setContent] = useState<JSONContent>({});
   const [selectedClassId, setSelectedClassId] = useState<string>("ALL");
   const [selectedPostType, setSelectedPostType] = useState<PostType>("NOTICE");
 
@@ -66,7 +66,11 @@ export default function CreateInstructorPostPage() {
       return;
     }
 
-    if (!content.trim()) {
+    // JSON 데이터 내용 체크
+    const isContentEmpty =
+      !content || !content.content || content.content.length === 0;
+
+    if (isContentEmpty) {
       alert("내용을 입력해주세요.");
       return;
     }
@@ -86,7 +90,7 @@ export default function CreateInstructorPostPage() {
 
     const payload = {
       title,
-      content,
+      content: JSON.stringify(content),
       isImportant: selectedPostType === "NOTICE",
       scope,
       targetRole,

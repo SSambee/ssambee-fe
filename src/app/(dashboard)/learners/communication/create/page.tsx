@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { JSONContent } from "@tiptap/react";
 
 import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
@@ -30,7 +31,7 @@ export default function CreateInquiryPostPageSVC() {
   const parentMutation = useCreateParentPostSVC();
 
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState<JSONContent>({});
   const [selectedLectureId, setSelectedLectureId] = useState("");
   const [attachment, setAttachment] = useState<File | undefined>(undefined);
 
@@ -49,8 +50,11 @@ export default function CreateInquiryPostPageSVC() {
       return;
     }
 
-    const textContent = content.replace(/<[^>]*>/g, "").trim();
-    if (!textContent) {
+    // JSON 데이터 내용 체크
+    const isContentEmpty =
+      !content || !content.content || content.content.length === 0;
+
+    if (isContentEmpty) {
       alert("내용을 입력해주세요.");
       return;
     }
@@ -62,19 +66,13 @@ export default function CreateInquiryPostPageSVC() {
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("content", content);
+    // 서버 전송 직전에만 Stringify 실행
+    formData.append("content", JSON.stringify(content));
     formData.append("lectureId", selectedLectureId);
 
     if (attachment) {
       formData.append("file", attachment);
     }
-
-    // const baseData = {
-    //   title,
-    //   content,
-    //   lectureId: selectedLectureId,
-    //   file: attachment,
-    // };
 
     const onSuccessAction = {
       onSuccess: () => router.push(`/learners/communication`),
@@ -129,7 +127,7 @@ export default function CreateInquiryPostPageSVC() {
           <CreateContentSVC
             title={title}
             setTitle={setTitle}
-            content={content}
+            content={content} // JSONContent 객체를 그대로 전달
             setContent={setContent}
             handleSubmit={handleSubmit}
             isSubmitting={isSubmitting}

@@ -1,4 +1,4 @@
-import { Paperclip, X } from "lucide-react";
+import { JSONContent } from "@tiptap/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -9,8 +9,8 @@ import TiptapEditor from "@/components/common/editor/TiptapEditor";
 type CreateContentSVCProps = {
   title: string;
   setTitle: (val: string) => void;
-  content: string;
-  setContent: (val: string) => void;
+  content: JSONContent;
+  setContent: (val: JSONContent) => void;
   attachment: File | undefined;
   setAttachment: (file: File | undefined) => void;
   handleSubmit: () => void;
@@ -43,34 +43,17 @@ export default function CreateContentSVC({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium">내용</Label>
+          <Label className="sr-only text-sm font-medium">내용</Label>
           <TiptapEditor
-            content={content}
-            onChange={setContent}
+            content={content} // 객체 전달
+            onChange={(json) => setContent(json)} // 객체로 바로 업데이트
             placeholder="내용을 입력하세요"
             className="min-h-[400px]"
             onFileUpload={setAttachment}
+            attachment={attachment}
+            onRemoveAttachment={() => setAttachment(undefined)}
           />
         </div>
-        {attachment && (
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="p-2 bg-white rounded-lg border shadow-sm shrink-0">
-                <Paperclip className="h-5 w-5 text-blue-500" />
-              </div>
-              <span className="text-sm font-medium text-slate-700 truncate max-w-[300px]">
-                {attachment.name}
-              </span>
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => setAttachment(undefined)}
-              className="h-8 w-8 p-0 border-slate-200 hover:text-red-500 hover:bg-red-50 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
 
         <div className="flex justify-end gap-2 pt-4">
           <Button

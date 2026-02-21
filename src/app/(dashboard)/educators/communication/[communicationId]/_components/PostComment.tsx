@@ -1,5 +1,6 @@
 import { Edit, Trash2, X, Paperclip, Save } from "lucide-react";
 import { useState } from "react";
+import { JSONContent } from "@tiptap/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,14 +17,14 @@ type PostCommentProps = {
     | GetInstructorPostDetailResponse
     | GetStudentPostDetailResponse
     | undefined;
-  answerContent: string;
-  setAnswerContent: (val: string) => void;
+  answerContent: JSONContent;
+  setAnswerContent: (val: JSONContent) => void;
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmitAnswer: () => void;
-  onUpdateComment: (commentId: string, content: string) => void;
+  onUpdateComment: (commentId: string, content: JSONContent) => void;
   onDeleteComment: (commentId: string) => void;
 };
 
@@ -113,17 +114,6 @@ export default function PostComment({
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                {/* {!isNoticePost && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`flex items-center gap-2 h-9 ${selectedFile ? "text-blue-600 bg-blue-50 border-blue-200" : "text-slate-500"}`}
-                  >
-                    <Paperclip className="h-4 w-4" />
-                    {selectedFile ? "파일 변경" : "파일 첨부"}
-                  </Button>
-                )} */}
               </div>
               <Button
                 onClick={handleSubmitAnswer}
@@ -146,16 +136,35 @@ function CommentItem({
   onDelete,
 }: {
   comment: CommonPostComment;
-  onUpdate: (id: string, content: string) => void;
+  onUpdate: (id: string, content: JSONContent) => void;
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.content);
+  const getParsedContent = (content: string): JSONContent => {
+    try {
+      return JSON.parse(content);
+    } catch {
+      // 파싱 실패 시 일반 텍스트를 Tiptap 구조로 반환
+      return {
+        type: "doc",
+        content: [
+          { type: "paragraph", content: [{ type: "text", text: content }] },
+        ],
+      };
+    }
+  };
+
+  const [editContent, setEditContent] = useState<JSONContent>(() =>
+    getParsedContent(comment.content)
+  );
 
   // 수정 완료
   const handleSave = () => {
-    const textOnly = editContent.replace(/<[^>]*>/g, "").trim();
-    if (!textOnly) {
+    if (
+      !editContent ||
+      !editContent.content ||
+      editContent.content.length === 0
+    ) {
       alert("내용을 입력해주세요.");
       return;
     }
@@ -220,7 +229,7 @@ function CommentItem({
                   variant="outline"
                   onClick={() => {
                     setIsEditing(false);
-                    setEditContent(comment.content); // 취소 시 원래 내용으로 복구
+                    setEditContent(getParsedContent(comment.content));
                   }}
                   className="h-8 w-8 p-0 text-slate-400"
                 >
@@ -262,7 +271,7 @@ function CommentItem({
         </div>
       ) : (
         <TiptapEditor
-          content={comment.content}
+          content={getParsedContent(comment.content)}
           readOnly={true}
           className="pt-2 px-2"
         />

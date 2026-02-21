@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { JSONContent } from "@tiptap/react";
 
 import Title from "@/components/common/header/Title";
 import { useDownloadMaterial } from "@/hooks/useMaterials";
@@ -60,8 +61,8 @@ export default function CommunicationDetailPageSVC() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [answerContent, setAnswerContent] = useState("");
+  const [editContent, setEditContent] = useState<JSONContent>({});
+  const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   if (isLoadingNotice || isLoadingInquiry) {
@@ -83,16 +84,28 @@ export default function CommunicationDetailPageSVC() {
 
   // 게시글 수정 시작
   const handleStartEdit = () => {
-    if (isNoticePost && noticePostData) {
-      setEditTitle(noticePostData.title);
-      setEditContent(noticePostData.content);
-    } else if (!isNoticePost && inquiryPostData) {
-      setEditTitle(inquiryPostData.title);
-      setEditContent(inquiryPostData.content);
+    if (currentData) {
+      setEditTitle(currentData.title);
+
+      // DB에서 가져온 content(문자열 JSON)를 객체로 파싱하여 에디터에 전달
+      try {
+        const parsedContent = JSON.parse(currentData.content);
+        setEditContent(parsedContent);
+      } catch {
+        // 만약 예전에 저장된 데이터가 일반 텍스트라면 그대로 보냄
+        setEditContent({
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: currentData.content }],
+            },
+          ],
+        });
+      }
     }
     setIsEditing(true);
   };
-
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -100,15 +113,22 @@ export default function CommunicationDetailPageSVC() {
 
   // 게시글 수정 저장
   const handleSaveEdit = () => {
-    if (!editTitle.trim() || !editContent.trim()) {
+    const isContentEmpty =
+      !editContent.content || editContent.content.length === 0;
+
+    if (!editTitle.trim() || isContentEmpty) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
+
+    // 서버에는 무조건 stringify 해서 전송
+    const payloadContent = JSON.stringify(editContent);
+
     if (!isNoticePost) {
       updatePostSVC.mutate(
         {
           postId: communicationId,
-          payload: { title: editTitle, content: editContent },
+          payload: { title: editTitle, content: payloadContent },
         },
         { onSuccess: () => setIsEditing(false) }
       );
@@ -144,46 +164,51 @@ export default function CommunicationDetailPageSVC() {
 
   // 댓글 작성
   const handleSubmitAnswer = () => {
-    const plainText = answerContent.replace(/<[^>]*>/g, "").trim();
+    const isContentEmpty =
+      !answerContent.content || answerContent.content.length === 0;
 
-    if (!plainText) {
+    if (isContentEmpty) {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
     const handleSuccess = () => {
-      setAnswerContent("");
+      setAnswerContent({}); // 초기화 시 빈 객체
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
+    const payload = { content: JSON.stringify(answerContent) };
+
     if (isNoticePost) {
       createInstructorPostCommentSVC.mutate(
-        { postId: communicationId, payload: { content: answerContent } },
+        { postId: communicationId, payload },
         { onSuccess: handleSuccess }
       );
     } else {
       createCommentSVC.mutate(
-        { postId: communicationId, payload: { content: answerContent } },
+        { postId: communicationId, payload },
         { onSuccess: handleSuccess }
       );
     }
   };
 
   //댓글 수정
-  const handleUpdateComment = (commentId: string, content: string) => {
-    if (!content.trim()) return alert("내용을 입력해주세요.");
+  const handleUpdateComment = (commentId: string, content: JSONContent) => {
+    if (!content || !content.content || content.content.length === 0) {
+      return alert("내용을 입력해주세요.");
+    }
 
     if (isNoticePost) {
       updateInstructorPostCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content },
+        payload: { content: JSON.stringify(content) },
       });
     } else {
       updateCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content },
+        payload: { content: JSON.stringify(content) },
       });
     }
   };

@@ -1,4 +1,5 @@
 import { Paperclip, FileText } from "lucide-react";
+import { JSONContent } from "@tiptap/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -14,8 +15,8 @@ type PostContentProps = {
   isEditing: boolean;
   editTitle: string;
   setEditTitle: (val: string) => void;
-  editContent: string;
-  setEditContent: (val: string) => void;
+  editContent: JSONContent;
+  setEditContent: (val: JSONContent) => void;
   noticePostData: GetInstructorPostDetailResponse | undefined;
   inquiryPostData: GetStudentPostDetailResponse | undefined;
   currentData:
@@ -37,6 +38,22 @@ export default function PostContent({
   currentData,
   handleAttachmentClick,
 }: PostContentProps) {
+  // 안전하게 JSON을 파싱하는 헬퍼 함수
+  const getParsedContent = (content: string | undefined) => {
+    if (!content) return {};
+    try {
+      return JSON.parse(content);
+    } catch {
+      // 텍스트 데이터일 경우 객체 구조로 리턴
+      return {
+        type: "doc",
+        content: [
+          { type: "paragraph", content: [{ type: "text", text: content }] },
+        ],
+      };
+    }
+  };
+
   return (
     <Card>
       <CardContent className="p-8">
@@ -64,9 +81,9 @@ export default function PostContent({
             </h2>
             <div className="border-t pt-4">
               <TiptapEditor
-                content={
+                content={getParsedContent(
                   noticePostData?.content ?? inquiryPostData?.content ?? ""
-                }
+                )}
                 readOnly={true}
               />
             </div>
