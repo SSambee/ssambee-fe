@@ -57,6 +57,7 @@ export function LecturesStats({
             key={stat.id}
             className={cn(
               "flex h-[160px] w-full items-end justify-between rounded-[24px] border border-[#eaecf2] px-8 pb-6 pt-8 xl:px-10",
+              index === stats.length - 1 && "sm:col-span-2 xl:col-span-1",
               isPrimary && "bg-[#4b72f7]",
               isSecondary && "bg-[#6b6f80]",
               isTertiary && "bg-white"
