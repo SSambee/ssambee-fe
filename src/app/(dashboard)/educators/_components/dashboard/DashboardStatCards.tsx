@@ -8,7 +8,7 @@ type DashboardStatCardsProps = {
 export function DashboardStatCards({ stats }: DashboardStatCardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 xl:gap-6">
-      {stats.map((stat, index) => {
+      {stats.slice(0, 3).map((stat, index) => {
         const isPrimary = index === 0;
         const isSecondary = index === 1;
         const isTertiary = index === 2;

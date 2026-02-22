@@ -17,6 +17,7 @@ export type DashboardInquiry = {
   type: DashboardInquiryType;
   name: string;
   message: string;
+  replyCount?: number;
   createdAt: string;
   status: DashboardInquiryStatus;
 };

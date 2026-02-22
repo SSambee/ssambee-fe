@@ -1,17 +1,18 @@
 import { ChevronRight } from "lucide-react";
 
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DashboardTask, DashboardTaskStatus } from "@/types/dashboard";
+import { DashboardTask } from "@/types/dashboard";
 
 type DashboardTaskListProps = {
   tasks: DashboardTask[];
 };
 
-const STATUS_BADGE_STYLE: Record<DashboardTaskStatus, string> = {
+const statusBadgeClasses: Record<DashboardTask["status"], string> = {
+  "진행 중": "bg-[#fef3c7] text-[#d97706]",
+  대기: "bg-[#f1f5f9] text-[#64748b]",
   완료: "bg-[#dcfce7] text-[#16a34a]",
-  "진행 중": "bg-[#dbeafe] text-[#2563eb]",
-  대기: "bg-[#fef3c7] text-[#d97706]",
 };
 
 export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
@@ -26,16 +27,16 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
             조교 업무 진행률을 확인하세요
           </p>
         </div>
-        <button
-          type="button"
+        <Button
+          variant={null}
           disabled
-          aria-disabled="true"
-          title="준비 중"
-          className="inline-flex h-auto items-center gap-1 cursor-not-allowed rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] opacity-60 transition-colors hover:bg-transparent"
+          aria-label="더보기 (준비 중)"
+          title="준비 중인 기능입니다"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -57,7 +58,7 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
                 <span
                   className={cn(
                     "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold",
-                    STATUS_BADGE_STYLE[task.status]
+                    statusBadgeClasses[task.status]
                   )}
                 >
                   {task.status}

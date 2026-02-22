@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DashboardScheduleItem } from "@/types/dashboard";
 
@@ -64,16 +65,16 @@ export function DashboardTodayTimeline({
             {dateLabel}
           </p>
         </div>
-        <button
-          type="button"
+        <Button
+          variant={null}
           disabled
-          aria-disabled="true"
-          title="준비 중"
-          className="inline-flex h-auto items-center gap-1 cursor-not-allowed rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] opacity-60 transition-colors hover:bg-transparent"
+          aria-label="더보기 (준비 중)"
+          title="준비 중인 기능입니다"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
-        </button>
+        </Button>
       </div>
 
       <div className="relative">

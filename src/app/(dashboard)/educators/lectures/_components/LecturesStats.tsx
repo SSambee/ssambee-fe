@@ -67,7 +67,7 @@ export function LecturesStats({
               <p
                 className={cn(
                   "text-xl font-semibold tracking-tight",
-                  isTertiary ? "text-[#4a4d5c]" : "text-white/88"
+                  isTertiary ? "text-[#4a4d5c]" : "text-white/[0.88]"
                 )}
               >
                 {stat.label}
