@@ -2,6 +2,7 @@ import type { AxiosError } from "axios";
 
 import type { ApiResponse } from "@/types/api";
 import {
+  EmailVerificationData,
   LoginUser,
   SignupAssistantUser,
   SignupInstructorUser,
@@ -9,7 +10,7 @@ import {
   SignupStudentUser,
 } from "@/types/auth.type";
 
-import { axiosClient, axiosClientSVC } from "./axiosClient";
+import { axiosClient, axiosClientPublic, axiosClientSVC } from "./axiosClient";
 
 // 인증코드 검증 API
 export const verifyAuthCodeAPI = async (signupCode: string) => {
@@ -43,26 +44,25 @@ export const verifyAuthCodeAPI = async (signupCode: string) => {
 };
 
 // 이메일 인증 API
-export const verifyEmailAPI = async (email: string) => {
+export const verifyEmailAPI = async (email: string, otp?: string) => {
   try {
-    const { data } = await axiosClient.post<ApiResponse<{ isValid: boolean }>>(
-      "/auth/email-verification",
-      { email }
-    );
+    const { data } = await axiosClientPublic.post<
+      ApiResponse<EmailVerificationData>
+    >("/auth/email-verification", {
+      email,
+      ...(otp ? { otp } : {}), // otp가 있으면 검증, 없으면 발송
+    });
 
     return {
-      success: !!data?.data?.isValid,
-      message: data?.message ?? "사용 가능한 이메일입니다.",
+      success: data.status === "success",
+      message: data.message,
+      data: data.data,
     };
   } catch (error) {
     const axiosError = error as AxiosError<{ message?: string }>;
-
     return {
       success: false,
-      message:
-        axiosError.response?.data?.message ??
-        axiosError.message ??
-        "이메일 인증 중 오류가 발생했습니다.",
+      message: axiosError.response?.data?.message || "오류가 발생했습니다.",
     };
   }
 };

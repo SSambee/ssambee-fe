@@ -31,6 +31,16 @@ export type ParentPhoneFormData = z.infer<typeof parentPhoneSchema>;
 // 로그인 전송 데이터 타입
 export type LoginUser = LoginFormData & { userType: Role };
 
+// 이메일 인증 타입
+export type EmailVerificationData = {
+  user: {
+    id: string;
+    email: string;
+    name?: string;
+    emailVerified: boolean;
+  };
+};
+
 // 회원가입 전송 데이터 타입
 export type RegisterUser = RegisterRequestFormData & {
   signupCode?: string;

@@ -2,6 +2,12 @@ import axios, { AxiosError } from "axios";
 
 import { ApiResponse } from "@/types/api";
 
+export const axiosClientPublic = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL_PUBLIC,
+  headers: {},
+  withCredentials: true,
+});
+
 // 강사 및 조교 전용
 export const axiosClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,

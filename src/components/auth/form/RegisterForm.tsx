@@ -44,8 +44,13 @@ export default function RegisterForm({
 }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
+  // 이메일 인증 관련 상태
   const [emailLoading, setEmailLoading] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false); // OTP 입력창 노출 여부
+  const [isEmailVerified, setIsEmailVerified] = useState(false); // 최종 인증 성공 여부
+  const [otpValue, setOtpValue] = useState(""); // 입력된 OTP 값
+
   const { signup, loading } = useAuth();
 
   const { isCodeVerified, signupCode, resetAuthCode } = useAuthCodeStore();
@@ -133,27 +138,48 @@ export default function RegisterForm({
   //   }
   // };
 
-  // 이메일 인증 버튼
-  const handleVerifyEmail = async () => {
-    // Zod로 이메일 형식 먼저 검사
+  // 이메일 OTP 코드 요청
+  const handleRequestEmailOtp = async () => {
     const isFormatValid = await trigger("email");
     if (!isFormatValid) return;
 
     try {
       setEmailLoading(true);
-      const res = await verifyEmailAPI(emailValue);
+      const res = await verifyEmailAPI(emailValue); // otp 파라미터 없이 호출 (발송)
 
       if (res.success) {
-        setIsEmailVerified(true);
+        setIsOtpSent(true);
         alert(res.message);
       } else {
-        setIsEmailVerified(false);
-        // 백엔드 에러 메시지를 InputForm 에러로 바인딩
         setError("email", { type: "manual", message: res.message });
       }
     } catch {
-      setIsEmailVerified(false);
       alert("서버 통신 중 오류가 발생했습니다.");
+    } finally {
+      setEmailLoading(false);
+    }
+  };
+
+  // OTP 코드 검증 확인
+  const handleVerifyOtp = async () => {
+    if (otpValue.length < 6) {
+      alert("인증코드 6자리를 입력해주세요.");
+      return;
+    }
+
+    try {
+      setEmailLoading(true);
+      const res = await verifyEmailAPI(emailValue, otpValue); // otp 포함하여 호출 (검증)
+
+      if (res.success) {
+        setIsEmailVerified(true);
+        setIsOtpSent(false); // 인증 성공 시 입력창은 닫음
+        alert(res.message);
+      } else {
+        alert(res.message || "인증코드가 올바르지 않습니다.");
+      }
+    } catch {
+      alert("인증 확인 중 오류가 발생했습니다.");
     } finally {
       setEmailLoading(false);
     }
@@ -163,7 +189,7 @@ export default function RegisterForm({
   const isSubmitDisabled =
     !isValid ||
     loading ||
-    !emailValue ||
+    !isEmailVerified ||
     (requireAuthCode && !isCodeVerified) ||
     (requireSchoolInfo && !isSchoolInfoValid) ||
     (userType === "STUDENT" && !isParentPhoneValid);
@@ -177,6 +203,12 @@ export default function RegisterForm({
     //   });
     //   return;
     // }
+
+    // 이메일 인증
+    if (!isEmailVerified) {
+      alert("이메일 인증을 완료해주세요.");
+      return;
+    }
 
     // 인증 코드 검증 - 외부 폼
     if (requireAuthCode && !isCodeVerified) {
@@ -282,6 +314,7 @@ export default function RegisterForm({
             id="email"
             label="이메일"
             type="email"
+            disabled={isEmailVerified} // 인증 완료 시 수정 불가
             error={errors.email?.message}
             {...register("email")}
             showReset={!!emailValue && !isEmailVerified}
@@ -293,8 +326,8 @@ export default function RegisterForm({
 
           <button
             type="button"
-            onClick={handleVerifyEmail}
-            disabled={!isEmailInputValid || emailLoading}
+            onClick={handleRequestEmailOtp}
+            disabled={!isEmailInputValid || emailLoading || isEmailVerified}
             className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors ${
               emailLoading
                 ? "bg-gray-200 text-gray-500 cursor-wait"
@@ -305,13 +338,38 @@ export default function RegisterForm({
                     : "bg-blue-100 text-blue-300 cursor-not-allowed"
             }`}
           >
-            {emailLoading
-              ? "인증 중..."
-              : isEmailVerified
-                ? "인증 완료"
-                : "인증 요청"}
+            {isEmailVerified ? "인증 완료" : isOtpSent ? "재요청" : "인증 요청"}
           </button>
         </div>
+
+        {/* OTP 입력란 (이메일 요청 후 노출) */}
+        {isOtpSent && !isEmailVerified && (
+          <div className="flex items-start gap-[10px] animate-in fade-in slide-in-from-top-1 duration-200">
+            <div className="flex-1">
+              <InputForm
+                id="otp"
+                label="인증코드"
+                type="text"
+                value={otpValue}
+                onChange={(e) => setOtpValue(e.target.value)}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleVerifyOtp}
+              disabled={!otpValue || emailLoading}
+              className={`px-10 h-[58px] rounded-lg font-medium whitespace-nowrap transition-colors ${
+                emailLoading
+                  ? "bg-gray-200 text-gray-500 cursor-wait"
+                  : otpValue
+                    ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer shadow-md"
+                    : "bg-blue-100 text-blue-300 cursor-not-allowed"
+              }`}
+            >
+              {emailLoading ? "인증 중..." : "확인"}
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-[10px]">
           <div>
