@@ -16,8 +16,8 @@ export interface PostFilterQuery extends Omit<
   answerStatus: AnswerStatusFilter | null;
   writerType: InquiryWriterTypeFilter | null;
   postType: PostTypeFilter | null;
-  workStatus: WorkStatusFilter | null;
-  priority: PriorityStatusFilter | null;
+  workStatus?: WorkStatusFilter | null;
+  priority?: PriorityStatusFilter | null;
 }
 
 export type CommonPostQuery = {
