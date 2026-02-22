@@ -67,3 +67,31 @@ export const dashboardKeys = {
   educatorsHomeWithQuery: (query: DashboardHomeQuery) =>
     [...dashboardKeys.educatorsHome(), query] as const,
 };
+
+type LearnerLectureAttendanceSummaryQuery = {
+  lectureIds: string[];
+  learnerPhone?: string;
+  learnerName?: string;
+  resolutionKeys: string[];
+};
+
+export const learnerLectureKeys = {
+  all: ["learners", "lectures"] as const,
+  enrollmentsSource: (enrollmentIds: string[]) =>
+    [
+      ...learnerLectureKeys.all,
+      "enrollmentsSource",
+      enrollmentIds.join(","),
+    ] as const,
+  detail: (lookupId: string) =>
+    [...learnerLectureKeys.all, "detail", lookupId] as const,
+  resolveLectureEnrollmentId: (params: {
+    lectureKey: string;
+    learnerPhone?: string;
+    learnerName?: string;
+    enrollmentsCount: number;
+  }) =>
+    [...learnerLectureKeys.all, "resolveLectureEnrollmentId", params] as const,
+  attendanceSummary: (query: LearnerLectureAttendanceSummaryQuery) =>
+    [...learnerLectureKeys.all, "attendanceSummary", query] as const,
+};

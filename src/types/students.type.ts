@@ -208,6 +208,13 @@ export type CreateEnrollmentAttendance = {
 // 강의 시험 조회: GET /lectureEnrollments/:lectureEnrollmentsId
 export type LectureEnrollmentDetail = {
   lectureEnrollmentId: string;
+  attendanceRate?: number | null;
+  attendances?: {
+    id: string;
+    date: string;
+    status: AttendanceStatus;
+    memo?: string | null;
+  }[];
   lecture: {
     title: string;
     instructor: {
@@ -222,9 +229,11 @@ export type LectureEnrollmentDetail = {
     status: "ACTIVE" | "PAUSED" | "DROPPED";
   };
   grades: {
+    gradeId?: string;
     exam: {
       id: string;
       title: string;
+      examType?: string | null;
       examDate: string;
       subject: string;
       average: number;
