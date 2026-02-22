@@ -74,7 +74,6 @@ export function LectureCard({ lecture }: LectureCardProps) {
     ? lecture.schedule.days.join(", ")
     : "일정 없음";
   const scheduleTime = hasSchedule ? lecture.schedule.time : "-";
-  const instructorInitial = lecture.instructor?.slice(0, 1) ?? "-";
 
   const openDeleteConfirmModal = () => {
     if (!user || user.userType === "ASSISTANT") {
@@ -104,7 +103,6 @@ export function LectureCard({ lecture }: LectureCardProps) {
       hasSchedule={hasSchedule}
       currentStudents={lecture.currentStudents}
       instructorName={lecture.instructor}
-      instructorInitial={instructorInitial}
       onClick={() => openDetailModal(lecture.id)}
       action={
         <Button

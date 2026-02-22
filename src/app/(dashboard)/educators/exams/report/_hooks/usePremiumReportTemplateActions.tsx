@@ -10,6 +10,7 @@ import {
   uploadGradeReportFile,
 } from "@/services/exams/report.service";
 import type { ReportTemplateExamData } from "@/types/report";
+import { createReportPreviewImageFile } from "@/utils/report-preview-image";
 import {
   htmlToReadableText,
   normalizeReportMessageHtml,
@@ -182,6 +183,7 @@ export const usePremiumReportTemplateActions = ({
       return;
     }
 
+    state.setIsGeneratingPdf(true);
     try {
       const blob = await pdf(
         <PremiumReportPdf
@@ -191,6 +193,18 @@ export const usePremiumReportTemplateActions = ({
           scoreHistory={state.scoreHistory}
         />
       ).toBlob();
+      const previewImageFile = await createReportPreviewImageFile({
+        template: "premium",
+        studentName: examData.studentName,
+        examName: examData.examName,
+        className: examData.className,
+        examDate: examData.examDate,
+        score: examData.score,
+      });
+      const imageUploadResult = await uploadGradeReportFile(
+        examData.gradeId,
+        previewImageFile
+      );
 
       const fileName = `${sanitizeFileName(examData.studentName)}_${sanitizeFileName(
         examData.examName
@@ -208,8 +222,9 @@ export const usePremiumReportTemplateActions = ({
 
       await showAlert({
         title: "발송 준비 완료",
-        description:
-          "성적표 파일 업로드가 완료되었습니다. 카카오톡 발송 기능은 현재 연동 준비 중입니다.",
+        description: imageUploadResult.reportUrl
+          ? "PDF와 미리보기 이미지 업로드가 완료되었습니다. 카카오톡 발송 기능은 현재 연동 준비 중입니다."
+          : "성적표 파일 업로드가 완료되었습니다. 카카오톡 발송 기능은 현재 연동 준비 중입니다.",
       });
     } catch (error) {
       console.error("Report send failed:", error);
@@ -218,6 +233,8 @@ export const usePremiumReportTemplateActions = ({
         description: "성적표 업로드 및 발송 중 오류가 발생했습니다.",
       });
       throw error;
+    } finally {
+      state.setIsGeneratingPdf(false);
     }
   };
 
@@ -232,13 +249,14 @@ export const usePremiumReportTemplateActions = ({
           scoreHistory={state.scoreHistory}
         />
       ).toBlob();
+      const fileName = `${sanitizeFileName(examData.studentName)}_${sanitizeFileName(
+        examData.examName
+      )}_프리미엄리포트.pdf`;
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${sanitizeFileName(examData.studentName)}_${sanitizeFileName(
-        examData.examName
-      )}_프리미엄리포트.pdf`;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

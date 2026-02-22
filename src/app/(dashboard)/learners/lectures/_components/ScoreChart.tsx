@@ -47,15 +47,20 @@ export default function ScoreChart({
 
   if (!chartData.length) {
     return (
-      <div className="flex h-[300px] items-center justify-center text-muted-foreground">
+      <div className="flex h-[300px] items-center justify-center text-[#8b90a3]">
         선택된 시험이 없습니다.
       </div>
     );
   }
 
   return (
-    <div className="h-[350px] w-full">
-      <ResponsiveContainer>
+    <div className="h-[350px] w-full min-w-0">
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        minWidth={0}
+        minHeight={350}
+      >
         <LineChart data={chartData}>
           <CartesianGrid stroke="#E9EBF0" strokeDasharray="0" />
           <XAxis
@@ -119,28 +124,30 @@ const CustomTooltip = ({
     const data = payload[0].payload;
 
     return (
-      <div className="rounded-lg border bg-white p-6 text-sm shadow-lg">
+      <div className="rounded-[12px] border border-[#e9ebf0] bg-white p-6 text-sm shadow-[0_0_14px_rgba(138,138,138,0.08)]">
         <div className="flex flex-col gap-y-6">
           <div>
-            <p className="mb-2 text-neutral-300">시험명</p>
-            <p className="font-semibold">{ellipsText(data.name, 17)}</p>
+            <p className="mb-2 text-[#8b90a3]">시험명</p>
+            <p className="font-semibold text-[#16161b]/88">
+              {ellipsText(data.name, 17)}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-x-4">
             <div>
-              <p className="mb-2 text-neutral-300">점수</p>
-              <p className="font-semibold text-blue-600">{data.score}점</p>
+              <p className="mb-2 text-[#8b90a3]">점수</p>
+              <p className="font-semibold text-[#3863f6]">{data.score}점</p>
             </div>
             <div>
-              <p className="mb-2 text-neutral-300">석차</p>
-              <p className="font-semibold text-gray-700">
+              <p className="mb-2 text-[#8b90a3]">석차</p>
+              <p className="font-semibold text-[#4a4d5c]">
                 {data.rank}등 / {data.totalExaminees}명
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 border-t border-dashed pt-3 text-[11px] text-gray-400">
+        <div className="mt-6 border-t border-dashed border-[#e9ebf0] pt-3 text-[11px] text-[#8b90a3]">
           반 평균 | {data.classAverage}점
         </div>
       </div>

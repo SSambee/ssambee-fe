@@ -89,14 +89,16 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">전화번호 변경</DialogTitle>
+      <DialogContent className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[620px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]">
+        <DialogHeader className="gap-2 border-b border-[#e9ebf0] px-6 pb-5 pt-6 sm:px-8">
+          <DialogTitle className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#040405]">
+            전화번호 변경
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <p className="text-sm text-neutral-500">
+        <div className="space-y-5 px-6 pb-6 pt-6 sm:px-8 sm:pb-8">
+          <div className="rounded-[12px] border border-[#e9ebf0] bg-[#f7f8fa] px-4 py-3">
+            <p className="text-[14px] font-medium tracking-[-0.02em] text-[#6b6f80]">
               현재 전화번호: {currentPhone}
             </p>
           </div>
@@ -117,12 +119,13 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
                   onReset={() => {
                     setPhoneValue("phoneNumber", "");
                   }}
+                  className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium tracking-[-0.02em] text-[#2b2e3a]"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={!!phoneErrors.phoneNumber || isCodeSent}
-                className="mt-0 h-[58px] cursor-pointer"
+                className="mt-0 h-14 min-w-[120px] rounded-[12px] bg-[#3863f6] px-4 text-[14px] font-semibold tracking-[-0.02em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
               >
                 {isCodeSent ? "발송됨" : "인증번호 발송"}
               </Button>
@@ -145,12 +148,13 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
                       setCodeValue("code", "");
                     }}
                     maxLength={6}
+                    className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium tracking-[-0.02em] text-[#2b2e3a]"
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={!isCodeValid || isVerified}
-                  className="mt-0 h-[58px] cursor-pointer"
+                  className="mt-0 h-14 min-w-[120px] rounded-[12px] bg-[#3863f6] px-4 text-[14px] font-semibold tracking-[-0.02em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
                 >
                   {isVerified ? "인증완료" : "인증하기"}
                 </Button>
@@ -158,16 +162,16 @@ export function PhoneChangeModal({ currentPhone }: PhoneChangeModalProps) {
             </form>
           )}
 
-          <div className="flex gap-2 pt-4">
+          <div className="mt-6 flex gap-2 border-t border-[#e9ebf0] pt-5">
             <Button
               variant="outline"
-              className="flex-1 cursor-pointer"
+              className="h-12 flex-1 rounded-[12px] border border-[#ced9fd] bg-[#f4f6fe] text-[14px] font-semibold tracking-[-0.02em] text-[#3863f6] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#e8edfe]"
               onClick={handleClose}
             >
               취소
             </Button>
             <Button
-              className="flex-1 cursor-pointer"
+              className="h-12 flex-1 rounded-[12px] bg-[#3863f6] text-[14px] font-semibold tracking-[-0.02em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
               onClick={handleFinalSubmit}
               disabled={!isVerified}
             >

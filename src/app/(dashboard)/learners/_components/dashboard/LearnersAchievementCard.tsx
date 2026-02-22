@@ -31,8 +31,13 @@ export default function LearnersAchievementCard({
           </Button>
         </div>
 
-        <div className="mt-6 h-[280px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="mt-6 h-[280px] w-full min-w-0">
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={280}
+          >
             <LineChart data={points}>
               <CartesianGrid
                 strokeDasharray="3 3"
