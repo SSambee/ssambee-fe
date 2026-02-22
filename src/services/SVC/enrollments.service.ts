@@ -275,7 +275,7 @@ export const fetchLectureEnrollmentDetailSVC = async (
   lectureEnrollmentId: string
 ): Promise<LectureEnrollmentDetail> => {
   const { data } = await axiosClientSVC.get<ApiResponse<unknown>>(
-    `/lectureEnrollments/${lectureEnrollmentId}`
+    `/lectures/${lectureEnrollmentId}`
   );
 
   return normalizeLectureEnrollmentDetail(data.data);
