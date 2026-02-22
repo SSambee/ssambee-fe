@@ -6,6 +6,13 @@ export type LearnerEnrollmentLectureEnrollmentApi = {
     id: string;
     title?: string | null;
     instructorId?: string | null;
+    instructorName?: string | null;
+    instructor?: {
+      name?: string | null;
+      user?: {
+        name?: string | null;
+      } | null;
+    } | null;
     subject?: string | null;
     schoolYear?: string | null;
     lectureTimes?: {

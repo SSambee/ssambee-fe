@@ -51,6 +51,15 @@ export default function LearnersLecturesPage() {
     );
   }
 
+  const primaryChild = profile.children[0];
+  const childSummary = primaryChild
+    ? `${primaryChild.name}${
+        profile.children.length > 1
+          ? ` 외 ${profile.children.length - 1}명`
+          : ""
+      }`
+    : "-";
+
   return (
     <div className="container mx-auto max-w-[1400px] space-y-6 px-8 py-8">
       <Title
@@ -80,8 +89,9 @@ export default function LearnersLecturesPage() {
                   </span>
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  🎓 학교 | {profile.school || "-"} ·{" "}
-                  {profile.schoolYear || "-"}
+                  {profile.userType === "STUDENT"
+                    ? `🎓 학교 | ${profile.school || "-"} · ${profile.schoolYear || "-"}`
+                    : `👨‍👩‍👦 자녀 | ${childSummary}`}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   📱 연락처 | {phoneNumberFormatter(profile.phone || "") || "-"}
@@ -90,8 +100,13 @@ export default function LearnersLecturesPage() {
                   ✉️ 이메일 | {profile.email || "-"}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  👨‍👩‍👦 학부모 |{" "}
-                  {phoneNumberFormatter(profile.parentPhone || "") || "-"}
+                  {profile.userType === "STUDENT"
+                    ? `👨‍👩‍👦 학부모 | ${
+                        phoneNumberFormatter(profile.parentPhone || "") || "-"
+                      }`
+                    : `📞 자녀 연락처 | ${
+                        phoneNumberFormatter(primaryChild?.phone || "") || "-"
+                      }`}
                 </p>
               </div>
             </div>
@@ -176,18 +191,26 @@ export default function LearnersLecturesPage() {
           {lectures.slice(0, visibleLectures).map((lecture) => {
             const instructor = instructorById.get(lecture.instructorId);
             const scheduleMeta = getScheduleMeta(lecture.lectureTimes);
+            const subject =
+              lecture.subject || instructor?.subject || "과목 정보";
+            const schoolYear =
+              lecture.schoolYear ||
+              (profile.userType === "STUDENT" ? profile.schoolYear : "") ||
+              "학년 정보";
+            const instructorName =
+              lecture.instructorName || instructor?.name || "담당 강사";
 
             return (
               <CommonLectureCard
                 key={lecture.id}
-                subject={instructor?.subject || "과목 정보"}
-                schoolYear={profile.schoolYear || "학년 정보"}
+                subject={subject}
+                schoolYear={schoolYear}
                 title={lecture.title}
                 scheduleDays={scheduleMeta.scheduleDays}
                 scheduleTime={scheduleMeta.scheduleTime}
                 hasSchedule={scheduleMeta.hasSchedule}
-                instructorName={instructor?.name || "담당 강사"}
-                instructorInitial={instructor?.name?.slice(0, 1) || "-"}
+                instructorName={instructorName}
+                instructorInitial={instructorName.slice(0, 1) || "-"}
                 onClick={() => handleMoveLectureDetail(lecture)}
                 className="h-full"
               />

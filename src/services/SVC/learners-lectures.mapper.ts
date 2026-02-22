@@ -10,6 +10,9 @@ export type LearnerLectureCardVM = {
   lectureEnrollmentId: string | null;
   title: string;
   instructorId: string;
+  instructorName: string;
+  subject: string;
+  schoolYear: string;
   lectureTimes: {
     id: string;
     lectureId: string;
@@ -40,6 +43,13 @@ export const toLearnerLectureCard = ({
       lectureEnrollment.id ?? lectureEnrollment.lectureEnrollmentId ?? null,
     title: lectureEnrollment.lecture?.title ?? "제목 없는 강의",
     instructorId: lectureEnrollment.lecture?.instructorId ?? "",
+    instructorName:
+      lectureEnrollment.lecture?.instructorName ??
+      lectureEnrollment.lecture?.instructor?.name ??
+      lectureEnrollment.lecture?.instructor?.user?.name ??
+      "",
+    subject: lectureEnrollment.lecture?.subject ?? "",
+    schoolYear: lectureEnrollment.lecture?.schoolYear ?? "",
     lectureTimes: (lectureEnrollment.lecture?.lectureTimes ?? []).map(
       (lectureTime) => ({
         id: lectureTime.id,
