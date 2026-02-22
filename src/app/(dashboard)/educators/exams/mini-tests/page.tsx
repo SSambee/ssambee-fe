@@ -68,97 +68,111 @@ export default function MiniTestsPage() {
   } = vm;
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" className="h-9 w-9 p-0" asChild>
-            <Link href="/educators/exams">
-              <ArrowLeft className="h-5 w-5" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">미니테스트</h1>
-            <p className="text-muted-foreground">
-              카테고리별 미니테스트 결과를 입력하고 관리합니다.
-            </p>
-            {feedbackMessage ? (
-              <p className="mt-1 text-xs font-medium text-primary">
-                {feedbackMessage}
-              </p>
-            ) : null}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={handleQuickEdit}
-            className="gap-2"
-            disabled={!isEditMode}
-          >
-            <Settings2 className="h-4 w-4" />
-            카테고리
-          </Button>
-          {selectedExamId && isExamFinalized ? (
+    <div className="container mx-auto space-y-8 p-6">
+      <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+          <div className="flex items-start gap-4">
             <Button
               variant="outline"
-              className="gap-2"
-              onClick={handleOpenResultModal}
+              className="h-11 w-11 rounded-full border-[#d6d9e0] bg-white p-0 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+              asChild
             >
-              <Eye className="h-4 w-4" />
-              결과 보기
+              <Link href="/educators/exams" aria-label="시험 관리로 이동">
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
             </Button>
-          ) : null}
-          {selectedExamId &&
-            (isEditMode ? (
-              <Button
-                onClick={handleSaveAll}
-                disabled={isSaving}
-                className="gap-2"
-              >
-                {isSaving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
-                최종 저장
-              </Button>
-            ) : (
+            <div className="space-y-1.5">
+              <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
+                미니테스트
+              </h1>
+              <p className="text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
+                카테고리별 미니테스트 결과를 입력하고 관리합니다.
+              </p>
+              {feedbackMessage ? (
+                <p className="text-[13px] font-semibold leading-5 tracking-[-0.13px] text-[#3863f6]">
+                  {feedbackMessage}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              onClick={handleQuickEdit}
+              className="h-11 gap-2 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[15px] font-semibold text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+              disabled={!isEditMode}
+            >
+              <Settings2 className="h-4 w-4" />
+              카테고리
+            </Button>
+            {selectedExamId && isExamFinalized ? (
               <Button
                 variant="outline"
-                onClick={handleEnableEditMode}
-                className="gap-2"
+                className="h-11 gap-2 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[15px] font-semibold text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                onClick={handleOpenResultModal}
               >
-                <Pencil className="h-4 w-4" />
-                수정
+                <Eye className="h-4 w-4" />
+                결과 보기
               </Button>
-            ))}
+            ) : null}
+            {selectedExamId &&
+              (isEditMode ? (
+                <Button
+                  onClick={handleSaveAll}
+                  disabled={isSaving}
+                  className="h-11 gap-2 rounded-[12px] bg-[#3863f6] px-5 text-[15px] font-semibold text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
+                >
+                  {isSaving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  최종 저장
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={handleEnableEditMode}
+                  className="h-11 gap-2 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[15px] font-semibold text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                >
+                  <Pencil className="h-4 w-4" />
+                  수정
+                </Button>
+              ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[320px_1fr] xl:items-start">
         <div className="space-y-6">
-          <Card>
-            <div className="p-4">
-              <h2 className="text-sm font-semibold">수업 및 시험 선택</h2>
+          <Card className="rounded-[24px] border border-[#eaecf2] bg-white shadow-none">
+            <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+              <h2 className="text-[18px] font-semibold tracking-[-0.18px] text-[#4a4d5c]">
+                수업 및 시험 선택
+              </h2>
+              <p className="mt-1 text-[13px] font-medium leading-5 tracking-[-0.13px] text-[rgba(22,22,27,0.4)]">
+                수업과 시험을 선택한 뒤 채점을 진행하세요.
+              </p>
             </div>
-            <CardContent className="p-4 pt-0 space-y-4">
+            <CardContent className="space-y-4 px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#b0b4c2]" />
                 <Input
                   placeholder="수업 검색"
-                  className="pl-8 h-9 text-sm"
+                  className="h-12 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] pl-10 text-[15px] font-medium tracking-[-0.15px] placeholder:text-[#8b90a3] focus-visible:ring-0"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
 
-              <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1">
+              <div className="space-y-1 max-h-[208px] overflow-y-auto pr-1">
                 {isLoadingClasses ? (
                   <div className="flex justify-center py-4">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    <Loader2 className="h-4 w-4 animate-spin text-[#8b90a3]" />
                   </div>
                 ) : filteredClasses.length === 0 ? (
-                  <p className="text-xs text-center py-4 text-muted-foreground">
+                  <p className="py-4 text-center text-[13px] font-medium text-[#8b90a3]">
                     수업이 없습니다.
                   </p>
                 ) : (
@@ -168,10 +182,10 @@ export default function MiniTestsPage() {
                       type="button"
                       onClick={() => void selectClass(cls.id)}
                       className={cn(
-                        "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                        "w-full rounded-[12px] border border-transparent px-3 py-2.5 text-left text-[14px] font-medium transition-colors",
                         selectedClassId === cls.id
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
+                          ? "border-[#4b72f7] bg-[#4b72f7] text-white"
+                          : "text-[#4a4d5c] hover:border-[#e9ebf0] hover:bg-[#fcfcfd]"
                       )}
                     >
                       {cls.name}
@@ -180,19 +194,19 @@ export default function MiniTestsPage() {
                 )}
               </div>
 
-              <Separator />
+              <Separator className="bg-[#eaecf2]" />
 
-              <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1">
+              <div className="space-y-1 max-h-[208px] overflow-y-auto pr-1">
                 {!selectedClassId ? (
-                  <p className="text-xs text-center py-4 text-muted-foreground">
+                  <p className="py-4 text-center text-[13px] font-medium text-[#8b90a3]">
                     수업을 먼저 선택하세요.
                   </p>
                 ) : isLoadingExams ? (
                   <div className="flex justify-center py-4">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    <Loader2 className="h-4 w-4 animate-spin text-[#8b90a3]" />
                   </div>
                 ) : exams.length === 0 ? (
-                  <p className="text-xs text-center py-4 text-muted-foreground">
+                  <p className="py-4 text-center text-[13px] font-medium text-[#8b90a3]">
                     시험이 없습니다.
                   </p>
                 ) : (
@@ -202,14 +216,14 @@ export default function MiniTestsPage() {
                       type="button"
                       onClick={() => void selectExam(exam.id)}
                       className={cn(
-                        "w-full text-left px-3 py-2 rounded-md text-sm transition-colors",
+                        "w-full rounded-[12px] border border-transparent px-3 py-2.5 text-left text-[14px] transition-colors",
                         selectedExamId === exam.id
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
+                          ? "border-[#4b72f7] bg-[#4b72f7] text-white"
+                          : "text-[#4a4d5c] hover:border-[#e9ebf0] hover:bg-[#fcfcfd]"
                       )}
                     >
-                      <div className="font-medium">{exam.examName}</div>
-                      <div className="text-[10px] opacity-80">
+                      <div className="font-semibold">{exam.examName}</div>
+                      <div className="text-[11px] opacity-80">
                         {exam.examDate}
                       </div>
                     </button>
@@ -222,24 +236,26 @@ export default function MiniTestsPage() {
           {selectedExamId && (
             <Card
               className={cn(
-                "transition-all",
+                "rounded-[24px] border border-[#eaecf2] bg-white shadow-none transition-all",
                 isCategoryApplyFeedback
-                  ? "ring-2 ring-primary/40 border-primary/40"
+                  ? "border-[#4b72f7]/40 ring-2 ring-[#4b72f7]/30"
                   : ""
               )}
             >
-              <div className="p-4">
-                <h2 className="text-sm font-semibold">포함된 과제</h2>
+              <div className="px-5 pt-5 sm:px-6 sm:pt-6">
+                <h2 className="text-[18px] font-semibold tracking-[-0.18px] text-[#4a4d5c]">
+                  포함된 과제
+                </h2>
               </div>
-              <CardContent className="p-4 pt-0 space-y-2">
+              <CardContent className="space-y-2 px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
                 {includedAssignments.length === 0 ? (
-                  <div className="text-xs text-muted-foreground py-2">
+                  <div className="py-2 text-[13px] font-medium text-[#8b90a3]">
                     <p>포함된 과제가 없습니다.</p>
                     <div className="mt-2 flex gap-2">
                       <Button
                         type="button"
                         variant="outline"
-                        className="h-8 px-3 text-xs"
+                        className="h-9 rounded-[10px] border-[#d6d9e0] px-3 text-[13px] font-semibold text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                         onClick={handleQuickEdit}
                         disabled={!isEditMode}
                       >
@@ -248,7 +264,7 @@ export default function MiniTestsPage() {
                       <Button
                         type="button"
                         variant="secondary"
-                        className="h-8 px-3 text-xs"
+                        className="h-9 rounded-[10px] bg-[#f4f6fe] px-3 text-[13px] font-semibold text-[#3863f6] hover:bg-[#e1e7fe]"
                         onClick={() => void handleOpenAssignmentCreationGuide()}
                       >
                         과제 생성 안내
@@ -259,9 +275,9 @@ export default function MiniTestsPage() {
                   includedAssignments.map((assignment) => (
                     <div
                       key={assignment.id}
-                      className="flex items-center gap-2 text-xs"
+                      className="flex items-center gap-2 rounded-[10px] bg-[#fcfcfd] px-3 py-2 text-[13px] font-medium text-[#4a4d5c]"
                     >
-                      <CheckCircle2 className="h-3 w-3 text-primary" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#3863f6]" />
                       <span>
                         {assignment.categoryName} · {assignment.title}
                       </span>
@@ -275,30 +291,31 @@ export default function MiniTestsPage() {
 
         <div className="space-y-4">
           {!selectedExamId ? (
-            <Card className="flex flex-col items-center justify-center py-20 border-dashed">
-              <p className="text-muted-foreground">
+            <Card className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-[#d6d9e0] bg-white py-24 shadow-none">
+              <p className="text-[15px] font-medium text-[#8b90a3]">
                 수업과 시험을 선택하여 채점을 시작하세요.
               </p>
             </Card>
           ) : isLoadingStudents || isLoadingAssignmentData ? (
-            <div className="flex h-[400px] items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
+            <Card className="flex h-[420px] items-center justify-center rounded-[24px] border border-[#eaecf2] bg-white shadow-none">
+              <Loader2 className="h-8 w-8 animate-spin text-[#8b90a3]" />
+            </Card>
           ) : students.length === 0 ? (
-            <Card className="flex flex-col items-center justify-center py-20 border-dashed">
-              <p className="text-muted-foreground">
+            <Card className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-[#d6d9e0] bg-white py-24 shadow-none">
+              <p className="text-[15px] font-medium text-[#8b90a3]">
                 해당 시험에 등록된 학생이 없습니다.
               </p>
             </Card>
           ) : includedAssignments.length === 0 ? (
-            <Card className="flex flex-col items-center justify-center py-20 border-dashed">
-              <p className="text-muted-foreground mb-4">
+            <Card className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-[#d6d9e0] bg-white py-24 shadow-none">
+              <p className="mb-4 text-[15px] font-medium text-[#8b90a3]">
                 성적표에 포함된 과제가 없습니다.
               </p>
               <Button
                 type="button"
                 onClick={handleQuickEdit}
                 disabled={!isEditMode}
+                className="h-11 rounded-[12px] bg-[#3863f6] px-5 text-[15px] font-semibold text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
               >
                 포함 과제 설정
               </Button>
