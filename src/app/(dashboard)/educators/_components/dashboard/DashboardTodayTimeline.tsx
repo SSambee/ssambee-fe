@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,12 +12,48 @@ type DashboardTodayTimelineProps = {
   items: DashboardScheduleItem[];
 };
 
-const TEMP_ACTIVE_INDEX_FOR_UI_PHASE = 2;
+const parseTimeToMinutes = (value: string) => {
+  const matched = /^(\d{1,2}):([0-5]\d)$/.exec(value.trim());
+
+  if (!matched) {
+    return null;
+  }
+
+  const hours = Number(matched[1]);
+  const minutes = Number(matched[2]);
+
+  if (hours === 24 && minutes === 0) {
+    return 24 * 60;
+  }
+
+  if (hours < 0 || hours > 23) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+};
+
+const getCurrentMinutes = () => {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+};
 
 export function DashboardTodayTimeline({
   dateLabel,
   items,
 }: DashboardTodayTimelineProps) {
+  const [nowMinutes, setNowMinutes] = useState(getCurrentMinutes);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNowMinutes(getCurrentMinutes());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <div className="w-full rounded-[24px] border border-[#eaecf2] bg-white px-6 pb-8 pt-8 shadow-none sm:pl-10 xl:w-[440px]">
       <div className="mb-6 flex items-center justify-between">
@@ -39,14 +78,22 @@ export function DashboardTodayTimeline({
       </div>
 
       <div className="relative">
-        {items.length > 0 ? (
+        {items.length >= 2 ? (
           <div className="absolute bottom-2 left-[5px] top-[11px] w-px bg-[#eaecf2]" />
         ) : null}
 
         <div className="space-y-4">
-          {items.map((item, index) => {
-            const isActive = index === TEMP_ACTIVE_INDEX_FOR_UI_PHASE;
-            const isPast = index < TEMP_ACTIVE_INDEX_FOR_UI_PHASE;
+          {items.map((item) => {
+            const startMinutes = parseTimeToMinutes(item.startTime);
+            const endMinutes = parseTimeToMinutes(item.endTime);
+            const hasValidRange =
+              startMinutes !== null &&
+              endMinutes !== null &&
+              endMinutes > startMinutes;
+            const isPast = hasValidRange ? endMinutes <= nowMinutes : false;
+            const isActive = hasValidRange
+              ? startMinutes <= nowMinutes && nowMinutes < endMinutes
+              : false;
 
             return (
               <div key={item.id} className="relative flex items-center gap-3">

@@ -13,7 +13,6 @@ import { ko } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { ScheduleCalendarEvent } from "@/types/schedules";
@@ -40,6 +39,19 @@ const calendarMessages = {
   noEventsInRange: "표시할 일정이 없습니다.",
 };
 
+const toRgba = (hexColor: string, alpha: number) => {
+  const normalized = hexColor.replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return `rgba(56, 99, 246, ${alpha})`;
+  }
+
+  const r = Number.parseInt(normalized.slice(0, 2), 16);
+  const g = Number.parseInt(normalized.slice(2, 4), 16);
+  const b = Number.parseInt(normalized.slice(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
 type ScheduleCalendarProps = {
   view: View;
   currentDate: Date;
@@ -49,19 +61,18 @@ type ScheduleCalendarProps = {
   onSelectEvent?: (event: ScheduleCalendarEvent) => void;
 };
 
-const getReadableTextColor = (hexColor: string) => {
-  const normalized = hexColor.replace("#", "");
-  if (normalized.length !== 6) {
-    return "#1f2937";
-  }
+function CalendarEvent({ event }: { event: ScheduleCalendarEvent }) {
+  const compactLabel =
+    event.allDay || event.timeLabel === "종일"
+      ? event.name
+      : `${event.timeLabel} · ${event.name}`;
 
-  const r = Number.parseInt(normalized.slice(0, 2), 16);
-  const g = Number.parseInt(normalized.slice(2, 4), 16);
-  const b = Number.parseInt(normalized.slice(4, 6), 16);
-
-  const luminance = (r * 299 + g * 587 + b * 114) / 1000;
-  return luminance >= 160 ? "#1f2937" : "#ffffff";
-};
+  return (
+    <div className="eduops-calendar-event-card">
+      <p className="eduops-calendar-event-title">{compactLabel}</p>
+    </div>
+  );
+}
 
 function CalendarToolbar({
   date,
@@ -72,12 +83,23 @@ function CalendarToolbar({
   const label = format(date, "yyyy년 M월", { locale: ko });
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 px-2 pb-4">
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-4 pb-6 lg:flex-row lg:items-center lg:justify-between">
+      <Button
+        type="button"
+        variant="outline"
+        size="default"
+        className="h-14 w-[100px] rounded-xl border-neutral-100 bg-surface-normal-light-alternative text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:bg-neutral-100"
+        onClick={() => onNavigate("TODAY")}
+      >
+        오늘
+      </Button>
+
+      <div className="flex items-center justify-center gap-8">
         <Button
           type="button"
           variant="outline"
           size="default"
+          className="h-10 w-10 rounded-full border-transparent p-0 text-neutral-500 shadow-none hover:bg-neutral-100"
           onClick={() => onNavigate("PREV")}
           aria-label="이전 달"
         >
@@ -87,42 +109,28 @@ function CalendarToolbar({
           type="button"
           variant="outline"
           size="default"
+          className="h-10 w-10 rounded-full border-transparent p-0 text-neutral-500 shadow-none hover:bg-neutral-100"
           onClick={() => onNavigate("NEXT")}
           aria-label="다음 달"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="default"
-          onClick={() => onNavigate("TODAY")}
-        >
-          오늘
-        </Button>
-        <span className="ml-2 text-lg font-semibold text-foreground">
+
+        <span className="text-xl font-bold tracking-[-0.02em] text-neutral-700 md:text-[22px] md:leading-[30px]">
           {label}
         </span>
       </div>
-      <ButtonGroup className="rounded-lg border border-input bg-background p-1 shadow-sm">
-        {[{ label: "월별", value: Views.MONTH }].map((option) => (
-          <Button
-            key={option.value}
-            type="button"
-            variant={view === option.value ? "default" : "outline"}
-            size="default"
-            className={cn(
-              "h-8 px-4 text-sm font-semibold",
-              view === option.value
-                ? "bg-primary text-primary-foreground"
-                : "border-transparent"
-            )}
-            onClick={() => onView(option.value)}
-          >
-            {option.label}
-          </Button>
-        ))}
-      </ButtonGroup>
+
+      <div className="flex items-center rounded-[20px] bg-neutral-50 p-2">
+        <button
+          type="button"
+          className="h-[42px] w-[100px] rounded-xl bg-neutral-700 text-sm font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)]"
+          onClick={() => onView(Views.MONTH)}
+          aria-pressed={view === Views.MONTH}
+        >
+          월별
+        </button>
+      </div>
     </div>
   );
 }
@@ -136,8 +144,8 @@ function ScheduleCalendarComponent({
   onSelectEvent,
 }: ScheduleCalendarProps) {
   return (
-    <Card className="border-none shadow-none">
-      <CardContent className="p-0">
+    <Card className="rounded-[24px] border border-neutral-100 shadow-none">
+      <CardContent className="p-6">
         <Calendar
           localizer={localizer}
           events={events}
@@ -167,16 +175,18 @@ function ScheduleCalendarComponent({
           eventPropGetter={(event: ScheduleCalendarEvent) => ({
             className: "eduops-calendar-event",
             style: {
-              backgroundColor: event.categoryColor,
-              color: getReadableTextColor(event.categoryColor),
+              backgroundColor: toRgba(event.categoryColor, 0.16),
+              color: "#4a4d5c",
+              border: `2px solid ${event.categoryColor}`,
             },
           })}
           components={{
             toolbar: CalendarToolbar,
+            event: CalendarEvent,
           }}
           messages={calendarMessages}
           className="eduops-calendar"
-          style={{ height: 720 }}
+          style={{ height: 872 }}
         />
       </CardContent>
     </Card>

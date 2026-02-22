@@ -51,7 +51,9 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
                   <p className="text-xl font-semibold text-[#040405]">
                     {task.title}
                   </p>
-                  <p className="text-base text-[#16161b]/40">{task.note}</p>
+                  {task.note ? (
+                    <p className="text-base text-[#16161b]/40">{task.note}</p>
+                  ) : null}
                 </div>
                 <span
                   className={cn(
