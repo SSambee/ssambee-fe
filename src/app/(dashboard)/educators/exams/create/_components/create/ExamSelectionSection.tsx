@@ -57,20 +57,27 @@ export function ExamSelectionSection({
   }, [exams]);
 
   return (
-    <Card>
-      <div className="p-6 border-b">
-        <h2 className="text-xl font-semibold">수업 및 시험 선택</h2>
+    <Card className="rounded-[24px] border border-[#eaecf2] bg-white shadow-none">
+      <div className="border-b border-[#eaecf2] px-6 py-5">
+        <h2 className="text-[20px] font-semibold tracking-[-0.2px] text-[#4a4d5c]">
+          수업 및 시험 선택
+        </h2>
       </div>
       <CardContent className="p-6">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label className="block text-sm font-medium">수업</label>
+            <label className="block text-[14px] font-semibold text-[#8b90a3]">
+              수업
+            </label>
             <Select
               value={lectureValue}
               onValueChange={onLectureChange}
               disabled={disabled || isLecturesLoading || lectures.length === 0}
             >
-              <SelectTrigger className="w-full" aria-label="수업 선택">
+              <SelectTrigger
+                className="h-11 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[14px] font-medium text-[#4a4d5c]"
+                aria-label="수업 선택"
+              >
                 <SelectValue placeholder="수업을 선택하세요" />
               </SelectTrigger>
               <SelectContent>
@@ -92,13 +99,18 @@ export function ExamSelectionSection({
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium">등록된 시험</label>
+            <label className="block text-[14px] font-semibold text-[#8b90a3]">
+              등록된 시험
+            </label>
             <Select
               value={examValue}
               onValueChange={onExamChange}
               disabled={disabled}
             >
-              <SelectTrigger className="w-full" aria-label="등록된 시험 선택">
+              <SelectTrigger
+                className="h-11 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[14px] font-medium text-[#4a4d5c]"
+                aria-label="등록된 시험 선택"
+              >
                 <SelectValue placeholder="새 시험 등록" />
               </SelectTrigger>
               <SelectContent>

@@ -14,17 +14,19 @@ export function ExamAutoRetestToggle({
   disabled = false,
 }: ExamAutoRetestToggleProps) {
   return (
-    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+    <div className="rounded-[14px] border border-[#ced9fd] bg-[#f4f6fe] p-4">
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"
           {...register("isAutoClinic")}
           disabled={disabled}
-          className="mt-1"
+          className="mt-1 h-4 w-4 accent-[#3863f6]"
         />
         <div>
-          <div className="font-medium">재시험 대상 자동 분류 활성화</div>
-          <div className="text-sm text-muted-foreground mt-1">
+          <div className="text-[15px] font-semibold text-[#4a4d5c]">
+            재시험 대상 자동 분류 활성화
+          </div>
+          <div className="mt-1 text-[13px] font-medium text-[#8b90a3]">
             통과 기준 점수에 미달하는 학생을 자동으로 재시험 대상 그룹으로
             분류합니다.
           </div>

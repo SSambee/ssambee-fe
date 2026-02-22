@@ -36,10 +36,10 @@ export function QuestionHeader({
   onScoreManualChange,
 }: QuestionHeaderProps) {
   return (
-    <div className="flex items-center gap-4 px-6 py-4 border-b">
+    <div className="flex items-center gap-4 border-b border-[#eaecf2] px-6 py-4">
       <div className="flex items-center gap-4 flex-1">
         <div className="flex items-center gap-2">
-          <div className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">
+          <div className="rounded-full bg-[#e1e7fe] px-3 py-1 text-[13px] font-semibold text-[#3863f6]">
             {questionNumber}
           </div>
           <Controller
@@ -51,7 +51,7 @@ export function QuestionHeader({
                 onValueChange={field.onChange}
                 disabled={disabled}
               >
-                <SelectTrigger className="w-24">
+                <SelectTrigger className="h-9 w-[104px] rounded-[10px] border-[#e9ebf0] bg-[#fcfcfd] text-[13px] font-semibold text-[#4a4d5c]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -77,9 +77,9 @@ export function QuestionHeader({
                 }
               }}
               disabled={disabled}
-              className="w-20"
+              className="h-9 w-20 rounded-[10px] border-[#e9ebf0] bg-[#fcfcfd] text-[13px] font-semibold text-[#4a4d5c]"
             />
-            <span className="text-sm text-muted-foreground">점</span>
+            <span className="text-[13px] font-semibold text-[#8b90a3]">점</span>
           </div>
           {scoreError && <p className="text-xs text-red-500">{scoreError}</p>}
         </div>
@@ -91,7 +91,7 @@ export function QuestionHeader({
           onClick={onDelete}
           disabled={disabled}
           aria-label={`문항 ${questionNumber} 삭제`}
-          className="p-2 rounded-md hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-[10px] border border-[#d6d9e0] p-2 text-[#ef4444] transition-colors hover:bg-[#fff1f2] hover:text-[#dc2626] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Trash2 className="h-4 w-4" />
         </button>
