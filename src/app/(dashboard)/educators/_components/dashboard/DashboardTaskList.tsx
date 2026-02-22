@@ -1,12 +1,17 @@
 import { ChevronRight } from "lucide-react";
 
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DashboardTask } from "@/types/dashboard";
+import { DashboardTask, DashboardTaskStatus } from "@/types/dashboard";
 
 type DashboardTaskListProps = {
   tasks: DashboardTask[];
+};
+
+const STATUS_BADGE_STYLE: Record<DashboardTaskStatus, string> = {
+  완료: "bg-[#dcfce7] text-[#16a34a]",
+  "진행 중": "bg-[#dbeafe] text-[#2563eb]",
+  대기: "bg-[#fef3c7] text-[#d97706]",
 };
 
 export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
@@ -21,13 +26,16 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
             조교 업무 진행률을 확인하세요
           </p>
         </div>
-        <Button
-          variant={null}
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="준비 중"
+          className="inline-flex h-auto items-center gap-1 cursor-not-allowed rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] opacity-60 transition-colors hover:bg-transparent"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -42,11 +50,14 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
                   <p className="text-xl font-semibold text-[#040405]">
                     {task.title}
                   </p>
-                  <p className="text-base text-[#16161b]/40">{task.note}</p>
+                  {task.note ? (
+                    <p className="text-base text-[#16161b]/40">{task.note}</p>
+                  ) : null}
                 </div>
                 <span
                   className={cn(
-                    "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold bg-[#dcfce7] text-[#16a34a]"
+                    "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold",
+                    STATUS_BADGE_STYLE[task.status]
                   )}
                 >
                   {task.status}

@@ -1,6 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DashboardScheduleItem } from "@/types/dashboard";
 
@@ -9,10 +11,48 @@ type DashboardTodayTimelineProps = {
   items: DashboardScheduleItem[];
 };
 
+const parseTimeToMinutes = (value: string) => {
+  const matched = /^(\d{1,2}):([0-5]\d)$/.exec(value.trim());
+
+  if (!matched) {
+    return null;
+  }
+
+  const hours = Number(matched[1]);
+  const minutes = Number(matched[2]);
+
+  if (hours === 24 && minutes === 0) {
+    return 24 * 60;
+  }
+
+  if (hours < 0 || hours > 23) {
+    return null;
+  }
+
+  return hours * 60 + minutes;
+};
+
+const getCurrentMinutes = () => {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes();
+};
+
 export function DashboardTodayTimeline({
   dateLabel,
   items,
 }: DashboardTodayTimelineProps) {
+  const [nowMinutes, setNowMinutes] = useState(getCurrentMinutes);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNowMinutes(getCurrentMinutes());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <div className="w-full rounded-[24px] border border-[#eaecf2] bg-white px-6 pb-8 pt-8 shadow-none sm:pl-10 xl:w-[440px]">
       <div className="mb-6 flex items-center justify-between">
@@ -24,22 +64,35 @@ export function DashboardTodayTimeline({
             {dateLabel}
           </p>
         </div>
-        <Button
-          variant={null}
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="준비 중"
+          className="inline-flex h-auto items-center gap-1 cursor-not-allowed rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] opacity-60 transition-colors hover:bg-transparent"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </div>
 
       <div className="relative">
-        <div className="absolute bottom-2 left-[5px] top-[11px] w-px bg-[#eaecf2]" />
+        {items.length >= 2 ? (
+          <div className="absolute bottom-2 left-[5px] top-[11px] w-px bg-[#eaecf2]" />
+        ) : null}
 
         <div className="space-y-4">
-          {items.map((item, index) => {
-            const isActive = index === 2;
-            const isPast = index < 2;
+          {items.map((item) => {
+            const startMinutes = parseTimeToMinutes(item.startTime);
+            const endMinutes = parseTimeToMinutes(item.endTime);
+            const hasValidRange =
+              startMinutes !== null &&
+              endMinutes !== null &&
+              endMinutes > startMinutes;
+            const isPast = hasValidRange ? endMinutes <= nowMinutes : false;
+            const isActive = hasValidRange
+              ? startMinutes <= nowMinutes && nowMinutes < endMinutes
+              : false;
 
             return (
               <div key={item.id} className="relative flex items-center gap-3">

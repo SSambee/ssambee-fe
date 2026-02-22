@@ -1,6 +1,5 @@
 import { ChevronRight } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { DashboardClinicItem } from "@/types/dashboard";
 
 type DashboardClinicCardProps = {
@@ -19,13 +18,16 @@ export function DashboardClinicCard({ clinics }: DashboardClinicCardProps) {
             예정된 클리닉 일정을 확인하세요
           </p>
         </div>
-        <Button
-          variant={null}
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3]"
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="준비 중"
+          className="inline-flex h-auto items-center gap-1 cursor-not-allowed rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] opacity-60 transition-colors hover:bg-transparent"
         >
           더보기
           <ChevronRight className="h-3.5 w-3.5" />
-        </Button>
+        </button>
       </div>
 
       <div className="flex flex-col gap-3">
