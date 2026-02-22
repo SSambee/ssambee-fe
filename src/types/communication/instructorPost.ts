@@ -1,5 +1,3 @@
-import { MaterialsType } from "../materials.type";
-
 import {
   CommonPostAttachment,
   CommonPostComment,
