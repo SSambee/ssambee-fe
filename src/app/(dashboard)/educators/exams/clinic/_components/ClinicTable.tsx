@@ -41,28 +41,17 @@ export function ClinicTable({
   showResetButton = false,
   onResetFilters,
 }: ClinicTableProps) {
-  const handleSelectAll = (checked: boolean) => {
-    onSelectAll(checked);
-  };
-
-  const handleSelectStudent = (id: string, checked: boolean) => {
-    onToggleSelect(id, checked);
-  };
-
   return (
     <div className="space-y-4">
-      {/* 테이블 헤더 */}
-      <div className="text-sm text-muted-foreground">
-        선택된 시험:{" "}
-        <span className="font-medium text-foreground">{selectedExamLabel}</span>
+      <div className="text-[14px] font-semibold text-[#8b90a3]">
+        선택된 시험: <span className="text-[#4a4d5c]">{selectedExamLabel}</span>
       </div>
 
-      {/* 테이블 */}
-      <div className="rounded-lg border">
-        <table className="w-full">
+      <div className="overflow-x-auto rounded-[20px] border border-[#eaecf2] bg-white">
+        <table className="min-w-[860px] w-full">
           <thead>
-            <tr className="border-b bg-muted/50">
-              <th className="w-12 px-4 py-3 text-left">
+            <tr className="border-b border-[#eaecf2] bg-[#fcfcfd]">
+              <th className="w-12 px-4 py-4 text-left">
                 <input
                   type="checkbox"
                   checked={
@@ -71,30 +60,30 @@ export function ClinicTable({
                       selectedIds.includes(student.id)
                     )
                   }
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="cursor-pointer"
+                  onChange={(event) => onSelectAll(event.target.checked)}
+                  className="h-4 w-4 cursor-pointer accent-[#3863f6]"
                   aria-label="전체 선택"
                 />
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium">
+              <th className="px-4 py-4 text-left text-[14px] font-semibold text-[#8b90a3]">
                 학생 정보
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium">
+              <th className="w-[24%] px-4 py-4 text-left text-[14px] font-semibold text-[#8b90a3]">
                 미통과 시험명
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium">
+              <th className="px-4 py-4 text-left text-[14px] font-semibold text-[#8b90a3]">
                 점수 / 컷
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium">
+              <th className="px-4 py-4 text-left text-[14px] font-semibold text-[#8b90a3]">
                 <div className="flex items-center gap-1">
                   미통과 일자
                   <button
                     type="button"
                     onClick={onSortLatest}
-                    className={`rounded p-0.5 transition ${
+                    className={`rounded-md p-1 transition ${
                       dateSort === "latest"
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                        ? "bg-[#eef2ff] text-[#3863f6]"
+                        : "text-[#8b90a3] hover:bg-[#f4f6fb]"
                     }`}
                     aria-label="미통과 일자 최신순 정렬"
                   >
@@ -106,16 +95,16 @@ export function ClinicTable({
                   </button>
                 </div>
               </th>
-              <th className="px-4 py-3 text-left text-sm font-medium">
+              <th className="px-4 py-4 text-left text-[14px] font-semibold text-[#8b90a3]">
                 <div className="flex items-center gap-1">
                   재시험 확인
                   <button
                     type="button"
                     onClick={onSortIncomplete}
-                    className={`rounded p-0.5 transition ${
+                    className={`rounded-md p-1 transition ${
                       incompleteFirst
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                        ? "bg-[#eef2ff] text-[#3863f6]"
+                        : "text-[#8b90a3] hover:bg-[#f4f6fb]"
                     }`}
                     aria-label="미완료 우선 정렬"
                   >
@@ -134,7 +123,7 @@ export function ClinicTable({
               <tr>
                 <td
                   colSpan={6}
-                  className="px-4 py-8 text-center text-muted-foreground"
+                  className="px-4 py-10 text-center text-[14px] font-medium text-[#8b90a3]"
                 >
                   <div className="flex flex-col items-center gap-2">
                     <p>{emptyMessage ?? "표시할 클리닉 대상자가 없습니다."}</p>
@@ -142,7 +131,7 @@ export function ClinicTable({
                       <button
                         type="button"
                         onClick={onResetFilters}
-                        className="text-xs font-medium text-primary underline"
+                        className="text-[12px] font-semibold text-[#3863f6] underline"
                       >
                         필터 초기화
                       </button>
@@ -152,19 +141,22 @@ export function ClinicTable({
               </tr>
             ) : (
               students.map((student) => (
-                <tr key={student.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3">
+                <tr
+                  key={student.id}
+                  className="border-b border-[#f0f2f7] last:border-b-0 hover:bg-[#fcfcfd]"
+                >
+                  <td className="px-4 py-4">
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(student.id)}
-                      onChange={(e) =>
-                        handleSelectStudent(student.id, e.target.checked)
+                      onChange={(event) =>
+                        onToggleSelect(student.id, event.target.checked)
                       }
-                      className="cursor-pointer"
+                      className="h-4 w-4 cursor-pointer accent-[#3863f6]"
                       aria-label={`${student.name} 선택`}
                     />
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <StudentProfileAvatar
                         size={36}
@@ -172,22 +164,29 @@ export function ClinicTable({
                         label={`${student.name || "학생"} 프로필 이미지`}
                       />
                       <div>
-                        <p className="font-medium">{student.name}</p>
+                        <p className="text-[14px] font-semibold text-[#4a4d5c]">
+                          {student.name}
+                        </p>
+                        <p className="text-[12px] font-medium text-[#8b90a3]">
+                          {student.class}
+                        </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm">{student.examName}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="text-red-500">{student.score}</span>
-                    <span className="text-muted-foreground">
+                  <td className="px-4 py-4 text-[14px] font-medium text-[#4a4d5c]">
+                    {student.examName}
+                  </td>
+                  <td className="px-4 py-4 text-[14px] font-semibold">
+                    <span className="text-[#e55b5b]">{student.score}</span>
+                    <span className="font-medium text-[#8b90a3]">
                       {" "}
                       / {student.cutoff}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">
+                  <td className="px-4 py-4 text-[14px] font-medium text-[#8b90a3]">
                     {student.failedDate}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     <StatusLabel
                       color={statusColorMap[student.status]}
                       showDot={student.status !== "알림 예정"}

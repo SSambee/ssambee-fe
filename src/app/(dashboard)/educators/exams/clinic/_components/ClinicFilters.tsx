@@ -1,5 +1,7 @@
 "use client";
 
+import { Search } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 type FilterOption = {
   value: string;
@@ -54,74 +57,94 @@ export function ClinicFilters({
   onMarkCompleted,
   isMarkingCompleted = false,
 }: ClinicFiltersProps) {
-  const handleMarkCompleted = () => {
-    if (selectedCount > 0) {
-      onMarkCompleted();
-    }
-  };
-
   return (
-    <div className="flex flex-col gap-3 rounded-lg border p-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* 좌측 필터 */}
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">수업:</span>
-            <Select
-              value={lectureValue}
-              onValueChange={onLectureChange}
-              disabled={isLectureLoading}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="수업 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                {lectureOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">시험:</span>
-            <Select
-              value={examValue === "all" ? "" : examValue}
-              onValueChange={onExamChange}
-              disabled={isExamLoading || !isLectureSelected}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="시험 선택(옵션)" />
-              </SelectTrigger>
-              <SelectContent>
-                {examOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">검색:</span>
-            <Input
-              value={examSearch}
-              onChange={(e) => onExamSearchChange(e.target.value)}
-              placeholder="학생/시험/날짜 검색"
-              className="w-[220px]"
+    <div className="space-y-3.5 rounded-[24px] border border-[#eaecf2] bg-white p-5 shadow-none sm:p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        {[
+          { key: "all", label: "전체" },
+          { key: "pending", label: "알림 예정만" },
+          { key: "completed", label: "완료만" },
+        ].map((item) => {
+          const isActive = statusFilter === item.key;
+          return (
+            <Button
+              key={item.key}
+              variant="outline"
+              className={cn(
+                "h-9 rounded-full px-3.5 text-[12px] font-semibold",
+                isActive
+                  ? "border-[#3863f6] bg-[#3863f6] text-white hover:bg-[#2f57e8] hover:text-white"
+                  : "border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+              )}
+              onClick={() =>
+                onStatusFilterChange(
+                  item.key as "all" | "pending" | "completed"
+                )
+              }
               disabled={!isLectureSelected}
-            />
-          </div>
+            >
+              {item.label}
+            </Button>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col gap-2.5 xl:flex-row xl:items-center">
+        <Select
+          value={lectureValue}
+          onValueChange={onLectureChange}
+          disabled={isLectureLoading}
+        >
+          <SelectTrigger className="h-10 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[13px] font-medium text-[#4a4d5c] xl:w-[204px]">
+            <SelectValue placeholder="수업 선택" />
+          </SelectTrigger>
+          <SelectContent>
+            {lectureOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={examValue}
+          onValueChange={onExamChange}
+          disabled={isExamLoading || !isLectureSelected}
+        >
+          <SelectTrigger className="h-10 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[13px] font-medium text-[#4a4d5c] xl:w-[204px]">
+            <SelectValue placeholder="시험 선택(옵션)" />
+          </SelectTrigger>
+          <SelectContent>
+            {examOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="relative flex-1 xl:max-w-[360px]">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[#b0b4c2]" />
+          <Input
+            value={examSearch}
+            onChange={(event) => onExamSearchChange(event.target.value)}
+            placeholder="학생/시험/날짜 검색"
+            className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] pl-10 text-[13px] font-medium tracking-[-0.13px] placeholder:text-[#8b90a3]"
+            disabled={!isLectureSelected}
+          />
         </div>
 
-        {/* 우측 액션 */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 xl:ml-auto">
           <Button
             variant="outline"
-            onClick={handleMarkCompleted}
+            className={cn(
+              "h-10 rounded-[12px] px-4 text-[12px] font-semibold",
+              selectedCount > 0
+                ? "border-[#3863f6] bg-[#3863f6] text-white hover:bg-[#2f57e8] hover:text-white"
+                : "border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+            )}
+            onClick={onMarkCompleted}
             disabled={selectedCount === 0 || isMarkingCompleted}
           >
             완료 표시
@@ -129,36 +152,13 @@ export function ClinicFilters({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">빠른 필터:</span>
-          {[
-            { key: "all", label: "전체" },
-            { key: "pending", label: "알림 예정만" },
-            { key: "completed", label: "완료만" },
-          ].map((item) => {
-            const isActive = statusFilter === item.key;
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() =>
-                  onStatusFilterChange(
-                    item.key as "all" | "pending" | "completed"
-                  )
-                }
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                  isActive
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground"
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-xs text-muted-foreground">정렬: {sortSummary}</p>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#eaecf2] pt-2.5">
+        <p className="text-[12px] font-semibold text-[#8b90a3]">
+          정렬: {sortSummary}
+        </p>
+        <p className="text-[12px] font-semibold text-[#8b90a3]">
+          선택 {selectedCount}명
+        </p>
       </div>
     </div>
   );
