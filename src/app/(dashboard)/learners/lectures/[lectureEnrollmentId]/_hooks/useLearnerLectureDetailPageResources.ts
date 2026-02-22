@@ -2,6 +2,7 @@
 
 import { isAxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 import { learnerLectureKeys } from "@/constants/query-keys";
@@ -32,9 +33,15 @@ const shouldRetryWithout404 = (failureCount: number, error: unknown) => {
 export const useLearnerLectureDetailPageResources = ({
   lectureKey,
 }: UseLearnerLectureDetailPageResourcesParams) => {
+  const searchParams = useSearchParams();
   const { profile, isPending: isProfilePending } = useMyLearnerProfile();
   const isParentUser = profile?.userType === "PARENT";
-  const activeChildId = isParentUser ? (profile?.children?.[0]?.id ?? "") : "";
+  const selectedChildId = searchParams.get("childId");
+  const activeChildId = isParentUser
+    ? (profile?.children?.find((child) => child.id === selectedChildId)?.id ??
+      profile?.children?.[0]?.id ??
+      "")
+    : "";
   const shouldFetchEnrollments =
     !!profile && (!isParentUser || !!activeChildId);
   const {
@@ -143,8 +150,8 @@ export const useLearnerLectureDetailPageResources = ({
 
   const isPending =
     isProfilePending ||
-    isEnrollmentsPending ||
-    isPrimaryPending ||
+    (shouldFetchEnrollments && isEnrollmentsPending) ||
+    (shouldFetchEnrollments && isPrimaryPending) ||
     (resolveEnabled && isResolvePending) ||
     (!!resolvedLectureEnrollmentId && isFallbackPending);
 

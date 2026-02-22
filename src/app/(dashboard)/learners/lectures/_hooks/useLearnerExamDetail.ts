@@ -1,5 +1,6 @@
 import { isAxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 import { learnerLectureKeys } from "@/constants/query-keys";
@@ -71,9 +72,15 @@ export const useLearnerExamDetail = ({
   lectureEnrollmentId: string;
   examId: string;
 }) => {
+  const searchParams = useSearchParams();
   const { profile } = useMyLearnerProfile();
   const isParentUser = profile?.userType === "PARENT";
-  const activeChildId = isParentUser ? (profile?.children?.[0]?.id ?? "") : "";
+  const selectedChildId = searchParams.get("childId");
+  const activeChildId = isParentUser
+    ? (profile?.children?.find((child) => child.id === selectedChildId)?.id ??
+      profile?.children?.[0]?.id ??
+      "")
+    : "";
   const shouldFetchEnrollments =
     !!profile && (!isParentUser || !!activeChildId);
   const {
@@ -160,7 +167,7 @@ export const useLearnerExamDetail = ({
 
   const lectureDetail = lectureEnrollmentData ?? resolvedLectureEnrollmentData;
   const isLectureLoading =
-    isLecturePending ||
+    (shouldFetchEnrollments && isLecturePending) ||
     (resolveEnabled && isResolvePending) ||
     (!!resolvedLectureEnrollmentId && isResolvedLecturePending);
   const hasLectureFetchError =
