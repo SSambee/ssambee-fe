@@ -45,7 +45,11 @@ export const useLearnerLecturesPageActions = ({
         lectureEnrollmentMap[lectureId]?.lectureEnrollmentId ??
         attendanceSummary?.lectureEnrollmentIdByLectureId?.[lectureId];
 
-      push(`/learners/lectures/${lectureEnrollmentId ?? lectureId}`);
+      if (!lectureEnrollmentId) {
+        return;
+      }
+
+      push(`/learners/lectures/${lectureEnrollmentId}`);
     },
     [
       attendanceSummary?.lectureEnrollmentIdByLectureId,

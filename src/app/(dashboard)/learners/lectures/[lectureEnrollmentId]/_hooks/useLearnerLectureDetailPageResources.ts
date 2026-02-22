@@ -1,5 +1,6 @@
 "use client";
 
+import { isAxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -19,6 +20,14 @@ type UseLearnerLectureDetailPageResourcesParams = {
 };
 
 const STALE_TIME_MS = 1000 * 60;
+
+const shouldRetryWithout404 = (failureCount: number, error: unknown) => {
+  if (isAxiosError(error) && error.response?.status === 404) {
+    return false;
+  }
+
+  return failureCount < 3;
+};
 
 export const useLearnerLectureDetailPageResources = ({
   lectureKey,
@@ -42,6 +51,7 @@ export const useLearnerLectureDetailPageResources = ({
     queryFn: () => fetchLectureEnrollmentDetailSVC(lectureKey),
     enabled: !!lectureKey,
     staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
   });
 
   const isPrimaryReady = !isPrimaryError && !!primaryLectureDetail;
@@ -75,6 +85,7 @@ export const useLearnerLectureDetailPageResources = ({
       return resolved.lectureEnrollmentId;
     },
     staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
   });
 
   const {
@@ -87,6 +98,7 @@ export const useLearnerLectureDetailPageResources = ({
       fetchLectureEnrollmentDetailSVC(resolvedLectureEnrollmentId!),
     enabled: !!resolvedLectureEnrollmentId,
     staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
   });
 
   const lectureDetail = isPrimaryReady

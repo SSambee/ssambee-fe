@@ -1,11 +1,16 @@
+import { isAxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { learnerLectureKeys } from "@/constants/query-keys";
+import { useMyEnrollmentsSVC } from "@/hooks/SVC/useEnrollmentsSVC";
+import { useMyLearnerProfile } from "@/hooks/profile/useMyLearnerProfile";
 import {
   fetchGradeDetailSVC,
   fetchLectureEnrollmentDetailSVC,
 } from "@/services/SVC/enrollments.service";
+
+import { resolveLectureEnrollmentFromLectureId } from "../_lib/resolveLectureEnrollment";
 
 export type LearnerExamDetailView = {
   examTitle: string;
@@ -49,6 +54,16 @@ const resolveQuestionTypeLabel = (type: string | undefined): string => {
   return type || "미제공";
 };
 
+const STALE_TIME_MS = 1000 * 60;
+
+const shouldRetryWithout404 = (failureCount: number, error: unknown) => {
+  if (isAxiosError(error) && error.response?.status === 404) {
+    return false;
+  }
+
+  return failureCount < 3;
+};
+
 export const useLearnerExamDetail = ({
   lectureEnrollmentId,
   examId,
@@ -56,6 +71,15 @@ export const useLearnerExamDetail = ({
   lectureEnrollmentId: string;
   examId: string;
 }) => {
+  const { profile } = useMyLearnerProfile();
+  const {
+    data: enrollments = [],
+    isPending: isEnrollmentsPending,
+    isError: isEnrollmentsError,
+  } = useMyEnrollmentsSVC();
+  const profilePhone = profile?.phone ?? "";
+  const profileName = profile?.name ?? "";
+
   const {
     data: lectureEnrollmentData,
     isPending: isLecturePending,
@@ -64,10 +88,67 @@ export const useLearnerExamDetail = ({
     queryKey: learnerLectureKeys.detail(lectureEnrollmentId),
     queryFn: () => fetchLectureEnrollmentDetailSVC(lectureEnrollmentId),
     enabled: !!lectureEnrollmentId,
-    staleTime: 1000 * 60,
+    staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
   });
 
-  const lectureDetail = lectureEnrollmentData;
+  const resolveEnabled =
+    !lectureEnrollmentData &&
+    isLectureError &&
+    !isLecturePending &&
+    !isEnrollmentsPending &&
+    !!lectureEnrollmentId &&
+    !!profile;
+
+  const {
+    data: resolvedLectureEnrollmentId,
+    isPending: isResolvePending,
+    isError: isResolveError,
+  } = useQuery({
+    queryKey: learnerLectureKeys.resolveLectureEnrollmentId({
+      lectureKey: lectureEnrollmentId,
+      learnerPhone: profilePhone,
+      learnerName: profileName,
+      enrollmentsCount: enrollments.length,
+    }),
+    enabled: resolveEnabled,
+    staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
+    queryFn: async () => {
+      const resolved = await resolveLectureEnrollmentFromLectureId({
+        lectureId: lectureEnrollmentId,
+        learnerPhone: profilePhone,
+        learnerName: profileName,
+        enrollments: isEnrollmentsError ? undefined : enrollments,
+      });
+
+      return resolved.lectureEnrollmentId;
+    },
+  });
+
+  const {
+    data: resolvedLectureEnrollmentData,
+    isPending: isResolvedLecturePending,
+    isError: isResolvedLectureError,
+  } = useQuery({
+    queryKey: learnerLectureKeys.detail(resolvedLectureEnrollmentId ?? ""),
+    queryFn: () =>
+      fetchLectureEnrollmentDetailSVC(resolvedLectureEnrollmentId!),
+    enabled:
+      !!resolvedLectureEnrollmentId &&
+      resolvedLectureEnrollmentId !== lectureEnrollmentId,
+    staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
+  });
+
+  const lectureDetail = lectureEnrollmentData ?? resolvedLectureEnrollmentData;
+  const isLectureLoading =
+    isLecturePending ||
+    (resolveEnabled && isResolvePending) ||
+    (!!resolvedLectureEnrollmentId && isResolvedLecturePending);
+  const hasLectureFetchError =
+    !lectureDetail &&
+    (isLectureError || isResolveError || isResolvedLectureError);
   const lectureGrades = lectureDetail?.grades;
   const selectedGradeItem = useMemo(() => {
     if (!lectureGrades?.length) {
@@ -90,10 +171,11 @@ export const useLearnerExamDetail = ({
     queryKey: ["learners", "examDetail", "grade", selectedGradeId],
     queryFn: () => fetchGradeDetailSVC(selectedGradeId),
     enabled: !!selectedGradeId,
-    staleTime: 1000 * 60,
+    staleTime: STALE_TIME_MS,
+    retry: shouldRetryWithout404,
   });
 
-  if (isLecturePending || (!!selectedGradeId && isGradePending)) {
+  if (isLectureLoading || (!!selectedGradeId && isGradePending)) {
     return {
       isPending: true,
       errorMessage: null,
@@ -103,7 +185,7 @@ export const useLearnerExamDetail = ({
     };
   }
 
-  if (isLectureError || isGradeError || !lectureDetail) {
+  if (hasLectureFetchError || isGradeError || !lectureDetail) {
     return {
       isPending: false,
       errorMessage: "시험 상세 정보를 불러올 수 없습니다.",
