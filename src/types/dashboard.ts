@@ -37,6 +37,7 @@ export type DashboardClinicItem = {
   id: string;
   date: string;
   title: string;
+  studentName?: string;
   meta?: string;
 };
 

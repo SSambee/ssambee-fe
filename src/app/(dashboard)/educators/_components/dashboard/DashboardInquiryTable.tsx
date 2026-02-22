@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,6 +23,12 @@ type DashboardInquiryTableProps = {
 export function DashboardInquiryTable({
   inquiries,
 }: DashboardInquiryTableProps) {
+  const router = useRouter();
+
+  const moveToInquiryDetail = (inquiryId: string) => {
+    router.push(`/educators/communication/${inquiryId}?type=inquiry`);
+  };
+
   return (
     <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -32,13 +42,14 @@ export function DashboardInquiryTable({
         </div>
         <Button
           variant={null}
-          disabled
-          aria-label="더보기 (준비 중)"
-          title="준비 중인 기능입니다"
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
+          asChild
+          aria-label="소통 관리 페이지로 이동"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#8b90a3] shadow-none transition-colors hover:bg-transparent hover:text-[#4a4d5c]"
         >
-          더보기
-          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/educators/communication">
+            더보기
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
         </Button>
       </div>
 
@@ -64,11 +75,22 @@ export function DashboardInquiryTable({
             {inquiries.map((inquiry) => (
               <TableRow
                 key={inquiry.id}
-                className="h-[72px] border-[#eaecf2] hover:bg-transparent"
+                tabIndex={0}
+                onClick={() => moveToInquiryDetail(inquiry.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    moveToInquiryDetail(inquiry.id);
+                  }
+                }}
+                className="h-[72px] cursor-pointer border-[#eaecf2] hover:bg-[#f8f9fc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4b72f7] focus-visible:ring-inset"
               >
                 <TableCell className="pl-10">
-                  <div className="flex items-center gap-1">
-                    <span className="text-lg font-medium text-[#16161b]/88">
+                  <div className="flex min-w-0 items-center gap-1">
+                    <span
+                      className="block max-w-[360px] truncate text-lg font-medium text-[#16161b]/88"
+                      title={inquiry.message}
+                    >
                       {inquiry.message}
                     </span>
                     {inquiry.replyCount ? (

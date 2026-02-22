@@ -18,6 +18,7 @@ export type LearnerProfile = {
   name: string;
   email: string;
   phone: string;
+  parentPhone: string;
   image: string | null;
   phoneVerified: boolean;
   userType: LearnerRole;

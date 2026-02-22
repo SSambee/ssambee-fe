@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { InputForm } from "@/components/common/input/InputForm";
 import { useModal } from "@/providers/ModalProvider";
+import { formatPhoneNumber } from "@/utils/phone";
 import {
   learnersProfileUpdateSchema,
   type LearnersProfileUpdateFormData,
@@ -44,6 +45,8 @@ export function LearnersProfileEditModal({
       school: profile.userType === "STUDENT" ? profile.school : undefined,
       schoolYear:
         profile.userType === "STUDENT" ? profile.schoolYear : undefined,
+      parentPhoneNumber:
+        profile.userType === "STUDENT" ? profile.parentPhone : undefined,
     },
   });
 
@@ -82,25 +85,48 @@ export function LearnersProfileEditModal({
           </div>
 
           {profile.userType === "STUDENT" ? (
-            <div className="grid grid-cols-2 gap-4">
-              <InputForm
-                id="school"
-                label="학교"
-                {...register("school")}
-                error={errors.school?.message}
-                showReset={(formValues.school?.length ?? 0) > 0}
-                onReset={() => setValue("school", "")}
-              />
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <InputForm
+                  id="school"
+                  label="학교"
+                  {...register("school")}
+                  error={errors.school?.message}
+                  showReset={(formValues.school?.length ?? 0) > 0}
+                  onReset={() => setValue("school", "")}
+                />
+
+                <InputForm
+                  id="schoolYear"
+                  label="학년"
+                  {...register("schoolYear")}
+                  error={errors.schoolYear?.message}
+                  showReset={(formValues.schoolYear?.length ?? 0) > 0}
+                  onReset={() => setValue("schoolYear", "")}
+                />
+              </div>
 
               <InputForm
-                id="schoolYear"
-                label="학년"
-                {...register("schoolYear")}
-                error={errors.schoolYear?.message}
-                showReset={(formValues.schoolYear?.length ?? 0) > 0}
-                onReset={() => setValue("schoolYear", "")}
+                id="parentPhoneNumber"
+                label="학부모 연락처"
+                {...register("parentPhoneNumber")}
+                error={errors.parentPhoneNumber?.message}
+                onChange={(event) => {
+                  const formatted = formatPhoneNumber(event.target.value);
+                  setValue("parentPhoneNumber", formatted, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                showReset={(formValues.parentPhoneNumber?.length ?? 0) > 0}
+                onReset={() =>
+                  setValue("parentPhoneNumber", "", {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  })
+                }
               />
-            </div>
+            </>
           ) : (
             <p className="text-sm text-neutral-500">
               학부모 계정은 이름만 수정할 수 있습니다.

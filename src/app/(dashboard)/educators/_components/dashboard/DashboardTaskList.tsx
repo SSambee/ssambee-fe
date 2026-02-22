@@ -1,8 +1,12 @@
+"use client";
+
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { DashboardTask } from "@/types/dashboard";
 
 type DashboardTaskListProps = {
@@ -16,27 +20,55 @@ const statusBadgeClasses: Record<DashboardTask["status"], string> = {
 };
 
 export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
+  const { user, isLoading } = useAuthContext();
+  const isInstructor = user?.userType === "INSTRUCTOR";
+  const isAssistant = user?.userType === "ASSISTANT";
+  const moreHref = isInstructor
+    ? "/educators/assistants/history"
+    : "/educators/communication";
+  const title = isAssistant ? "내 업무 지시 내역" : "강사 업무 지시 내역";
+  const description = isAssistant
+    ? "강사가 배정한 업무 진행률을 확인하세요"
+    : "조교 업무 진행률을 확인하세요";
+
   return (
     <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-bold tracking-tight text-[#4a4d5c] xl:text-2xl">
-            강사 업무 지시 내역
+            {title}
           </h2>
           <p className="text-base font-medium tracking-tight text-[#16161b]/28 xl:text-lg">
-            조교 업무 진행률을 확인하세요
+            {description}
           </p>
         </div>
-        <Button
-          variant={null}
-          disabled
-          aria-label="더보기 (준비 중)"
-          title="준비 중인 기능입니다"
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
-        >
-          더보기
-          <ChevronRight className="h-3.5 w-3.5" />
-        </Button>
+        {isLoading ? (
+          <Button
+            variant={null}
+            disabled
+            aria-label="더보기"
+            className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
+          >
+            더보기
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
+          <Button
+            variant={null}
+            asChild
+            aria-label={
+              isInstructor
+                ? "업무 지시 내역 페이지로 이동"
+                : "소통 관리 페이지로 이동"
+            }
+            className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#8b90a3] shadow-none transition-colors hover:bg-transparent hover:text-[#4a4d5c]"
+          >
+            <Link href={moreHref}>
+              더보기
+              <ChevronRight className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">

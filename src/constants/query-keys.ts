@@ -51,3 +51,19 @@ export const profileKeys = {
   me: () => [...profileKeys.all, "me"] as const,
   learnerMe: () => [...profileKeys.all, "learner", "me"] as const,
 };
+
+type DashboardHomeQuery = {
+  inquiryPage: number;
+  inquiryLimit: number;
+  inquiryOrderBy: "latest" | "oldest";
+  taskPage: number;
+  taskLimit: number;
+  taskStatus?: "PENDING" | "IN_PROGRESS" | "END";
+};
+
+export const dashboardKeys = {
+  all: ["dashboard"] as const,
+  educatorsHome: () => [...dashboardKeys.all, "educators-home"] as const,
+  educatorsHomeWithQuery: (query: DashboardHomeQuery) =>
+    [...dashboardKeys.educatorsHome(), query] as const,
+};

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { KR_PHONE_REGEX } from "@/constants/regex";
+
 export const learnersProfileUpdateSchema = z.object({
   name: z
     .string()
@@ -13,6 +15,14 @@ export const learnersProfileUpdateSchema = z.object({
     .email("올바른 이메일 형식이 아닙니다"),
   school: z.string().trim().optional(),
   schoolYear: z.string().trim().optional(),
+  parentPhoneNumber: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (value) => !value || KR_PHONE_REGEX.test(value),
+      "전화번호 형식이 올바르지 않습니다"
+    ),
 });
 
 export type LearnersProfileUpdateFormData = z.infer<

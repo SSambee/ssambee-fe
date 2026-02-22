@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -67,13 +68,14 @@ export function DashboardTodayTimeline({
         </div>
         <Button
           variant={null}
-          disabled
-          aria-label="더보기 (준비 중)"
-          title="준비 중인 기능입니다"
-          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#b0b4c2] shadow-none transition-colors hover:bg-transparent hover:text-[#8b90a3] disabled:opacity-100"
+          asChild
+          aria-label="수업 관리 페이지로 이동"
+          className="h-auto rounded-full px-2 py-1 text-[13px] font-medium leading-5 text-[#8b90a3] shadow-none transition-colors hover:bg-transparent hover:text-[#4a4d5c]"
         >
-          더보기
-          <ChevronRight className="h-3.5 w-3.5" />
+          <Link href="/educators/lectures">
+            더보기
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
         </Button>
       </div>
 
