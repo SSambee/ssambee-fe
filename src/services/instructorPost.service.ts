@@ -17,6 +17,7 @@ import {
   CommonPostComment,
   CommonPostQuery,
 } from "@/types/communication/commonPost";
+import { DownloadResponse } from "@/types/materials.type";
 
 export const instructorPostService = {
   // 강사 게시글 알림 대상 조회
@@ -164,5 +165,13 @@ export const studentPostService = {
       `/student-posts/${postId}/comments/${commentId}`
     );
     return data.data;
+  },
+
+  // 학생 문의 자료 다운로드
+  getStudentPostDownload: async (attachmentId: string) => {
+    const { data } = await axiosClient.get<DownloadResponse>(
+      `/student-posts/attachments/${attachmentId}/download-url`
+    );
+    return data;
   },
 };

@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { MaterialsType } from "@/types/materials.type";
 import { materialsService } from "@/services/materials.service";
+import { studentPostService } from "@/services/instructorPost.service";
+import { myPostServiceSVC } from "@/services/SVC/studentPost.service";
 
 export const useMaterials = (params: {
   page: number;
@@ -91,13 +93,54 @@ export const useMaterialDetail = (id: string) => {
 };
 
 // 자료 다운로드
-export const useDownloadMaterial = () => {
+type DownloadRole = "EDUCATORS" | "LEARNERS";
+
+export const useDownloadMaterial = (role: DownloadRole) => {
   return useMutation({
-    mutationFn: (materialsId: string) =>
-      materialsService.getDownloadUrl(materialsId),
+    mutationFn: async ({
+      materialsId,
+      attachmentId,
+      fileUrl,
+      isNotice = true,
+    }: {
+      materialsId?: string;
+      attachmentId?: string;
+      fileUrl?: string;
+      isNotice?: boolean;
+    }) => {
+      // 자료실 관련 자료 다운로드
+      if (isNotice && materialsId) {
+        if (role === "EDUCATORS") {
+          return materialsService.getDownloadUrl(materialsId);
+        } else {
+          return materialsService.getStudentDownloadUrl(materialsId);
+        }
+      }
+
+      // 학생 문의글 자료 다운로드
+      else if (attachmentId) {
+        if (role === "EDUCATORS") {
+          // 강사가 학생 문의글
+          return studentPostService.getStudentPostDownload(attachmentId);
+        } else {
+          // 학생이 본인 문의글
+          return myPostServiceSVC.getMyPostDownloadSVC(attachmentId);
+        }
+      }
+
+      // 유튜브나 직접 URL이 있는 경우
+      if (fileUrl) {
+        return {
+          status: "success",
+          data: { url: fileUrl, type: "direct" },
+          message: "",
+        };
+      }
+
+      throw new Error("다운로드 가능한 정보가 없습니다.");
+    },
     onSuccess: (response) => {
-      // 서버 응답 구조가 { status, data: { url, type }, message } 이므로
-      // response.data에서 추출해야 합니다.
+      // 서버 응답 구조 { status, data: { url, type }, message }
       const { url, type } = response.data;
 
       if (!url) {
@@ -107,8 +150,9 @@ export const useDownloadMaterial = () => {
 
       if (
         type === "youtube" ||
+        type === "direct" ||
         url.includes("youtube.com") ||
-        url.includes("youtu.be")
+        url.includes("youtube")
       ) {
         window.open(url, "_blank");
       } else {

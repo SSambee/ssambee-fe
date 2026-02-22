@@ -2,10 +2,10 @@ import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { Building2, BookOpen, Calendar, Edit, Settings } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Profile } from "@/types/profile.type";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 
 type ProfileSummaryProps = {
   profile: Profile;
@@ -24,20 +24,20 @@ export function ProfileSummary({
   const hasValidCreatedAt =
     parsedCreatedAt !== null && !Number.isNaN(parsedCreatedAt.getTime());
 
+  const avatarSeedKey = profile.id || "default-profile";
+
   return (
     <Card className="w-full">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div className="flex gap-6">
-            <Avatar className="size-24 border-2 border-neutral-50">
-              <AvatarImage
-                src={profile.image || undefined}
-                alt={profile.name}
-              />
-              <AvatarFallback className="bg-neutral-50 text-2xl text-neutral-400">
-                {profile.name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+            <StudentProfileAvatar
+              seedKey={avatarSeedKey}
+              size={96}
+              sizePreset="Large"
+              label={`${profile.name}님의 프로필 아바타`}
+              className="border-2 border-neutral-50 shadow-sm"
+            />
             <div className="flex flex-col justify-center gap-2">
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-bold text-neutral-800">

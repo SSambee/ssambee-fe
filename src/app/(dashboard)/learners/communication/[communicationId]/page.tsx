@@ -2,10 +2,10 @@
 
 import { useState, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { JSONContent } from "@tiptap/react";
 
 import Title from "@/components/common/header/Title";
 import { useDownloadMaterial } from "@/hooks/useMaterials";
-import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import {
   useInstructorPostCommentMutationsSVC,
   useInstructorPostDetailSVC,
@@ -14,6 +14,7 @@ import {
   useUpdateStudentPostStatusSVC,
 } from "@/hooks/SVC/useCommunicationSVC";
 import { useStudentPostDetailSVC } from "@/hooks/SVC/useCommunicationSVC";
+import { CommonPostAttachment } from "@/types/communication/commonPost";
 
 import PostActionSVC from "./_components/PostActionSVC";
 import PostInfoSVC from "./_components/PostInfoSVC";
@@ -56,12 +57,12 @@ export default function CommunicationDetailPageSVC() {
   const updateStatusSVC = useUpdateStudentPostStatusSVC();
 
   // 자료 다운로드
-  const { mutate: downloadMaterial } = useDownloadMaterial();
+  const { mutate: downloadMaterial } = useDownloadMaterial("LEARNERS");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const [answerContent, setAnswerContent] = useState("");
+  const [editContent, setEditContent] = useState<JSONContent>({});
+  const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   if (isLoadingNotice || isLoadingInquiry) {
@@ -83,16 +84,28 @@ export default function CommunicationDetailPageSVC() {
 
   // 게시글 수정 시작
   const handleStartEdit = () => {
-    if (isNoticePost && noticePostData) {
-      setEditTitle(noticePostData.title);
-      setEditContent(noticePostData.content);
-    } else if (!isNoticePost && inquiryPostData) {
-      setEditTitle(inquiryPostData.title);
-      setEditContent(inquiryPostData.content);
+    if (currentData) {
+      setEditTitle(currentData.title);
+
+      // DB에서 가져온 content(문자열 JSON)를 객체로 파싱하여 에디터에 전달
+      try {
+        const parsedContent = JSON.parse(currentData.content);
+        setEditContent(parsedContent);
+      } catch {
+        // 만약 예전에 저장된 데이터가 일반 텍스트라면 그대로 보냄
+        setEditContent({
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: currentData.content }],
+            },
+          ],
+        });
+      }
     }
     setIsEditing(true);
   };
-
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -100,15 +113,22 @@ export default function CommunicationDetailPageSVC() {
 
   // 게시글 수정 저장
   const handleSaveEdit = () => {
-    if (!editTitle.trim() || !editContent.trim()) {
+    const isContentEmpty =
+      !editContent.content || editContent.content.length === 0;
+
+    if (!editTitle.trim() || isContentEmpty) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
+
+    // 서버에는 무조건 stringify 해서 전송
+    const payloadContent = JSON.stringify(editContent);
+
     if (!isNoticePost) {
       updatePostSVC.mutate(
         {
           postId: communicationId,
-          payload: { title: editTitle, content: editContent },
+          payload: { title: editTitle, content: payloadContent },
         },
         { onSuccess: () => setIsEditing(false) }
       );
@@ -144,46 +164,51 @@ export default function CommunicationDetailPageSVC() {
 
   // 댓글 작성
   const handleSubmitAnswer = () => {
-    const plainText = answerContent.replace(/<[^>]*>/g, "").trim();
+    const isContentEmpty =
+      !answerContent.content || answerContent.content.length === 0;
 
-    if (!plainText) {
+    if (isContentEmpty) {
       alert("댓글 내용을 입력해주세요.");
       return;
     }
     const handleSuccess = () => {
-      setAnswerContent("");
+      setAnswerContent({}); // 초기화 시 빈 객체
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
+    const payload = { content: JSON.stringify(answerContent) };
+
     if (isNoticePost) {
       createInstructorPostCommentSVC.mutate(
-        { postId: communicationId, payload: { content: answerContent } },
+        { postId: communicationId, payload },
         { onSuccess: handleSuccess }
       );
     } else {
       createCommentSVC.mutate(
-        { postId: communicationId, payload: { content: answerContent } },
+        { postId: communicationId, payload },
         { onSuccess: handleSuccess }
       );
     }
   };
 
   //댓글 수정
-  const handleUpdateComment = (commentId: string, content: string) => {
-    if (!content.trim()) return alert("내용을 입력해주세요.");
+  const handleUpdateComment = (commentId: string, content: JSONContent) => {
+    if (!content || !content.content || content.content.length === 0) {
+      return alert("내용을 입력해주세요.");
+    }
 
     if (isNoticePost) {
       updateInstructorPostCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content },
+        payload: { content: JSON.stringify(content) },
       });
     } else {
       updateCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content },
+        payload: { content: JSON.stringify(content) },
       });
     }
   };
@@ -212,21 +237,25 @@ export default function CommunicationDetailPageSVC() {
   };
 
   // 자료 다운로드
-  const handleAttachmentClick = (
-    file: NonNullable<GetStudentPostDetailResponse["attachments"]>[number]
-  ) => {
-    const { material } = file;
-    if (material.type === "VIDEO" && material.fileUrl) {
-      window.open(material.fileUrl, "_blank");
+  const handleAttachmentClick = (file: CommonPostAttachment) => {
+    const isVideo =
+      file.fileUrl?.includes("youtube.com") ||
+      file.fileUrl?.includes("youtube");
+
+    if (isVideo) {
+      window.open(file.fileUrl, "_blank");
       return;
     }
-    if (material.id) {
-      downloadMaterial(material.id);
-    }
+    downloadMaterial({
+      materialsId: file.materialId,
+      attachmentId: file.id,
+      fileUrl: file.fileUrl,
+      isNotice: isNoticePost,
+    });
   };
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Title
           title={isNoticePost ? "공지사항 상세" : "문의 상세"}
@@ -260,6 +289,7 @@ export default function CommunicationDetailPageSVC() {
 
         <div className="lg:col-span-2 lg:order-1 space-y-6">
           <PostContentSVC
+            isNoticePost={isNoticePost}
             isEditing={isEditing}
             editTitle={editTitle}
             setEditTitle={setEditTitle}

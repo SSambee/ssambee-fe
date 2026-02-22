@@ -42,7 +42,7 @@ export default function MaterialsDetailPage() {
     materialsId as string
   );
 
-  const { mutate: downloadMutation } = useDownloadMaterial();
+  const { mutate: downloadMutation } = useDownloadMaterial("EDUCATORS");
 
   const [mode, setMode] = useState<FormMode>("view");
   const [formData, setFormData] = useState<
@@ -148,7 +148,7 @@ export default function MaterialsDetailPage() {
   };
 
   const handleDownload = async () => {
-    downloadMutation(material.id);
+    downloadMutation({ materialsId: material.id });
   };
 
   const renderForm = () => {
@@ -174,7 +174,7 @@ export default function MaterialsDetailPage() {
   };
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <div className="flex items-center justify-between">
         <Title
           title={mode === "view" ? "학습 자료 상세" : "학습 자료 수정"}

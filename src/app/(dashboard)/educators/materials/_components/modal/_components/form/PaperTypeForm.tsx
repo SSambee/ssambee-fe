@@ -11,6 +11,7 @@ import FileUploadField from "@/components/common/input/FileUploadField";
 import { PaperFormData, FormMode, Materials } from "@/types/materials.type";
 import { paperFormSchema } from "@/validation/materials.validation";
 import { getPaperFormDefaults } from "@/constants/materials.default";
+import { decodeUtf8 } from "@/utils/decodeUtf";
 
 type PaperTypeFormProps = {
   mode?: FormMode;
@@ -41,7 +42,6 @@ export default function PaperTypeForm({
       ? {
           title: initialData.title,
           writer: initialData?.writer ? initialData.writer : userName,
-          className: initialData.className || "",
           description: initialData.description,
           file: initialData.file || null,
         }
@@ -71,7 +71,6 @@ export default function PaperTypeForm({
       reset({
         title: initialData.title,
         writer: initialData?.writer ? initialData.writer : userName,
-        className: initialData.className || "",
         description: initialData.description,
         file: initialData.file || null,
       });
@@ -95,30 +94,26 @@ export default function PaperTypeForm({
         </div>
 
         <div className="space-y-4">
-          <InputForm
-            label="제목"
-            id="title"
-            error={errors.title?.message}
-            disabled={isDisabled}
-            {...register("title")}
-          />
+          <div className="grid grid-cols-4 gap-2 ">
+            <div className="col-span-3">
+              <InputForm
+                label="제목"
+                id="title"
+                error={errors.title?.message}
+                disabled={isDisabled}
+                {...register("title")}
+              />
+            </div>
 
-          <div className="flex flex-row gap-2">
-            <InputForm
-              label="클래스명"
-              id="className"
-              error={errors.className?.message}
-              disabled={isDisabled}
-              {...register("className")}
-            />
-
-            <InputForm
-              label="등록자"
-              id="writer"
-              readOnly
-              className="bg-gray-50"
-              {...register("writer")}
-            />
+            <div className="col-span-1">
+              <InputForm
+                label="등록자"
+                id="writer"
+                readOnly
+                className="bg-gray-50"
+                {...register("writer")}
+              />
+            </div>
           </div>
 
           <TextareaForm
@@ -128,7 +123,6 @@ export default function PaperTypeForm({
             disabled={isDisabled}
             {...register("description")}
           />
-
           {!isDisabled && (
             <FileUploadField
               label="시험지 파일"
@@ -140,14 +134,15 @@ export default function PaperTypeForm({
               error={errors.file?.message as string}
             />
           )}
-
           {isDisabled && initialData?.file && (
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 첨부 파일
               </label>
               <div className="border rounded-lg p-4 bg-gray-50">
-                <p className="text-sm text-gray-900">{initialData.file.name}</p>
+                <p className="text-sm text-gray-900">
+                  {decodeUtf8(initialData.file.name)}
+                </p>
               </div>
             </div>
           )}

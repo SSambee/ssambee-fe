@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { JSONContent } from "@tiptap/react";
 
 import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
@@ -11,8 +12,12 @@ import {
   useCreateStudentPostSVC,
   useGetMyChildrenSVC,
 } from "@/hooks/SVC/useCommunicationSVC";
-import { AuthorRole } from "@/types/communication/studentPost";
+import {
+  AuthorRole,
+  CreateStudentPostRequest,
+} from "@/types/communication/studentPost";
 import { useAuthContext } from "@/providers/AuthProvider";
+import { CreateStudentParentPostRequest } from "@/types/communication/studentPost";
 
 import CreateContentSVC from "./_components/content/CreateContentSVC";
 import WriterTypeSelect from "./_components/setting/WriterTypeSelect";
@@ -26,8 +31,9 @@ export default function CreateInquiryPostPageSVC() {
   const parentMutation = useCreateParentPostSVC();
 
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState<JSONContent>({});
   const [selectedLectureId, setSelectedLectureId] = useState("");
+  const [attachment, setAttachment] = useState<File | undefined>(undefined);
 
   // 유저 정보에 따른 작성자 역할 고정
   const authorRole: AuthorRole =
@@ -44,8 +50,14 @@ export default function CreateInquiryPostPageSVC() {
       return;
     }
 
-    const textContent = content.replace(/<[^>]*>/g, "").trim();
-    if (!textContent) {
+    // JSON 데이터 내용 체크
+    const hasText = (node: JSONContent): boolean => {
+      if (node.text && node.text.trim().length > 0) return true;
+      return (node.content ?? []).some(hasText);
+    };
+    const isContentEmpty = !content || !hasText(content);
+
+    if (isContentEmpty) {
       alert("내용을 입력해주세요.");
       return;
     }
@@ -55,33 +67,42 @@ export default function CreateInquiryPostPageSVC() {
       return;
     }
 
-    const baseData = {
-      title,
-      content,
-      lectureId: selectedLectureId,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    // 서버 전송 직전에만 Stringify 실행
+    formData.append("content", JSON.stringify(content));
+    formData.append("lectureId", selectedLectureId);
+
+    if (attachment) {
+      formData.append("file", attachment);
+    }
 
     const onSuccessAction = {
       onSuccess: () => router.push(`/learners/communication`),
     };
 
     if (user?.userType === "PARENT") {
+      // 학부모일 경우 추가 데이터 삽입
+      if (effectiveChildId) {
+        formData.append("childLinkId", effectiveChildId);
+      }
+
       parentMutation.mutate(
-        {
-          ...baseData,
-          childLinkId: authorRole === "PARENT" ? effectiveChildId : "",
-        },
+        formData as CreateStudentParentPostRequest,
         onSuccessAction
       );
     } else {
-      studentMutation.mutate(baseData, onSuccessAction);
+      studentMutation.mutate(
+        formData as CreateStudentPostRequest,
+        onSuccessAction
+      );
     }
   };
 
   const isSubmitting = studentMutation.isPending || parentMutation.isPending;
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <div className="flex items-center justify-between gap-4">
         <Title title="게시글 등록" description="새로운 게시글을 작성합니다." />
 
@@ -109,11 +130,13 @@ export default function CreateInquiryPostPageSVC() {
           <CreateContentSVC
             title={title}
             setTitle={setTitle}
-            content={content}
+            content={content} // JSONContent 객체를 그대로 전달
             setContent={setContent}
             handleSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             onCancel={() => router.back()}
+            attachment={attachment} // 현재 파일 상태 (미리보기용)
+            setAttachment={setAttachment} // 파일 변경 함수 (추가/삭제 공용)
           />
         </div>
       </div>

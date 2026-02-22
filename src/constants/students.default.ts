@@ -59,7 +59,6 @@ export const TODAY_ATTENDANCE_LABEL = {
 } as const;
 
 export const STUDENTS_TABLE_COLUMNS = [
-  { key: "profile", label: "프로필" },
   { key: "name", label: "학생명" },
   { key: "status", label: "재원상태" },
   { key: "appInstalled", label: "가입여부" },

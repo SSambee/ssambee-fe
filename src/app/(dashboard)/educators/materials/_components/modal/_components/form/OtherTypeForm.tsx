@@ -45,7 +45,6 @@ export default function OtherTypeForm({
       ? {
           title: initialData.title,
           writer: initialData?.writer ? initialData.writer : userName,
-          className: initialData.className || "",
           description: initialData.description,
           image: null,
         }
@@ -146,30 +145,26 @@ export default function OtherTypeForm({
         </div>
 
         <div className="space-y-4">
-          <InputForm
-            label="제목"
-            id="title"
-            error={errors.title?.message}
-            disabled={isDisabled}
-            {...register("title")}
-          />
+          <div className="grid grid-cols-4 gap-2 ">
+            <div className="col-span-3">
+              <InputForm
+                label="제목"
+                id="title"
+                error={errors.title?.message}
+                disabled={isDisabled}
+                {...register("title")}
+              />
+            </div>
 
-          <div className="flex flex-row gap-2">
-            <InputForm
-              label="클래스명"
-              id="className"
-              error={errors.className?.message}
-              disabled={isDisabled}
-              {...register("className")}
-            />
-
-            <InputForm
-              label="등록자"
-              id="writer"
-              readOnly
-              className="bg-gray-50"
-              {...register("writer")}
-            />
+            <div className="col-span-1">
+              <InputForm
+                label="등록자"
+                id="writer"
+                readOnly
+                className="bg-gray-50"
+                {...register("writer")}
+              />
+            </div>
           </div>
 
           <TextareaForm

@@ -20,6 +20,7 @@ import {
   GetMyChildrenResponse,
 } from "@/types/communication/studentPost";
 import { UpdateStudentPostStatusRequest } from "@/types/communication/studentPost";
+import { DownloadResponse } from "@/types/materials.type";
 
 export const instructorPostServiceSVC = {
   // 강사 공지 목록 조회
@@ -187,5 +188,13 @@ export const myPostServiceSVC = {
       ApiResponse<CommonPostComment>
     >(`/student-posts/${postId}/comments/${commentId}`);
     return data.data;
+  },
+
+  // 내 게시글 첨부파일 다운로드
+  getMyPostDownloadSVC: async (attachmentId: string) => {
+    const { data } = await axiosClientSVC.get<DownloadResponse>(
+      `/student-posts/attachments/${attachmentId}/download-url`
+    );
+    return data;
   },
 };

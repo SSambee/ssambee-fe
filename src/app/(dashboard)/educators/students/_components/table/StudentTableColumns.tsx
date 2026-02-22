@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import SelectBtn from "@/components/common/button/SelectBtn";
@@ -9,30 +7,37 @@ import {
   STATUS_SETTING_OPTIONS,
   STUDENT_STATUS_LABEL,
 } from "@/constants/students.default";
-import noProfileImage from "@/assets/images/no-profile.jpg";
 import { GetEnrollmentList, StudentStatus } from "@/types/students.type";
 import { formatYMDFromISO, getTodayYMD } from "@/utils/date";
 import { phoneNumberFormatter } from "@/utils/phone";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { ColumnDefinition } from "@/components/common/table/DataTable";
 
-export type StudentTableColumn = {
-  key: string;
-  render: (row: GetEnrollmentList) => React.ReactNode;
-};
-
-export const StudentTableData = ({
-  selectedStudents,
-  onToggleStudent,
-  onNavigate,
-  onStatusChange,
-}: {
+type StudentTableDataProps = {
   selectedStudents: string[];
   onToggleStudent: (student: GetEnrollmentList) => void;
   onNavigate: (enrollmentId: string) => void;
   onStatusChange: (id: string, status: StudentStatus) => void;
-}): StudentTableColumn[] => [
+  isAllSelected: boolean;
+  onSelectAll: (checked: boolean) => void;
+};
+
+export const STUDENT_TABLE_COLUMNS = ({
+  selectedStudents,
+  onToggleStudent,
+  onStatusChange,
+  isAllSelected,
+  onSelectAll,
+}: StudentTableDataProps): ColumnDefinition<GetEnrollmentList>[] => [
   {
     key: "select",
-    render: (row: GetEnrollmentList) => (
+    label: (
+      <Checkbox
+        checked={isAllSelected}
+        onCheckedChange={(checked) => onSelectAll(!!checked)}
+      />
+    ),
+    render: (row) => (
       <Checkbox
         className="cursor-pointer"
         checked={selectedStudents.includes(row.id)}
@@ -41,30 +46,25 @@ export const StudentTableData = ({
     ),
   },
   {
-    key: "profile",
-    render: (row: GetEnrollmentList) => (
-      <Image
-        src={noProfileImage}
-        alt={row.studentName}
-        width={32}
-        height={32}
-        className="rounded-full"
-      />
-    ),
-  },
-  {
     key: "name",
+    label: "학생 프로필",
     render: (row: GetEnrollmentList) => (
-      <span
-        className="font-medium whitespace-nowrap text-base cursor-pointer hover:text-primary hover:underline"
-        onClick={() => onNavigate(row.id)}
-      >
-        {row.studentName || "-"}
-      </span>
+      <div className="flex items-center gap-2">
+        <StudentProfileAvatar
+          seedKey={row.id}
+          size={32}
+          sizePreset="Medium"
+          label={`${row.studentName}의 프로필`}
+        />
+        <span className="font-medium whitespace-nowrap text-base cursor-pointer hover:text-primary hover:underline">
+          {row.studentName || "-"}
+        </span>
+      </div>
     ),
   },
   {
     key: "status",
+    label: "재원 상태",
     render: (row: GetEnrollmentList) => (
       <StatusLabel
         color={
@@ -81,6 +81,7 @@ export const StudentTableData = ({
   },
   {
     key: "appInstalled",
+    label: "가입 여부",
     render: (row: GetEnrollmentList) => {
       const isInstalled = !!row.appStudentId;
       const config = isInstalled
@@ -96,6 +97,7 @@ export const StudentTableData = ({
   },
   {
     key: "class",
+    label: "수업명",
     render: (row: GetEnrollmentList) => (
       <span className="text-base whitespace-nowrap">
         {row.lecture?.title || "-"}
@@ -104,6 +106,7 @@ export const StudentTableData = ({
   },
   {
     key: "school",
+    label: "학교/학년",
     render: (row: GetEnrollmentList) => (
       <span className="text-base whitespace-nowrap">
         {row.school || "-"} / {row.schoolYear || "-"}
@@ -112,6 +115,7 @@ export const StudentTableData = ({
   },
   {
     key: "phoneNumber",
+    label: "연락처",
     render: (row: GetEnrollmentList) => (
       <span className="text-base whitespace-nowrap">
         {phoneNumberFormatter(row.studentPhone || "-")}
@@ -120,6 +124,7 @@ export const StudentTableData = ({
   },
   {
     key: "registeredAt",
+    label: "등록일",
     render: (row: GetEnrollmentList) => (
       <span className="text-base whitespace-nowrap">
         {row.registeredAt ? formatYMDFromISO(row.registeredAt) : "-"}
@@ -128,6 +133,7 @@ export const StudentTableData = ({
   },
   {
     key: "attendance",
+    label: "출석 현황",
     render: (row: GetEnrollmentList) => {
       const today = getTodayYMD(); // 예: "2026-02-04"
 
@@ -146,6 +152,7 @@ export const StudentTableData = ({
   },
   {
     key: "statusSelect",
+    label: "상태 변경",
     render: (row: GetEnrollmentList) => (
       <SelectBtn
         className="w-[100px]"

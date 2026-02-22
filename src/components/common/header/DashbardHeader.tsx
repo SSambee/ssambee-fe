@@ -13,7 +13,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +25,8 @@ import { useBreadcrumb } from "@/providers/BreadcrumbProvider";
 import { useAuth } from "@/hooks/useAuth";
 import { API_URL_TYPE } from "@/hooks/useAuth";
 import { Role } from "@/types/auth.type";
+
+import { StudentProfileAvatar } from "../avatar/StudentProfileAvatar";
 
 export function DashboardHeader() {
   const { breadcrumbs } = useBreadcrumb();
@@ -54,7 +55,7 @@ export function DashboardHeader() {
   };
 
   const displayName = user ? `${getRoleLabel(user.userType)} ${user.name}` : "";
-  const initials = user?.name?.charAt(0) || "";
+  const userSeedKey = user?.id ?? "default-user";
 
   const isValidRole = (type: string): type is Role =>
     ["INSTRUCTOR", "ASSISTANT", "STUDENT", "PARENT"].includes(type);
@@ -123,12 +124,13 @@ export function DashboardHeader() {
               type="button"
               className="flex cursor-pointer items-center gap-4"
             >
-              <Avatar className="size-12 border-[1.5px] border-neutral-50 bg-white">
-                <AvatarImage src={user?.image || undefined} alt={displayName} />
-                <AvatarFallback className="bg-neutral-50 text-sm text-neutral-400">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <StudentProfileAvatar
+                seedKey={userSeedKey}
+                size={48}
+                sizePreset="Medium-2"
+                label="내 프로필 아바타"
+                className="border-[1.5px] border-neutral-50 shadow-sm"
+              />
               <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
                 {displayName}
               </span>
@@ -151,12 +153,13 @@ export function DashboardHeader() {
         </DropdownMenu>
       ) : (
         <div className="flex items-center gap-4">
-          <Avatar className="size-12 border-[1.5px] border-neutral-50 bg-white">
-            <AvatarImage src={user?.image || undefined} alt={displayName} />
-            <AvatarFallback className="bg-neutral-50 text-sm text-neutral-400">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <StudentProfileAvatar
+            seedKey={userSeedKey}
+            size={48}
+            sizePreset="Medium-2"
+            label="내 프로필 아바타"
+            className="border-[1.5px] border-neutral-50 shadow-sm"
+          />
           <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
             {displayName}
           </span>

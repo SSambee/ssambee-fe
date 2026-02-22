@@ -63,11 +63,6 @@ export default function FileUploadField({
               <p className="text-sm font-medium text-gray-900 truncate">
                 {file ? file.name : "기존 이미지"}
               </p>
-              {file && (
-                <p className="text-xs text-gray-500">
-                  {(file.size / 1024).toFixed(2)} KB
-                </p>
-              )}
             </div>
             <button
               type="button"

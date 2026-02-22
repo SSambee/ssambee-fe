@@ -1,3 +1,5 @@
+import { JSONContent } from "@tiptap/react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -7,8 +9,10 @@ import TiptapEditor from "@/components/common/editor/TiptapEditor";
 type CreateContentSVCProps = {
   title: string;
   setTitle: (val: string) => void;
-  content: string;
-  setContent: (val: string) => void;
+  content: JSONContent;
+  setContent: (val: JSONContent) => void;
+  attachment: File | undefined;
+  setAttachment: (file: File | undefined) => void;
   handleSubmit: () => void;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -22,6 +26,8 @@ export default function CreateContentSVC({
   handleSubmit,
   isSubmitting,
   onCancel,
+  attachment,
+  setAttachment,
 }: CreateContentSVCProps) {
   return (
     <Card>
@@ -37,12 +43,15 @@ export default function CreateContentSVC({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium">내용</Label>
+          <Label className="sr-only text-sm font-medium">내용</Label>
           <TiptapEditor
-            content={content}
-            onChange={setContent}
+            content={content} // 객체 전달
+            onChange={(json) => setContent(json)} // 객체로 바로 업데이트
             placeholder="내용을 입력하세요"
             className="min-h-[400px]"
+            onFileUpload={setAttachment}
+            attachment={attachment}
+            onRemoveAttachment={() => setAttachment(undefined)}
           />
         </div>
 

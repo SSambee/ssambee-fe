@@ -55,6 +55,7 @@ export type Materials = {
   className?: string | null; // 강의명
   file?: { name: string; url: string }; // 파일 정보 (PAPER, REQUEST, OTHER)
   link?: string; // 동영상 링크
+  externalDownloadUrl?: string; // 외부 다운로드 URL
 };
 
 export type MaterialsDetailResponse = {
@@ -67,7 +68,7 @@ export type DownloadResponse = {
   status: string;
   data: {
     url: string;
-    type: "file" | "youtube";
+    type: "file" | "youtube" | "direct";
   };
   message: string;
 };

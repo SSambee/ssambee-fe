@@ -11,6 +11,7 @@ import FileUploadField from "@/components/common/input/FileUploadField";
 import { RequestFormData, FormMode, Materials } from "@/types/materials.type";
 import { requestFormSchema } from "@/validation/materials.validation";
 import { getRequestFormDefaults } from "@/constants/materials.default";
+import { decodeUtf8 } from "@/utils/decodeUtf";
 
 type RequestTypeFormProps = {
   mode?: FormMode;
@@ -41,10 +42,9 @@ export default function RequestTypeForm({
       ? {
           title: initialData.title,
           writer: initialData?.writer ? initialData.writer : userName,
-          className: initialData.className || "",
           description: initialData.description,
           file: initialData.file || null,
-          driveLink: initialData.link || "",
+          driveLink: initialData.externalDownloadUrl || "",
         }
       : { ...getRequestFormDefaults(), writer: userName },
   });
@@ -53,7 +53,6 @@ export default function RequestTypeForm({
   const watchedValues = useWatch({ control });
 
   const file = watchedValues.file;
-  const driveLink = watchedValues.driveLink ?? initialData?.link;
 
   // onDataChange를 ref로 관리하여 의존성 배열에서 제외
   const onDataChangeRef = useRef(onDataChange);
@@ -76,7 +75,6 @@ export default function RequestTypeForm({
       reset({
         title: initialData.title,
         writer: initialData?.writer ? initialData.writer : userName,
-        className: initialData.className || "",
         description: initialData.description,
         file: initialData.file || null,
         driveLink: initialData.link || "",
@@ -101,30 +99,26 @@ export default function RequestTypeForm({
         </div>
 
         <div className="space-y-4">
-          <InputForm
-            label="제목"
-            id="title"
-            error={errors.title?.message}
-            disabled={isDisabled}
-            {...register("title")}
-          />
+          <div className="grid grid-cols-4 gap-2 ">
+            <div className="col-span-3">
+              <InputForm
+                label="제목"
+                id="title"
+                error={errors.title?.message}
+                disabled={isDisabled}
+                {...register("title")}
+              />
+            </div>
 
-          <div className="flex flex-row gap-2">
-            <InputForm
-              label="클래스명"
-              id="className"
-              error={errors.className?.message}
-              disabled={isDisabled}
-              {...register("className")}
-            />
-
-            <InputForm
-              label="등록자"
-              id="writer"
-              readOnly
-              className="bg-gray-50"
-              {...register("writer")}
-            />
+            <div className="col-span-1">
+              <InputForm
+                label="등록자"
+                id="writer"
+                readOnly
+                className="bg-gray-50"
+                {...register("writer")}
+              />
+            </div>
           </div>
 
           <TextareaForm
@@ -153,28 +147,43 @@ export default function RequestTypeForm({
                 첨부 파일
               </label>
               <div className="border rounded-lg p-4 bg-gray-50">
-                <p className="text-sm text-gray-900">{initialData.file.name}</p>
+                <p className="text-sm text-gray-900">
+                  {decodeUtf8(initialData.file.name)}
+                </p>
               </div>
             </div>
           )}
 
           <div className="relative space-y-2">
-            <InputForm
-              label="구글 드라이브 링크 (선택)"
-              id="driveLink"
-              error={errors.driveLink?.message}
-              disabled={isDisabled}
-              {...register("driveLink")}
-            />
-
-            {isDisabled && driveLink && driveLink.length > 0 && (
-              <a
-                href={driveLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="구글 드라이브 링크 열기"
-                className="absolute left-0 right-0 bottom-0 top-0 z-20 cursor-pointer rounded-lg hover:bg-blue-50/30 transition-colors"
-              ></a>
+            {!isDisabled ? (
+              <InputForm
+                label="구글 드라이브 링크 (선택)"
+                id="driveLink"
+                error={errors.driveLink?.message}
+                {...register("driveLink")}
+              />
+            ) : (
+              // 상세 보기 모드일 때 드라이브 링크가 있다면 컴포넌트로 표시
+              initialData?.externalDownloadUrl && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    구글 드라이브 링크
+                  </label>
+                  <div className="border rounded-lg p-3 bg-blue-50 border-blue-100 flex items-center justify-between">
+                    <span className="text-sm truncate mr-4">
+                      {initialData.externalDownloadUrl}
+                    </span>
+                    <a
+                      href={initialData.externalDownloadUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 transition-colors shrink-0"
+                    >
+                      링크 이동
+                    </a>
+                  </div>
+                </div>
+              )
             )}
           </div>
         </div>

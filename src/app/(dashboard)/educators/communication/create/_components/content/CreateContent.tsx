@@ -1,4 +1,5 @@
 import { FileText, Paperclip, X } from "lucide-react";
+import { JSONContent } from "@tiptap/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,8 +12,8 @@ import { Materials } from "@/types/materials.type";
 type CreateContentProps = {
   title: string;
   setTitle: (val: string) => void;
-  content: string;
-  setContent: (val: string) => void;
+  content: JSONContent;
+  setContent: (val: JSONContent) => void;
   selectedPostType: PostType;
   selectedMaterials: Materials[];
   setSelectedMaterials: (materials: Materials[]) => void;

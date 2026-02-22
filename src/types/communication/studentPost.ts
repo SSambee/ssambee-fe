@@ -1,6 +1,4 @@
-import { MaterialsType } from "../materials.type";
-
-import { PaginationType } from "./commonPost";
+import { CommonPostAttachment, PaginationType } from "./commonPost";
 import { CommonPostComment } from "./commonPost";
 
 export type InquiryWriterType = "STUDENT" | "PARENT"; // 문의 작성자
@@ -36,11 +34,9 @@ export type ChildInfo = {
 export type GetMyChildrenResponse = ChildInfo[];
 
 // 학생 문의 생성
-export type CreateStudentPostRequest = {
-  title: string;
-  content: string;
-  lectureId: string;
-};
+export type CreateStudentPostRequest =
+  | { title: string; content: string; lectureId: string; file?: File }
+  | FormData;
 
 // 학부모 문의 생성
 export type CreateStudentParentPostRequest = CreateStudentPostRequest & {
@@ -89,17 +85,7 @@ export type GetStudentPostDetailResponse = {
     studentName: string;
   };
   comments?: CommonPostComment[];
-  attachments?: {
-    id: string;
-    materialId: string;
-    material: {
-      id: string;
-      title: string;
-      fileUrl: string | null;
-      type: MaterialsType;
-      externalDownloadUrl: string | null;
-    };
-  }[];
+  attachments?: CommonPostAttachment[];
 };
 
 // 학생 문의 상세 댓글

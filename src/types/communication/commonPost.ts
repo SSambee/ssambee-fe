@@ -43,6 +43,8 @@ export type CommonPostComment = {
   updatedAt: string;
   authorRole: AuthorRole | "INSTRUCTOR" | "ASSISTANT";
   isMine: boolean;
+  instructorId: string | null;
+  assistantId: string | null;
   instructor: {
     user: { name: string };
   } | null;
@@ -54,5 +56,13 @@ export type CommonPostComment = {
     appStudentId: string;
     appParentLink: string;
   };
-  attachments?: [];
+  attachments?: CommonPostAttachment[];
+};
+
+export type CommonPostAttachment = {
+  id: string;
+  filename: string;
+  fileUrl: string;
+  materialId?: string;
+  createdAt: string;
 };

@@ -4,7 +4,7 @@ import {
   MaterialQueryParams,
   MaterialsDetailResponse,
 } from "@/types/materials.type";
-import { axiosClient } from "@/services/axiosClient";
+import { axiosClient, axiosClientSVC } from "@/services/axiosClient";
 
 export const materialsService = {
   // 자료 목록 조회
@@ -47,9 +47,17 @@ export const materialsService = {
     await axiosClient.delete(`/materials/${materialId}`);
   },
 
-  // 자료 다운로드
+  // 강사용 자료 다운로드
   getDownloadUrl: async (materialsId: string) => {
     const { data } = await axiosClient.get<DownloadResponse>(
+      `/materials/${materialsId}/download`
+    );
+    return data;
+  },
+
+  // 학생용 자료 다운로드
+  getStudentDownloadUrl: async (materialsId: string) => {
+    const { data } = await axiosClientSVC.get<DownloadResponse>(
       `/materials/${materialsId}/download`
     );
     return data;

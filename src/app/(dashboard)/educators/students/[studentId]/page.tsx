@@ -2,12 +2,10 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Title from "@/components/common/header/Title";
-import noProfile from "@/assets/images/no-profile.jpg";
 import { useModal } from "@/providers/ModalProvider";
 import {
   useEnrollmentAttendances,
@@ -22,6 +20,7 @@ import {
 } from "@/types/students.type";
 import { STUDENT_STATUS_LABEL } from "@/constants/students.default";
 import { formatLectureTimes } from "@/utils/formatLectureTimes";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 
 import EditProfileModal from "./_components/detail-modal/EditProfileModal";
 import AttendanceDetailModal from "./_components/detail-modal/AttendanceDetailModal";
@@ -96,7 +95,7 @@ export default function StudentDetailPage() {
   };
 
   return (
-    <div className="container mx-auto px-8 py-8 space-y-6 max-w-[1400px]">
+    <div className="container mx-auto space-y-8 p-6">
       <Title
         title="학생 상세 정보"
         description="학생의 상세 정보를 확인하고 관리합니다."
@@ -109,12 +108,12 @@ export default function StudentDetailPage() {
             <div className="flex gap-6">
               {/* 프로필 이미지 */}
               <div className="shrink-0">
-                <Image
-                  src={noProfile}
-                  alt={"학생 프로필 이미지"}
-                  width={120}
-                  height={120}
-                  className="rounded-lg object-cover"
+                <StudentProfileAvatar
+                  seedKey={studentId}
+                  size={120}
+                  sizePreset="Medium"
+                  label={`${enrollmentData.studentName}의 프로필`}
+                  // className="rounded-lg shadow-sm"
                 />
               </div>
 

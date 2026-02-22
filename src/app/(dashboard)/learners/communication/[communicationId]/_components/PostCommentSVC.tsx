@@ -1,14 +1,15 @@
 import { Edit, Trash2, X, Paperclip, Save } from "lucide-react";
 import { useState } from "react";
+import { JSONContent } from "@tiptap/react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import TiptapEditor from "@/components/common/editor/TiptapEditor";
 import { formatYMDFromISO } from "@/utils/date";
 import { GetInstructorPostDetailResponse } from "@/types/communication/instructorPost";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import { CommonPostComment } from "@/types/communication/commonPost";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 
 type PostCommentSVCProps = {
   isNoticePost: boolean;
@@ -16,14 +17,14 @@ type PostCommentSVCProps = {
     | GetInstructorPostDetailResponse
     | GetStudentPostDetailResponse
     | undefined;
-  answerContent: string;
-  setAnswerContent: (val: string) => void;
+  answerContent: JSONContent;
+  setAnswerContent: (val: JSONContent) => void;
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmitAnswer: () => void;
-  onUpdateComment: (commentId: string, content: string) => void;
+  onUpdateComment: (commentId: string, content: JSONContent) => void;
   onDeleteComment: (commentId: string) => void;
 };
 
@@ -64,77 +65,68 @@ export default function PostCommentSVC({
         </Card>
       )}
 
-      <Card>
-        <CardContent className="p-6 space-y-4">
-          <h3 className="font-semibold text-lg">
-            {isNoticePost ? "댓글 작성" : "답변 작성"}
-          </h3>
-          <div className="space-y-3">
-            <TiptapEditor
-              content={answerContent}
-              onChange={setAnswerContent}
-              placeholder={
-                isNoticePost
-                  ? "댓글을 입력하세요..."
-                  : "답변 내용을 입력하세요..."
-              }
-              className="h-[200px]"
-            />
-            {!isNoticePost && selectedFile && (
-              <div className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg border shadow-sm">
-                    <Paperclip className="h-5 w-5 text-blue-500" />
+      {!isNoticePost && (
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <h3 className="font-semibold text-lg">
+              {isNoticePost ? "댓글 작성" : "답변 작성"}
+            </h3>
+            <div className="space-y-3">
+              <TiptapEditor
+                content={answerContent}
+                onChange={setAnswerContent}
+                placeholder={
+                  isNoticePost
+                    ? "댓글을 입력하세요..."
+                    : "답변 내용을 입력하세요..."
+                }
+                className="h-[200px]"
+              />
+              {!isNoticePost && selectedFile && (
+                <div className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-lg border shadow-sm">
+                      <Paperclip className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-slate-700 truncate max-w-[200px]">
+                        {selectedFile.name}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-700 truncate max-w-[200px]">
-                      {selectedFile.name}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
-                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedFile(null)}
+                    className="h-8 w-8 hover:text-red-500"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between border-t pt-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                 </div>
                 <Button
-                  variant="outline"
-                  onClick={() => setSelectedFile(null)}
-                  className="h-8 w-8 hover:text-red-500"
+                  onClick={handleSubmitAnswer}
+                  className="h-11 px-8 rounded-xl text-[14px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
                 >
-                  <X className="h-4 w-4" />
+                  {isNoticePost ? "댓글 등록" : "답변 등록"}
                 </Button>
               </div>
-            )}
-
-            <div className="flex items-center justify-between border-t pt-4">
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                {!isNoticePost && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`flex items-center gap-2 h-9 ${selectedFile ? "text-blue-600 bg-blue-50 border-blue-200" : "text-slate-500"}`}
-                  >
-                    <Paperclip className="h-4 w-4" />
-                    {selectedFile ? "파일 변경" : "파일 첨부"}
-                  </Button>
-                )}
-              </div>
-              <Button
-                onClick={handleSubmitAnswer}
-                className="h-11 px-8 rounded-xl text-[14px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
-              >
-                {isNoticePost ? "댓글 등록" : "답변 등록"}
-              </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -146,37 +138,62 @@ function CommentItemSVC({
   onDelete,
 }: {
   comment: CommonPostComment;
-  onUpdate: (id: string, content: string) => void;
+  onUpdate: (id: string, content: JSONContent) => void;
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.content);
+  // DB에서 가져온 content(string)를 JSON 객체로 파싱하는 헬퍼 함수
+  const getParsedContent = (content: string): JSONContent => {
+    try {
+      return JSON.parse(content);
+    } catch {
+      // 파싱 실패 시 일반 텍스트를 Tiptap 구조로 반환
+      return {
+        type: "doc",
+        content: [
+          { type: "paragraph", content: [{ type: "text", text: content }] },
+        ],
+      };
+    }
+  };
+
+  const [editContent, setEditContent] = useState<JSONContent>(() =>
+    getParsedContent(comment.content)
+  );
 
   // 작성자 표기
   const { authorRole, instructor, assistant, enrollment } = comment;
 
   let roleLabel = "";
   let displayName = "";
+  let avatarSeedKey = comment.id;
 
   if (authorRole === "INSTRUCTOR") {
     roleLabel = "강사";
     displayName = instructor?.user.name || "강사";
+    avatarSeedKey = comment.instructorId || "instructor";
   } else if (authorRole === "ASSISTANT") {
     roleLabel = "조교";
     displayName = assistant?.user.name || "조교";
+    avatarSeedKey = comment.assistantId || "assistant";
   } else if (authorRole === "STUDENT") {
     roleLabel = "학생";
     displayName = enrollment?.studentName || "학생";
+    avatarSeedKey = enrollment?.appStudentId || "student";
   } else if (authorRole === "PARENT") {
     roleLabel = "학부모";
     const studentName = enrollment?.studentName || "학생";
     displayName = `${studentName} 학부모`;
+    avatarSeedKey = enrollment?.appStudentId || "parent";
   }
 
   // 수정 완료 버튼
   const handleSave = () => {
-    const textOnly = editContent.replace(/<[^>]*>/g, "").trim();
-    if (!textOnly) {
+    if (
+      !editContent ||
+      !editContent.content ||
+      editContent.content.length === 0
+    ) {
       alert("내용을 입력해주세요.");
       return;
     }
@@ -188,11 +205,13 @@ function CommentItemSVC({
     <div className="border rounded-4xl p-6 space-y-2 bg-white">
       <div className="flex items-center justify-between font-medium">
         <div className="flex items-center gap-2">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="text-xs">
-              {displayName.slice(0, 1)}
-            </AvatarFallback>
-          </Avatar>
+          <StudentProfileAvatar
+            seedKey={avatarSeedKey}
+            size={36}
+            sizePreset="Medium"
+            label={`${displayName}의 프로필`}
+            className="shadow-sm"
+          />
           <span className="text-sm font-semibold text-slate-700">
             {displayName}
           </span>
@@ -220,7 +239,7 @@ function CommentItemSVC({
                   variant="outline"
                   onClick={() => {
                     setIsEditing(false);
-                    setEditContent(comment.content); // 취소 시 원래 내용으로 복구
+                    setEditContent(getParsedContent(comment.content));
                   }}
                   className="h-8 w-8 p-0 text-slate-400"
                 >
@@ -262,7 +281,7 @@ function CommentItemSVC({
         </div>
       ) : (
         <TiptapEditor
-          content={comment.content}
+          content={getParsedContent(comment.content)}
           readOnly={true}
           className="pt-2 px-2"
         />
