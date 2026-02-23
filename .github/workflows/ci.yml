@@ -107,7 +107,11 @@ jobs:
         run: pnpm run build
 
       - name: Run lighthouse CI
-        run: pnpm exec lhci autorun
+        run: |
+          pnpm exec ihci collect
+          pnpm exec lhci assert
+          # 1. 상세 리포트를 구글 서버에 업로드하고 그 결과(링크)를 로그에 남김
+          pnpm exec lhci upload --target=temporary-public-storage
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
@@ -139,6 +143,9 @@ jobs:
               comments += `| ${score(formatResult(summary['best-practices']))} Best practices | ${formatResult(summary['best-practices'])} |\n`;
               comments += `| ${score(formatResult(summary.seo))} SEO | ${formatResult(summary.seo)} |\n\n`;
             });
+
+            // 링크는 GitHub Actions 로그나 LHCI 기본 코멘트에서 확인할 수 있으므로 요약 위주로 전달
+            comments += "> 상세 리포트는 하단의 **lhci/url** Checks 내 Details 링크를 확인해주세요! 🚀";
 
             core.setOutput('comments', comments);
 
