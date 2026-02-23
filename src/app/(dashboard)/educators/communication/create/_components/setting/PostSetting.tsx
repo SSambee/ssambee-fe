@@ -209,7 +209,7 @@ export default function PostSetting({
                       >
                         <StudentProfileAvatar
                           sizePreset="Medium"
-                          seedKey={student.studentName}
+                          seedKey={student.enrollmentId}
                         />
                       </div>
 

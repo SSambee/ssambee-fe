@@ -124,7 +124,7 @@ export default function PaperTypeForm({
         {!isDisabled && (
           <FileUploadField
             label="시험지 파일"
-            file={watchedValues.file}
+            file={watchedValues.file ?? null}
             onFileChange={(file) =>
               setValue("file", file, { shouldValidate: true })
             }
