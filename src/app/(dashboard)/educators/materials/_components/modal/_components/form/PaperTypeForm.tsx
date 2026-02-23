@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { InputForm } from "@/components/common/input/InputForm";
 import { TextareaForm } from "@/components/common/input/TextareaForm";
 import FileUploadField from "@/components/common/input/FileUploadField";

@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { MaterialsType } from "@/types/materials.type";
 
 type MaterialsTypeSelectProps = {
