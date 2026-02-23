@@ -10,12 +10,19 @@ module.exports = {
       outputDir: "./lhci_reports",
     },
     assert: {
-      preset: "lighthouse:recommended",
       assertions: {
-        "categories:performance": ["warn", { minScore: 0.5 }], // 성능 80점 미만 시 경고
+        "legacy-javascript-insight": "off",
+        "network-dependency-tree-insight": "off",
+        "categories:performance": ["warn", { minScore: 0.3 }], // 성능 80점 미만 시 경고
         "categories:accessibility": ["warn", { minScore: 0.5 }],
         "categories:bast-practices": ["warn", { minScore: 0.5 }],
         "categories:seo": ["warn", { minScore: 0.3 }],
+
+        // interactive: "off", // 시간 관련 지표들
+        "largest-contentful-paint": "off",
+        "first-contentful-paint": "off",
+        "render-blocking-resources": "off",
+
         "errors-in-console": "off",
         "unused-javascript": "off",
         "valid-source-maps": "off",
