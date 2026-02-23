@@ -28,14 +28,14 @@ export default function DataTable<T extends { id: string }>({
   emptyMessage = "기록이 없습니다.",
 }: CommonDataTableProps<T>) {
   return (
-    <div className="border rounded-lg overflow-x-auto min-h-[60px] bg-white">
+    <div className="overflow-x-auto rounded-[20px] border border-[#eaecf2]">
       <Table>
-        <TableHeader className="whitespace-nowrap h-[45px]">
-          <TableRow className="bg-muted/30">
+        <TableHeader className="bg-surface-elevated-light">
+          <TableRow className="border-[#eaecf2] hover:bg-transparent">
             {columns.map((col) => (
               <TableHead
                 key={col.key}
-                className="whitespace-nowrap text-base px-4 font-semibold text-neutral-700"
+                className="h-[66px] text-lg font-semibold text-neutral-400 px-6 whitespace-nowrap"
               >
                 {col.label}
               </TableHead>
@@ -48,11 +48,13 @@ export default function DataTable<T extends { id: string }>({
             data.map((record) => (
               <TableRow
                 key={record.id}
-                className={`transition-colors h-[60px] ${
-                  onRowClick ? "cursor-pointer hover:bg-muted/50" : ""
+                tabIndex={onRowClick ? 0 : undefined}
+                className={`h-[70px] border-neutral-100 ${
+                  onRowClick
+                    ? "cursor-pointer hover:bg-surface-normal-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-inset"
+                    : ""
                 }`}
                 onClick={(e) => {
-                  // 클릭된 요소가 체크박스(input)나 링크(a)라면 행 전체 클릭 이벤트 무시
                   const target = e.target as HTMLElement;
                   if (
                     target.closest("button") ||
@@ -63,11 +65,17 @@ export default function DataTable<T extends { id: string }>({
                   }
                   onRowClick?.(record);
                 }}
+                onKeyDown={(e) => {
+                  if (onRowClick && (e.key === "Enter" || e.key === " ")) {
+                    e.preventDefault();
+                    onRowClick(record);
+                  }
+                }}
               >
                 {columns.map((col) => (
                   <TableCell
                     key={`${record.id}-${col.key}`}
-                    className="whitespace-nowrap text-base px-4"
+                    className="text-lg font-medium text-label-normal px-6 whitespace-nowrap"
                   >
                     {col.render(record)}
                   </TableCell>
@@ -78,7 +86,7 @@ export default function DataTable<T extends { id: string }>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="text-center py-20 text-muted-foreground"
+                className="text-center py-20 text-neutral-400 px-6 whitespace-nowrap"
               >
                 {emptyMessage}
               </TableCell>
