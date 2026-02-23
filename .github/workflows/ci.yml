@@ -108,7 +108,7 @@ jobs:
 
       - name: Run lighthouse CI
         run: |
-          pnpm exec lhci collect
+          pnpm exec lhci collect --outputDir=./lhci_reports
           pnpm exec lhci assert
           # 1. 상세 리포트를 구글 서버에 업로드하고 그 결과(링크)를 로그에 남김
           pnpm exec lhci upload --target=temporary-public-storage
@@ -124,6 +124,7 @@ jobs:
             // 경로 주의: 프로젝트 루트의 lhci_reports 폴더 확인
             const manifestPath = './lhci_reports/manifest.json';
             if (!fs.existsSync(manifestPath)) {
+              console.log("현재 폴더 목록:", fs.readdirSync('.'));
               core.setFailed("Lighthouse manifest not found!");
               return;
             }
