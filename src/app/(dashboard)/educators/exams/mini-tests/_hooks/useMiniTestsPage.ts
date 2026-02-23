@@ -15,19 +15,17 @@ import { useMiniTestsPageState } from "./useMiniTestsPageState";
 
 export const useMiniTestsPage = () => {
   const state = useMiniTestsPageState();
-  const {
-    classes,
-    exams,
-    students,
-    selectedClassId,
-    selectedExamId,
-    isLoadingClasses,
-    isLoadingExams,
-    isLoadingStudents,
-    loadClasses,
-    selectClass,
-    selectExam,
-  } = useReportStore();
+  const classes = useReportStore((store) => store.classes);
+  const exams = useReportStore((store) => store.exams);
+  const students = useReportStore((store) => store.students);
+  const selectedClassId = useReportStore((store) => store.selectedClassId);
+  const selectedExamId = useReportStore((store) => store.selectedExamId);
+  const isLoadingClasses = useReportStore((store) => store.isLoadingClasses);
+  const isLoadingExams = useReportStore((store) => store.isLoadingExams);
+  const isLoadingStudents = useReportStore((store) => store.isLoadingStudents);
+  const loadClasses = useReportStore((store) => store.loadClasses);
+  const selectClass = useReportStore((store) => store.selectClass);
+  const selectExam = useReportStore((store) => store.selectExam);
   const { showAlert, showConfirm } = useDialogAlert();
   const { exams: modalExams } = useExamsPage();
 

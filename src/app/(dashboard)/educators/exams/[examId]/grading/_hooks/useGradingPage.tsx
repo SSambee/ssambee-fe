@@ -169,9 +169,11 @@ export const useGradingPage = () => {
     if (!canComplete) return;
     openModal(
       <CheckModal
-        title="채점을 완료할까요?"
-        description="클리닉 생성이 함께 진행되며, 완료 후에는 결과 확인만 가능합니다."
-        confirmText="전체 완료"
+        title="채점을 최종 완료할까요?"
+        description={
+          "클리닉 대상이 함께 생성됩니다.\n완료 후 수정하려면 다시 완료 처리가 필요합니다."
+        }
+        confirmText="최종 완료"
         cancelText="취소"
         onConfirm={() => {
           triggerComplete();

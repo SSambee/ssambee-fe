@@ -21,16 +21,17 @@ Font.register({
 
 // 공통 색상 상수
 export const colors = {
-  black: "#1e212b",
+  black: "#040405",
   darkGray: "#4a4d5c",
   gray: "#6b6f80",
   lightGray: "#8b90a3",
-  border: "#d6d9e0",
-  lightBg: "#f4f6fa",
+  border: "#eaecf2",
+  lightBg: "#fcfcfd",
+  lightBlueBg: "#f4f7ff",
   white: "#ffffff",
-  primary: "#4b72f7",
-  success: "#16a34a",
-  error: "#dc2626",
+  primary: "#3863f6",
+  success: "#1f8b4d",
+  error: "#d84949",
 };
 
 // ==========================================
@@ -54,7 +55,7 @@ export const premiumStyles = StyleSheet.create({
   },
   // 헤더
   header: {
-    backgroundColor: colors.black,
+    backgroundColor: colors.primary,
     padding: 16,
     borderRadius: 12,
     flex: 1,
@@ -287,7 +288,7 @@ export const premiumStyles = StyleSheet.create({
   page2Header: {
     marginBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: colors.black,
+    borderBottomColor: colors.border,
     paddingBottom: 8,
   },
   page2Subtitle: {
@@ -305,7 +306,7 @@ export const premiumStyles = StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 0,
     borderTopWidth: 1,
-    borderTopColor: colors.black,
+    borderTopColor: colors.border,
   },
   questionHeaderRow: {
     flexDirection: "row",
@@ -329,7 +330,7 @@ export const premiumStyles = StyleSheet.create({
     alignItems: "center",
   },
   questionRowAlt: {
-    backgroundColor: "#f7f8fa",
+    backgroundColor: "#f8f9fc",
   },
   questionCell: {
     textAlign: "center",
@@ -370,13 +371,13 @@ export const simpleStyles = StyleSheet.create({
   // 헤더
   header: {
     marginBottom: 16,
-    backgroundColor: colors.black,
+    backgroundColor: colors.primary,
     padding: 18,
     borderRadius: 8,
   },
   headerLabel: {
     fontSize: 10,
-    color: colors.primary,
+    color: "#dce4ff",
     letterSpacing: 1,
     marginBottom: 6,
     fontWeight: 700,
@@ -390,7 +391,7 @@ export const simpleStyles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 11,
-    color: colors.lightGray,
+    color: "#dce4ff",
     fontWeight: 500,
   },
   // 통계 카드 영역
@@ -401,7 +402,7 @@ export const simpleStyles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.lightBg,
+    backgroundColor: colors.lightBlueBg,
     borderRadius: 8,
     padding: 12,
     alignItems: "center",

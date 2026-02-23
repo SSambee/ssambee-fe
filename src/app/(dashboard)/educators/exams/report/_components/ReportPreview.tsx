@@ -1,11 +1,43 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useMemo } from "react";
+
+import type { ReportTemplateExamData } from "@/types/report";
 
 import { useReportPage } from "../_hooks/useReportPage";
 
-import { SimpleReportTemplate } from "./SimpleReportTemplate";
-import { PremiumReportTemplate } from "./PremiumReportTemplate";
+function ReportTemplateLoading() {
+  return (
+    <div className="flex min-h-[560px] items-center justify-center rounded-[24px] border border-[#eaecf2] bg-white">
+      <p className="text-[14px] font-medium text-[#8b90a3]">
+        리포트를 불러오는 중입니다...
+      </p>
+    </div>
+  );
+}
+
+const SimpleReportTemplate = dynamic<{ examData: ReportTemplateExamData }>(
+  () =>
+    import("./SimpleReportTemplate").then(
+      (module) => module.SimpleReportTemplate
+    ),
+  {
+    ssr: false,
+    loading: () => <ReportTemplateLoading />,
+  }
+);
+
+const PremiumReportTemplate = dynamic<{ examData: ReportTemplateExamData }>(
+  () =>
+    import("./PremiumReportTemplate").then(
+      (module) => module.PremiumReportTemplate
+    ),
+  {
+    ssr: false,
+    loading: () => <ReportTemplateLoading />,
+  }
+);
 
 export function ReportPreview() {
   const {
@@ -61,17 +93,14 @@ export function ReportPreview() {
   // 학생 미선택 시 빈 상태
   if (!selectedStudentId || !selectedData) {
     return (
-      <div className="flex h-full min-h-[500px] flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-10 text-center">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-zinc-100">
-          <span className="text-2xl">👋</span>
-        </div>
-        <h3 className="text-lg font-bold text-zinc-900">리포트 미리보기</h3>
-        <p className="mt-2 text-sm text-zinc-500 max-w-[240px] leading-relaxed">
-          좌측 목록에서{" "}
-          <span className="font-semibold text-indigo-600">
-            수업 → 시험 → 학생
-          </span>{" "}
-          순서로 선택하면 리포트가 생성됩니다.
+      <div className="flex min-h-[560px] flex-col items-center justify-center rounded-[24px] border border-dashed border-[#d6d9e0] bg-white p-10 text-center">
+        <h3 className="text-[22px] font-bold tracking-[-0.22px] text-[#4a4d5c]">
+          리포트 미리보기
+        </h3>
+        <p className="mt-2 max-w-[280px] text-[14px] font-medium leading-6 text-[#8b90a3]">
+          좌측에서 수업, 시험, 학생을 선택하면
+          <br />
+          성적표 미리보기가 표시됩니다.
         </p>
       </div>
     );

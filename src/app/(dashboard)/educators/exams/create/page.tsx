@@ -1,6 +1,5 @@
 "use client";
 
-import Title from "@/components/common/header/Title";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 
 import { ExamSelectionSection } from "./_components/create/ExamSelectionSection";
@@ -46,11 +45,17 @@ export default function CreateExamPage() {
   } = useExamCreateForm();
 
   return (
-    <div className="container mx-auto space-y-6 p-6 pb-28">
-      <Title
-        title="시험 등록/수정"
-        description="시험 정보를 입력하고 문항을 구성합니다."
-      />
+    <div className="container mx-auto space-y-8 p-6 pb-32">
+      <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
+        <div className="space-y-1.5">
+          <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
+            시험 등록/수정
+          </h1>
+          <p className="text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
+            시험 정보를 입력하고 문항을 구성합니다.
+          </p>
+        </div>
+      </section>
 
       <ExamSelectionSection
         lectures={lectures}

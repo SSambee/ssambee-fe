@@ -106,7 +106,16 @@ export default function LearnersProfilePage() {
   }
 
   return (
-    <div className="space-y-6 p-4 max-w-[1400px] mx-auto w-full">
+    <div className="container mx-auto space-y-8 p-6">
+      <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
+        <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
+          내 프로필
+        </h1>
+        <p className="text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
+          내 프로필을 확인하고 관리합니다
+        </p>
+      </section>
+
       <LearnersProfileSummary
         profile={profile}
         onEditClick={handleEditClick}

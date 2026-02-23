@@ -225,15 +225,15 @@ function ScheduleTimetableModalComponent({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showClose={false}
-        className="w-[calc(100vw-24px)] max-h-[86vh] max-w-[980px] gap-5 overflow-y-auto border-none bg-white p-4 shadow-[0_0_14px_rgba(138,138,138,0.16)] sm:gap-6 sm:rounded-[24px] sm:p-6"
+        className="w-[calc(100vw-24px)] max-h-[88vh] max-w-[1040px] gap-5 overflow-y-auto rounded-[24px] border border-[#eaecf2] bg-white p-4 shadow-[0_0_14px_rgba(138,138,138,0.08)] sm:gap-6 sm:p-6"
       >
-        <DialogHeader className="flex-col items-stretch gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-          <DialogTitle className="text-[22px] font-bold leading-8 tracking-[-0.24px] text-[#040405]">
+        <DialogHeader className="flex-col items-stretch gap-3 space-y-0 border-b border-[#eaecf2] pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+          <DialogTitle className="text-[22px] font-bold leading-8 tracking-[-0.22px] text-[#040405]">
             개설된 강의 시간표
           </DialogTitle>
           <Button
             type="button"
-            className="h-11 w-full rounded-[12px] bg-[#3863f6] px-6 text-[14px] font-semibold leading-5 tracking-[-0.14px] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] sm:w-auto"
+            className="h-10 w-full rounded-[10px] bg-[#3863f6] px-6 text-[14px] font-semibold leading-5 tracking-[-0.14px] text-white hover:bg-[#2f57e8] sm:w-auto"
             onClick={() => onOpenChange(false)}
           >
             확인
@@ -241,11 +241,11 @@ function ScheduleTimetableModalComponent({
         </DialogHeader>
 
         <div className="space-y-5">
-          <div className="rounded-[18px] border border-[#f2d4dd] bg-[#fbe4ea] px-5 py-[18px] text-center">
-            <p className="text-[15px] font-semibold leading-6 tracking-[-0.01em] text-[#3f2b35]">
+          <div className="rounded-[18px] border border-[#dce4ff] bg-[#f4f7ff] px-5 py-[18px] text-center">
+            <p className="text-[15px] font-semibold leading-6 tracking-[-0.01em] text-[#4a4d5c]">
               {meta.academy}
             </p>
-            <p className="text-[22px] font-bold leading-8 tracking-[-0.02em] text-[#2f2030]">
+            <p className="text-[22px] font-bold leading-8 tracking-[-0.02em] text-[#2f57e8]">
               {meta.term}
             </p>
           </div>
@@ -268,7 +268,7 @@ function ScheduleTimetableModalComponent({
             </p>
           ) : null}
 
-          <div className="rounded-[20px] border border-[#e9ebf0] bg-[#f7f8fa] p-3 sm:p-4">
+          <div className="rounded-[20px] border border-[#eaecf2] bg-white p-3 sm:p-4">
             <div className="overflow-x-auto">
               <div className="min-w-[760px] space-y-3">
                 <div
@@ -279,7 +279,7 @@ function ScheduleTimetableModalComponent({
                   {timetableDays.map((day) => (
                     <div
                       key={day}
-                      className="rounded-[10px] border border-[#e9ebf0] bg-white py-2.5 text-center text-[#6b6f80]"
+                      className="rounded-[10px] border border-[#eaecf2] bg-[#fcfcfd] py-2.5 text-center text-[#6b6f80]"
                     >
                       {day}
                     </div>
@@ -312,7 +312,7 @@ function ScheduleTimetableModalComponent({
                     return (
                       <div
                         key={day}
-                        className="relative overflow-hidden rounded-[14px] border border-[#e9ebf0] bg-[#fcfcfd]"
+                        className="relative overflow-hidden rounded-[14px] border border-[#eaecf2] bg-white"
                         style={{ height: timeAxis.gridHeight }}
                       >
                         <div className="absolute inset-0 flex flex-col">
@@ -320,7 +320,7 @@ function ScheduleTimetableModalComponent({
                             (_, index) => (
                               <div
                                 key={`row-${day}-${timeAxis.startHour + index}`}
-                                className="border-b border-[#eef0f4] last:border-b-0"
+                                className="border-b border-[#f1f3f7] last:border-b-0"
                                 style={{ height: timetableRowHeight }}
                               />
                             )
@@ -352,7 +352,7 @@ function ScheduleTimetableModalComponent({
                           return (
                             <div
                               key={entry.id}
-                              className="absolute left-1.5 right-1.5 overflow-hidden rounded-[10px] px-2 py-1.5 shadow-[0_0_12px_rgba(0,0,0,0.08)]"
+                              className="absolute left-1.5 right-1.5 overflow-hidden rounded-[12px] border border-white/25 px-2.5 py-2 shadow-[0_8px_18px_rgba(28,32,43,0.16)] ring-1 ring-black/5"
                               style={{
                                 top: style.top,
                                 height: style.height,

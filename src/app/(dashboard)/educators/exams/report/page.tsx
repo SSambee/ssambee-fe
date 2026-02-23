@@ -15,21 +15,19 @@ export default function ReportPage() {
     { label: "성적표 발송" },
   ]);
   return (
-    <div className="container mx-auto space-y-8 p-6">
+    <div className="container mx-auto space-y-6 p-6 xl:space-y-7">
       <ReportHeader />
 
-      <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
-        {/* 좌측: 검색 + 학생 목록 + 템플릿 */}
+      <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
         <div className="space-y-6">
           <ReportSearchSection />
           <ReportTemplateSelect />
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             <ReportCommonMessageSection />
             <ReportAssignmentSection />
           </div>
         </div>
 
-        {/* 우측: 미리보기 */}
         <ReportPreview />
       </div>
     </div>

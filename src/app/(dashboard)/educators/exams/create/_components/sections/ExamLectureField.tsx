@@ -32,7 +32,10 @@ export function ExamLectureField({
 }: ExamLectureFieldProps) {
   return (
     <div className="sm:col-span-2">
-      <label htmlFor="exam-class" className="block text-sm font-medium mb-2">
+      <label
+        htmlFor="exam-class"
+        className="mb-2 block text-[14px] font-semibold text-[#8b90a3]"
+      >
         수업 <span className="text-red-500">*</span>
       </label>
       <Controller
@@ -49,7 +52,10 @@ export function ExamLectureField({
               lectures.length === 0
             }
           >
-            <SelectTrigger id="exam-class">
+            <SelectTrigger
+              id="exam-class"
+              className="h-11 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[14px] font-medium text-[#4a4d5c]"
+            >
               <SelectValue placeholder="수업 선택" />
             </SelectTrigger>
             <SelectContent>

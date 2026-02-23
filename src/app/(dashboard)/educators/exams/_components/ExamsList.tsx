@@ -54,7 +54,7 @@ export function ExamsList({
   });
 
   return (
-    <div className="space-y-6">
+    <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
       <ExamsFilterBar
         statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
@@ -89,6 +89,6 @@ export function ExamsList({
         isDisabled={isPaginationDisabled}
         onPageChange={setCurrentPage}
       />
-    </div>
+    </section>
   );
 }

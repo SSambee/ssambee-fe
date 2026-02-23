@@ -2,9 +2,9 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Loader2, Plus, X } from "lucide-react";
 
-import Title from "@/components/common/header/Title";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import type { Exam } from "@/types/exams";
 
 import { useExamsCategoryModal } from "../_hooks/useExamsCategoryModal";
@@ -31,6 +32,7 @@ type ExamsHeaderProps = {
 };
 
 export function ExamsHeader({ exams }: ExamsHeaderProps) {
+  const pathname = usePathname();
   const {
     presetSnippets,
     isCategoryModalOpen,
@@ -83,32 +85,56 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
     }, {});
   }, [availableAssignments]);
 
+  const navigationTabs = [
+    { label: "시험 관리", href: "/educators/exams" },
+    { label: "시험 등록/수정", href: "/educators/exams/create" },
+    { label: "클리닉", href: "/educators/exams/clinic" },
+    { label: "미니테스트", href: "/educators/exams/mini-tests" },
+    { label: "성적표 발송", href: "/educators/exams/report" },
+  ] as const;
+
+  const isTabActive = (href: string) => {
+    if (href === "/educators/exams") {
+      return pathname === href;
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
   return (
     <>
-      <div className="space-y-6">
-        <Title
-          title="시험 및 과제 관리"
-          description="학생 평가를 생성, 채점 및 관리합니다."
-        />
+      <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
+        <div className="flex flex-col gap-5">
+          <div className="space-y-1.5">
+            <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
+              시험 및 과제 관리
+            </h1>
+            <p className="text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
+              학생 평가를 생성, 채점 및 관리합니다.
+            </p>
+          </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" className="rounded-full">
-            시험 관리
-          </Button>
-          <Button variant="outline" className="rounded-full" asChild>
-            <Link href="/educators/exams/create">시험 등록/수정</Link>
-          </Button>
-          <Button variant="outline" className="rounded-full" asChild>
-            <Link href="/educators/exams/clinic">클리닉</Link>
-          </Button>
-          <Button variant="outline" className="rounded-full" asChild>
-            <Link href="/educators/exams/mini-tests">미니테스트</Link>
-          </Button>
-          <Button className="rounded-full" asChild>
-            <Link href="/educators/exams/report">성적표 발송</Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {navigationTabs.map((tab) => {
+              const isActive = isTabActive(tab.href);
+              return (
+                <Button
+                  key={tab.href}
+                  variant="outline"
+                  className={cn(
+                    "h-10 rounded-full px-4 text-[13px] font-semibold",
+                    isActive
+                      ? "border-[#3863f6] bg-[#3863f6] text-white hover:bg-[#2f57e8] hover:text-white"
+                      : "border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                  )}
+                  asChild
+                >
+                  <Link href={tab.href}>{tab.label}</Link>
+                </Button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      </section>
 
       <Dialog
         open={isCategoryModalOpen}
@@ -116,10 +142,12 @@ export function ExamsHeader({ exams }: ExamsHeaderProps) {
           void handleModalOpenChange(nextOpen);
         }}
       >
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>카테고리 등록</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto rounded-[24px] border border-[#eaecf2] p-6 sm:p-7">
+          <DialogHeader className="border-b border-[#eaecf2] pb-4">
+            <DialogTitle className="text-[22px] font-bold tracking-[-0.22px] text-[#040405]">
+              카테고리 등록
+            </DialogTitle>
+            <DialogDescription className="text-[14px] font-medium text-[#8b90a3]">
               카테고리는 분류/프리셋 라이브러리이며, 성적표 포함은 과제 단위로
               설정합니다.
             </DialogDescription>

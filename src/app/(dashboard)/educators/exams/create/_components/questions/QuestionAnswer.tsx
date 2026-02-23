@@ -29,10 +29,12 @@ export function QuestionAnswer({
 }: QuestionAnswerProps) {
   if (questionType === "객관식") {
     return (
-      <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
+      <div className="rounded-[12px] border border-[#ced9fd] bg-[#f4f6fe] p-4">
         <div className="flex items-center gap-2 mb-4">
-          <Check className="h-4 w-4 text-blue-500" />
-          <h3 className="font-medium">객관식 정답 설정</h3>
+          <Check className="h-4 w-4 text-[#3863f6]" />
+          <h3 className="text-[14px] font-semibold text-[#4a4d5c]">
+            객관식 정답 설정
+          </h3>
         </div>
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((num) => (
@@ -47,10 +49,10 @@ export function QuestionAnswer({
               }
               disabled={disabled}
               className={
-                "w-12 h-12 rounded-full border-2 font-medium transition-colors " +
+                "h-11 w-11 rounded-full border-2 text-[13px] font-semibold transition-colors " +
                 (selectedAnswer === num
-                  ? "bg-blue-500 border-blue-500 text-white"
-                  : "bg-background border-input hover:bg-accent") +
+                  ? "border-[#3863f6] bg-[#3863f6] text-white"
+                  : "border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd]") +
                 " disabled:opacity-50 disabled:cursor-not-allowed"
               }
             >
@@ -66,15 +68,17 @@ export function QuestionAnswer({
   }
 
   return (
-    <div className="border border-blue-500/20 bg-blue-500/5 rounded-lg p-4">
+    <div className="rounded-[12px] border border-[#ced9fd] bg-[#f4f6fe] p-4">
       <div className="flex items-center gap-2 mb-4">
-        <Check className="h-4 w-4 text-blue-500" />
-        <h3 className="font-medium">주관식 정답 설정</h3>
+        <Check className="h-4 w-4 text-[#3863f6]" />
+        <h3 className="text-[14px] font-semibold text-[#4a4d5c]">
+          주관식 정답 설정
+        </h3>
       </div>
       <div>
         <label
           htmlFor={`question-${index}-answer-text`}
-          className="block text-sm font-medium mb-2"
+          className="mb-2 block text-[13px] font-semibold text-[#8b90a3]"
         >
           정답 입력
         </label>
@@ -83,6 +87,7 @@ export function QuestionAnswer({
           {...register(`questions.${index}.answer.text`)}
           placeholder="정답을 입력하세요"
           disabled={disabled}
+          className="h-10 rounded-[10px] border-[#e9ebf0] bg-white text-[14px] font-medium text-[#4a4d5c]"
         />
         {answerTextError && (
           <p className="text-xs text-red-500 mt-1">{answerTextError}</p>

@@ -1,9 +1,16 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+const reactCompilerEnabled =
+  process.env.NODE_ENV === "production" ||
+  process.env.NEXT_REACT_COMPILER === "1";
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  reactCompiler: true,
+  reactCompiler: reactCompilerEnabled,
+  turbopack: {
+    root: __dirname,
+  },
   images: {
     remotePatterns: [
       {

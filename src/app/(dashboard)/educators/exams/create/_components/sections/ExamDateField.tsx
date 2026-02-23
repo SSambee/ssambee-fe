@@ -43,7 +43,10 @@ export function ExamDateField({
 }: ExamDateFieldProps) {
   return (
     <div>
-      <label htmlFor="exam-date" className="block text-sm font-medium mb-2">
+      <label
+        htmlFor="exam-date"
+        className="mb-2 block text-[14px] font-semibold text-[#8b90a3]"
+      >
         시험일 <span className="text-red-500">*</span>
       </label>
       <Controller
@@ -58,8 +61,8 @@ export function ExamDateField({
                 variant="outline"
                 disabled={disabled}
                 className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !field.value && "text-muted-foreground"
+                  "h-11 w-full justify-start rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-left text-[14px] font-medium text-[#4a4d5c]",
+                  !field.value && "text-[#8b90a3]"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
