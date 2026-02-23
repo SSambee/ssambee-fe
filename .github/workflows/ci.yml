@@ -108,7 +108,7 @@ jobs:
 
       - name: Run lighthouse CI
         run: |
-          pnpm exec lhci collect --outputDir=./lhci_reports
+          pnpm exec lhci collect --outputDir=./.lighthouseci
           pnpm exec lhci assert
           # 1. 상세 리포트를 구글 서버에 업로드하고 그 결과(링크)를 로그에 남김
           pnpm exec lhci upload --target=temporary-public-storage

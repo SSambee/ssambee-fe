@@ -7,7 +7,7 @@ module.exports = {
     },
     upload: {
       target: "filesystem", // 로컬 파일로 저장
-      outputDir: "./lhci_reports",
+      outputDir: "./.lighthouseci",
     },
     assert: {
       assertions: {
