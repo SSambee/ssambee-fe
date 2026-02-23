@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "react-day-picker/dist/style.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -27,6 +28,7 @@ export default function RootLayout({
         className={`${pretendard.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
