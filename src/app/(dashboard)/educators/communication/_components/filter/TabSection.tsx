@@ -36,7 +36,11 @@ export default function TabSection() {
   const isAssistant = user?.userType === "ASSISTANT";
 
   const rawTab = searchParams.get("tab");
-  const VALID_TABS: TabType[] = ["INQUIRY", "NOTICE", "WORKS"];
+  const VALID_TABS: TabType[] = [
+    "INQUIRY",
+    "NOTICE",
+    ...(isAssistant ? (["WORKS"] as TabType[]) : []),
+  ];
   const initialTab: TabType =
     rawTab && VALID_TABS.includes(rawTab as TabType)
       ? (rawTab as TabType)
