@@ -26,8 +26,6 @@ export function LearnersProfileSummary({
   const parsedCreatedAt = profile.createdAt
     ? new Date(profile.createdAt)
     : null;
-  const hasValidCreatedAt =
-    parsedCreatedAt !== null && !Number.isNaN(parsedCreatedAt.getTime());
 
   return (
     <Card className="w-full">
@@ -70,7 +68,8 @@ export function LearnersProfileSummary({
                   <Calendar className="h-4 w-4 text-neutral-400" />
                   <span>
                     가입일:{" "}
-                    {hasValidCreatedAt
+                    {parsedCreatedAt !== null &&
+                    !Number.isNaN(parsedCreatedAt.getTime())
                       ? format(parsedCreatedAt, "yyyy년 MM월 dd일", {
                           locale: ko,
                         })
