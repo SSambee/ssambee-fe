@@ -22,6 +22,7 @@ import "./tiptap-styles.css";
 type TiptapEditorProps = {
   content: string | JSONContent;
   onChange?: (json: JSONContent) => void;
+  onHtmlChange?: (html: string) => void;
   readOnly?: boolean; // 읽기 전용(내부적으로 위험한 스크립트를 파싱 단계에서 차단함)
   placeholder?: string;
   className?: string;
@@ -33,6 +34,7 @@ type TiptapEditorProps = {
 export default function TiptapEditor({
   content,
   onChange,
+  onHtmlChange,
   onFileUpload,
   placeholder = "내용을 입력하세요",
   className = "",
@@ -56,6 +58,7 @@ export default function TiptapEditor({
     onUpdate: ({ editor }) => {
       // 타이핑할 때마다 JSON 객체만 부모로 전달
       onChange?.(editor.getJSON());
+      onHtmlChange?.(editor.getHTML());
     },
     editorProps: {
       attributes: {

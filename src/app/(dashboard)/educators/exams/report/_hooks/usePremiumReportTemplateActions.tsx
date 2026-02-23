@@ -217,7 +217,6 @@ export const usePremiumReportTemplateActions = ({
         title: "발송 실패",
         description: "성적표 업로드 및 발송 중 오류가 발생했습니다.",
       });
-      throw error;
     }
   };
 

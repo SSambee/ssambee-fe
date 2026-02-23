@@ -23,10 +23,14 @@ export function ReportCommonMessageSection() {
     isModalOpen,
     setIsModalOpen,
     draftMessageHtml,
-    // setDraftMessageHtml,
+    setDraftMessageHtml,
     handleOpenModal,
     handleSaveCommon,
   } = useReportCommonMessageSection();
+
+  const handleDraftMessageChange = (html: string) => {
+    setDraftMessageHtml(html);
+  };
 
   const handleDialogOpenChange = (open: boolean) => {
     if (!open && isCommonSaving) return;
@@ -54,7 +58,7 @@ export function ReportCommonMessageSection() {
           </DialogHeader>
           <TiptapEditor
             content={draftMessageHtml}
-            // onChange={setDraftMessageHtml}
+            onHtmlChange={handleDraftMessageChange}
             placeholder="시험 공통 전달사항을 입력하세요"
             className="min-h-[220px]"
           />

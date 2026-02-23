@@ -26,7 +26,7 @@ const sanitizeFileName = (value: string) =>
 const shouldFallbackToLegacyStudentSave = (error: unknown) => {
   if (!isAxiosError(error)) return false;
   const status = error.response?.status;
-  return status === 404 || status === 501;
+  return status === 404 || status === 405 || status === 501;
 };
 
 export const useSimpleReportTemplateActions = ({
