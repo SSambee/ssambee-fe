@@ -122,9 +122,12 @@ jobs:
           script: |
             const fs = require('fs');
             // 경로 주의: 프로젝트 루트의 lhci_reports 폴더 확인
-            const manifestPath = './lhci_reports/manifest.json';
+            const manifestPath = './.lighthouseci/manifest.json';
             if (!fs.existsSync(manifestPath)) {
               console.log("현재 폴더 목록:", fs.readdirSync('.'));
+              if (fs.existsSync('./.lighthouseci')) {
+                console.log(".lighthouseci 폴더 내용:", fs.readdirSync('./.lighthouseci'));
+              }
               core.setFailed("Lighthouse manifest not found!");
               return;
             }
