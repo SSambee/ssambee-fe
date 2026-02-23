@@ -110,3 +110,40 @@ jobs:
         run: pnpm exec lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Format lighthouse score
+        id: format_lighthouse_score
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            // 경로 주의: 프로젝트 루트의 lhci_reports 폴더 확인
+            const manifestPath = './lhci_reports/manifest.json';
+            if (!fs.existsSync(manifestPath)) {
+              core.setFailed("Lighthouse manifest not found!");
+              return;
+            }
+
+            const results = JSON.parse(fs.readFileSync(manifestPath));
+            let comments = "## ⚡️ Lighthouse Report\n\n";
+
+            results.forEach((result, index) => {
+              const { summary, htmlPath } = result;
+              const formatResult = (res) => Math.round(res * 100);
+              const score = (res) => (res >= 90 ? "🟢" : res >= 70 ? "🟠" : "🔴");
+
+              comments += `### 🏠 URL: ${result.url}\n`;
+              comments += `| Category | Score |\n| --- | --- |\n`;
+              comments += `| ${score(formatResult(summary.performance))} Performance | ${formatResult(summary.performance)} |\n`;
+              comments += `| ${score(formatResult(summary.accessibility))} Accessibility | ${formatResult(summary.accessibility)} |\n`;
+              comments += `| ${score(formatResult(summary['best-practices']))} Best practices | ${formatResult(summary['best-practices'])} |\n`;
+              comments += `| ${score(formatResult(summary.seo))} SEO | ${formatResult(summary.seo)} |\n\n`;
+            });
+
+            core.setOutput('comments', comments);
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        if: github.event_name == 'pull_request' # PR일 때만 댓글 작성
+        with:
+          message: ${{ steps.format_lighthouse_score.outputs.comments }}
