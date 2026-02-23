@@ -121,34 +121,33 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            // 경로 주의: 프로젝트 루트의 lhci_reports 폴더 확인
-            const manifestPath = './.lighthouseci/manifest.json';
-            if (!fs.existsSync(manifestPath)) {
-              console.log("현재 폴더 목록:", fs.readdirSync('.'));
-              if (fs.existsSync('./.lighthouseci')) {
-                console.log(".lighthouseci 폴더 내용:", fs.readdirSync('./.lighthouseci'));
-              }
-              core.setFailed("Lighthouse manifest not found!");
+            const path = require('path');
+            const lhciDir = './.lighthouseci';
+
+            // 1. 폴더 내 lhr-로 시작하는 json 파일들 필터링
+            const lhrFiles = fs.readdirSync(lhciDir).filter(file => file.startsWith('lhr-') && file.endsWith('.json'));
+
+            if (lhrFiles.length === 0) {
+              core.setFailed("Lighthouse report files (.json) not found in .lighthouseci directory!");
               return;
             }
 
-            const results = JSON.parse(fs.readFileSync(manifestPath));
+            // 2. 여러 번 실행했다면 그중 첫 번째(혹은 대표) 파일을 읽음
+            const rawData = fs.readFileSync(path.join(lhciDir, lhrFiles[0]));
+            const result = JSON.parse(rawData);
+
+            const { categories } = result;
+            const formatScore = (score) => Math.round(score * 100);
+            const getEmoji = (score) => (score >= 0.9 ? "🟢" : score >= 0.7 ? "🟠" : "🔴");
+
             let comments = "## ⚡️ Lighthouse Report\n\n";
+            comments += `### 🏠 URL: ${result.requestedUrl}\n`;
+            comments += `| Category | Score |\n| --- | --- |\n`;
+            comments += `| ${getEmoji(categories.performance.score)} Performance | ${formatScore(categories.performance.score)} |\n`;
+            comments += `| ${getEmoji(categories.accessibility.score)} Accessibility | ${formatScore(categories.accessibility.score)} |\n`;
+            comments += `| ${getEmoji(categories['best-practices'].score)} Best practices | ${formatScore(categories['best-practices'].score)} |\n`;
+            comments += `| ${getEmoji(categories.seo.score)} SEO | ${formatScore(categories.seo.score)} |\n\n`;
 
-            results.forEach((result, index) => {
-              const { summary, htmlPath } = result;
-              const formatResult = (res) => Math.round(res * 100);
-              const score = (res) => (res >= 90 ? "🟢" : res >= 70 ? "🟠" : "🔴");
-
-              comments += `### 🏠 URL: ${result.url}\n`;
-              comments += `| Category | Score |\n| --- | --- |\n`;
-              comments += `| ${score(formatResult(summary.performance))} Performance | ${formatResult(summary.performance)} |\n`;
-              comments += `| ${score(formatResult(summary.accessibility))} Accessibility | ${formatResult(summary.accessibility)} |\n`;
-              comments += `| ${score(formatResult(summary['best-practices']))} Best practices | ${formatResult(summary['best-practices'])} |\n`;
-              comments += `| ${score(formatResult(summary.seo))} SEO | ${formatResult(summary.seo)} |\n\n`;
-            });
-
-            // 링크는 GitHub Actions 로그나 LHCI 기본 코멘트에서 확인할 수 있으므로 요약 위주로 전달
             comments += "> 상세 리포트는 하단의 **lhci/url** Checks 내 Details 링크를 확인해주세요! 🚀";
 
             core.setOutput('comments', comments);
