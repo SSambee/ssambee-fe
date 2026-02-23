@@ -319,6 +319,7 @@ export default function CommunicationDetailPage() {
         <div className="lg:col-span-2 lg:order-1 space-y-6">
           <PostContent
             isNoticePost={isNoticePost}
+            isWorksPost={isWorksPost}
             isEditing={isEditing}
             editTitle={editTitle}
             setEditTitle={setEditTitle}
@@ -326,6 +327,7 @@ export default function CommunicationDetailPage() {
             setEditContent={setEditContent}
             noticePostData={noticePostData}
             inquiryPostData={inquiryPostData}
+            worksPostData={worksPostData ?? undefined}
             currentData={currentData}
             handleAttachmentClick={handleAttachmentClick}
           />

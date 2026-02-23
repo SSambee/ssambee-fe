@@ -36,7 +36,11 @@ export default function TabSection() {
   const isAssistant = user?.userType === "ASSISTANT";
 
   const rawTab = searchParams.get("tab");
-  const initialTab: TabType = (rawTab as TabType) || "INQUIRY";
+  const VALID_TABS: TabType[] = ["INQUIRY", "NOTICE", "WORKS"];
+  const initialTab: TabType =
+    rawTab && VALID_TABS.includes(rawTab as TabType)
+      ? (rawTab as TabType)
+      : "INQUIRY";
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
 
   // 검색어 상태 및 디바운스

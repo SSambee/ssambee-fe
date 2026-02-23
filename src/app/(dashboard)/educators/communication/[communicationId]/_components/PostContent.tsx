@@ -15,6 +15,7 @@ import { decodeUtf8 } from "@/utils/decodeUtf";
 
 type PostContentProps = {
   isNoticePost: boolean;
+  isWorksPost: boolean;
   isEditing: boolean;
   editTitle: string;
   setEditTitle: (val: string) => void;
@@ -22,6 +23,7 @@ type PostContentProps = {
   setEditContent: (val: JSONContent) => void;
   noticePostData: GetInstructorPostDetailResponse | undefined;
   inquiryPostData: GetStudentPostDetailResponse | undefined;
+  worksPostData: GetAssistantWorkDetailResponse | undefined;
   currentData:
     | GetInstructorPostDetailResponse
     | GetStudentPostDetailResponse
@@ -32,6 +34,7 @@ type PostContentProps = {
 
 export default function PostContent({
   isNoticePost,
+  isWorksPost,
   isEditing,
   editTitle,
   setEditTitle,
@@ -39,14 +42,10 @@ export default function PostContent({
   setEditContent,
   noticePostData,
   inquiryPostData,
+  worksPostData,
   currentData,
   handleAttachmentClick,
 }: PostContentProps) {
-  const isWorksPost = "workStatus" in (currentData ?? {});
-  const worksPostData = isWorksPost
-    ? (currentData as GetAssistantWorkDetailResponse)
-    : undefined;
-
   // 안전하게 JSON을 파싱하는 헬퍼 함수
   const getParsedContent = (content: string | undefined) => {
     if (!content) return {};
@@ -94,7 +93,7 @@ export default function PostContent({
             {isWorksPost ? (
               <div className="border-t pt-4">
                 <p className="text-slate-700 whitespace-pre-wrap">
-                  {worksPostData?.memo || "내용 없음"}
+                  {worksPostData?.memo || ""}
                 </p>
               </div>
             ) : (

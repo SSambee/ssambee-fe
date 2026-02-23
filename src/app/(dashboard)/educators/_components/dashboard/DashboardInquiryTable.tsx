@@ -93,67 +93,70 @@ export function DashboardInquiryTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {inquiries.map((inquiry) => (
-              <TableRow
-                key={inquiry.id}
-                tabIndex={0}
-                onClick={() => moveToInquiryDetail(inquiry.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    moveToInquiryDetail(inquiry.id);
-                  }
-                }}
-                className="h-[72px] cursor-pointer border-[#eaecf2] hover:bg-[#f8f9fc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4b72f7] focus-visible:ring-inset"
-              >
-                <TableCell className="pl-10">
-                  <div className="flex min-w-0 items-center gap-1">
-                    <span
-                      className="block max-w-[360px] truncate text-lg font-medium text-[#16161b]/88"
-                      title={inquiry.message}
-                    >
-                      {getPlainText(inquiry.message)}
-                    </span>
-                    {inquiry.replyCount ? (
-                      <span className="text-base font-bold text-[#3863f6]">
-                        ({inquiry.replyCount})
+            {inquiries.map((inquiry) => {
+              const plainText = getPlainText(inquiry.message);
+              return (
+                <TableRow
+                  key={inquiry.id}
+                  tabIndex={0}
+                  onClick={() => moveToInquiryDetail(inquiry.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      moveToInquiryDetail(inquiry.id);
+                    }
+                  }}
+                  className="h-[72px] cursor-pointer border-[#eaecf2] hover:bg-[#f8f9fc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4b72f7] focus-visible:ring-inset"
+                >
+                  <TableCell className="pl-10">
+                    <div className="flex min-w-0 items-center gap-1">
+                      <span
+                        className="block max-w-[360px] truncate text-lg font-medium text-[#16161b]/88"
+                        title={plainText}
+                      >
+                        {plainText}
                       </span>
-                    ) : null}
-                  </div>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <span className="text-lg font-medium text-[#16161b]/88">
-                      {inquiry.name}
-                    </span>
-                    <span className="text-base text-[#16161b]/40">
-                      {inquiry.type}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center text-lg font-medium text-[#16161b]/88">
-                  {inquiry.createdAt}
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex justify-center">
-                    <span
-                      className={cn(
-                        "inline-flex h-9 w-20 items-center justify-center rounded-lg text-sm font-semibold",
-                        inquiry.status === "답변 완료" ||
-                          inquiry.status === "완료"
-                          ? "bg-[#dcfce7] text-[#16a34a]"
-                          : "bg-[#fef3c7] text-[#d97706]"
-                      )}
-                    >
-                      {inquiry.status === "답변 완료" ||
-                      inquiry.status === "완료"
-                        ? "답변 등록"
-                        : "대기 중"}
-                    </span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                      {inquiry.replyCount ? (
+                        <span className="text-base font-bold text-[#3863f6]">
+                          ({inquiry.replyCount})
+                        </span>
+                      ) : null}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <span className="text-lg font-medium text-[#16161b]/88">
+                        {inquiry.name}
+                      </span>
+                      <span className="text-base text-[#16161b]/40">
+                        {inquiry.type}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center text-lg font-medium text-[#16161b]/88">
+                    {inquiry.createdAt}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex justify-center">
+                      <span
+                        className={cn(
+                          "inline-flex h-9 w-20 items-center justify-center rounded-lg text-sm font-semibold",
+                          inquiry.status === "답변 완료" ||
+                            inquiry.status === "완료"
+                            ? "bg-[#dcfce7] text-[#16a34a]"
+                            : "bg-[#fef3c7] text-[#d97706]"
+                        )}
+                      >
+                        {inquiry.status === "답변 완료" ||
+                        inquiry.status === "완료"
+                          ? "답변 등록"
+                          : "대기 중"}
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
