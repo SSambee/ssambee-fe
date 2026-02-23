@@ -107,7 +107,7 @@ export default function PostCommentSVC({
                 </div>
               )}
 
-              <div className="flex items-center justify-between border-t pt-4">
+              <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
