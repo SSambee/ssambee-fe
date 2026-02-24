@@ -27,6 +27,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
 
   const closeModal = () => {
     setIsOpen(false);
+    setModalContent(null);
   };
 
   // Context에 전달할 값

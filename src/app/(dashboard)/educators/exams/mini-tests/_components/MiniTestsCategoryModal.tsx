@@ -191,8 +191,8 @@ export function MiniTestsCategoryModal({ vm }: MiniTestsCategoryModalProps) {
                     </p>
                     {vm.isCategoryMutationBlocked ? (
                       <p className="text-[13px] font-medium text-amber-700">
-                        임시 안내: BE ID validation 핫픽스 후 카테고리
-                        수정/삭제가 활성화됩니다.
+                        카테고리 수정/삭제 기능을 점검 중입니다. 점검 완료 후
+                        다시 이용할 수 있습니다.
                       </p>
                     ) : null}
                     <div className="max-h-[200px] space-y-2 overflow-y-auto pr-1">

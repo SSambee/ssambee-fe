@@ -67,7 +67,8 @@ const mapTaskStatus = (
 ): DashboardTask["status"] => {
   if (status === "PENDING") return "대기";
   if (status === "IN_PROGRESS") return "진행 중";
-  return "완료";
+  if (status === "END") return "완료";
+  return "대기";
 };
 
 const mapTaskProgress = (
@@ -75,7 +76,8 @@ const mapTaskProgress = (
 ) => {
   if (status === "PENDING") return 0;
   if (status === "IN_PROGRESS") return 50;
-  return 100;
+  if (status === "END") return 100;
+  return 0;
 };
 
 const normalizeName = (value?: string | null) => {

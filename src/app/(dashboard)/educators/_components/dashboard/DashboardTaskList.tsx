@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "@/providers/AuthProvider";
@@ -101,7 +101,7 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
               <div className="border-t border-[#eaecf2] bg-white px-6 py-4">
                 <div className="flex items-center gap-3.5">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#eaecf2] bg-white">
-                    <StudentProfileAvatar
+                    <TeacherProfileAvatar
                       size={32}
                       seedKey={task.target}
                       label={`${task.target} 프로필 이미지`}

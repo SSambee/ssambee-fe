@@ -127,8 +127,11 @@ export default function AssistantsHistoryDetailDialog({
               <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/30 px-4 py-4 text-sm text-muted-foreground">
                 {attachmentNames.length > 0 ? (
                   <ul className="space-y-2">
-                    {attachmentNames.map((attachmentName) => (
-                      <li key={attachmentName} className="truncate">
+                    {attachmentNames.map((attachmentName, index) => (
+                      <li
+                        key={`${index}-${attachmentName}`}
+                        className="truncate"
+                      >
                         {attachmentName}
                       </li>
                     ))}
