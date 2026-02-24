@@ -94,6 +94,11 @@ export default function ContractManageModal({
                       <Button
                         variant="outline"
                         className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                        onClick={() =>
+                          onPreviewNotice(
+                            `${contract.fileName} 다운로드는 UI 미리보기 단계입니다.`
+                          )
+                        }
                       >
                         <Download className="h-4 w-4" />
                         {contract.fileName}

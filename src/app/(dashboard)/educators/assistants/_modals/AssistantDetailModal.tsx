@@ -58,6 +58,12 @@ export default function AssistantDetailModal({
   onCloseDetail,
   onStartEdit,
 }: AssistantDetailModalProps) {
+  const nameFieldId = "assistant-detail-name";
+  const phoneFieldId = "assistant-detail-phone";
+  const emailFieldId = "assistant-detail-email";
+  const statusFieldId = "assistant-detail-status";
+  const statusLabelId = "assistant-detail-status-label";
+  const memoFieldId = "assistant-detail-memo";
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto rounded-[24px] border border-[#eaecf2] p-6 sm:p-7">
@@ -81,41 +87,66 @@ export default function AssistantDetailModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-[#4a4d5c]">이름</p>
+            <label
+              htmlFor={nameFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
+              이름
+            </label>
             <Input
+              id={nameFieldId}
               value={selectedAssistant?.name ?? ""}
               readOnly
               className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-[#4a4d5c]">연락처</p>
+            <label
+              htmlFor={phoneFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
+              연락처
+            </label>
             <Input
+              id={phoneFieldId}
               value={selectedAssistant?.phone ?? ""}
               readOnly
               className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-[#4a4d5c]">이메일</p>
+            <label
+              htmlFor={emailFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
+              이메일
+            </label>
             <Input
+              id={emailFieldId}
               value={selectedAssistant?.email ?? ""}
               readOnly
               className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-[#4a4d5c]">상태</p>
-            {isEditingAssistantDetail ? (
+            <label
+              id={statusLabelId}
+              htmlFor={statusFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
+              상태
+            </label>
+            {isEditingAssistantDetail &&
+            assistantDetailDraft.status !== "퇴사" ? (
               <Select
-                value={
-                  assistantDetailDraft.status === "퇴사"
-                    ? "근무중"
-                    : assistantDetailDraft.status
-                }
+                value={assistantDetailDraft.status}
                 onValueChange={onChangeStatus}
               >
-                <SelectTrigger className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80]">
+                <SelectTrigger
+                  id={statusFieldId}
+                  aria-labelledby={statusLabelId}
+                  className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80]"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -128,6 +159,7 @@ export default function AssistantDetailModal({
               </Select>
             ) : (
               <Input
+                id={statusFieldId}
                 value={assistantDetailDraft.status}
                 readOnly
                 className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
@@ -137,8 +169,14 @@ export default function AssistantDetailModal({
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-[#4a4d5c]">메모</p>
+          <label
+            htmlFor={memoFieldId}
+            className="text-sm font-semibold text-[#4a4d5c]"
+          >
+            메모
+          </label>
           <Textarea
+            id={memoFieldId}
             value={assistantDetailDraft.memo}
             readOnly={!isEditingAssistantDetail}
             className="min-h-[100px] rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
