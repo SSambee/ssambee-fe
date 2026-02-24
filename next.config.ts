@@ -21,6 +21,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "ssambee-dev-lms-documents.s3.ap-northeast-2.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "ssambee-dev-lms-reports.s3.ap-northeast-2.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "dszplxin70296.cloudfront.net",
+      },
+      {
+        protocol: "https",
+        hostname: "d34widfoq1o1xc.cloudfront.net",
+      },
     ],
   },
 };
