@@ -123,7 +123,7 @@ export const useAssistantsManageState = () => {
       {
         label: "업무 지시 현황",
         value: assistantOrdersStats
-          ? `총 ${assistantOrdersStats.totalCount}건`
+          ? `${assistantOrdersStats.totalCount}건`
           : "-",
         delta: assistantOrdersStats
           ? `진행 중 ${assistantOrdersStats.inProgressCount}건 · 완료 ${assistantOrdersStats.completedCount}건`
