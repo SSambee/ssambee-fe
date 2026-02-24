@@ -5,8 +5,7 @@ import {
   type AssistantDetailDraft,
   type AssistantStatus,
 } from "@/types/assistants";
-import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
-import { getTeacherAvatarSortByRole } from "@/components/common/avatar/getTeacherAvatarSortByRole";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -65,28 +64,21 @@ export default function AssistantDetailModal({
   const statusFieldId = "assistant-detail-status";
   const statusLabelId = "assistant-detail-status-label";
   const memoFieldId = "assistant-detail-memo";
-
-  const avatarSeed =
-    selectedAssistant?.id ?? selectedAssistant?.name ?? "assistant";
-  const avatarSort = getTeacherAvatarSortByRole("ASSISTANT", avatarSeed);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
-        <DialogHeader className="text-left">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto rounded-[24px] border border-[#eaecf2] p-6 sm:p-7">
+        <DialogHeader className="border-b border-[#eaecf2] pb-4 text-left">
           <div className="flex items-center gap-3">
-            <TeacherProfileAvatar
-              seedKey={avatarSeed}
-              sort={avatarSort}
-              sizePreset="Medium-2"
-              label="조교 프로필 아바타"
-              className="border border-[#f4f6fa]"
-            />
+            <Avatar className="h-12 w-12">
+              <AvatarFallback>
+                {selectedAssistant?.name.slice(0, 1)}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <DialogTitle className="text-2xl font-bold">
+              <DialogTitle className="text-[22px] font-bold tracking-[-0.22px] text-[#040405]">
                 {selectedAssistant?.name}
               </DialogTitle>
-              <DialogDescription className="mt-1 text-base">
+              <DialogDescription className="mt-1 text-base text-[#8b90a3]">
                 현재 상태 {assistantDetailDraft.status}
               </DialogDescription>
             </div>
@@ -95,40 +87,52 @@ export default function AssistantDetailModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor={nameFieldId} className="text-sm font-semibold">
+            <label
+              htmlFor={nameFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
               이름
             </label>
             <Input
               id={nameFieldId}
               value={selectedAssistant?.name ?? ""}
               readOnly
+              className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor={phoneFieldId} className="text-sm font-semibold">
+            <label
+              htmlFor={phoneFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
               연락처
             </label>
             <Input
               id={phoneFieldId}
               value={selectedAssistant?.phone ?? ""}
               readOnly
+              className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor={emailFieldId} className="text-sm font-semibold">
+            <label
+              htmlFor={emailFieldId}
+              className="text-sm font-semibold text-[#4a4d5c]"
+            >
               이메일
             </label>
             <Input
               id={emailFieldId}
               value={selectedAssistant?.email ?? ""}
               readOnly
+              className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
           <div className="space-y-2">
             <label
               id={statusLabelId}
               htmlFor={statusFieldId}
-              className="text-sm font-semibold"
+              className="text-sm font-semibold text-[#4a4d5c]"
             >
               상태
             </label>
@@ -141,6 +145,7 @@ export default function AssistantDetailModal({
                 <SelectTrigger
                   id={statusFieldId}
                   aria-labelledby={statusLabelId}
+                  className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80]"
                 >
                   <SelectValue />
                 </SelectTrigger>
@@ -157,31 +162,35 @@ export default function AssistantDetailModal({
                 id={statusFieldId}
                 value={assistantDetailDraft.status}
                 readOnly
+                className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
               />
             )}
           </div>
         </div>
 
         <div className="space-y-2">
-          <label htmlFor={memoFieldId} className="text-sm font-semibold">
+          <label
+            htmlFor={memoFieldId}
+            className="text-sm font-semibold text-[#4a4d5c]"
+          >
             메모
           </label>
           <Textarea
             id={memoFieldId}
             value={assistantDetailDraft.memo}
             readOnly={!isEditingAssistantDetail}
-            className="min-h-[100px]"
+            className="min-h-[100px] rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             placeholder="조교 운영 메모를 입력하세요."
             onChange={(event) => onChangeMemo(event.target.value)}
           />
         </div>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 border-t border-[#eaecf2] pt-4">
           {isEditingAssistantDetail ? (
             <>
               <Button
                 variant="outline"
-                className="rounded-full"
+                className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                 onClick={onRetireAssistant}
                 disabled={
                   selectedAssistant?.status === "퇴사" || isRetiringAssistant
@@ -191,14 +200,14 @@ export default function AssistantDetailModal({
               </Button>
               <Button
                 variant="outline"
-                className="rounded-full"
+                className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                 onClick={onCancelEdit}
                 disabled={isRetiringAssistant}
               >
                 취소
               </Button>
               <Button
-                className="rounded-full"
+                className="h-10 rounded-[12px] bg-[#3863f6] px-4 text-white hover:bg-[#2f57e8]"
                 onClick={onSaveDetail}
                 disabled={isRetiringAssistant}
               >
@@ -210,7 +219,7 @@ export default function AssistantDetailModal({
             <>
               <Button
                 variant="outline"
-                className="rounded-full"
+                className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                 onClick={onCloseDetail}
                 disabled={isRetiringAssistant}
               >
@@ -218,7 +227,7 @@ export default function AssistantDetailModal({
               </Button>
               <Button
                 variant="outline"
-                className="rounded-full"
+                className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                 onClick={onRetireAssistant}
                 disabled={
                   selectedAssistant?.status === "퇴사" || isRetiringAssistant
@@ -227,7 +236,7 @@ export default function AssistantDetailModal({
                 {isRetiringAssistant ? "처리 중..." : "퇴사 처리"}
               </Button>
               <Button
-                className="rounded-full"
+                className="h-10 rounded-[12px] bg-[#3863f6] px-4 text-white hover:bg-[#2f57e8]"
                 disabled={
                   selectedAssistant?.status === "퇴사" || isRetiringAssistant
                 }

@@ -36,7 +36,7 @@ export default function AssistantsHeader({
         />
         <Button
           variant="outline"
-          className="rounded-full"
+          className="h-10 rounded-[12px] bg-[#3863f6] px-4 text-[16px] font-semibold text-white hover:bg-[#2f57e8]"
           onClick={onOpenTaskModal}
         >
           <CheckSquare className="mr-2 h-4 w-4" />
@@ -45,7 +45,7 @@ export default function AssistantsHeader({
       </div>
 
       {actionNotice ? (
-        <div className="rounded-lg border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        <div className="rounded-[12px] border border-[#eaecf2] bg-[#fcfcfd] px-4 py-3 text-[16px] text-[#6b6f80]">
           {actionNotice}
         </div>
       ) : null}

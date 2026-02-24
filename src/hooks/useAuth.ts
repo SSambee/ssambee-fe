@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 import { useAuthContext } from "@/providers/AuthProvider";
@@ -36,6 +37,7 @@ export const API_URL_TYPE: Record<Role, LoginURLType> = {
 
 export function useAuth() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { setUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const { showAlert } = useDialogAlert();
@@ -164,11 +166,11 @@ export function useAuth() {
       await signoutAPI(apiRole);
 
       setUser(null);
+      queryClient.clear();
 
-      router.replace(targetPath);
+      window.location.replace(targetPath);
     } catch (err) {
       console.error("로그아웃 처리 중 문제가 발생했습니다.", err);
-    } finally {
       setLoading(false);
     }
   };

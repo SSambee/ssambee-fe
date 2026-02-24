@@ -56,25 +56,28 @@ export default function ContractSendModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
-        <DialogHeader className="text-left">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto rounded-[24px] border border-[#eaecf2] p-6 sm:p-7">
+        <DialogHeader className="border-b border-[#eaecf2] pb-4 text-left">
           <div className="flex items-start justify-between gap-3 pr-8">
             <div>
-              <DialogTitle className="text-2xl font-bold">
+              <DialogTitle className="text-[22px] font-bold tracking-[-0.22px] text-[#040405]">
                 조교 계약서 발송
               </DialogTitle>
-              <DialogDescription className="mt-1 text-base">
+              <DialogDescription className="mt-1 text-base text-[#8b90a3]">
                 서명 상태와 계약서 파일을 확인하고 발송합니다.
               </DialogDescription>
             </div>
-            <Button className="rounded-full" onClick={onOpenContractManage}>
+            <Button
+              className="h-10 rounded-[12px] bg-[#3863f6] px-4 text-white hover:bg-[#2f57e8]"
+              onClick={onOpenContractManage}
+            >
               <FileText className="h-4 w-4" />
               계약서 관리
             </Button>
           </div>
         </DialogHeader>
 
-        <div className="rounded-lg border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+        <div className="rounded-[12px] border border-[#eaecf2] bg-[#fcfcfd] px-4 py-3 text-[16px] text-[#8b90a3]">
           선택한 조교의 이메일로 계약서 양식을 발송합니다. 서명 완료 시 자동
           저장되며, 전송 로그가 기록됩니다.
         </div>
@@ -83,12 +86,15 @@ export default function ContractSendModal({
           <div className="space-y-2">
             <label
               htmlFor={sendTargetFieldId}
-              className="text-sm font-semibold"
+              className="text-[16px] font-semibold text-[#4a4d5c]"
             >
               계약서 발송 대상
             </label>
             <Select value={sendTargetId} onValueChange={onChangeSendTargetId}>
-              <SelectTrigger id={sendTargetFieldId}>
+              <SelectTrigger
+                id={sendTargetFieldId}
+                className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80]"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -104,7 +110,7 @@ export default function ContractSendModal({
           <div className="space-y-2">
             <label
               htmlFor={receiverEmailFieldId}
-              className="text-sm font-semibold"
+              className="text-[16px] font-semibold text-[#4a4d5c]"
             >
               수신 이메일
             </label>
@@ -112,18 +118,22 @@ export default function ContractSendModal({
               id={receiverEmailFieldId}
               value={selectedTargetAssistant?.email ?? ""}
               readOnly
+              className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd]"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor={sendTemplateFieldId}
-              className="text-sm font-semibold"
+              className="text-[16px] font-semibold text-[#4a4d5c]"
             >
               발송 양식
             </label>
             <Select value={sendTemplate} onValueChange={onChangeSendTemplate}>
-              <SelectTrigger id={sendTemplateFieldId}>
+              <SelectTrigger
+                id={sendTemplateFieldId}
+                className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80]"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -137,10 +147,12 @@ export default function ContractSendModal({
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-semibold">계약서 템플릿 업로드</p>
+            <p className="text-[16px] font-semibold text-[#4a4d5c]">
+              계약서 템플릿 업로드
+            </p>
             <label
               htmlFor="contract-template-file"
-              className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
+              className="flex cursor-pointer items-center gap-3 rounded-[12px] border border-dashed border-[#d6d9e0] bg-[#fcfcfd] px-4 py-3 text-[16px] text-[#8b90a3]"
             >
               <FileUp className="h-4 w-4" />
               <span>{uploadFileName}</span>
@@ -155,15 +167,17 @@ export default function ContractSendModal({
                 )
               }
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[16px] text-[#8b90a3]">
               PDF 또는 DOC/DOCX 업로드 가능
             </p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-dashed border-muted-foreground/35 bg-muted/30 px-5 py-4">
-          <p className="text-sm font-semibold">이메일 미리보기</p>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <div className="rounded-[20px] border border-dashed border-[#d6d9e0] bg-[#fcfcfd] px-5 py-4">
+          <p className="text-[16px] font-semibold text-[#040405]">
+            이메일 미리보기
+          </p>
+          <p className="mt-2 text-[16px] leading-relaxed text-[#8b90a3]">
             안녕하세요 {selectedTargetAssistant?.name}님,
             <br />
             {sendTemplate} 파일을 확인하시고 3일 이내에 서명 부탁드립니다. 서명
@@ -171,16 +185,16 @@ export default function ContractSendModal({
           </p>
         </div>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 border-t border-[#eaecf2] pt-4">
           <Button
             variant="outline"
-            className="rounded-full"
+            className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
             onClick={onOpenContractManage}
           >
             취소
           </Button>
           <Button
-            className="rounded-full"
+            className="h-10 rounded-[12px] bg-[#3863f6] px-4 text-white hover:bg-[#2f57e8]"
             onClick={() => {
               onPreviewNotice("계약서 발송은 UI 미리보기 단계입니다.");
               onOpenContractManage();

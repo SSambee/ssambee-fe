@@ -31,21 +31,27 @@ export default function AssistantsTable({
   onPageChange,
 }: AssistantsTableProps) {
   return (
-    <Card>
+    <Card className="rounded-[24px] border-[#eaecf2] bg-white shadow-none">
       <CardContent className="pt-6">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-[20px] text-[#8b90a3]">
           <span>
             {statusLabel} 조교 {totalCount}명
           </span>
         </div>
 
-        <div className="mt-4 rounded-lg border">
-          <Table className="table-fixed">
-            <TableHeader>
+        <div className="mt-4 overflow-x-auto rounded-[20px] border border-[#eaecf2] bg-white">
+          <Table className="table-fixed text-[18px]">
+            <TableHeader className="bg-[#fcfcfd] [&_tr]:border-b-[#eaecf2]">
               <TableRow>
-                <TableHead className="w-[40%] px-4">조교명</TableHead>
-                <TableHead className="w-[35%] px-4">연락처</TableHead>
-                <TableHead className="w-[25%] px-4">상태</TableHead>
+                <TableHead className="h-14 w-[40%] px-4 text-[18px] font-semibold text-[#8b90a3]">
+                  조교명
+                </TableHead>
+                <TableHead className="h-14 w-[35%] px-4 text-[18px] font-semibold text-[#8b90a3]">
+                  연락처
+                </TableHead>
+                <TableHead className="h-14 w-[25%] px-4 text-[18px] font-semibold text-[#8b90a3]">
+                  상태
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -53,29 +59,33 @@ export default function AssistantsTable({
                 <TableRow>
                   <TableCell
                     colSpan={3}
-                    className="py-8 text-center text-muted-foreground"
+                    className="py-10 text-center text-[18px] font-medium text-[#8b90a3]"
                   >
                     조교가 없습니다.
                   </TableCell>
                 </TableRow>
               )}
               {assistants.map((assistant) => (
-                <TableRow key={assistant.id}>
-                  <TableCell className="px-4">
+                <TableRow
+                  key={assistant.id}
+                  className="border-b-[#eaecf2] hover:bg-[#fcfcfd]"
+                >
+                  <TableCell className="px-4 py-4">
                     <button
                       type="button"
-                      className="font-medium text-primary underline-offset-2 hover:underline"
+                      className="font-semibold text-[#3863f6] underline-offset-2 hover:underline"
                       onClick={() => onOpenAssistantDetail(assistant.id)}
                     >
                       {assistant.name}
                     </button>
                   </TableCell>
-                  <TableCell className="px-4 text-foreground/90">
+                  <TableCell className="px-4 py-4 text-[#4a4d5c]">
                     {assistant.phone}
                   </TableCell>
-                  <TableCell className="px-4">
+                  <TableCell className="px-4 py-4">
                     <StatusLabel
                       color={statusColorMap[assistant.status] ?? "gray"}
+                      className="px-3.5 py-2 text-[16px]"
                     >
                       {assistant.status}
                     </StatusLabel>
@@ -86,7 +96,9 @@ export default function AssistantsTable({
           </Table>
         </div>
 
-        <Pagination pagination={pagination} onPageChange={onPageChange} />
+        <div className="mt-4">
+          <Pagination pagination={pagination} onPageChange={onPageChange} />
+        </div>
       </CardContent>
     </Card>
   );

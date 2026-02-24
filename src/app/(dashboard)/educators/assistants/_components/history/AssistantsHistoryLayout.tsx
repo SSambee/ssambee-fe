@@ -1,18 +1,13 @@
 "use client";
 
-import {
-  CalendarClock,
-  CheckCircle2,
-  ClipboardList,
-  ListFilter,
-  Search,
-} from "lucide-react";
+import { ListFilter, Search } from "lucide-react";
 
 import AssistantsTabs from "@/app/(dashboard)/educators/assistants/_components/AssistantsTabs";
 import type { AssistantsHistoryPageViewModel } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsHistoryPage";
 import Title from "@/components/common/header/Title";
 import StatusLabel from "@/components/common/label/StatusLabel";
 import { Pagination } from "@/components/common/pagination/Pagination";
+import { SummaryMetricCard } from "@/components/common/SummaryMetricCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,6 +34,30 @@ type AssistantsHistoryLayoutProps = {
 export default function AssistantsHistoryLayout({
   vm,
 }: AssistantsHistoryLayoutProps) {
+  const summaryCards = [
+    {
+      id: "history-total",
+      title: "전체 업무",
+      subtitle: vm.isHistoryLoading ? "불러오는 중" : "전체 기간",
+      value: `${vm.totalCount}건`,
+      tone: "primary" as const,
+    },
+    {
+      id: "history-progress",
+      title: "진행 중",
+      subtitle: vm.isHistoryLoading ? "불러오는 중" : "전체 기간",
+      value: `${vm.progressCount}건`,
+      tone: "secondary" as const,
+    },
+    {
+      id: "history-completed",
+      title: "완료",
+      subtitle: vm.isHistoryLoading ? "불러오는 중" : "전체 기간",
+      value: `${vm.completedCount}건`,
+      tone: "neutral" as const,
+    },
+  ];
+
   return (
     <>
       <div className="space-y-6">
@@ -52,64 +71,24 @@ export default function AssistantsHistoryLayout({
         <AssistantsTabs active="history" />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">전체 업무</p>
-                <p className="mt-2 text-3xl font-bold">{vm.totalCount}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {vm.isHistoryLoading ? "불러오는 중" : "전체 기간"}
-                </p>
-              </div>
-              <div className="rounded-xl bg-muted p-3 text-muted-foreground">
-                <CalendarClock className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">진행 중</p>
-                <p className="mt-2 text-3xl font-bold">{vm.progressCount}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {vm.isHistoryLoading ? "불러오는 중" : "전체 기간"}
-                </p>
-              </div>
-              <div className="rounded-xl bg-muted p-3 text-muted-foreground">
-                <ClipboardList className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">완료</p>
-                <p className="mt-2 text-3xl font-bold">{vm.completedCount}</p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {vm.isHistoryLoading ? "불러오는 중" : "전체 기간"}
-                </p>
-              </div>
-              <div className="rounded-xl bg-muted p-3 text-muted-foreground">
-                <CheckCircle2 className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex flex-wrap items-stretch gap-4 xl:gap-5">
+        {summaryCards.map((card) => (
+          <SummaryMetricCard
+            key={card.id}
+            title={card.title}
+            subtitle={card.subtitle}
+            value={card.value}
+            tone={card.tone}
+            className="w-full sm:w-[272px] xl:w-[300px]"
+          />
+        ))}
       </div>
 
-      <Card>
+      <Card className="rounded-[24px] border-[#eaecf2] bg-white shadow-none">
         <CardContent className="space-y-4 pt-6">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
             <div className="relative min-w-[240px] flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b90a3]" />
               <Input
                 value={vm.searchKeyword}
                 onChange={(event) => {
@@ -117,7 +96,7 @@ export default function AssistantsHistoryLayout({
                   vm.resetPagination();
                 }}
                 placeholder="업무 제목 또는 조교 이름으로 검색"
-                className="pl-9"
+                className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] pl-9 placeholder:text-[#8b90a3]"
               />
             </div>
 
@@ -129,7 +108,7 @@ export default function AssistantsHistoryLayout({
                   vm.resetPagination();
                 }}
               >
-                <SelectTrigger className="w-full xl:w-[130px]">
+                <SelectTrigger className="h-10 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80] xl:w-[130px]">
                   <SelectValue placeholder="상태" />
                 </SelectTrigger>
                 <SelectContent>
@@ -148,7 +127,7 @@ export default function AssistantsHistoryLayout({
                   vm.resetPagination();
                 }}
               >
-                <SelectTrigger className="w-full xl:w-[140px]">
+                <SelectTrigger className="h-10 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80] xl:w-[140px]">
                   <SelectValue placeholder="우선순위" />
                 </SelectTrigger>
                 <SelectContent>
@@ -167,7 +146,7 @@ export default function AssistantsHistoryLayout({
                   vm.resetPagination();
                 }}
               >
-                <SelectTrigger className="w-full xl:w-[150px]">
+                <SelectTrigger className="h-10 w-full rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80] xl:w-[150px]">
                   <SelectValue placeholder="기간" />
                 </SelectTrigger>
                 <SelectContent>
@@ -180,7 +159,7 @@ export default function AssistantsHistoryLayout({
               </Select>
             </div>
 
-            <div className="text-xs text-muted-foreground">
+            <div className="text-[16px] text-[#8b90a3]">
               {vm.historyError
                 ? vm.historyError
                 : (vm.historyNotice ?? "서버 데이터 기준으로 조회합니다.")}
@@ -189,22 +168,32 @@ export default function AssistantsHistoryLayout({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-[24px] border-[#eaecf2] bg-white shadow-none">
         <CardContent className="pt-6">
-          <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-            <ListFilter className="h-4 w-4" />
+          <div className="mb-4 flex items-center gap-2 text-[20px] text-[#8b90a3]">
+            <ListFilter className="h-4 w-4 text-[#8b90a3]" />
             <span>총 {vm.totalCount}건의 업무 내역</span>
           </div>
 
-          <div className="rounded-lg border">
-            <Table>
-              <TableHeader>
+          <div className="overflow-x-auto rounded-[20px] border border-[#eaecf2] bg-white">
+            <Table className="text-[18px]">
+              <TableHeader className="bg-[#fcfcfd] [&_tr]:border-b-[#eaecf2]">
                 <TableRow>
-                  <TableHead>업무 제목</TableHead>
-                  <TableHead>담당 조교</TableHead>
-                  <TableHead>지시 일자</TableHead>
-                  <TableHead>우선순위</TableHead>
-                  <TableHead>상태</TableHead>
+                  <TableHead className="h-14 text-[18px] font-semibold text-[#8b90a3]">
+                    업무 제목
+                  </TableHead>
+                  <TableHead className="h-14 text-[18px] font-semibold text-[#8b90a3]">
+                    담당 조교
+                  </TableHead>
+                  <TableHead className="h-14 text-[18px] font-semibold text-[#8b90a3]">
+                    지시 일자
+                  </TableHead>
+                  <TableHead className="h-14 text-[18px] font-semibold text-[#8b90a3]">
+                    우선순위
+                  </TableHead>
+                  <TableHead className="h-14 text-[18px] font-semibold text-[#8b90a3]">
+                    상태
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -212,7 +201,7 @@ export default function AssistantsHistoryLayout({
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="py-10 text-center text-muted-foreground"
+                      className="py-10 text-center text-[18px] font-medium text-[#8b90a3]"
                     >
                       업무 내역을 불러오는 중입니다.
                     </TableCell>
@@ -221,7 +210,7 @@ export default function AssistantsHistoryLayout({
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="py-10 text-center text-muted-foreground"
+                      className="py-10 text-center text-[18px] font-medium text-[#8b90a3]"
                     >
                       {vm.historyError
                         ? "업무 내역을 불러오지 못했습니다."
@@ -230,36 +219,44 @@ export default function AssistantsHistoryLayout({
                   </TableRow>
                 ) : (
                   vm.paginatedTasks.map((task) => (
-                    <TableRow key={task.id}>
-                      <TableCell>
+                    <TableRow
+                      key={task.id}
+                      className="border-b-[#eaecf2] hover:bg-[#fcfcfd]"
+                    >
+                      <TableCell className="py-4">
                         <div className="space-y-1">
                           <button
                             type="button"
-                            className="cursor-pointer text-left text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                            className="cursor-pointer text-left text-[18px] font-semibold text-[#3863f6] underline-offset-2 hover:underline"
                             onClick={() => vm.setSelectedTaskId(task.id)}
                           >
                             {task.title}
                           </button>
                           {task.subtitle ? (
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-[18px] text-[#8b90a3]">
                               {task.subtitle}
                             </p>
                           ) : null}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="py-4 font-medium text-[#4a4d5c]">
                         {task.assistantName}
                       </TableCell>
-                      <TableCell>{task.issuedAt}</TableCell>
-                      <TableCell>
+                      <TableCell className="py-4 text-[#4a4d5c]">
+                        {task.issuedAt}
+                      </TableCell>
+                      <TableCell className="py-4">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${vm.priorityClassMap[task.priority]}`}
+                          className={`inline-flex items-center rounded-full px-3.5 py-2 text-[16px] font-medium ${vm.priorityClassMap[task.priority]}`}
                         >
                           {task.priority}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <StatusLabel color={vm.statusColorMap[task.status]}>
+                      <TableCell className="py-4">
+                        <StatusLabel
+                          color={vm.statusColorMap[task.status]}
+                          className="px-3.5 py-2 text-[16px]"
+                        >
                           {task.status}
                         </StatusLabel>
                       </TableCell>
@@ -279,7 +276,7 @@ export default function AssistantsHistoryLayout({
             <div className="mt-3 flex justify-end">
               <Button
                 variant="outline"
-                className="rounded-full"
+                className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                 onClick={() => void vm.loadTaskRecords()}
               >
                 다시 시도

@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import type { AssistantsStatItem } from "@/types/assistants";
-import { Card, CardContent } from "@/components/ui/card";
+import { SummaryMetricCard } from "@/components/common/SummaryMetricCard";
+import { cn } from "@/lib/utils";
 
 type AssistantsStatsGridProps = {
   stats: AssistantsStatItem[];
@@ -13,31 +14,27 @@ export default function AssistantsStatsGrid({
   onOpenContractManageModal,
 }: AssistantsStatsGridProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {stats.map((stat) => {
-        const Icon = stat.icon;
+    <div className="flex flex-wrap items-stretch gap-4 xl:gap-5">
+      {stats.map((stat, index) => {
         const isInteractive = Boolean(stat.href || stat.modal);
+        const tone =
+          index === 0 ? "primary" : index === 1 ? "secondary" : "neutral";
+
         const card = (
-          <Card
-            className={
-              isInteractive
-                ? "transition hover:border-primary/40 hover:shadow-md"
-                : undefined
-            }
-          >
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="mt-2 text-3xl font-bold">{stat.value}</p>
-                  <p className={`mt-2 text-xs ${stat.accent}`}>{stat.delta}</p>
-                </div>
-                <div className="rounded-xl bg-muted p-3 text-muted-foreground">
-                  <Icon className="h-5 w-5" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <SummaryMetricCard
+            title={stat.label}
+            subtitle={stat.delta}
+            value={stat.value}
+            tone={tone}
+            className={cn(
+              "w-full sm:w-[272px] xl:w-[300px]",
+              isInteractive && tone === "neutral"
+                ? "transition hover:border-[#4b72f7]/40 hover:bg-[#f4f7ff]"
+                : isInteractive
+                  ? "transition hover:brightness-95"
+                  : undefined
+            )}
+          />
         );
 
         if (stat.href) {
