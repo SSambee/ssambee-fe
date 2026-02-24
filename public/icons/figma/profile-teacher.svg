@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Mask group">
+<mask id="mask0_0_211" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="20" height="20">
+<circle id="Ellipse 117" cx="10" cy="10" r="10" fill="var(--fill-0, #DDE9FD)"/>
+</mask>
+<g mask="url(#mask0_0_211)">
+<g id="Group 323">
+<path id="Rectangle 4173" d="M3.57141 19.0474C3.57141 15.6285 6.34298 12.8569 9.76189 12.8569H10.2381C13.657 12.8569 16.4286 15.6285 16.4286 19.0474V19.0474C16.4286 20.7569 15.0428 22.1426 13.3333 22.1426H6.66665C4.9572 22.1426 3.57141 20.7569 3.57141 19.0474V19.0474Z" fill="var(--fill-0, #233E8E)"/>
+<path id="Subtract" d="M11.7754 13.0498C14.4506 13.7335 16.4287 16.1597 16.4287 19.0479C16.4285 20.7571 15.0423 22.1426 13.333 22.1426H6.66699C4.95769 22.1426 3.57153 20.7571 3.57129 19.0479C3.57129 16.16 5.54892 13.7338 8.22363 13.0498L10 15.7139L11.7754 13.0498ZM8.92871 18.9287L10 19.8213L11.0713 18.9287L10 15.7139L8.92871 18.9287Z" fill="var(--fill-0, #4C6ED5)"/>
+</g>
+</g>
+</g>
+</svg>

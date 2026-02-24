@@ -1,6 +1,6 @@
 @theme {
   --font-pretendard: var(--font-pretendard);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-pretendard);
 
   --color-background: #d9d9d9;
   --color-brand-25: #f4f6fe;

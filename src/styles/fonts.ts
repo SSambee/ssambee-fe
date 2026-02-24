@@ -1,5 +1,4 @@
 import localFont from "next/font/local";
-import { Geist_Mono } from "next/font/google";
 
 export const pretendard = localFont({
   src: [
@@ -11,9 +10,4 @@ export const pretendard = localFont({
   ],
   display: "swap",
   variable: "--font-pretendard",
-});
-
-export const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
