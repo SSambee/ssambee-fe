@@ -24,6 +24,7 @@ import { GRADE_SELECTING_OPTIONS } from "@/constants/students.default";
 import { Textarea } from "@/components/ui/textarea";
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type EditProfileModalProps = {
   studentData: EditProfileFormDataType;
@@ -48,6 +49,7 @@ export default function EditProfileModal({
 }: EditProfileModalProps) {
   const { isOpen, closeModal } = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
+  const { showAlert } = useDialogAlert();
 
   // 수강생 정보 수정
   const { mutate: updateStudent, isPending } = useUpdateEnrollment();
@@ -102,8 +104,8 @@ export default function EditProfileModal({
           setIsEditMode(false);
           closeModal();
         },
-        onError: () => {
-          alert("수강생 정보 수정에 실패했습니다.");
+        onError: async () => {
+          await showAlert({ description: "수강생 정보 수정에 실패했습니다." });
         },
       }
     );

@@ -10,10 +10,12 @@ import { AuthCodeFormData } from "@/types/auth.type";
 import { AUTH_CODE_FORM_DEFAULTS } from "@/constants/auth.defaults";
 import { verifyAuthCodeAPI } from "@/services/auth.service";
 import { InputForm } from "@/components/common/input/InputForm";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 export default function AuthenticationCodeForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { isCodeVerified, setAuthCode, setCodeVerified } = useAuthCodeStore();
+  const { showAlert } = useDialogAlert();
 
   const {
     register,
@@ -41,7 +43,7 @@ export default function AuthenticationCodeForm() {
   const handleVerifyCode = async () => {
     const isValidCode = await trigger("signupCode");
     if (!isValidCode) {
-      alert("인증번호를 입력해주세요.");
+      await showAlert({ description: "인증번호를 입력해주세요." });
       return;
     }
 
@@ -54,17 +56,16 @@ export default function AuthenticationCodeForm() {
       if (res.success) {
         setAuthCode(signupCode);
         setCodeVerified(true);
-        alert("인증번호 인증 완료!");
+        await showAlert({ description: "인증번호 인증 완료!" });
       } else {
         setCodeVerified(false);
         reset({ signupCode: "" });
-        alert("인증번호 매칭에 실패했습니다.");
+        await showAlert({ description: "인증번호 매칭에 실패했습니다." });
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       setCodeVerified(false);
       reset({ signupCode: "" });
-      alert("인증 중 오류가 발생했습니다.");
+      await showAlert({ description: "인증 중 오류가 발생했습니다." });
     } finally {
       setIsLoading(false);
     }

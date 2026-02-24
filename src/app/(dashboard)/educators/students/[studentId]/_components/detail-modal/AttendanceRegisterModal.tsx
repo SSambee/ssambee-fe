@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCreateAttendance } from "@/hooks/useEnrollment";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type AttendanceRegisterModalProps = {
   studentId: string;
@@ -35,6 +36,7 @@ export default function AttendanceRegisterModal({
   mainLectureId,
 }: AttendanceRegisterModalProps) {
   const { isOpen, closeModal } = useModal();
+  const { showAlert } = useDialogAlert();
 
   // 개별 수강생 출결 등록
   const { mutate: createAttendance, isPending } = useCreateAttendance(
@@ -69,9 +71,8 @@ export default function AttendanceRegisterModal({
           reset();
           closeModal();
         },
-        onError: (error) => {
-          console.error("출결 등록 실패:", error);
-          alert("출결 등록에 실패했습니다.");
+        onError: async () => {
+          await showAlert({ description: "출결 등록에 실패했습니다." });
         },
       }
     );

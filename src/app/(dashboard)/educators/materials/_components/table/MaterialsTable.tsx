@@ -8,6 +8,7 @@ import { Materials, MaterialsType } from "@/types/materials.type";
 import { Pagination } from "@/components/common/pagination/Pagination";
 import { useMaterials } from "@/hooks/useMaterials";
 import { materialsService } from "@/services/materials.service";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 import { MATERIALS_TABLE_COLUMNS } from "./MaterialsTableColumns";
 
@@ -24,6 +25,7 @@ export default function MaterialsTable({
 }: MaterialsTableProps) {
   const [page, setPage] = useState(1);
   const limit = 10;
+  const { showAlert } = useDialogAlert();
 
   const [prevFilters, setPrevFilters] = useState({
     selectedType,
@@ -64,9 +66,10 @@ export default function MaterialsTable({
 
       // 파일이든 YouTube든 새 탭에서 열기
       window.open(response.data.url, "_blank");
-    } catch (error) {
-      console.error("다운로드 링크를 가져오는데 실패했습니다.", error);
-      alert("다운로드 링크를 가져오는데 실패했습니다.");
+    } catch {
+      await showAlert({
+        description: "다운로드 링크를 가져오는데 실패했습니다.",
+      });
     }
   };
 

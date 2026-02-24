@@ -20,6 +20,7 @@ import {
   useMaterialDetail,
   useMaterials,
 } from "@/hooks/useMaterials";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 import PaperTypeForm from "../_components/modal/_components/form/PaperTypeForm";
 import VideoTypeForm from "../_components/modal/_components/form/VideoTypeForm";
@@ -30,6 +31,7 @@ export default function MaterialsDetailPage() {
   const { materialsId } = useParams();
   const router = useRouter();
   const { openModal } = useModal();
+  const { showAlert } = useDialogAlert();
 
   const { updateMutation, deleteMutation } = useMaterials({
     page: 1,
@@ -84,9 +86,9 @@ export default function MaterialsDetailPage() {
     setIsFormValid(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isFormValid || !formData) {
-      alert("필수 항목을 모두 입력해주세요.");
+      await showAlert({ description: "필수 항목을 모두 입력해주세요." });
       return;
     }
 

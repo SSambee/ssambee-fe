@@ -26,6 +26,7 @@ import {
   UncheckedIcon,
 } from "@/components/icons/AuthIcons";
 import { verifyEmailAPI } from "@/services/auth.service";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type RegisterFormProps = {
   requireAuthCode?: boolean; // 인증 코드 필요 여부 - 조교
@@ -52,6 +53,7 @@ export default function RegisterForm({
   const [otpValue, setOtpValue] = useState(""); // 입력된 OTP 값
 
   const { signup, loading } = useAuth();
+  const { showAlert } = useDialogAlert();
 
   const { isCodeVerified, signupCode, resetAuthCode } = useAuthCodeStore();
 
@@ -149,12 +151,12 @@ export default function RegisterForm({
 
       if (res.success) {
         setIsOtpSent(true);
-        alert(res.message);
+        await showAlert({ description: "이메일 인증 코드가 발송되었습니다." });
       } else {
         setError("email", { type: "manual", message: res.message });
       }
     } catch {
-      alert("서버 통신 중 오류가 발생했습니다.");
+      await showAlert({ description: "서버 통신 중 오류가 발생했습니다." });
     } finally {
       setEmailLoading(false);
     }
@@ -163,7 +165,7 @@ export default function RegisterForm({
   // OTP 코드 검증 확인
   const handleVerifyOtp = async () => {
     if (otpValue.length < 6) {
-      alert("인증코드 6자리를 입력해주세요.");
+      await showAlert({ description: "인증코드 6자리를 입력해주세요." });
       return;
     }
 
@@ -174,12 +176,14 @@ export default function RegisterForm({
       if (res.success) {
         setIsEmailVerified(true);
         setIsOtpSent(false); // 인증 성공 시 입력창은 닫음
-        alert(res.message);
+        await showAlert({ description: "이메일 인증이 완료되었습니다." });
       } else {
-        alert(res.message || "인증코드가 올바르지 않습니다.");
+        await showAlert({
+          description: res.message || "인증코드가 올바르지 않습니다.",
+        });
       }
     } catch {
-      alert("인증 확인 중 오류가 발생했습니다.");
+      await showAlert({ description: "인증 확인 중 오류가 발생했습니다." });
     } finally {
       setEmailLoading(false);
     }
@@ -206,25 +210,27 @@ export default function RegisterForm({
 
     // 이메일 인증
     if (!isEmailVerified) {
-      alert("이메일 인증을 완료해주세요.");
+      await showAlert({ description: "이메일 인증을 완료해주세요." });
       return;
     }
 
     // 인증 코드 검증 - 외부 폼
     if (requireAuthCode && !isCodeVerified) {
-      alert("인증 코드 검사를 완료해주세요.");
+      await showAlert({ description: "인증 코드 검사를 완료해주세요." });
       return;
     }
 
     // 학생용 외부 폼 - 학교 정보 검증
     if (requireSchoolInfo && !isSchoolInfoValid) {
-      alert("학교 정보를 모두 입력해주세요.");
+      await showAlert({ description: "학교 정보를 모두 입력해주세요." });
       return;
     }
 
     // 학생용 외부 폼 - 학부모 전화번호 검증
     if (userType === "STUDENT" && !isParentPhoneValid) {
-      alert("학부모 전화번호를 올바르게 입력해주세요.");
+      await showAlert({
+        description: "학부모 전화번호를 올바르게 입력해주세요.",
+      });
       return;
     }
 

@@ -21,6 +21,7 @@ import {
 } from "@/types/materials.type";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { useMaterials } from "@/hooks/useMaterials";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 import MaterialsTypeSelect from "./_components/tab/MaterialsTypeSelect";
 import PaperTypeForm from "./_components/form/PaperTypeForm";
@@ -31,6 +32,7 @@ import OtherTypeForm from "./_components/form/OtherTypeForm";
 export function CreateMaterialsModal() {
   const { isOpen, closeModal } = useModal();
   const { user } = useAuthContext();
+  const { showAlert } = useDialogAlert();
 
   // 리스트 갱신
   const { createMutation } = useMaterials({
@@ -72,9 +74,9 @@ export function CreateMaterialsModal() {
   };
 
   // 학습 자료 등록
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isFormValid || !formData) {
-      alert("필수 항목을 모두 입력해주세요.");
+      await showAlert({ description: "필수 항목을 모두 입력해주세요." });
       return;
     }
 

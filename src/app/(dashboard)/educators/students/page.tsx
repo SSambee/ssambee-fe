@@ -24,6 +24,7 @@ import { getTodayYMD } from "@/utils/date";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 import DataTable from "@/components/common/table/DataTable";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 import { StudentFilter } from "./_components/filter/StudentFilter";
 import { StudentActions } from "./_components/action/StudentActions";
@@ -34,6 +35,7 @@ const PAGE_LIMIT = 10;
 export default function StudentsListPage() {
   const router = useRouter();
   const { openModal } = useModal();
+  const { showAlert } = useDialogAlert();
 
   useSetBreadcrumb([{ label: "학생 관리" }]);
 
@@ -149,11 +151,13 @@ export default function StudentsListPage() {
           updateStatus(
             { id, data: { status: status } },
             {
-              onSuccess: () => {
-                alert("상태 변경이 완료되었습니다.");
+              onSuccess: async () => {
+                await showAlert({ description: "상태 변경이 완료되었습니다." });
               },
-              onError: () => {
-                alert("오류가 발생했습니다. 다시 시도해주세요.");
+              onError: async () => {
+                await showAlert({
+                  description: "오류가 발생했습니다. 다시 시도해주세요.",
+                });
               },
             }
           );
