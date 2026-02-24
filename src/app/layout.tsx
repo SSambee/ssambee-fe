@@ -70,8 +70,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: "#ffffff",
-  title: "SSAM B",
-  description: "SSAM BEE",
 };
 
 export default function RootLayout({
