@@ -126,7 +126,11 @@ export default function LearnersLectureDetailPage() {
             <p className="text-[24px] font-bold tracking-tight text-[#4a4d5c]">
               성적 변화 추이{" "}
               <span className="text-[24px] text-[#3863f6]">
-                {selectedExamIds.length}개
+                {selectedExamIds.length > 0 && (
+                  <span className="text-[24px] text-brand-700">
+                    {selectedExamIds.length}개
+                  </span>
+                )}
               </span>
             </p>
 
@@ -154,7 +158,9 @@ export default function LearnersLectureDetailPage() {
       <Card className="rounded-[24px] border border-[#eaecf2] bg-white">
         <CardContent className="p-6">
           <div className="pb-3">
-            <p className="text-sm font-bold text-[#8b90a3]">시험 목록</p>
+            <p className="font-bold text-neutral-700 text-[20px] py-[11px]">
+              시험 목록
+            </p>
           </div>
 
           {grades.length > 0 ? (
