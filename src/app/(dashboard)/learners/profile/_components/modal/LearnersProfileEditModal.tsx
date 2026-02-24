@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -38,6 +38,7 @@ export function LearnersProfileEditModal({
     formState: { errors },
     setValue,
     control,
+    reset,
   } = useForm<LearnersProfileUpdateFormData>({
     resolver: zodResolver(learnersProfileUpdateSchema),
     mode: "onChange",
@@ -54,14 +55,44 @@ export function LearnersProfileEditModal({
 
   const formValues = useWatch({ control });
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    reset({
+      name: profile.name,
+      email: profile.email,
+      school: profile.userType === "STUDENT" ? profile.school : undefined,
+      schoolYear:
+        profile.userType === "STUDENT" ? profile.schoolYear : undefined,
+      parentPhoneNumber:
+        profile.userType === "STUDENT" ? profile.parentPhone : undefined,
+    });
+  }, [
+    isOpen,
+    profile.name,
+    profile.email,
+    profile.school,
+    profile.schoolYear,
+    profile.parentPhone,
+    profile.userType,
+    reset,
+  ]);
+
   const handleClose = () => {
     setIsEditMode(false);
     closeModal();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[860px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]">
+    <Dialog open={isOpen}>
+      <DialogContent
+        className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[860px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]"
+        showClose={false}
+        onPointerDownOutside={(event) => event.preventDefault()}
+        onFocusOutside={(event) => event.preventDefault()}
+        onInteractOutside={(event) => event.preventDefault()}
+        onEscapeKeyDown={(event) => event.preventDefault()}
+      >
         <DialogHeader className="gap-2 border-b border-[#e9ebf0] px-6 pb-5 pt-6 sm:px-8">
           <DialogTitle className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#040405]">
             프로필 수정
@@ -83,7 +114,7 @@ export function LearnersProfileEditModal({
               error={errors.name?.message}
               showReset={(formValues.name?.length ?? 0) > 0}
               onReset={() => setValue("name", "")}
-              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
             />
 
             <InputForm
@@ -110,7 +141,7 @@ export function LearnersProfileEditModal({
                   error={errors.school?.message}
                   showReset={(formValues.school?.length ?? 0) > 0}
                   onReset={() => setValue("school", "")}
-                  className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+                  className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
                 />
 
                 <InputForm
@@ -121,7 +152,7 @@ export function LearnersProfileEditModal({
                   error={errors.schoolYear?.message}
                   showReset={(formValues.schoolYear?.length ?? 0) > 0}
                   onReset={() => setValue("schoolYear", "")}
-                  className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+                  className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
                 />
               </div>
 
@@ -145,7 +176,7 @@ export function LearnersProfileEditModal({
                     shouldDirty: true,
                   })
                 }
-                className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+                className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
               />
             </>
           ) : (
@@ -179,7 +210,11 @@ export function LearnersProfileEditModal({
             ) : (
               <Button
                 type="button"
-                onClick={() => setIsEditMode(true)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsEditMode(true);
+                }}
                 className="h-[46px] flex-1 rounded-[10px] bg-[#3863f6] px-7 text-[14px] font-semibold leading-5 tracking-[-0.02em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] sm:flex-none"
               >
                 수정하기

@@ -27,6 +27,8 @@ import { API_URL_TYPE } from "@/hooks/useAuth";
 import { Role } from "@/types/auth.type";
 
 import { StudentProfileAvatar } from "../avatar/StudentProfileAvatar";
+import { TeacherProfileAvatar } from "../avatar/TeacherProfileAvatar";
+import { getTeacherAvatarSortByRole } from "../avatar/getTeacherAvatarSortByRole";
 
 export function DashboardHeader() {
   const { breadcrumbs } = useBreadcrumb();
@@ -56,6 +58,36 @@ export function DashboardHeader() {
 
   const displayName = user ? `${getRoleLabel(user.userType)} ${user.name}` : "";
   const userSeedKey = user?.id ?? "default-user";
+
+  const renderProfileAvatar = () => {
+    if (user?.userType === "INSTRUCTOR" || user?.userType === "ASSISTANT") {
+      const teacherSort = getTeacherAvatarSortByRole(
+        user.userType,
+        userSeedKey
+      );
+
+      return (
+        <TeacherProfileAvatar
+          seedKey={userSeedKey}
+          sort={teacherSort}
+          size={48}
+          sizePreset="Medium-2"
+          label="내 프로필 아바타"
+          className="border-[1.5px] border-neutral-50 shadow-sm"
+        />
+      );
+    }
+
+    return (
+      <StudentProfileAvatar
+        seedKey={userSeedKey}
+        size={48}
+        sizePreset="Medium-2"
+        label="내 프로필 아바타"
+        className="border-[1.5px] border-neutral-50 shadow-sm"
+      />
+    );
+  };
 
   const isValidRole = (type: string): type is Role =>
     ["INSTRUCTOR", "ASSISTANT", "STUDENT", "PARENT"].includes(type);
@@ -124,13 +156,7 @@ export function DashboardHeader() {
               type="button"
               className="flex cursor-pointer items-center gap-4"
             >
-              <StudentProfileAvatar
-                seedKey={userSeedKey}
-                size={48}
-                sizePreset="Medium-2"
-                label="내 프로필 아바타"
-                className="border-[1.5px] border-neutral-50 shadow-sm"
-              />
+              {renderProfileAvatar()}
               <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
                 {displayName}
               </span>
@@ -153,13 +179,7 @@ export function DashboardHeader() {
         </DropdownMenu>
       ) : (
         <div className="flex items-center gap-4">
-          <StudentProfileAvatar
-            seedKey={userSeedKey}
-            size={48}
-            sizePreset="Medium-2"
-            label="내 프로필 아바타"
-            className="border-[1.5px] border-neutral-50 shadow-sm"
-          />
+          {renderProfileAvatar()}
           <span className="text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-neutral-400">
             {displayName}
           </span>

@@ -14,11 +14,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { InputForm } from "@/components/common/input/InputForm";
 import { useModal } from "@/providers/ModalProvider";
+import { useAuthContext } from "@/providers/AuthProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
+import { verifyEmailAPI } from "@/services/auth.service";
+import { changeMyPasswordAPI } from "@/services/profile.service";
 import {
-  passwordResetSchema,
+  passwordChangeSchema,
   verificationCodeSchema,
-  type PasswordResetFormData,
+  type PasswordChangeFormData,
   type VerificationCodeFormData,
 } from "@/validation/profile.validation";
 import { EyeClosedIcon, EyeOpenIcon } from "@/components/icons/AuthIcons";
@@ -31,12 +34,17 @@ type SettingsSecurityModalProps = {
 
 export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
   const { isOpen, closeModal, openModal } = useModal();
+  const { user } = useAuthContext();
   const [viewMode, setViewMode] = useState<ViewMode>("menu");
 
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [showNewPwd, setShowNewPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<"success" | "error">(
+    "success"
+  );
 
   const {
     register: registerCode,
@@ -57,11 +65,12 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     reset,
     control,
     clearErrors,
-  } = useForm<PasswordResetFormData>({
-    resolver: zodResolver(passwordResetSchema),
+  } = useForm<PasswordChangeFormData>({
+    resolver: zodResolver(passwordChangeSchema),
     mode: "onChange",
   });
 
+  const currentPasswordValue = useWatch({ control, name: "currentPassword" });
   const newPasswordValue = useWatch({ control, name: "newPassword" });
   const confirmPasswordValue = useWatch({ control, name: "confirmPassword" });
 
@@ -69,6 +78,8 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     setViewMode("menu");
     setIsCodeSent(false);
     setIsVerified(false);
+    setFeedbackMessage(null);
+    setFeedbackTone("success");
     resetCode();
     reset();
     setShowNewPwd(false);
@@ -84,25 +95,79 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     setViewMode("menu");
     setIsCodeSent(false);
     setIsVerified(false);
+    setFeedbackMessage(null);
+    setFeedbackTone("success");
     resetCode();
     reset();
     setShowNewPwd(false);
     setShowConfirmPwd(false);
   };
 
-  const handleSendCode = () => {
-    // TODO: API 연동 - 인증메일 발송
+  const authRole =
+    user?.userType === "STUDENT" || user?.userType === "PARENT"
+      ? "SVC"
+      : "MGMT";
+
+  const handleSendCode = async () => {
+    setFeedbackMessage(null);
+
+    const result = await verifyEmailAPI(email);
+
+    if (!result.success) {
+      setFeedbackTone("error");
+      setFeedbackMessage(
+        result.message || "인증메일 발송 중 오류가 발생했습니다."
+      );
+      return;
+    }
+
     setIsCodeSent(true);
+    setIsVerified(false);
+    setFeedbackTone("success");
+    setFeedbackMessage("이메일 인증 코드가 발송되었습니다.");
   };
 
-  const handleVerifyCode = handleCodeSubmit(() => {
-    // TODO: API 연동 - 인증코드 검증
+  const handleVerifyCode = handleCodeSubmit(async ({ code }) => {
+    setFeedbackMessage(null);
+
+    const result = await verifyEmailAPI(email, code);
+
+    if (!result.success) {
+      setFeedbackTone("error");
+      setFeedbackMessage(
+        result.message || "인증코드 확인 중 오류가 발생했습니다."
+      );
+      return;
+    }
+
     setIsVerified(true);
+    setFeedbackTone("success");
+    setFeedbackMessage("이메일 인증이 완료되었습니다.");
   });
 
-  const onSubmit = () => {
-    // TODO: API 연동 - 비밀번호 변경
-    handleClose();
+  const onSubmit = async (data: PasswordChangeFormData) => {
+    setFeedbackMessage(null);
+
+    try {
+      await changeMyPasswordAPI(
+        {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        },
+        authRole
+      );
+
+      setFeedbackTone("success");
+      setFeedbackMessage("비밀번호가 변경되었습니다.");
+      handleClose();
+    } catch (error) {
+      setFeedbackTone("error");
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : "비밀번호 변경 중 오류가 발생했습니다."
+      );
+    }
   };
 
   const handleWithdrawal = () => {
@@ -121,7 +186,14 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleClose();
+        }
+      }}
+    >
       <DialogContent className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[620px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]">
         <DialogHeader className="gap-2 border-b border-[#e9ebf0] px-6 pb-5 pt-6 sm:px-8">
           <DialogTitle className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#040405]">
@@ -153,6 +225,18 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-5 px-6 pb-6 pt-6 sm:px-8 sm:pb-8"
           >
+            {feedbackMessage ? (
+              <p
+                className={`rounded-[12px] border px-4 py-3 text-[14px] font-medium leading-5 tracking-[-0.02em] ${
+                  feedbackTone === "success"
+                    ? "border-[#ced9fd] bg-[#f4f6fe] text-[#3863f6]"
+                    : "border-[#fee2e2] bg-[#fff7f7] text-[#dc2626]"
+                }`}
+              >
+                {feedbackMessage}
+              </p>
+            ) : null}
+
             <div className="space-y-2">
               <InputForm
                 id="email"
@@ -204,6 +288,20 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
                 </Button>
               </div>
             )}
+
+            <InputForm
+              label="현재 비밀번호"
+              type="password"
+              {...register("currentPassword")}
+              disabled={!isVerified}
+              error={errors.currentPassword?.message}
+              showReset={!!currentPasswordValue && isVerified}
+              onReset={() => {
+                setValue("currentPassword", "", { shouldValidate: true });
+                clearErrors("currentPassword");
+              }}
+              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium tracking-[-0.02em] text-[#2b2e3a]"
+            />
 
             <div className="relative">
               <InputForm

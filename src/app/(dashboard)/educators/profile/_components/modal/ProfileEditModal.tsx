@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Camera } from "lucide-react";
@@ -39,6 +39,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
     formState: { errors },
     setValue,
     control,
+    reset,
   } = useForm<ProfileUpdateFormData>({
     resolver: zodResolver(profileUpdateSchema),
     mode: "onChange",
@@ -52,6 +53,26 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
   });
 
   const formValues = useWatch({ control });
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    reset({
+      name: profile.name,
+      email: profile.email,
+      subjects: profile.subjects,
+      academyName: profile.academyName,
+      bio: profile.bio,
+    });
+  }, [
+    isOpen,
+    profile.name,
+    profile.email,
+    profile.subjects,
+    profile.academyName,
+    profile.bio,
+    reset,
+  ]);
 
   const onInternalSubmit = (data: ProfileUpdateFormData) => {
     onSubmit({
@@ -87,8 +108,15 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[860px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]">
+    <Dialog open={isOpen}>
+      <DialogContent
+        className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[860px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]"
+        showClose={false}
+        onPointerDownOutside={(event) => event.preventDefault()}
+        onFocusOutside={(event) => event.preventDefault()}
+        onInteractOutside={(event) => event.preventDefault()}
+        onEscapeKeyDown={(event) => event.preventDefault()}
+      >
         <DialogHeader className="gap-2 border-b border-[#e9ebf0] px-6 pb-5 pt-6 sm:px-8">
           <DialogTitle className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#040405]">
             프로필 수정
@@ -141,7 +169,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
               error={errors.name?.message}
               showReset={(formValues.name?.length ?? 0) > 0}
               onReset={() => setValue("name", "")}
-              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
             />
             <InputForm
               id="email"
@@ -164,7 +192,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
               disabled={!isEditMode}
               showReset={(formValues.academyName?.length ?? 0) > 0}
               onReset={() => setValue("academyName", "")}
-              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
             />
           </div>
 
@@ -175,7 +203,7 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
             disabled={!isEditMode}
             showReset={(formValues.bio?.length ?? 0) > 0}
             onReset={() => setValue("bio", "")}
-            className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:ring-0"
+            className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium leading-6 tracking-[-0.16px] text-[#2b2e3a] focus:border-[#d6d9e0] focus:ring-0"
           />
 
           {!isEditMode ? (
@@ -203,7 +231,11 @@ export function ProfileEditModal({ profile, onSubmit }: ProfileEditModalProps) {
             ) : (
               <Button
                 type="button"
-                onClick={() => setIsEditMode(true)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsEditMode(true);
+                }}
                 className="h-[46px] flex-1 rounded-[10px] bg-[#3863f6] px-7 text-[14px] font-semibold leading-5 tracking-[-0.02em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] sm:flex-none"
               >
                 수정하기

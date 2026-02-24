@@ -10,7 +10,8 @@ import {
   Settings,
 } from "lucide-react";
 
-import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
+import { getTeacherAvatarSortByRole } from "@/components/common/avatar/getTeacherAvatarSortByRole";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Profile } from "@/types/profile.type";
@@ -33,14 +34,16 @@ export function ProfileSummary({
     : null;
 
   const avatarSeedKey = profile.id || "default-profile";
+  const avatarSort = getTeacherAvatarSortByRole(profile.role, avatarSeedKey);
 
   return (
     <Card className="w-full rounded-[24px] border border-[#eaecf2] bg-white">
       <CardContent className="space-y-6 p-5 sm:p-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div className="flex gap-4 md:gap-5">
-            <StudentProfileAvatar
+            <TeacherProfileAvatar
               seedKey={avatarSeedKey}
+              sort={avatarSort}
               size={48}
               sizePreset="Medium"
               label={`${profile.name}님의 프로필 아바타`}
