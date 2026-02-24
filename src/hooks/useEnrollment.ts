@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import * as api from "@/services/students.service";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 import {
   AttendanceStatus,
   CreateEnrollment,
@@ -56,6 +57,7 @@ export const useCreateEnrollment = () => {
 // 수강생 단체 출결 등록
 export const useUpdateAllAttendance = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   return useMutation({
     mutationFn: ({
@@ -77,18 +79,19 @@ export const useUpdateAllAttendance = () => {
       return api.createAllAttendanceAPI(lectureId, payload);
     },
     onSuccess: () => {
-      alert("일괄 출결 등록이 완료되었습니다.");
+      showAlert({ description: "일괄 출결 등록이 완료되었습니다." });
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
     onError: (error) => {
       console.error("출결 등록 실패:", error);
-      alert("재원 상태인 학생만 출결 등록 가능합니다.");
+      showAlert({ description: "재원 상태인 학생만 출결 등록 가능합니다." });
     },
   });
 };
 // 수강생 단체 강의 변경
 export const useMigrateStudents = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   return useMutation({
     mutationFn: ({
@@ -99,12 +102,12 @@ export const useMigrateStudents = () => {
       enrollmentIds: string[];
     }) => api.migrateStudentsAPI(lectureId, { enrollmentIds }),
     onSuccess: () => {
-      alert("수업 변경이 완료되었습니다.");
+      showAlert({ description: "수업 변경이 완료되었습니다." });
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
     },
     onError: (error) => {
       console.error("수업 변경 실패:", error);
-      alert("수업 변경 중 오류가 발생했습니다.");
+      showAlert({ description: "수업 변경 중 오류가 발생했습니다." });
     },
   });
 };
@@ -152,12 +155,14 @@ export const useCreateAttendance = (
   enrollmentId: string
 ) => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
+
   return useMutation({
     mutationFn: (data: CreateEnrollmentAttendance) =>
       api.createAttendanceAPI(lectureId, enrollmentId, data),
 
     onSuccess: () => {
-      alert("출결 등록이 완료되었습니다.");
+      showAlert({ description: "출결 등록이 완료되었습니다." });
 
       queryClient.invalidateQueries({
         queryKey: ["enrollments", "attendances", lectureId, enrollmentId],
@@ -167,7 +172,9 @@ export const useCreateAttendance = (
 
     onError: (error) => {
       console.error("출결 등록 실패:", error);
-      alert("출결 등록에 실패했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "출결 등록에 실패했습니다. 다시 시도해주세요.",
+      });
     },
   });
 };

@@ -12,6 +12,7 @@ import {
   instructorPostServiceSVC,
   myPostServiceSVC,
 } from "@/services/SVC/studentPost.service";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 // 강사 공지 목록 조회
 export const useInstructorPostsSVC = (
@@ -41,6 +42,7 @@ export const useInstructorPostDetailSVC = (
 // 강사 공지 댓글 mutations
 export const useInstructorPostCommentMutationsSVC = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   // 댓글 작성
   const createInstructorPostCommentSVC = useMutation({
@@ -63,10 +65,12 @@ export const useInstructorPostCommentMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("댓글이 등록되었습니다.");
+      showAlert({ description: "댓글이 등록되었습니다." });
     },
     onError: () => {
-      alert("댓글 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "댓글 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -93,10 +97,12 @@ export const useInstructorPostCommentMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("댓글이 수정되었습니다.");
+      showAlert({ description: "댓글이 수정되었습니다." });
     },
     onError: () => {
-      alert("댓글 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "댓글 수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -120,10 +126,12 @@ export const useInstructorPostCommentMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("댓글이 삭제되었습니다.");
+      showAlert({ description: "댓글이 삭제되었습니다." });
     },
     onError: () => {
-      alert("댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -195,16 +203,19 @@ export const useCreateStudentPostSVC = () => {
 // 학부모 문의 생성
 export const useCreateParentPostSVC = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   return useMutation({
     mutationFn: (payload: CreateStudentParentPostRequest) =>
       myPostServiceSVC.createStudentParentPostSVC(payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["studentPosts"] });
-      alert("문의가 등록되었습니다.");
+      showAlert({ description: "문의가 등록되었습니다." });
     },
     onError: () => {
-      alert("문의 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "문의 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 };
@@ -212,6 +223,7 @@ export const useCreateParentPostSVC = () => {
 // 문의 수정 & 삭제 mutations
 export const useStudentPostMutationsSVC = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   // 문의 수정
   const updatePostSVC = useMutation({
@@ -234,10 +246,12 @@ export const useStudentPostMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("문의가 수정되었습니다.");
+      showAlert({ description: "문의가 수정되었습니다." });
     },
     onError: () => {
-      alert("문의 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "문의 수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -253,10 +267,12 @@ export const useStudentPostMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("문의가 삭제되었습니다.");
+      showAlert({ description: "문의가 삭제되었습니다." });
     },
     onError: () => {
-      alert("문의 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "문의 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -266,6 +282,7 @@ export const useStudentPostMutationsSVC = () => {
 // 문의 상태 변경
 export const useUpdateStudentPostStatusSVC = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   return useMutation({
     mutationFn: ({
@@ -285,10 +302,13 @@ export const useUpdateStudentPostStatusSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("문의 상태가 변경되었습니다.");
+      showAlert({ description: "문의 상태가 변경되었습니다." });
     },
     onError: () => {
-      alert("문의 상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description:
+          "문의 상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 };
@@ -296,6 +316,7 @@ export const useUpdateStudentPostStatusSVC = () => {
 // 댓글 mutations
 export const useStudentPostCommentMutationsSVC = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   const createCommentSVC = useMutation({
     mutationFn: ({
@@ -316,10 +337,12 @@ export const useStudentPostCommentMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("답변이 등록되었습니다.");
+      showAlert({ description: "답변이 등록되었습니다." });
     },
     onError: () => {
-      alert("답변 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "답변 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -341,10 +364,12 @@ export const useStudentPostCommentMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("답변이 수정되었습니다.");
+      showAlert({ description: "답변이 수정되었습니다." });
     },
     onError: () => {
-      alert("답변 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "답변 수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -367,10 +392,12 @@ export const useStudentPostCommentMutationsSVC = () => {
           refetchType: "active",
         }),
       ]);
-      alert("답변이 삭제되었습니다.");
+      showAlert({ description: "답변이 삭제되었습니다." });
     },
     onError: () => {
-      alert("답변 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "답변 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 

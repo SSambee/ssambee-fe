@@ -1,27 +1,37 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { useInstructorPosts } from "@/hooks/useInstructorPost";
 
 type StatItemProps = {
   label: string;
   value: number | string;
   description: React.ReactNode;
-  valueColor: string;
+  bgColor: string;
 };
 
-function StatItem({ label, value, description, valueColor }: StatItemProps) {
+function StatItem({ label, value, description, bgColor }: StatItemProps) {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="pb-3">
-          <p className="text-sm font-bold text-muted-foreground">{label}</p>
-        </div>
-        <p className={`text-3xl font-bold ${valueColor}`}>{value}</p>
-        <div className="pt-3">
-          <p className="text-xs font-bold text-muted-foreground">
+    <Card
+      className={cn(
+        "w-full rounded-[20px] border border-[#eaecf2] shadow-none sm:w-[272px] xl:w-[300px]",
+        bgColor
+      )}
+    >
+      <CardContent className="flex h-[124px] items-end justify-between px-5 pb-4 pt-5 xl:px-6">
+        <div className="flex h-full flex-col gap-1">
+          <p className="text-base font-semibold tracking-tight text-white/88">
+            {label}
+          </p>
+          <p className="text-xs font-semibold tracking-tight text-white/40">
             {description}
           </p>
+        </div>
+        <div className="flex items-end gap-1 font-bold text-white">
+          <span className="text-[30px] leading-[38px] tracking-tight">
+            {value}
+          </span>
         </div>
       </CardContent>
     </Card>
@@ -40,50 +50,32 @@ export default function CommunicationStats() {
   const stats = [
     {
       label: "누적 게시글",
-      value: statsData?.totalCount,
-      valueColor: "text-green-600",
-      description: (
-        <>
-          지난 달 기준{" "}
-          <span className="text-green-600">{statsData?.increaseRate} </span>
-          증가
-        </>
-      ),
+      value: statsData?.totalCount ?? 0,
+      bgColor: "bg-[#4b72f7]",
+      description: `지난 달 기준 ${statsData?.increaseRate ?? 0} 증가`,
     },
     {
       label: "미답변",
-      value: statsData?.unansweredCount,
-      valueColor: "text-red-600",
-      description: (
-        <>
-          <span className="text-red-600">
-            {statsData?.unansweredCriteria}건{" "}
-          </span>{" "}
-          지연 중
-        </>
-      ),
+      value: statsData?.unansweredCount ?? 0,
+      bgColor: "bg-[#6b6f80]",
+      description: `${statsData?.unansweredCriteria ?? 0}건 지연 중`,
     },
     {
       label: "이번 달 답변 완료",
-      value: statsData?.answeredThisMonthCount,
-      valueColor: "text-blue-600",
-      description: (
-        <>
-          <span className="text-blue-600">{statsData?.processingCount}건 </span>
-          응답 진행 중
-        </>
-      ),
+      value: statsData?.answeredThisMonthCount ?? 0,
+      bgColor: "bg-white",
+      description: `${statsData?.processingCount ?? 0}건 응답 진행 중`,
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="flex flex-wrap items-stretch gap-4 xl:gap-5">
       {stats.map((stat, index) => (
         <StatItem
           key={index}
           label={stat.label}
-          value={stat.value ?? 0}
-          valueColor={stat.valueColor}
+          value={stat.value}
+          bgColor={index === 1 ? stat.bgColor : "bg-[#4b72f7]"}
           description={stat.description}
         />
       ))}

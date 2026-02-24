@@ -72,7 +72,7 @@ export default function LectureOptionSelect({
             value={selectedLectureId}
             onChange={(value) => onLectureIdChange(value)}
             placeholder="강의를 선택하세요"
-            optionSize="sm"
+            optionSize="lg"
             className="text-base px-4 h-[58px] w-full my-2"
             options={lectureOptions}
           />

@@ -1,4 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
+
+import "react-day-picker/dist/style.css";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import "@/styles/globals.css";
 import { pretendard } from "@/styles/fonts";
@@ -16,6 +20,8 @@ const metadataBase = (() => {
     return new URL(DEFAULT_SITE_URL);
   }
 })();
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {
   metadataBase,
@@ -73,7 +79,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${pretendard.variable} antialiased`}>{children}</body>
+      <body className={`${pretendard.variable} antialiased`}>
+        {children}
+        {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
+      </body>
     </html>
   );
 }

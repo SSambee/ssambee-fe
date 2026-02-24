@@ -27,7 +27,7 @@ export const MATERIALS_TABLE_COLUMNS = ({
     render: (row: Materials) => (
       <Link
         href={`/educators/materials/${row.id}`}
-        className="font-medium hover:text-primary hover:underline block w-full"
+        className="font-medium hover:text-primary hover:underline block w-[400px]"
       >
         {row.title || "-"}
       </Link>
@@ -46,12 +46,12 @@ export const MATERIALS_TABLE_COLUMNS = ({
   {
     key: "writer",
     label: "작성자",
-    render: (row: Materials) => <span>{row.writer}</span>,
+    render: (row: Materials) => <span className="w-[100px]">{row.writer}</span>,
   },
   {
     key: "date",
     label: "등록일",
-    render: (row: Materials) => <span>{row.date}</span>,
+    render: (row: Materials) => <span className="w-[100px]">{row.date}</span>,
   },
   {
     key: "download",
@@ -59,7 +59,8 @@ export const MATERIALS_TABLE_COLUMNS = ({
     render: (row: Materials) => {
       const typeKey = resolveMaterialTypeKey(row.type);
       // 파일이 있는 타입만 다운로드 버튼 표시
-      if (typeKey === "VIDEO") return <span className="text-gray-400">-</span>;
+      if (typeKey === "VIDEO")
+        return <span className="text-neutral-400"> </span>;
 
       return (
         <Button
@@ -68,9 +69,12 @@ export const MATERIALS_TABLE_COLUMNS = ({
             e.stopPropagation();
             onDownload(row);
           }}
-          className="cursor-pointer"
+          className="group h-10 px-4 gap-2 rounded-xl border-neutral-200 hover:border-brand-500 hover:bg-brand-50 transition-all cursor-pointer shadow-none"
         >
-          <Download className="h-4 w-4" />
+          <Download className="h-4 w-4 text-neutral-500 group-hover:text-brand-500 transition-colors" />
+          <span className="text-sm font-semibold text-neutral-500 group-hover:text-brand-500 transition-colors">
+            다운로드
+          </span>
         </Button>
       );
     },

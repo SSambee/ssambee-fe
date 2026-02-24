@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 
 import { useAuthContext } from "@/providers/AuthProvider";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 import {
   signinAPI,
   signoutAPI,
@@ -37,6 +38,7 @@ export function useAuth() {
   const router = useRouter();
   const { setUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
+  const { showAlert } = useDialogAlert();
 
   const signup = async (data: RegisterUser) => {
     try {
@@ -90,7 +92,7 @@ export function useAuth() {
           throw new Error("알 수 없는 사용자 타입입니다.");
       }
 
-      alert("회원가입 성공!");
+      showAlert({ description: "회원가입 성공!" });
 
       // 회원가입 후 자동 로그인
       await signin({
@@ -103,9 +105,11 @@ export function useAuth() {
       return res.data;
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        alert(err.response?.data?.message || "회원가입 실패");
+        showAlert({
+          description: err.response?.data?.message || "회원가입 실패",
+        });
       } else {
-        alert("알 수 없는 에러가 발생했습니다.");
+        showAlert({ description: "알 수 없는 에러가 발생했습니다." });
       }
     } finally {
       setLoading(false);
@@ -124,7 +128,7 @@ export function useAuth() {
       const user = res.data?.data?.user;
 
       if (user) {
-        alert("로그인 성공!");
+        showAlert({ description: "로그인 성공!" });
         setUser(user);
 
         // 역할별 메인 페이지(대시보드) 이동
@@ -135,14 +139,16 @@ export function useAuth() {
           router.push("/learners");
         }
       } else {
-        alert("사용자 정보를 가져오지 못했습니다.");
+        showAlert({ description: "사용자 정보를 가져오지 못했습니다." });
         return;
       }
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        alert(err.response?.data?.message || "로그인 실패!");
+        showAlert({
+          description: err.response?.data?.message || "로그인 실패!",
+        });
       } else {
-        alert("알 수 없는 에러가 발생했습니다.");
+        showAlert({ description: "알 수 없는 에러가 발생했습니다." });
       }
     } finally {
       setLoading(false);

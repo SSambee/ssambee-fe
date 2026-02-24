@@ -55,22 +55,22 @@ export default function CreateContentSVC({
           />
         </div>
 
-        <div className="flex justify-end gap-2 pt-4">
+        <div className="flex justify-end gap-3 pt-4">
           <Button
             variant="outline"
             onClick={onCancel}
-            className="h-11 px-6 rounded-xl text-[14px] font-bold border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all active:scale-95"
+            className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
           >
             취소
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="cursor-pointer h-11 px-8 rounded-xl text-[14px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:scale-100"
+            className="h-14 w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <span className="flex items-center gap-2">
-                <span className="cursor-pointer h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 등록 중...
               </span>
             ) : (

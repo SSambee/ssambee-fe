@@ -143,10 +143,12 @@ export function CreateMaterialsModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-[32px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">학습 자료 등록</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[24px] font-bold text-label-normal">
+            학습 자료 등록
+          </DialogTitle>
+          <DialogDescription className="text-[18px] font-medium text-label-alternative">
             새로운 학습 자료를 업로드합니다.
           </DialogDescription>
         </DialogHeader>
@@ -159,22 +161,22 @@ export function CreateMaterialsModal() {
 
           {renderForm()}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3 mt-4">
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
               disabled={createMutation.isPending}
-              className="cursor-pointer"
+              className="cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-white border border-neutral-200 hover:bg-neutral-50 text-label-normal shadow-none"
             >
               취소
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!isFormValid || createMutation.isPending}
-              className={`cursor-pointer ${
+              className={`cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none ${
                 !isFormValid || createMutation.isPending
-                  ? "opacity-50 cursor-not-allowed"
+                  ? "bg-neutral-200 text-neutral-500 cursor-not-allowed"
                   : ""
               }`}
             >

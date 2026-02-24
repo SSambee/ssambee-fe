@@ -21,6 +21,7 @@ import {
 import { STUDENT_STATUS_LABEL } from "@/constants/students.default";
 import { formatLectureTimes } from "@/utils/formatLectureTimes";
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { CommonLectureCard } from "@/components/common/CommonLectureCard";
 
 import EditProfileModal from "./_components/detail-modal/EditProfileModal";
 import AttendanceDetailModal from "./_components/detail-modal/AttendanceDetailModal";
@@ -42,19 +43,19 @@ export default function StudentDetailPage() {
     isError: isDetailError,
   } = useEnrollmentDetail(studentId);
 
-  // 전체 강의 목록 (상태 필터링 제거)
+  // 전체 강의 목록
   const allLectures = enrollmentData?.lectures || [];
 
-  // IN_PROGRESS 상태인 강의 중 가장 최신 강의 ID (출결 조회의 기준)
+  // IN_PROGRESS 상태인 강의 중 가장 최신 강의 ID
   const inProgressLectures = allLectures.filter(
     (lecture) => lecture.status === "IN_PROGRESS"
   );
   const mainLectureId = inProgressLectures[0]?.id;
 
-  // 진행 중인 수업이 있는지 확인 (출결 등록 가능 여부)
+  // 진행 중인 수업이 있는지 확인
   const hasNoInProgressLecture = !mainLectureId;
 
-  // 학생 출결 통계 조회 (진행 중인 강의가 있을 때만)
+  // 학생 출결 통계 조회
   const {
     data: attendanceData,
     isPending: isAttendancePending,
@@ -66,11 +67,7 @@ export default function StudentDetailPage() {
   const enrolledLectures = enrollmentData?.lectures || [];
 
   if (isDetailPending || (isAttendancePending && !hasNoInProgressLecture)) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        로딩 중...
-      </div>
-    );
+    return <div className="p-8 text-center text-neutral-400">로딩 중...</div>;
   }
   if (
     isDetailError ||
@@ -94,6 +91,40 @@ export default function StudentDetailPage() {
     setVisibleLectures((prev) => prev + 6);
   };
 
+  const getScheduleMeta = (
+    lectureTimes: GetEnrollmentDetail["lectures"][0]["lectureTimes"]
+  ) => {
+    if (lectureTimes.length === 0) {
+      return {
+        hasSchedule: false,
+        scheduleDays: "일정 없음",
+        scheduleTime: "-",
+      };
+    }
+
+    const firstTimeRange = `${lectureTimes[0].startTime} - ${lectureTimes[0].endTime}`;
+    const hasSingleTimeRange = lectureTimes.every(
+      (lectureTime) =>
+        `${lectureTime.startTime} - ${lectureTime.endTime}` === firstTimeRange
+    );
+
+    if (hasSingleTimeRange) {
+      return {
+        hasSchedule: true,
+        scheduleDays: lectureTimes
+          .map((lectureTime) => lectureTime.day)
+          .join(", "),
+        scheduleTime: firstTimeRange,
+      };
+    }
+
+    return {
+      hasSchedule: false,
+      scheduleDays: formatLectureTimes(lectureTimes),
+      scheduleTime: "-",
+    };
+  };
+
   return (
     <div className="container mx-auto space-y-8 p-6">
       <Title
@@ -101,35 +132,28 @@ export default function StudentDetailPage() {
         description="학생의 상세 정보를 확인하고 관리합니다."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 학생 프로필 */}
-        <Card className="lg:col-span-2">
-          <CardContent className="flex gap-6 p-6 justify-between sm:flex-row flex-col">
-            <div className="flex gap-6">
-              {/* 프로필 이미지 */}
-              <div className="shrink-0">
-                <StudentProfileAvatar
-                  seedKey={studentId}
-                  size={120}
-                  sizePreset="Medium"
-                  label={`${enrollmentData.studentName}의 프로필`}
-                  // className="rounded-lg shadow-sm"
-                />
-              </div>
+      <Card className="rounded-[24px] border border-neutral-100 bg-white">
+        <CardContent className="flex flex-col justify-between gap-6 p-6 sm:flex-row">
+          <div className="flex gap-6 items-center">
+            <div className="shrink-0">
+              <StudentProfileAvatar
+                seedKey={studentId}
+                size={120}
+                sizePreset="Medium"
+                label={`${enrollmentData.studentName}의 프로필`}
+              />
+            </div>
 
-              {/* 학생 정보 */}
-              <div className="flex-1 space-y-3">
-                <div className="flex flex-col">
-                  <h2 className="text-2xl font-bold flex items-center gap-1">
-                    {enrollmentData.studentName}
-                    <span className="text-sm text-muted-foreground">
-                      {enrollmentData.appStudentId ? (
-                        <StatusLabel color="green">앱 사용자</StatusLabel>
-                      ) : (
-                        <StatusLabel color="red">미등록</StatusLabel>
-                      )}
-                    </span>
-                    {/* TODO: 상태, 컬러 매핑 객체 만들어 사용 > 라벨 컴포넌트 변경해야함*/}
+            <div className="flex-1 space-y-3">
+              <div className="flex flex-col">
+                <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-neutral-700 xl:text-2xl">
+                  {enrollmentData.studentName}
+                  <span className="flex gap-1 text-sm">
+                    {enrollmentData.appStudentId ? (
+                      <StatusLabel color="green">앱 사용자</StatusLabel>
+                    ) : (
+                      <StatusLabel color="red">미등록</StatusLabel>
+                    )}
                     <StatusLabel
                       color={
                         enrollmentData.status === "ACTIVE"
@@ -141,167 +165,160 @@ export default function StudentDetailPage() {
                     >
                       {STUDENT_STATUS_LABEL[enrollmentData.status]}
                     </StatusLabel>
-                  </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    🎓 학교 | {enrollmentData.school} ·{" "}
-                    {enrollmentData.schoolYear}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    📱 연락처 |{" "}
-                    {phoneNumberFormatter(enrollmentData.studentPhone || "")}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    ✉️ 이메일 | {enrollmentData.email || ""}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    👨‍👩‍👦 학부모 |{" "}
-                    {phoneNumberFormatter(enrollmentData.parentPhone || "")}
-                  </p>
-                </div>
+                  </span>
+                </h2>
+                <p className="mt-1 text-sm text-neutral-400">
+                  🎓 학교 | {enrollmentData.school} ·{" "}
+                  {enrollmentData.schoolYear}
+                </p>
+                <p className="text-sm text-neutral-400">
+                  📱 연락처 |{" "}
+                  {phoneNumberFormatter(enrollmentData.studentPhone || "")}
+                </p>
+                <p className="text-sm text-neutral-400">
+                  ✉️ 이메일 | {enrollmentData.email || "-"}
+                </p>
+                <p className="text-sm text-neutral-400">
+                  👨‍👩‍👦 학부모 |{" "}
+                  {phoneNumberFormatter(enrollmentData.parentPhone || "")}
+                </p>
               </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <Button
-                className="cursor-pointer"
-                variant="outline"
-                onClick={() =>
-                  openModal(
-                    <EditProfileModal
-                      studentData={enrollmentData as EditProfileFormDataType}
-                    />
-                  )
-                }
-              >
-                정보 수정
-              </Button>
-              <Button
-                className="cursor-pointer"
-                variant="outline"
-                onClick={() =>
-                  openModal(
-                    <AttendanceDetailModal
-                      studentData={enrollmentData}
-                      attendancesList={attendancesList}
-                    />
-                  )
-                }
-              >
-                출결 상세
-              </Button>
-              <Button
-                className="cursor-pointer"
-                disabled={hasNoInProgressLecture}
-                variant="default"
-                onClick={() =>
-                  openModal(
-                    <AttendanceRegisterModal
-                      studentId={studentId}
-                      mainLectureId={mainLectureId ?? ""}
-                    />
-                  )
-                }
-              >
-                출결 등록
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
 
-      {/* 출결 통계 */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="outline"
+              className="h-10 rounded-[12px] border border-neutral-200 bg-white px-6 text-[16px] font-semibold text-neutral-400 hover:bg-neutral-50"
+              onClick={() =>
+                openModal(
+                  <EditProfileModal
+                    studentData={enrollmentData as EditProfileFormDataType}
+                  />
+                )
+              }
+            >
+              정보 수정
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-[12px] border border-neutral-200 bg-white px-6 text-[16px] font-semibold text-neutral-400 hover:bg-neutral-50"
+              onClick={() =>
+                openModal(
+                  <AttendanceDetailModal
+                    studentData={enrollmentData}
+                    attendancesList={attendancesList}
+                  />
+                )
+              }
+            >
+              출결 상세
+            </Button>
+            <Button
+              disabled={hasNoInProgressLecture}
+              className={`h-10 rounded-[12px] px-6 text-[16px] font-semibold shadow-none ${
+                hasNoInProgressLecture
+                  ? "bg-neutral-200 text-neutral-500 cursor-not-allowed"
+                  : "bg-brand-700 hover:bg-brand-800 text-white"
+              }`}
+              onClick={() =>
+                openModal(
+                  <AttendanceRegisterModal
+                    studentId={studentId}
+                    mainLectureId={mainLectureId ?? ""}
+                  />
+                )
+              }
+            >
+              출결 등록
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card className="rounded-[24px] border border-[#eaecf2] bg-white">
           <CardContent className="p-6 text-left">
-            <p className="text-sm text-muted-foreground mb-2">지각 횟수</p>
-            <p className="text-3xl font-bold text-yellow-600">
+            <p className="mb-2 text-sm text-neutral-400">지각 횟수</p>
+            <p className="text-3xl font-bold text-status-warning-normal">
               {lateCount || 0}회
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-[24px] border border-[#eaecf2] bg-white">
           <CardContent className="p-6 text-left">
-            <p className="text-sm text-muted-foreground mb-2">결석 횟수</p>
-            <p className="text-3xl font-bold text-red-600">
+            <p className="mb-2 text-sm text-neutral-400">결석 횟수</p>
+            <p className="text-3xl font-bold text-status-negative-normal">
               {absentCount || 0}회
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-[24px] border border-[#eaecf2] bg-white">
           <CardContent className="p-6 text-left">
-            <p className="text-sm text-muted-foreground mb-2">
-              출석률 (최근 30일)
-            </p>
-            <p className="text-3xl font-bold text-green-600">
+            <p className="mb-2 text-sm text-neutral-400">출석률 (최근 30일)</p>
+            <p className="text-3xl font-bold text-status-positive-normal">
               {attendanceRate || 0}%
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* 수강 중인 수업 */}
+      {isAttendanceError && (
+        <p className="text-sm text-neutral-400">
+          일부 출결 데이터는 현재 불러오지 못했습니다.
+        </p>
+      )}
+
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold">수강 중인 수업</h3>
-          <span className="text-sm text-muted-foreground">
+          <h3 className="text-xl font-bold tracking-tight text-neutral-700 xl:text-2xl">
+            수강 중인 수업
+          </h3>
+          <span className="text-sm text-neutral-400">
             총 {enrolledLectures.length}개
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {enrolledLectures
             .slice(0, visibleLectures)
-            .map((lecture: GetEnrollmentDetail["lectures"][0]) => (
-              <Card
-                key={lecture.id}
-                className="hover:shadow-md transition-shadow relative cursor-pointer"
-                onClick={() =>
-                  router.push(
-                    `/educators/students/${studentId}/lectures/${lecture.lectureEnrollmentId}`
-                  )
-                }
-              >
-                <CardContent className="w-full">
-                  <div className="absolute top-0 left-0 w-full h-[40%] bg-blue-500 rounded-t-lg"></div>
-                  <div>
-                    <div className="flex items-center gap-2 mt-[40%]">
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded">
-                        {lecture.subject}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {lecture.schoolYear}
-                      </span>
-                    </div>
-                    <h4 className="font-semibold text-lg">{lecture.title}</h4>
-                  </div>
-                  <div className="space-y-1.5 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">담당 강사:</span>
-                      <span className="font-medium">
-                        {enrollmentData.instructorName}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">수업 시간:</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          {formatLectureTimes(lecture.lectureTimes)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          {visibleLectures < enrolledLectures.length && (
-            <div className="flex justify-center pt-4">
-              <Button variant="outline" onClick={handleLoadMore}>
-                더보기 ({enrolledLectures.length - visibleLectures})
-              </Button>
-            </div>
-          )}
+            .map((lecture: GetEnrollmentDetail["lectures"][0]) => {
+              const scheduleMeta = getScheduleMeta(lecture.lectureTimes);
+
+              return (
+                <CommonLectureCard
+                  key={lecture.id}
+                  subject={lecture.subject}
+                  schoolYear={lecture.schoolYear}
+                  title={lecture.title}
+                  scheduleDays={scheduleMeta.scheduleDays}
+                  scheduleTime={scheduleMeta.scheduleTime}
+                  hasSchedule={scheduleMeta.hasSchedule}
+                  instructorName={enrollmentData.instructorName}
+                  onClick={() =>
+                    router.push(
+                      `/educators/students/${studentId}/lectures/${lecture.lectureEnrollmentId}`
+                    )
+                  }
+                  className="h-full"
+                />
+              );
+            })}
         </div>
+
+        {visibleLectures < enrolledLectures.length && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              className="h-12 rounded-[12px] border border-neutral-200 bg-white px-6 text-[16px] font-semibold text-neutral-400 hover:bg-neutral-50"
+              onClick={handleLoadMore}
+            >
+              더보기 ({enrolledLectures.length - visibleLectures})
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

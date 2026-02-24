@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { InputForm } from "@/components/common/input/InputForm";
 import { TextareaForm } from "@/components/common/input/TextareaForm";
 import FileUploadField from "@/components/common/input/FileUploadField";
@@ -78,76 +77,80 @@ export default function PaperTypeForm({
   }, [mode, initialData, userName, reset]);
 
   return (
-    <Card>
-      <CardContent className="p-6 space-y-6">
-        <div>
-          <h3 className="font-semibold text-lg mb-2">
-            {mode === "create" ? "시험지 등록" : "시험지"}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {mode === "create"
-              ? "시험지/PDF 파일을 업로드합니다."
-              : mode === "view"
-                ? "시험지 정보를 확인합니다."
-                : "시험지 정보를 수정합니다."}
-          </p>
-        </div>
+    <div
+      className={`space-y-4 border rounded-[20px] bg-white ${mode !== "create" ? "shadow-sm p-10" : "px-[24px] py-[16px]"}`}
+    >
+      <div className="py-4">
+        <h3
+          className={`font-semibold text-label-neutral ${mode !== "create" ? "text-[20px]" : "text-[18px]"}`}
+        >
+          {mode === "create" ? "시험지 등록" : "시험지"}
+        </h3>
+        <p
+          className={`text-muted-foreground ${mode !== "create" ? "text-[18px]" : "text-sm"}`}
+        >
+          {mode === "create"
+            ? "시험지/PDF 파일을 업로드합니다."
+            : mode === "view"
+              ? "시험지 정보를 확인합니다."
+              : "시험지 정보를 수정합니다."}
+        </p>
+      </div>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-4 gap-2 ">
-            <div className="col-span-3">
-              <InputForm
-                label="제목"
-                id="title"
-                error={errors.title?.message}
-                disabled={isDisabled}
-                {...register("title")}
-              />
-            </div>
-
-            <div className="col-span-1">
-              <InputForm
-                label="등록자"
-                id="writer"
-                readOnly
-                className="bg-gray-50"
-                {...register("writer")}
-              />
-            </div>
+      <div className="space-y-4 pb-4">
+        <div className="grid grid-cols-4 gap-2">
+          <div className="col-span-3">
+            <InputForm
+              label="제목"
+              id="title"
+              error={errors.title?.message}
+              disabled={isDisabled}
+              {...register("title")}
+            />
           </div>
 
-          <TextareaForm
-            label="세부 내용"
-            id="description"
-            error={errors.description?.message}
-            disabled={isDisabled}
-            {...register("description")}
-          />
-          {!isDisabled && (
-            <FileUploadField
-              label="시험지 파일"
-              file={watchedValues.file}
-              onFileChange={(file) =>
-                setValue("file", file, { shouldValidate: true })
-              }
-              accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsm,.xlsx,.hwp,.hwpx"
-              error={errors.file?.message as string}
+          <div className="col-span-1">
+            <InputForm
+              label="등록자"
+              id="writer"
+              readOnly
+              className="bg-white"
+              {...register("writer")}
             />
-          )}
-          {isDisabled && initialData?.file && (
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                첨부 파일
-              </label>
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <p className="text-sm text-gray-900">
-                  {decodeUtf8(initialData.file.name)}
-                </p>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <TextareaForm
+          label="세부 내용"
+          id="description"
+          error={errors.description?.message}
+          disabled={isDisabled}
+          {...register("description")}
+        />
+        {!isDisabled && (
+          <FileUploadField
+            label="시험지 파일"
+            file={watchedValues.file ?? null}
+            onFileChange={(file) =>
+              setValue("file", file, { shouldValidate: true })
+            }
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsm,.xlsx,.hwp,.hwpx"
+            error={errors.file?.message as string}
+          />
+        )}
+        {isDisabled && initialData?.file && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              첨부 파일
+            </label>
+            <div className="border border-neutral-200 rounded-[12px] h-[58px] px-4 bg-white flex items-center">
+              <p className="text-sm text-gray-900">
+                {decodeUtf8(initialData.file.name)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

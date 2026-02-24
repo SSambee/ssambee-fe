@@ -75,10 +75,9 @@ export default function LearnersLecturesPage() {
             <div className="shrink-0">
               <StudentProfileAvatar
                 size={120}
-                sizePreset="XL"
+                sizePreset="Medium"
                 seedKey={profile.id || profile.name}
                 label={`${profile.name} 프로필 이미지`}
-                className="rounded-[12px] border border-[#f4f6fa]"
               />
             </div>
 

@@ -155,7 +155,8 @@ export const STUDENT_TABLE_COLUMNS = ({
     label: "상태 변경",
     render: (row: GetEnrollmentList) => (
       <SelectBtn
-        className="w-[100px]"
+        className="w-[120px]"
+        optionSize="sm"
         value={row.status}
         placeholder="상태 선택"
         options={STATUS_SETTING_OPTIONS}

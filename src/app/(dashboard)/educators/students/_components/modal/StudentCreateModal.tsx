@@ -87,117 +87,161 @@ export function StudentCreateModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-[32px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">학생 등록</DialogTitle>
-          <DialogDescription>
-            등록 후 학적과 수업 정보를 바로 연결할 수 있습니다.
+          <DialogTitle className="text-[24px] font-bold text-label-normal">
+            학생 등록
+          </DialogTitle>
+          <DialogDescription className="text-[18px] font-medium text-label-alternative">
+            등록 후 학적과 수업 정보를 바로 연결할 수 있어요.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-4">
-            {/* 학생 정보 */}
-            <h3 className="text-base font-semibold">
-              학생 정보<span className="text-red-500">*</span>
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
+            <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+              학생 정보
             </h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="studentName"
+                    className="text-muted-foreground"
+                  >
+                    이름
+                  </Label>
+                  <InputForm
+                    id="studentName"
+                    label="학생 이름"
+                    placeholder="이름 입력"
+                    floating={false}
+                    className="bg-white border border-neutral-200 rounded-[12px]"
+                    required
+                    error={errors.studentName?.message}
+                    {...register("studentName")}
+                  />
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <InputForm
-                  id="studentName"
-                  label="학생 이름"
-                  required
-                  error={errors.studentName?.message}
-                  {...register("studentName")}
-                />
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="studentName"
+                    className="text-muted-foreground"
+                  >
+                    연락처
+                  </Label>
+                  <InputForm
+                    id="studentPhone"
+                    label="연락처"
+                    placeholder="연락처 입력"
+                    floating={false}
+                    className="bg-white border border-neutral-200 rounded-[12px]"
+                    required
+                    error={errors.studentPhone?.message}
+                    {...register("studentPhone")}
+                    onChange={(e) => handlePhoneChange(e, "studentPhone")}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <InputForm
-                  id="studentPhone"
-                  label="연락처"
-                  required
-                  error={errors.studentPhone?.message}
-                  {...register("studentPhone")}
-                  onChange={(e) => handlePhoneChange(e, "studentPhone")}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="school" className="text-muted-foreground">
+                    학교
+                  </Label>
+                  <InputForm
+                    id="school"
+                    label="학교"
+                    placeholder="학교 입력"
+                    floating={false}
+                    className="bg-white border border-neutral-200 rounded-[12px]"
+                    required
+                    error={errors.school?.message}
+                    {...register("school")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="schoolYear" className="text-muted-foreground">
+                    학년
+                  </Label>
+                  <SelectBtn
+                    id="schoolYear"
+                    value={schoolYear}
+                    placeholder="학년 선택"
+                    optionSize="lg"
+                    className="text-base px-4 h-[58px] w-full bg-white border border-neutral-200"
+                    options={GRADE_SELECTING_OPTIONS}
+                    onChange={(value) =>
+                      setValue("schoolYear", value, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      })
+                    }
+                  />
+                  {errors.schoolYear && (
+                    <p className="text-xs text-red-500">
+                      {errors.schoolYear.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="parentPhone"
+                    className="text-muted-foreground"
+                  >
+                    학부모 연락처
+                  </Label>
+                  <InputForm
+                    id="parentPhone"
+                    label="학부모 연락처"
+                    placeholder="학부모 연락처 입력"
+                    floating={false}
+                    className="bg-white border border-neutral-200 rounded-[12px]"
+                    required
+                    error={errors.parentPhone?.message}
+                    {...register("parentPhone")}
+                    onChange={(e) => handlePhoneChange(e, "parentPhone")}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="registrationDate"
+                    className="text-muted-foreground"
+                  >
+                    학생 등록 날짜
+                  </Label>
+                  <Input
+                    id="registrationDate"
+                    type="date"
+                    {...register("registrationDate")}
+                    disabled
+                    className="rounded-[12px] text-base px-4 h-[58px] w-full bg-white border border-neutral-200"
+                  />
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <InputForm
-                  id="school"
-                  label="학교"
-                  required
-                  error={errors.school?.message}
-                  {...register("school")}
-                />
-              </div>
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
+            <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+              수업 정보
+            </h3>
 
+            <div>
               <div className="space-y-2">
-                <Label htmlFor="schoolYear" className="sr-only">
-                  학년
+                <Label htmlFor="assignedClass" className="sr-only">
+                  배정 클래스
                 </Label>
-                <SelectBtn
-                  id="schoolYear"
-                  value={schoolYear}
-                  placeholder="학년 선택"
-                  optionSize="sm"
-                  className="text-base px-4 h-[58px] w-full"
-                  options={GRADE_SELECTING_OPTIONS}
-                  onChange={(value) =>
-                    setValue("schoolYear", value, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    })
-                  }
-                />
-                {errors.schoolYear && (
-                  <p className="text-xs text-red-500">
-                    {errors.schoolYear.message}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* 학부모 정보 */}
-          <div className="space-y-4">
-            <h3 className="text-base font-semibold">
-              학부모 정보<span className="text-red-500">*</span>
-            </h3>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <InputForm
-                  id="parentPhone"
-                  label="학부모 연락처"
-                  required
-                  error={errors.parentPhone?.message}
-                  {...register("parentPhone")}
-                  onChange={(e) => handlePhoneChange(e, "parentPhone")}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* 수업 정보 */}
-          <div className="space-y-4">
-            <h3 className="text-base font-semibold">
-              수업 정보<span className="text-red-500">*</span>
-            </h3>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="assignedClass">배정 클래스</Label>
                 <SelectBtn
                   id="assignedClass"
                   value={assignedClass}
-                  placeholder="클래스 선택"
-                  optionSize="sm"
-                  className="text-base px-4 h-[58px] w-full"
+                  placeholder="배정 클래스"
+                  optionSize="lg"
+                  className="text-base px-4 h-[58px] w-full bg-white border border-neutral-200"
                   options={lectureOptions}
                   onChange={(value) =>
                     setValue("assignedClass", value, {
@@ -212,54 +256,46 @@ export function StudentCreateModal() {
                   </p>
                 )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="registrationDate">학생 등록 날짜</Label>
-                <Input
-                  id="registrationDate"
-                  type="date"
-                  {...register("registrationDate")}
-                  disabled
-                  className="bg-muted text-base px-4 h-[58px] w-full"
-                />
-              </div>
             </div>
           </div>
 
-          {/* 추가 메모 */}
-          <div className="space-y-2">
-            <Label htmlFor="memo">추가 메모</Label>
-            <Textarea
-              id="memo"
-              {...register("memo")}
-              placeholder="학생에 대한 추가 정보를 입력하세요"
-              rows={4}
-              className="text-base p-4 min-h-[130px] w-full"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
-            <p className="text-xs text-muted-foreground">
-              저장 시 학사 담당자에게 자동으로 공유됩니다.
-            </p>
-            <div className="flex gap-2">
-              <Button
-                className="cursor-pointer"
-                type="button"
-                variant="outline"
-                onClick={handleClose}
-                disabled={isPending}
-              >
-                닫기
-              </Button>
-              <Button
-                className={`cursor-pointer ${!isValid || isPending ? "opacity-50 cursor-not-allowed" : ""}`}
-                type="submit"
-                disabled={!isValid || isPending}
-              >
-                {isPending ? "등록 중..." : "학생 등록"}
-              </Button>
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative ">
+            <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+              추가 메모
+            </h3>
+            <div className="space-y-2">
+              <Textarea
+                id="memo"
+                {...register("memo")}
+                placeholder="추가 정보를 입력해주세요"
+                rows={4}
+                className="text-base p-4 min-h-[130px] w-full rounded-[12px] bg-white border border-neutral-200 shadow-none"
+              />
             </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+              <p className="text-xs text-muted-foreground ml-1">
+                * 저장 시 학사 담당자에게 자동으로 공유됩니다.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 w-full justify-end">
+            <Button
+              className="cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-white border border-neutral-200 hover:bg-neutral-50 text-label-normal shadow-none"
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isPending}
+            >
+              닫기
+            </Button>
+            <Button
+              className={`cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none ${!isValid || isPending ? "bg-neutral-200 text-neutral-500 cursor-not-allowed" : ""}`}
+              type="submit"
+              disabled={!isValid || isPending}
+            >
+              {isPending ? "등록 중..." : "등록하기"}
+            </Button>
           </div>
         </form>
       </DialogContent>

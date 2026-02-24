@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, X } from "lucide-react";
+import { X } from "lucide-react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { useModal } from "@/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 
 type SendTarget = "all" | "student" | "parent";
 
@@ -42,13 +43,12 @@ export function TalkNotificationModal() {
 
   const handleSubmit = () => {
     console.log({
-      studentIds: selectedStudentIds, // API 전송용 ID 배열
+      studentIds: selectedStudentIds,
       sendChannel,
       sendTarget,
       messageContent,
     });
 
-    // TODO: API 호출
     resetForm();
     resetSelection();
     closeModal();
@@ -72,45 +72,54 @@ export function TalkNotificationModal() {
         if (!open) handleClose();
       }}
     >
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-[32px]">
         <DialogHeader>
-          <div className="flex items-center gap-2 mb-1">
-            <Bell className="w-4 h-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">
-              수업 알림 발송
-            </span>
-          </div>
-          <DialogTitle className="text-xl flex items-center gap-2">
+          <DialogTitle className="text-[24px] font-bold text-label-normal flex items-center gap-2">
             알림톡 전송
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[18px] font-medium text-label-alternative">
             선택한 학생에게 알림톡을 전송합니다.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="w-full grid grid-cols-2 gap-3 items-start">
-            <div>
-              <Label>발송 채널</Label>
-              <RadioGroup value={sendChannel} onValueChange={setSendChannel}>
-                <div className="flex items-center space-x-3 border rounded-lg px-4 py-3 w-full">
-                  <RadioGroupItem value="kakao" id="kakao" />
-                  <Label htmlFor="kakao" className="font-normal cursor-pointer">
-                    카카오톡
-                  </Label>
-                </div>
-              </RadioGroup>
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
+            <div className="flex justify-between items-center">
+              <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+                발송 설정
+              </h3>
+              <p className="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                총 예상 수신: {getExpectedRecipients()}명
+              </p>
             </div>
+            <div className="w-full grid grid-cols-2 gap-4 items-start pb-2">
+              <div className="space-y-2">
+                <Label className="text-muted-foreground ml-1">발송 채널</Label>
+                <RadioGroup value={sendChannel} onValueChange={setSendChannel}>
+                  <div className="flex items-center space-x-3 bg-white border border-neutral-200 rounded-[12px] px-4 h-[58px] w-full shadow-sm">
+                    <RadioGroupItem
+                      value="kakao"
+                      id="kakao"
+                      className="text-blue-600"
+                    />
+                    <Label
+                      htmlFor="kakao"
+                      className="text-base font-normal cursor-pointer flex-1"
+                    >
+                      카카오톡
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </div>
 
-            {/* 발송 대상 */}
-            <div>
-              <Label>발송 대상</Label>
-              <div className="flex border rounded-lg p-4">
-                <div className="flex flex-col gap-2 w-full">
+              <div className="space-y-2">
+                <Label className="text-muted-foreground ml-1">발송 대상</Label>
+                <div className="space-y-2">
                   <SelectBtn
-                    className="w-full"
+                    className="w-full text-base px-4 h-[58px] bg-white border border-neutral-200 rounded-[12px]"
                     value={sendTarget}
                     placeholder="발송 대상 선택"
+                    optionSize="lg"
                     options={[
                       { label: "전체", value: "all" },
                       { label: "학생만", value: "student" },
@@ -118,88 +127,115 @@ export function TalkNotificationModal() {
                     ]}
                     onChange={(value) => setSendTarget(value as SendTarget)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    총 예상 수신: {getExpectedRecipients()}명
-                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div>
-            <Label>대상 학생 정보 ({selectedStudents.length}명)</Label>
-            <div className="border rounded-lg p-4 space-y-2 max-h-[200px] overflow-y-auto">
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
+            <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+              대상 학생 정보
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                ({selectedStudents.length}명)
+              </span>
+            </h3>
+            <div className="min-h-[100px] max-h-[400px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
               {selectedStudents.length === 0 ? (
-                <div className="p-8 text-center text-sm text-muted-foreground">
-                  선택된 학생이 없습니다.
+                <div className="flex items-center justify-center h-[100px] bg-white border border-dashed border-neutral-200 rounded-[12px]">
+                  <p className="text-sm text-muted-foreground">
+                    선택된 학생이 없습니다.
+                  </p>
                 </div>
               ) : (
                 selectedStudents.map((student) => (
                   <div
                     key={student.enrollmentId}
-                    className="relative space-y-1 pb-2 border-b last:border-b-0"
+                    className="flex items-center gap-4 p-4 bg-white border border-neutral-200 rounded-[12px] hover:border-blue-300 transition-colors shadow-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm mb-1">{student.name}</p>
-                        <p className="text-xs text-muted-foreground mb-0.5">
-                          학생 연락처 | {student.phoneNumber}
+                    <StudentProfileAvatar
+                      seedKey={student.enrollmentId}
+                      sizePreset="Medium"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] font-bold text-label-normal truncate">
+                        {student.name}
+                      </p>
+                      <div className="flex flex-col sm:flex-row sm:gap-3 mt-0.5">
+                        <p className="text-[12px] text-label-alternative">
+                          학생 | {student.phoneNumber}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          부모님 연락처 | {student.parentPhone}
+                        <p className="text-[12px] text-label-alternative">
+                          부모 | {student.parentPhone}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                          {sendChannel === "kakao" ? "카카오톡" : "SMS"}
-                        </span>
-                        <button
-                          type="button"
-                          aria-label={`학생 ${student.name} 삭제`}
-                          className="px-2 py-1 hover:bg-red-100 rounded"
-                          onClick={() => removeStudent(student.enrollmentId)}
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="hidden sm:inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-600 border border-blue-100">
+                        {sendChannel === "kakao" ? "카카오톡" : "SMS"}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`학생 ${student.name} 삭제`}
+                        className="p-2 hover:bg-red-50 text-neutral-400 hover:text-red-500 rounded-full transition-colors"
+                        onClick={() => removeStudent(student.enrollmentId)}
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
                 ))
               )}
             </div>
           </div>
-          <div>
-            <Label>메시지 내용</Label>
-            {/* 메시지 입력 */}
-            <Textarea
-              value={messageContent}
-              onChange={(e) => setMessageContent(e.target.value)}
-              placeholder="전송할 메시지를 입력하세요"
-              rows={6}
-            />
+
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
+            <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+              메시지 내용
+            </h3>
+            <div className="space-y-2">
+              <Textarea
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+                placeholder="전송할 메시지를 입력하세요"
+                className="text-base p-4 min-h-[160px] w-full rounded-[12px] bg-white border border-neutral-200 shadow-none focus-visible:ring-blue-500"
+                rows={6}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground ml-1">
+              * 전송 버튼 클릭 시 취소가 불가하므로 신중히 확인해주세요.
+            </p>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            onClick={handleClose}
-          >
-            취소
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="default"
-            onClick={handleSubmit}
-            disabled={
-              !messageContent ||
-              selectedStudents.length === 0 ||
-              getExpectedRecipients() === 0
-            }
-          >
-            알림 전송
-          </Button>
+        <DialogFooter className="flex flex-col gap-4 sm:flex-row sm:justify-end sm:items-center mt-4">
+          <div className="flex gap-2 w-full justify-end">
+            <Button
+              className="cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-white border border-neutral-200 hover:bg-neutral-50 text-label-normal shadow-none"
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+            >
+              취소
+            </Button>
+            <Button
+              className={`cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none ${
+                !messageContent ||
+                selectedStudents.length === 0 ||
+                getExpectedRecipients() === 0
+                  ? "bg-neutral-200 text-neutral-500 cursor-not-allowed border-none"
+                  : ""
+              }`}
+              variant="default"
+              onClick={handleSubmit}
+              disabled={
+                !messageContent ||
+                selectedStudents.length === 0 ||
+                getExpectedRecipients() === 0
+              }
+            >
+              알림 전송
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -165,7 +165,7 @@ export default function PostInfoSVC({
                 variant={isCompleted ? "outline" : "default"}
                 size="lg"
                 disabled={!canAction}
-                className={`w-full gap-2 font-bold transition-all shadow-sm ${
+                className={`w-full h-[50px] gap-2 font-bold transition-all shadow-sm ${
                   isRegistered
                     ? "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md"
                     : isCompleted

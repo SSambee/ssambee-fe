@@ -172,10 +172,10 @@ export default function TabSection() {
           <button
             key={tab.id}
             onClick={() => handleTabChange(tab.id as TabType)}
-            className={`px-6 py-3 text-base font-medium transition-colors relative cursor-pointer ${
+            className={`px-6 py-3 text-[18px] font-medium transition-colors relative cursor-pointer ${
               activeTab === tab.id
-                ? "text-blue-600"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-brand-700 border-brand-800"
+                : "text-neutral-500 hover:text-neutral-700"
             }`}
           >
             {tab.label}
