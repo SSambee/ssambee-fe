@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 import "react-day-picker/dist/style.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -28,6 +29,7 @@ export default function RootLayout({
       >
         <Providers>{children}</Providers>
       </body>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID as string} />
     </html>
   );
 }
