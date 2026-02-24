@@ -1,172 +1,85 @@
-이 프로젝트는 [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app)으로 생성된 [Next.js](https://nextjs.org) 프로젝트입니다.
+![SSam B Logo](assets/ssam-b-logo.png)
 
-## 시작하기
+# SSam B 프론트엔드
 
-### 필수 요구사항
+이 레포는 **SSam B** 학원/수업 운영 플랫폼의 **프론트엔드(Next.js)** 입니다.
+강사/조교(MGMT)와 학생/학부모(SVC) 사용자를 위한 화면과 대시보드를 제공합니다.
 
-- Node.js 20.9.0
-- pnpm
+## 주요 기능(화면/라우트 기준)
 
-### 설치 방법
+- 랜딩: `/`
+- 인증
+  - 강사/조교: `/educators/login`, `/educators/instructor-register`, `/educators/assistant-register`
+  - 학생/학부모: `/learners/login`, `/learners/register`
+- 대시보드(강사/조교): `/educators/*`
+  - 강의/수강생: `/educators/lectures`, `/educators/students`
+  - 일정: `/educators/schedules`
+  - 시험/리포트: `/educators/exams`
+  - 조교 관리: `/educators/assistants`
+  - 커뮤니케이션: `/educators/communication`
+  - 자료실: `/educators/materials`
+  - 프로필: `/educators/profile`
+- 대시보드(학생/학부모): `/learners/*`
+  - 수강/상세: `/learners/lectures`
+  - 커뮤니케이션: `/learners/communication`
+  - 자료실: `/learners/materials`
+  - 프로필: `/learners/profile`
+- 조교 승인/서명 대기: `/pending-approval`
 
-1. 저장소를 클론하고 의존성을 설치합니다:
+## 권한/역할 흐름(요약)
 
-```bash
-pnpm install
-```
-
-2. 환경 변수를 설정합니다:
-
-```bash
-cp .env.example .env.local
-# .env.local 파일을 열어 실제 값을 입력하세요
-# ⚠️ .env.local은 Git에 커밋되지 않습니다 (보안)
-```
-
-3. Git hooks를 초기화합니다:
-
-```bash
-pnpm run prepare
-```
-
-4. 개발 서버를 실행합니다:
-
-```bash
-pnpm dev
-```
-
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
-
-`app/page.tsx` 파일을 수정하여 페이지를 편집할 수 있습니다. 파일을 편집하면 페이지가 자동으로 업데이트됩니다.
+- URL 기준으로 역할을 구분합니다: `/educators/*` → `MGMT`(강사/조교), `/learners/*` → `SVC`(학생/학부모)
+- 세션은 쿠키 기반이며, API 호출은 role에 따라 서로 다른 base URL을 사용합니다(`NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_API_BASE_URL_SVC`)
+- 조교(ASSISTANT)는 가입/서명 상태(`signStatus`)가 `SIGNED`가 아니면 `/pending-approval`로 이동합니다
 
 ## 기술 스택
 
-- **Framework**: Next.js 16.1.1
-- **Language**: TypeScript 5
-- **UI Library**: React 19.2.3
-- **Styling**: Tailwind CSS 4
-- **Code Quality**: ESLint, Prettier
-- **Git Hooks**: Husky, lint-staged, Commitlint
+- Framework: Next.js `16.1.6` (App Router, RSC)
+- Language: TypeScript `^5`
+- UI: React `19.2.4`, Tailwind CSS `4`, shadcn/ui + Radix UI
+- Data Fetching: Axios + TanStack Query(React Query)
+- State: Zustand (화면/도메인 UI 상태)
+- Form/Validation: React Hook Form + Zod
+- 기타: Recharts, react-big-calendar, react-day-picker, TipTap, @react-pdf/renderer
+- Observability: Sentry (server/edge/client)
+- Test: Jest (일부 `src/services/**` 테스트)
 
-## 사용 가능한 스크립트
+## 로컬 실행
 
-- `pnpm run dev` - 개발 서버 실행
-- `pnpm run build` - 프로덕션 빌드
-- `pnpm run start` - 프로덕션 서버 실행
-- `pnpm run lint` - ESLint 실행
-- `pnpm run lint:fix` - ESLint 오류 자동 수정
-- `pnpm run format` - Prettier로 코드 포맷팅
-- `pnpm run format:check` - 코드 포맷 검사
-- `pnpm run type-check` - TypeScript 타입 검사
-- `pnpm test` - Jest 테스트 실행
+### 요구사항
 
-## 코드 품질
+- Node.js `24.13.0` (`.nvmrc`, `package.json#engines`)
+- pnpm `10.28.0` (`package.json#packageManager`)
 
-이 프로젝트는 코드 품질과 포맷팅을 위해 ESLint와 Prettier를 사용합니다. Husky와 lint-staged 덕분에 각 커밋 전에 코드가 자동으로 포맷팅되고 린트됩니다.
-
-### Husky (Git Hooks)
-
-이 프로젝트는 Husky를 사용해 Git 커밋 훅을 관리합니다.
-의존성 설치 후 `pnpm run prepare` 스크립트를 통해 Husky 훅이 설정됩니다.
-
-- 커밋 시 커밋 메시지 규칙을 검사합니다 (commitlint)
-- 훅 설정은 `.husky/` 디렉토리에 위치합니다
-
-### VS Code (권장)
-
-VS Code를 사용하는 경우, 프로젝트에는 다음을 제공하는 권장 확장 프로그램과 설정이 포함되어 있습니다:
-
-- 저장 시 자동 포맷팅
-- 실시간 ESLint 오류 표시
-- TypeScript IntelliSense 제공
-
-### 수동 포맷팅
+### 설치/실행
 
 ```bash
-pnpm run format        # 모든 파일 포맷팅
-pnpm run lint:fix      # 린트 오류 수정
-```
-
-## Git 워크플로우
-
-### 커밋 메시지 컨벤션
-
-이 프로젝트는 [Conventional Commits](https://www.conventionalcommits.org/) 규격을 따릅니다:
-
-```
-<type>: <subject>
-```
-
-**타입:**
-
-- `feat`: 새로운 기능 추가
-- `fix`: 버그 수정
-- `docs`: 문서 변경
-- `style`: 코드 스타일 변경 (포맷팅 등)
-- `refactor`: 코드 리팩토링
-- `test`: 테스트 추가 또는 변경
-- `chore`: 빌드 작업, 패키지 매니저 설정
-
-**예시:**
-
-- `feat: 사용자 인증 기능 추가`
-- `fix: 다크모드 토글 문제 해결`
-- `docs: README 업데이트`
-
-### Pre-commit Hooks
-
-각 커밋 전에:
-
-- Staged된 파일이 자동으로 린트 및 포맷팅됩니다
-- 커밋 메시지가 conventional commits 형식에 맞는지 검증됩니다
-
-커밋이 실패하면 오류를 수정하고 다시 커밋하세요.
-
-## 환경 변수 관리
-
-### 설정 방법
-
-1. `.env.example` 파일을 `.env.local`로 복사합니다:
-
-```bash
+pnpm install
 cp .env.example .env.local
+pnpm run prepare
+pnpm dev
 ```
 
-2. `.env.local` 파일을 열어 실제 값을 입력합니다.
+## 코드 구조
 
-3. ⚠️ **중요**: `.env.local`은 Git에 커밋되지 않습니다 (보안).
+- `src/app`: 라우팅(페이지/레이아웃/메타/에러 처리)
+- `src/components`: 공용 컴포넌트 (`src/components/ui`는 shadcn/ui)
+- `src/services`: axios client + 도메인별 API 호출 (mapper 포함)
+- `src/providers`: React Query/Auth/Modal/Breadcrumb 등 상위 Provider
+- `src/stores`: Zustand store
+- `src/hooks`: 재사용 훅
+- `src/types`, `src/validation`: 타입 정의, Zod 스키마
+- `src/utils`, `src/constants`: 유틸/상수
 
-### 환경 변수 규칙
+## 스크립트
 
-- **공개 변수** (브라우저에서 접근 가능): `NEXT_PUBLIC_` 접두사 사용
-- **비공개 변수** (서버에서만 접근 가능): 접두사 없음
+- 개발/빌드: `pnpm dev`, `pnpm build`, `pnpm start`
+- 품질: `pnpm lint`, `pnpm lint:fix`, `pnpm format`, `pnpm format:check`, `pnpm type-check`
+- 테스트: `pnpm test`
+- 체크: `pnpm check:commit`(lint+format), `pnpm check:push`(type-check+test)
 
-### 프런트엔드 최소 환경 변수 예시
+## 배포/운영 메모
 
-```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
-```
-
-### 파일 우선순위 (Frontend 기준)
-
-이 프런트엔드 레포에서는 로컬 개발 시 `.env.local`만 사용합니다.
-
-- `.env.local` (로컬 개발용, Git에 커밋되지 않음)
-
-배포 환경(AWS 등)에서는 플랫폼의 환경 변수 설정을 사용합니다.
-
-## CI/CD
-
-이 프로젝트는 지속적 통합을 위해 GitHub Actions를 사용합니다. `main` 또는 `dev` 브랜치에 푸시하거나 Pull Request를 열 때마다 다음 검사가 자동으로 실행됩니다:
-
-- ESLint 검사
-- Prettier 포맷 검증
-- TypeScript 타입 검사
-- 프로덕션 빌드 테스트
-
-## 배포 개요 (AWS)
-
-이 프로젝트는 Vercel이 아닌 AWS 환경에 배포합니다.
-• Frontend (Next.js): AWS에 배포 (SSR/Node 런타임 필요)
-• Backend (Express): 별도 저장소/서비스로 AWS에 배포
-• 통신 방식: Front → Back API 호출 (도메인/환경변수로 분리)
+- Vercel배포를 전제로 합니다.
+- Sentry는 `next.config.ts`에서 `withSentryConfig`로 설정되어 있고, client 초기화는 `src/instrumentation-client.ts`에서 수행합니다.
+  - tunnel route: `/monitoring`
