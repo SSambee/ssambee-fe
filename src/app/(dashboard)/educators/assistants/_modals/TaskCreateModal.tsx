@@ -96,6 +96,10 @@ export default function TaskCreateModal({
   onSubmit,
   isSubmitting,
 }: TaskCreateModalProps) {
+  const assigneeFieldId = "task-create-assignee";
+  const instructorFieldId = "task-create-instructor";
+  const titleFieldId = "task-create-title";
+
   const selectedAssistant =
     assistantOptions.find((assistant) => assistant.id === taskAssigneeId) ??
     null;
@@ -142,9 +146,11 @@ export default function TaskCreateModal({
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-semibold">대상 조교</p>
+          <label htmlFor={assigneeFieldId} className="text-sm font-semibold">
+            대상 조교
+          </label>
           <Select value={taskAssigneeId} onValueChange={onChangeTaskAssigneeId}>
-            <SelectTrigger>
+            <SelectTrigger id={assigneeFieldId}>
               <SelectValue placeholder="조교를 선택하세요" />
             </SelectTrigger>
             <SelectContent>
@@ -178,12 +184,17 @@ export default function TaskCreateModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium">지시자</label>
-            <Input value={instructorName} readOnly />
+            <label htmlFor={instructorFieldId} className="text-sm font-medium">
+              지시자
+            </label>
+            <Input id={instructorFieldId} value={instructorName} readOnly />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">업무명</label>
+            <label htmlFor={titleFieldId} className="text-sm font-medium">
+              업무명
+            </label>
             <Input
+              id={titleFieldId}
               placeholder="예: 중등 2학년 1학기 기말고사 채점"
               value={taskTitle}
               onChange={(event) => onChangeTaskTitle(event.target.value)}
@@ -193,7 +204,7 @@ export default function TaskCreateModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium">우선순위</label>
+            <p className="text-sm font-medium">우선순위</p>
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
@@ -222,7 +233,7 @@ export default function TaskCreateModal({
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">마감 일시</label>
+            <p className="text-sm font-medium">마감 일시</p>
             <div className="grid gap-2 sm:grid-cols-2">
               <DatePickerField
                 control={control}
@@ -250,7 +261,7 @@ export default function TaskCreateModal({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">업무 내용</label>
+          <p className="text-sm font-medium">업무 내용</p>
           <TiptapEditor
             content={taskInstructionContent}
             onHtmlChange={onChangeTaskInstructionContent}
@@ -261,11 +272,11 @@ export default function TaskCreateModal({
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">첨부 자료</label>
+            <p className="text-sm font-medium">첨부 자료</p>
             <Button
               type="button"
               variant="outline"
-              className="rounded-full"
+              className="rounded-[12px]"
               onClick={onOpenResourceLibraryModal}
             >
               자료실에서 선택

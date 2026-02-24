@@ -1,4 +1,4 @@
-import { FileUp, Mail, SendHorizontal } from "lucide-react";
+import { FileText, FileUp, Mail } from "lucide-react";
 
 import type { Assistant } from "@/types/assistants";
 import { Button } from "@/components/ui/button";
@@ -50,6 +50,10 @@ export default function ContractSendModal({
   onOpenContractManage,
   onPreviewNotice,
 }: ContractSendModalProps) {
+  const sendTargetFieldId = "contract-send-target";
+  const sendTemplateFieldId = "contract-send-template";
+  const receiverEmailFieldId = "contract-send-receiver-email";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
@@ -64,7 +68,7 @@ export default function ContractSendModal({
               </DialogDescription>
             </div>
             <Button className="rounded-full" onClick={onOpenContractManage}>
-              <SendHorizontal className="h-4 w-4" />
+              <FileText className="h-4 w-4" />
               계약서 관리
             </Button>
           </div>
@@ -77,9 +81,14 @@ export default function ContractSendModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-semibold">계약서 발송 대상</label>
+            <label
+              htmlFor={sendTargetFieldId}
+              className="text-sm font-semibold"
+            >
+              계약서 발송 대상
+            </label>
             <Select value={sendTargetId} onValueChange={onChangeSendTargetId}>
-              <SelectTrigger>
+              <SelectTrigger id={sendTargetFieldId}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -93,14 +102,28 @@ export default function ContractSendModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold">수신 이메일</label>
-            <Input value={selectedTargetAssistant?.email ?? ""} readOnly />
+            <label
+              htmlFor={receiverEmailFieldId}
+              className="text-sm font-semibold"
+            >
+              수신 이메일
+            </label>
+            <Input
+              id={receiverEmailFieldId}
+              value={selectedTargetAssistant?.email ?? ""}
+              readOnly
+            />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold">발송 양식</label>
+            <label
+              htmlFor={sendTemplateFieldId}
+              className="text-sm font-semibold"
+            >
+              발송 양식
+            </label>
             <Select value={sendTemplate} onValueChange={onChangeSendTemplate}>
-              <SelectTrigger>
+              <SelectTrigger id={sendTemplateFieldId}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -114,9 +137,7 @@ export default function ContractSendModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold">
-              계약서 템플릿 업로드
-            </label>
+            <p className="text-sm font-semibold">계약서 템플릿 업로드</p>
             <label
               htmlFor="contract-template-file"
               className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-muted-foreground/40 bg-muted/30 px-4 py-3 text-sm text-muted-foreground"
