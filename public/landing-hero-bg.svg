@@ -1,0 +1,35 @@
+<svg width="1920" height="840" viewBox="0 0 1920 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="960" y1="0" x2="960" y2="840" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DFE4F7" />
+      <stop offset="1" stop-color="#D7DDF0" />
+    </linearGradient>
+    <radialGradient id="mintGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1656 318) rotate(135) scale(332)">
+      <stop stop-color="#8EE4D4" stop-opacity="0.56" />
+      <stop offset="1" stop-color="#8EE4D4" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="violetGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(388 652) rotate(135) scale(254)">
+      <stop stop-color="#8776F2" stop-opacity="0.48" />
+      <stop offset="1" stop-color="#8776F2" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="whiteGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(520 118) rotate(131) scale(474)">
+      <stop stop-color="#F3F6FF" stop-opacity="0.96" />
+      <stop offset="1" stop-color="#F3F6FF" stop-opacity="0" />
+    </radialGradient>
+    <filter id="blurXl" x="-200" y="-300" width="2480" height="1580" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="36" />
+    </filter>
+  </defs>
+
+  <rect width="1920" height="840" fill="url(#bgGradient)" />
+  <g filter="url(#blurXl)">
+    <rect x="-269" y="-145" width="1321" height="1321" rx="220" fill="#CFD7EE" fill-opacity="0.62" />
+    <rect x="226" y="-564" width="2151" height="2151" rx="420" fill="#ECF0FF" fill-opacity="0.55" />
+    <rect x="1436.5" y="194" width="451.94" height="451.94" rx="152" fill="#B3C7FF" fill-opacity="0.20" />
+    <rect x="258.74" y="794.27" width="325.27" height="325.27" rx="86" fill="#B09FFF" fill-opacity="0.26" />
+    <circle cx="514" cy="135" r="227" fill="url(#whiteGlow)" />
+    <circle cx="1656" cy="318" r="236" fill="url(#mintGlow)" />
+    <circle cx="388" cy="652" r="181" fill="url(#violetGlow)" />
+  </g>
+  <rect width="1920" height="840" fill="#E7ECFA" fill-opacity="0.16" />
+</svg>

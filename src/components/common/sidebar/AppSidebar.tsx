@@ -177,7 +177,7 @@ export function AppSidebar() {
           <Image
             src="/brand/ssam-b.svg"
             alt="ssam B"
-            width={96}
+            width={98}
             height={28}
             priority
           />

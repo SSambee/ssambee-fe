@@ -1,13 +1,75 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 import "react-day-picker/dist/style.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import "@/styles/globals.css";
-import { geistMono, pretendard } from "@/styles/fonts";
-import Providers from "@/providers/Providers";
+import { pretendard } from "@/styles/fonts";
+
+const DEFAULT_SITE_URL = "http://localhost:3000";
+const SITE_NAME = "SSam B";
+const DEFAULT_TITLE = "SSam B | 수업 운영부터 학생 관리까지";
+const DEFAULT_DESCRIPTION =
+  "수업 운영, 학생 관리, 조교 관리, 일정 확인을 하나의 대시보드에서 운영하는 학원 관리 플랫폼";
+
+const metadataBase = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL);
+  } catch {
+    return new URL(DEFAULT_SITE_URL);
+  }
+})();
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {
+  metadataBase,
+  applicationName: SITE_NAME,
+  title: {
+    default: DEFAULT_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: DEFAULT_DESCRIPTION,
+  keywords: ["학원 관리", "학생 관리", "수업 운영", "조교 관리", "SSam B"],
+  openGraph: {
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: "/",
+    siteName: SITE_NAME,
+    locale: "ko_KR",
+    type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        alt: "SSam B 랜딩 배경",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: ["/opengraph-image"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#ffffff",
   title: "SSAM B",
   description: "SSAM BEE",
 };
@@ -18,15 +80,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="keywords" content="Next.js, React, TypeScript" />
-      </head>
-      <body
-        className={`${pretendard.variable} ${geistMono.variable} antialiased`}
-      >
-        <Providers>{children}</Providers>
+    <html lang="ko">
+      <body className={`${pretendard.variable} antialiased`}>
+        {children}
+        {GA_ID ? <GoogleAnalytics gaId={GA_ID} /> : null}
       </body>
     </html>
   );
