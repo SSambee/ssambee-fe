@@ -128,7 +128,13 @@ export const useAssistantsApprovalPage = () => {
     try {
       const createdCode = await createAssistantCodeAPI();
       setApprovalCode(createdCode.code);
-      setActionNotice("인증 코드가 생성되었습니다.");
+
+      try {
+        await navigator.clipboard.writeText(createdCode.code);
+        setActionNotice("인증 코드가 생성되고 클립보드에 복사되었습니다.");
+      } catch {
+        setActionNotice("인증 코드는 생성되었지만 자동 복사에 실패했습니다.");
+      }
     } catch (error) {
       setActionNotice(getErrorMessage(error));
     } finally {
@@ -137,15 +143,7 @@ export const useAssistantsApprovalPage = () => {
   };
 
   const handleCopyInviteLink = async () => {
-    if (!approvalCode || approvalCode === "-") {
-      setActionNotice("복사할 인증 코드가 없습니다.");
-      return;
-    }
-
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL ??
-      (typeof window !== "undefined" ? window.location.origin : "");
-    const inviteLink = `${appUrl}/signup/assistant?code=${approvalCode}`;
+    const inviteLink = "https://www.ssambee.com/educators/assistant-register";
 
     try {
       await navigator.clipboard.writeText(inviteLink);
