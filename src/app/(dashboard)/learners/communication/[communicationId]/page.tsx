@@ -15,6 +15,9 @@ import {
 } from "@/hooks/SVC/useCommunicationSVC";
 import { useStudentPostDetailSVC } from "@/hooks/SVC/useCommunicationSVC";
 import { CommonPostAttachment } from "@/types/communication/commonPost";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
+import { useModal } from "@/providers/ModalProvider";
+import { CheckModal } from "@/components/common/modals/CheckModal";
 
 import PostActionSVC from "./_components/PostActionSVC";
 import PostInfoSVC from "./_components/PostInfoSVC";
@@ -24,6 +27,8 @@ import PostCommentSVC from "./_components/PostCommentSVC";
 export default function CommunicationDetailPageSVC() {
   const router = useRouter();
   const params = useParams();
+  const { showAlert } = useDialogAlert();
+  const { openModal } = useModal();
   const searchParams = useSearchParams();
   const communicationId = params.communicationId as string;
   const typeParam = searchParams.get("type");
@@ -112,12 +117,12 @@ export default function CommunicationDetailPageSVC() {
   };
 
   // 게시글 수정 저장
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     const isContentEmpty =
       !editContent.content || editContent.content.length === 0;
 
     if (!editTitle.trim() || isContentEmpty) {
-      alert("제목과 내용을 모두 입력해주세요.");
+      await showAlert({ description: "제목과 내용을 모두 입력해주세요." });
       return;
     }
 
@@ -163,12 +168,12 @@ export default function CommunicationDetailPageSVC() {
   };
 
   // 댓글 작성
-  const handleSubmitAnswer = () => {
+  const handleSubmitAnswer = async () => {
     const isContentEmpty =
       !answerContent.content || answerContent.content.length === 0;
 
     if (isContentEmpty) {
-      alert("댓글 내용을 입력해주세요.");
+      await showAlert({ description: "댓글 내용을 입력해주세요." });
       return;
     }
     const handleSuccess = () => {
@@ -193,9 +198,13 @@ export default function CommunicationDetailPageSVC() {
   };
 
   //댓글 수정
-  const handleUpdateComment = (commentId: string, content: JSONContent) => {
+  const handleUpdateComment = async (
+    commentId: string,
+    content: JSONContent
+  ) => {
     if (!content || !content.content || content.content.length === 0) {
-      return alert("내용을 입력해주세요.");
+      await showAlert({ description: "내용을 입력해주세요." });
+      return;
     }
 
     if (isNoticePost) {
@@ -215,19 +224,26 @@ export default function CommunicationDetailPageSVC() {
 
   //댓글 삭제
   const handleDeleteComment = (commentId: string) => {
-    if (!confirm("댓글을 삭제하시겠습니까?")) return;
-
-    if (isNoticePost) {
-      deleteInstructorPostCommentSVC.mutate({
-        postId: communicationId,
-        commentId,
-      });
-    } else {
-      deleteCommentSVC.mutate({
-        postId: communicationId,
-        commentId,
-      });
-    }
+    openModal(
+      <CheckModal
+        title="댓글 삭제"
+        description="댓글을 삭제하시겠습니까?"
+        confirmText="삭제"
+        onConfirm={() => {
+          if (isNoticePost) {
+            deleteInstructorPostCommentSVC.mutate({
+              postId: communicationId,
+              commentId,
+            });
+          } else {
+            deleteCommentSVC.mutate({
+              postId: communicationId,
+              commentId,
+            });
+          }
+        }}
+      />
+    );
   };
 
   // 자료 변경

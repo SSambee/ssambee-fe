@@ -17,7 +17,7 @@ export function ReportTemplateSelect() {
           type="button"
           onClick={() => selectTemplate("premium")}
           className={cn(
-            "group relative w-full overflow-hidden rounded-[14px] border p-4 text-left transition-all",
+            "cursor-pointer group relative w-full overflow-hidden rounded-[14px] border p-4 text-left transition-all",
             selectedTemplate === "premium"
               ? "border-[#3863f6] bg-[#f4f7ff] ring-1 ring-[#3863f6]"
               : "border-[#dfe3ec] bg-[#fcfcfd] hover:border-[#c6d2ff] hover:bg-[#f6f8ff]"
@@ -56,7 +56,7 @@ export function ReportTemplateSelect() {
           type="button"
           onClick={() => selectTemplate("simple")}
           className={cn(
-            "group relative w-full overflow-hidden rounded-[14px] border p-4 text-left transition-all",
+            "cursor-pointer group relative w-full overflow-hidden rounded-[14px] border p-4 text-left transition-all",
             selectedTemplate === "simple"
               ? "border-[#6b6f80] bg-[#f7f8fb] ring-1 ring-[#6b6f80]"
               : "border-[#dfe3ec] bg-[#fcfcfd] hover:border-[#ced3e1] hover:bg-[#f8f9fc]"

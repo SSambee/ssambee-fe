@@ -47,8 +47,9 @@ export default function ScoreChart({
 
   if (!chartData.length) {
     return (
-      <div className="flex h-[300px] items-center justify-center text-[#8b90a3]">
-        선택된 시험이 없습니다.
+      <div className="flex flex-col gap-1 items-center justify-center h-[300px] text-muted-foreground">
+        <p>선택된 시험이 없어요.</p>
+        <p>시험을 선택하면 성적 추이가 표시돼요</p>
       </div>
     );
   }

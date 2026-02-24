@@ -61,12 +61,10 @@ export default function LectureDetailPage() {
 
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <div className="flex items-center gap-4">
-        <Title
-          title={lecture.title}
-          description={`${lecture.subject} · ${lecture.instructor.name} 강사`}
-        />
-      </div>
+      <Title
+        title={lecture.title}
+        description={`${lecture.subject} · ${lecture.instructor.name} 강사`}
+      />
 
       <Card>
         <CardContent className="p-8">

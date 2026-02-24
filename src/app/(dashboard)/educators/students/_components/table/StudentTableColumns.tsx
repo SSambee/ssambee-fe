@@ -35,11 +35,12 @@ export const STUDENT_TABLE_COLUMNS = ({
       <Checkbox
         checked={isAllSelected}
         onCheckedChange={(checked) => onSelectAll(!!checked)}
+        className="cursor-pointer w-5 h-5"
       />
     ),
     render: (row) => (
       <Checkbox
-        className="cursor-pointer"
+        className="cursor-pointer w-5 h-5"
         checked={selectedStudents.includes(row.id)}
         onCheckedChange={() => onToggleStudent(row)}
       />

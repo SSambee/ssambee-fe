@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import Title from "@/components/common/header/Title";
 
 import CommunicationStats from "./_components/stats/CommunicationStats";
 import TabSection from "./_components/filter/TabSection";
@@ -8,14 +9,10 @@ import TabSection from "./_components/filter/TabSection";
 export default function CommunicationListPage() {
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
-        <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
-          소통 관리 대시보드
-        </h1>
-        <p className="mt-[6px] text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
-          학생/학부모의 문의 내역을 관리합니다.
-        </p>
-      </section>
+      <Title
+        title="소통 관리 대시보드"
+        description="학생/학부모의 문의 내역을 관리합니다."
+      />
 
       <div className="space-y-8">
         <div className="flex flex-wrap items-center justify-between gap-4">

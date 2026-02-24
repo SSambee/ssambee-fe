@@ -18,6 +18,7 @@ import {
 } from "@/types/communication/studentPost";
 import { useAuthContext } from "@/providers/AuthProvider";
 import { CreateStudentParentPostRequest } from "@/types/communication/studentPost";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 import CreateContentSVC from "./_components/content/CreateContentSVC";
 import WriterTypeSelect from "./_components/setting/WriterTypeSelect";
@@ -26,6 +27,7 @@ import LectureOptionSelect from "./_components/setting/LectureOptionSelect";
 export default function CreateInquiryPostPageSVC() {
   const router = useRouter();
   const { user } = useAuthContext();
+  const { showAlert } = useDialogAlert();
 
   const studentMutation = useCreateStudentPostSVC();
   const parentMutation = useCreateParentPostSVC();
@@ -44,9 +46,9 @@ export default function CreateInquiryPostPageSVC() {
   const effectiveChildId = myChildren?.[0]?.id || "";
 
   // 게시글 등록
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) {
-      alert("제목을 입력해주세요.");
+      await showAlert({ description: "제목을 입력해주세요." });
       return;
     }
 
@@ -58,12 +60,12 @@ export default function CreateInquiryPostPageSVC() {
     const isContentEmpty = !content || !hasText(content);
 
     if (isContentEmpty) {
-      alert("내용을 입력해주세요.");
+      await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
 
     if (!selectedLectureId) {
-      alert("강의를 선택해주세요.");
+      await showAlert({ description: "강의를 선택해주세요." });
       return;
     }
 

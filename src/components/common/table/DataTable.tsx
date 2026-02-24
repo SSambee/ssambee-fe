@@ -51,7 +51,7 @@ export default function DataTable<T extends { id: string }>({
                 tabIndex={onRowClick ? 0 : undefined}
                 className={`h-[70px] border-neutral-100 ${
                   onRowClick
-                    ? "cursor-pointer hover:bg-surface-normal-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-inset"
+                    ? "cursor-pointer hover:bg-surface-normal-light-alternative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-inset"
                     : ""
                 }`}
                 onClick={(e) => {

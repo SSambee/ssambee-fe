@@ -15,16 +15,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/providers/ModalProvider";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import SelectBtn from "@/components/common/button/SelectBtn";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useMaterials } from "@/hooks/useMaterials";
 import { Materials, MaterialsType } from "@/types/materials.type";
+import {
+  MATERIALS_TYPE_OPTIONS,
+  MATERIALS_TYPE_LABEL,
+} from "@/constants/communication.default";
 
 type AddResourceModalProps = {
   initialSelected: Materials[];
@@ -97,21 +95,17 @@ export default function AddResourceModal({
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               placeholder="자료명 또는 분류로 검색"
-              className="h-14 pl-11 pr-4 text-base placeholder:text-base"
+              className="h-14 pl-11 pr-4 text-base placeholder:text-base rounded-[12px] shadow-none border"
             />
           </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="h-14 text-base">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {["ALL", "PAPER", "VIDEO", "OTHER"].map((opt) => (
-                <SelectItem key={opt} value={opt}>
-                  {opt}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SelectBtn
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            placeholder="분류 선택"
+            options={MATERIALS_TYPE_OPTIONS}
+            className="h-14 text-base"
+            optionSize="lg"
+          />
         </div>
 
         <div className="mt-4 flex items-center justify-between text-sm text-slate-500 font-medium">
@@ -174,13 +168,15 @@ export default function AddResourceModal({
                       </span>
                       <div className="flex items-center gap-2 mt-1">
                         <span
-                          className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
                             isChecked
                               ? "bg-blue-100 text-blue-600"
                               : "bg-slate-100 text-slate-500"
                           }`}
                         >
-                          {item.type}
+                          {MATERIALS_TYPE_LABEL[
+                            item.type as keyof typeof MATERIALS_TYPE_LABEL
+                          ] || item.type}
                         </span>
                         <span className="text-xs text-slate-400">
                           {item.writer} • {item.date}

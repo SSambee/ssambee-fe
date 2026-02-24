@@ -79,7 +79,7 @@ function DatePickerBase({
           disabled={disabled}
           className={cn(
             "relative flex h-14 w-full items-center rounded-[12px] border border-[#d6d9e0] bg-white px-4 text-[16px] text-[#8b90a3]",
-            "disabled:cursor-not-allowed disabled:opacity-60",
+            "cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
             className
           )}
         >

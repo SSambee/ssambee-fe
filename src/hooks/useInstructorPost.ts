@@ -322,10 +322,10 @@ export const useStudentPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("답변이 수정되었습니다.");
+      showAlert({ description: "답변이 수정되었습니다." });
     },
     onError: () => {
-      alert("답변 수정 중 오류가 발생했습니다.");
+      showAlert({ description: "답변 수정 중 오류가 발생했습니다." });
     },
   });
 

@@ -235,7 +235,7 @@ export default function AssistantsHistoryLayout({
                         <div className="space-y-1">
                           <button
                             type="button"
-                            className="text-left text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                            className="cursor-pointer text-left text-sm font-semibold text-primary underline-offset-2 hover:underline"
                             onClick={() => vm.setSelectedTaskId(task.id)}
                           >
                             {task.title}

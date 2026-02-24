@@ -80,7 +80,7 @@ export function ClinicTable({
                   <button
                     type="button"
                     onClick={onSortLatest}
-                    className={`rounded-md p-1 transition ${
+                    className={`cursor-pointer rounded-md p-1 transition ${
                       dateSort === "latest"
                         ? "bg-[#eef2ff] text-[#3863f6]"
                         : "text-[#8b90a3] hover:bg-[#f4f6fb]"
@@ -131,7 +131,7 @@ export function ClinicTable({
                       <button
                         type="button"
                         onClick={onResetFilters}
-                        className="text-[12px] font-semibold text-[#3863f6] underline"
+                        className="cursor-pointer text-[12px] font-semibold text-[#3863f6] underline"
                       >
                         필터 초기화
                       </button>

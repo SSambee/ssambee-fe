@@ -10,6 +10,7 @@ import { GetInstructorPostDetailResponse } from "@/types/communication/instructo
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import { CommonPostComment } from "@/types/communication/commonPost";
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type PostCommentProps = {
   isNoticePost: boolean;
@@ -140,6 +141,7 @@ function CommentItem({
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const { showAlert } = useDialogAlert();
   const getParsedContent = (content: string): JSONContent => {
     try {
       return JSON.parse(content);
@@ -159,13 +161,13 @@ function CommentItem({
   );
 
   // 수정 완료
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
       !editContent ||
       !editContent.content ||
       editContent.content.length === 0
     ) {
-      alert("내용을 입력해주세요.");
+      await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
     onUpdate(comment.id, editContent);

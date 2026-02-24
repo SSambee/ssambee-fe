@@ -74,3 +74,21 @@ export const PRIORITY_LABEL = {
   HIGH: { label: "높음", color: "yellow" },
   URGENT: { label: "긴급", color: "red" },
 } as const;
+
+// 자료 분류 필터 옵션
+export const MATERIALS_TYPE_OPTIONS = [
+  { label: "전체", value: "ALL" },
+  { label: "시험지", value: "PAPER" },
+  { label: "동영상", value: "VIDEO" },
+  { label: "요청 자료", value: "REQUEST" },
+  { label: "기타", value: "OTHER" },
+];
+
+// 자료 분류 라벨
+export const MATERIALS_TYPE_LABEL = {
+  ALL: "전체",
+  PAPER: "시험지",
+  VIDEO: "동영상",
+  REQUEST: "요청 자료",
+  OTHER: "기타",
+} as const;

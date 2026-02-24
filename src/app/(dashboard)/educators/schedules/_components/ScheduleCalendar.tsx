@@ -124,7 +124,7 @@ function CalendarToolbar({
       <div className="flex items-center rounded-[20px] bg-neutral-50 p-2">
         <button
           type="button"
-          className="h-[42px] w-[100px] rounded-xl bg-neutral-700 text-sm font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)]"
+          className="cursor-pointer h-[42px] w-[100px] rounded-xl bg-neutral-700 text-sm font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)]"
           onClick={() => onView(Views.MONTH)}
           aria-pressed={view === Views.MONTH}
         >

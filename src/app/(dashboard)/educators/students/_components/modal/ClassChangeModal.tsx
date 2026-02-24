@@ -115,7 +115,7 @@ export function StudentChangeModal() {
                     <button
                       type="button"
                       aria-label={`학생 ${student.name} 삭제`}
-                      className="p-2 hover:bg-red-50 text-neutral-400 hover:text-red-500 rounded-full transition-colors"
+                      className="p-2 hover:bg-red-50 text-neutral-400 hover:text-red-500 rounded-full transition-colors cursor-pointer"
                       onClick={() => removeStudent(student.enrollmentId)}
                     >
                       <X className="w-5 h-5" />

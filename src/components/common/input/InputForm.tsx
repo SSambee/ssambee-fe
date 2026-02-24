@@ -23,6 +23,7 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
       onReset,
       showReset,
       floating = true,
+      placeholder,
       ...props
     },
     ref
@@ -35,7 +36,7 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
           <input
             id={id}
             ref={ref}
-            placeholder={floating ? " " : props.placeholder} // 플로팅일 때만 빈 문자열 유지
+            placeholder={floating ? " " : placeholder} // 플로팅일 때만 빈 문자열 유지
             className={cn(
               "peer w-full h-[58px] px-4 text-base border rounded-lg outline-none transition-all duration-200",
               "focus:ring-2 focus:border-transparent",
@@ -74,7 +75,7 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
             <button
               type="button"
               onClick={onReset}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 cursor-pointer p-1 hover:bg-gray-100 rounded-full transition-colors"
               tabIndex={-1}
               aria-label="Reset input"
             >

@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 // 공통 수신자 타입
 export type NotificationRecipient = {
@@ -66,6 +67,7 @@ export function KakaoNotificationModal({
   const [message, setMessage] = useState(defaultMessage);
   const [targetType, setTargetType] = useState<TargetType>("all");
   const [isSending, setIsSending] = useState(false);
+  const { showAlert } = useDialogAlert();
 
   // 발송 대상에 따른 수신자 수 계산
   const targetInfo = useMemo(() => {
@@ -106,7 +108,7 @@ export function KakaoNotificationModal({
         mode === "prepare"
           ? "발송 준비가 완료되었습니다."
           : "발송이 완료되었습니다.";
-      alert(`${targetLabel}에게 카카오톡 ${suffix}`);
+      await showAlert({ description: `${targetLabel}에게 카카오톡 ${suffix}` });
       handleClose();
     }
   };

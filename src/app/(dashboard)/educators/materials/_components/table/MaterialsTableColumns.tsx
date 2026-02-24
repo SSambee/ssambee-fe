@@ -59,8 +59,7 @@ export const MATERIALS_TABLE_COLUMNS = ({
     render: (row: Materials) => {
       const typeKey = resolveMaterialTypeKey(row.type);
       // 파일이 있는 타입만 다운로드 버튼 표시
-      if (typeKey === "VIDEO")
-        return <span className="text-neutral-400"> </span>;
+      if (typeKey === "VIDEO") return null;
 
       return (
         <Button

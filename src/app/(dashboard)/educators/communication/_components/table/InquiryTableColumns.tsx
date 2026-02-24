@@ -13,8 +13,8 @@ export const INQUIRY_TABLE_COLUMNS: ColumnDefinition<InquiryRow>[] = [
     render: (row: InquiryRow) => {
       const commentCount = row._count.comments;
       return (
-        <div className="flex items-center gap-2 w-[400px]">
-          <span className="truncate font-medium">{row.title}</span>
+        <div className="flex items-center gap-2 w-[400px] min-w-0">
+          <span className="truncate font-medium min-w-0">{row.title}</span>
           {!!commentCount && commentCount > 0 && (
             <span className="text-blue-700 text-xs font-bold">
               [{commentCount}]

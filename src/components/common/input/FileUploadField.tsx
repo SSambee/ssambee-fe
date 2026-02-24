@@ -67,7 +67,7 @@ export default function FileUploadField({
             <button
               type="button"
               onClick={handleRemoveFile}
-              className="ml-4 p-1 hover:bg-gray-100 rounded-full transition-colors"
+              className="ml-4 cursor-pointer p-1 hover:bg-gray-100 rounded-full transition-colors"
             >
               <X className="h-5 w-5 text-gray-500" />
             </button>

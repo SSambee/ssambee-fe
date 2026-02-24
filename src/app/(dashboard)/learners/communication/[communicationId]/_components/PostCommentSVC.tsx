@@ -10,6 +10,7 @@ import { GetInstructorPostDetailResponse } from "@/types/communication/instructo
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
 import { CommonPostComment } from "@/types/communication/commonPost";
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type PostCommentSVCProps = {
   isNoticePost: boolean;
@@ -142,6 +143,7 @@ function CommentItemSVC({
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const { showAlert } = useDialogAlert();
   // DB에서 가져온 content(string)를 JSON 객체로 파싱하는 헬퍼 함수
   const getParsedContent = (content: string): JSONContent => {
     try {
@@ -188,13 +190,13 @@ function CommentItemSVC({
   }
 
   // 수정 완료 버튼
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
       !editContent ||
       !editContent.content ||
       editContent.content.length === 0
     ) {
-      alert("내용을 입력해주세요.");
+      await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
     onUpdate(comment.id, editContent);

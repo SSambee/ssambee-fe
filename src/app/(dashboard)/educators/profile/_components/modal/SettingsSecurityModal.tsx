@@ -223,7 +223,7 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
                 <button
                   type="button"
                   onClick={() => setShowNewPwd(!showNewPwd)}
-                  className="absolute right-3 top-[29px] -translate-y-1/2 rounded-md p-1 text-[#8b90a3] hover:bg-[#f4f6fa]"
+                  className="absolute right-3 top-[29px] -translate-y-1/2 cursor-pointer rounded-md p-1 text-[#8b90a3] hover:bg-[#f4f6fa]"
                 >
                   {showNewPwd ? (
                     <EyeOpenIcon size={20} />
@@ -252,7 +252,7 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPwd(!showConfirmPwd)}
-                  className="absolute right-3 top-[29px] -translate-y-1/2 rounded-md p-1 text-[#8b90a3] hover:bg-[#f4f6fa]"
+                  className="absolute right-3 top-[29px] -translate-y-1/2 cursor-pointer rounded-md p-1 text-[#8b90a3] hover:bg-[#f4f6fa]"
                 >
                   {showConfirmPwd ? (
                     <EyeOpenIcon size={20} />

@@ -13,7 +13,7 @@ export default function PostTypeSelect({
   togglePostType,
 }: PostTypeSelectProps) {
   return (
-    <Card className="border-none shadow-none lg:border lg:shadow-sm">
+    <Card className="border shadow-none lg:border lg:shadow-sm">
       <CardContent className="p-6 space-y-4">
         <div>
           <h3 className="font-semibold text-lg">게시글 분류</h3>

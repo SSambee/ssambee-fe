@@ -24,6 +24,7 @@ import { GRADE_SELECTING_OPTIONS } from "@/constants/students.default";
 import { Textarea } from "@/components/ui/textarea";
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type EditProfileModalProps = {
   studentData: EditProfileFormDataType;
@@ -48,6 +49,7 @@ export default function EditProfileModal({
 }: EditProfileModalProps) {
   const { isOpen, closeModal } = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
+  const { showAlert } = useDialogAlert();
 
   // 수강생 정보 수정
   const { mutate: updateStudent, isPending } = useUpdateEnrollment();
@@ -102,8 +104,8 @@ export default function EditProfileModal({
           setIsEditMode(false);
           closeModal();
         },
-        onError: () => {
-          alert("수강생 정보 수정에 실패했습니다.");
+        onError: async () => {
+          await showAlert({ description: "수강생 정보 수정에 실패했습니다." });
         },
       }
     );
@@ -130,45 +132,64 @@ export default function EditProfileModal({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-[32px]">
         <DialogHeader>
-          <DialogTitle>학생 정보</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-[24px] font-bold text-label-normal">
+            학생 정보
+          </DialogTitle>
+          <DialogDescription className="text-[18px] font-medium text-label-alternative">
             학생 정보를 최신 상태로 유지하세요.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="max-h-[70vh] overflow-y-auto pr-2 py-2 space-y-4 custom-scrollbar">
-            {/* 학생 정보 */}
-            <div className="flex flex-col gap-4 text-xs">
-              <InputForm
-                label="학생 이름"
-                disabled={!isEditMode}
-                error={errors.studentName?.message}
-                {...register("studentName")}
-                onReset={() =>
-                  setValue("studentName", "", { shouldDirty: true })
-                }
-                showReset={isEditMode && !!watchedName}
-              />
-
-              <InputForm
-                label="학교"
-                disabled={!isEditMode}
-                error={errors.school?.message}
-                {...register("school")}
-                onReset={() => setValue("school", "", { shouldDirty: true })}
-                showReset={isEditMode && !!watchedSchool}
-              />
+          <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="studentName" className="text-muted-foreground">
+                  학생 이름
+                </Label>
+                <InputForm
+                  id="studentName"
+                  label="학생 이름"
+                  placeholder="이름 입력"
+                  disabled={!isEditMode}
+                  floating={false}
+                  className="bg-white border border-neutral-200 rounded-[12px]"
+                  error={errors.studentName?.message}
+                  {...register("studentName")}
+                  onReset={() =>
+                    setValue("studentName", "", { shouldDirty: true })
+                  }
+                  showReset={isEditMode && !!watchedName}
+                />
+              </div>
 
               <div className="space-y-2">
-                <Label className="text-xs text-gray-500 ml-1">학년</Label>
+                <Label htmlFor="school" className="text-muted-foreground">
+                  학교
+                </Label>
+                <InputForm
+                  id="school"
+                  label="학교"
+                  placeholder="학교 입력"
+                  disabled={!isEditMode}
+                  floating={false}
+                  className="bg-white border border-neutral-200 rounded-[12px]"
+                  error={errors.school?.message}
+                  {...register("school")}
+                  onReset={() => setValue("school", "", { shouldDirty: true })}
+                  showReset={isEditMode && !!watchedSchool}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">학년</Label>
                 <SelectBtn
                   disabled={!isEditMode}
                   value={watchedSchoolYear}
-                  optionSize="sm"
-                  className="w-full h-[58px] text-base"
+                  optionSize="lg"
+                  className="text-base px-4 h-[58px] w-full bg-white border border-neutral-200"
                   options={GRADE_SELECTING_OPTIONS}
                   onChange={(val) =>
                     setValue("schoolYear", val as string, {
@@ -179,83 +200,115 @@ export default function EditProfileModal({
                   placeholder="학년 선택"
                 />
                 {errors.schoolYear?.message && (
-                  <p className="text-xs text-red-500 ml-1">
+                  <p className="text-xs text-red-500">
                     {errors.schoolYear.message}
                   </p>
                 )}
               </div>
 
-              <InputForm
-                label="연락처"
-                disabled={!isEditMode}
-                error={errors.studentPhone?.message}
-                {...register("studentPhone")}
-                onReset={() =>
-                  setValue("studentPhone", "", { shouldDirty: true })
-                }
-                showReset={isEditMode && !!watchedStudentPhone}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="studentPhone" className="text-muted-foreground">
+                  연락처
+                </Label>
+                <InputForm
+                  id="studentPhone"
+                  label="연락처"
+                  placeholder="연락처 입력"
+                  disabled={!isEditMode}
+                  floating={false}
+                  className="bg-white border border-neutral-200 rounded-[12px]"
+                  error={errors.studentPhone?.message}
+                  {...register("studentPhone")}
+                  onReset={() =>
+                    setValue("studentPhone", "", { shouldDirty: true })
+                  }
+                  showReset={isEditMode && !!watchedStudentPhone}
+                />
+              </div>
 
-              <InputForm
-                label="이메일"
-                disabled={!isEditMode}
-                error={errors.email?.message}
-                {...register("email")}
-                onReset={() => setValue("email", "", { shouldDirty: true })}
-                showReset={isEditMode && !!watchedEmail}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-muted-foreground">
+                  이메일
+                </Label>
+                <InputForm
+                  id="email"
+                  label="이메일"
+                  placeholder="이메일 입력"
+                  disabled={!isEditMode}
+                  floating={false}
+                  className="bg-white border border-neutral-200 rounded-[12px]"
+                  error={errors.email?.message}
+                  {...register("email")}
+                  onReset={() => setValue("email", "", { shouldDirty: true })}
+                  showReset={isEditMode && !!watchedEmail}
+                />
+              </div>
 
-              <InputForm
-                label="학부모 연락처"
-                disabled={!isEditMode}
-                error={errors.parentPhone?.message}
-                {...register("parentPhone")}
-                onReset={() =>
-                  setValue("parentPhone", "", { shouldDirty: true })
-                }
-                showReset={isEditMode && !!watchedParentPhone}
-              />
+              <div className="space-y-2">
+                <Label htmlFor="parentPhone" className="text-muted-foreground">
+                  학부모 연락처
+                </Label>
+                <InputForm
+                  id="parentPhone"
+                  label="학부모 연락처"
+                  placeholder="학부모 연락처 입력"
+                  disabled={!isEditMode}
+                  floating={false}
+                  className="bg-white border border-neutral-200 rounded-[12px]"
+                  error={errors.parentPhone?.message}
+                  {...register("parentPhone")}
+                  onReset={() =>
+                    setValue("parentPhone", "", { shouldDirty: true })
+                  }
+                  showReset={isEditMode && !!watchedParentPhone}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="memo" className="text-muted-foreground">
+                  메모
+                </Label>
+                <Textarea
+                  id="memo"
+                  disabled={!isEditMode}
+                  {...register("memo")}
+                  placeholder="학생 관련 메모를 입력하세요"
+                  rows={4}
+                  className="text-base p-4 min-h-[130px] w-full rounded-[12px] bg-white border border-neutral-200 shadow-none"
+                />
+              </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="memo">메모</Label>
-              <Textarea
-                id="memo"
-                disabled={!isEditMode}
-                {...register("memo")}
-                placeholder="학생 관련 메모를 입력하세요"
-                rows={4}
-              />
-            </div>
-
-            <div className="flex gap-2 justify-end">
+          <div className="flex gap-2 w-full justify-end">
+            <Button
+              className="cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-white border border-neutral-200 hover:bg-neutral-50 text-label-normal shadow-none"
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              disabled={isPending}
+            >
+              닫기
+            </Button>
+            {!isEditMode && (
               <Button
-                className="cursor-pointer"
+                className="cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none"
                 type="button"
-                variant="outline"
-                onClick={handleClose}
+                variant="default"
+                onClick={handleEditToggle}
               >
-                닫기
+                수정
               </Button>
-              {!isEditMode && (
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={handleEditToggle}
-                >
-                  수정
-                </Button>
-              )}
-              {isEditMode && (
-                <Button
-                  className="cursor-pointer"
-                  type="submit"
-                  disabled={!isValid || !isDirty || isPending}
-                >
-                  {isPending ? "저장 중..." : "저장"}
-                </Button>
-              )}
-            </div>
+            )}
+            {isEditMode && (
+              <Button
+                className={`cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none ${!isValid || !isDirty || isPending ? "bg-neutral-200 text-neutral-500 cursor-not-allowed" : ""}`}
+                type="submit"
+                disabled={!isValid || !isDirty || isPending}
+              >
+                {isPending ? "저장 중..." : "저장"}
+              </Button>
+            )}
           </div>
         </form>
       </DialogContent>

@@ -15,6 +15,7 @@ import {
 import { useInstructorPostMutations } from "@/hooks/useInstructorPost";
 import { useModal } from "@/providers/ModalProvider";
 import { Materials } from "@/types/materials.type";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 import PostTypeSelect from "./_components/setting/PostTypeSelect";
 import PostSetting from "./_components/setting/PostSetting";
@@ -24,6 +25,7 @@ import CreateContent from "./_components/content/CreateContent";
 export default function CreateInstructorPostPage() {
   const router = useRouter();
   const { openModal } = useModal();
+  const { showAlert } = useDialogAlert();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<JSONContent>({});
@@ -60,9 +62,9 @@ export default function CreateInstructorPostPage() {
   };
 
   // 게시글 등록
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim()) {
-      alert("제목을 입력해주세요.");
+      await showAlert({ description: "제목을 입력해주세요." });
       return;
     }
 
@@ -71,7 +73,7 @@ export default function CreateInstructorPostPage() {
       !content || !content.content || content.content.length === 0;
 
     if (isContentEmpty) {
-      alert("내용을 입력해주세요.");
+      await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
 

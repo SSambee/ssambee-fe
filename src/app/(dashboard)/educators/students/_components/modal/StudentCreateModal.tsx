@@ -25,9 +25,11 @@ import { studentCreateSchema } from "@/validation/students.validation";
 import { useCreateEnrollment, useLecturesList } from "@/hooks/useEnrollment";
 import { InputForm } from "@/components/common/input/InputForm";
 import { formatPhoneNumber } from "@/utils/phone";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 export function StudentCreateModal() {
   const { isOpen, closeModal } = useModal();
+  const { showAlert } = useDialogAlert();
 
   // 수강생 등록
   const { mutate: createEnrollment, isPending } = useCreateEnrollment();
@@ -72,8 +74,8 @@ export function StudentCreateModal() {
     createEnrollment(
       { lectureId, data: { ...rest, lectureId } },
       {
-        onSuccess: () => {
-          alert("수강생이 등록되었습니다.");
+        onSuccess: async () => {
+          await showAlert({ description: "수강생이 등록되었습니다." });
           closeModal();
           reset();
         },
@@ -125,7 +127,7 @@ export function StudentCreateModal() {
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="studentName"
+                    htmlFor="studentPhone"
                     className="text-muted-foreground"
                   >
                     연락처
