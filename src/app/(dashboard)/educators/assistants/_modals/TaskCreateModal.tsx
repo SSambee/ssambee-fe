@@ -44,7 +44,7 @@ const normalizeTimeInput = (value: string) => {
 };
 
 const deadlineInputClassName =
-  "h-14 rounded-[12px] border-[#d6d9e0] bg-white text-[16px] text-[#8b90a3] placeholder:text-[#8b90a3]";
+  "h-11 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[16px] text-[#4a4d5c] placeholder:text-[#8b90a3]";
 
 type TaskCreateModalProps = {
   open: boolean;
@@ -111,17 +111,17 @@ export default function TaskCreateModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-        <DialogHeader className="text-left">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto rounded-[24px] border border-[#eaecf2] p-6 sm:p-7">
+        <DialogHeader className="border-b border-[#eaecf2] pb-4 text-left">
           <div className="flex items-center gap-3">
-            <div className="rounded-full bg-primary/10 p-2 text-primary">
+            <div className="rounded-full bg-[#f4f7ff] p-2 text-[#3863f6]">
               <ClipboardCheck className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold">
+              <DialogTitle className="text-[22px] font-bold tracking-[-0.22px] text-[#040405]">
                 새 업무 지시 등록
               </DialogTitle>
-              <DialogDescription className="mt-1">
+              <DialogDescription className="mt-1 text-[#8b90a3]">
                 {selectedAssistant
                   ? `${selectedAssistant.name} 조교에게 업무를 전달합니다.`
                   : "조교를 선택하여 업무를 전달합니다."}
@@ -130,14 +130,14 @@ export default function TaskCreateModal({
           </div>
         </DialogHeader>
 
-        <div className="rounded-lg border bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
+        <div className="rounded-[12px] border border-[#eaecf2] bg-[#fcfcfd] px-4 py-3 text-[16px] text-[#8b90a3]">
           업무 지시는 상세 모달 기준으로 저장되어 조교에게 즉시 전달됩니다.
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-semibold">대상 조교</p>
+          <p className="text-[16px] font-semibold">대상 조교</p>
           <Select value={taskAssigneeId} onValueChange={onChangeTaskAssigneeId}>
-            <SelectTrigger>
+            <SelectTrigger className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] text-[#6b6f80]">
               <SelectValue placeholder="조교를 선택하세요" />
             </SelectTrigger>
             <SelectContent>
@@ -149,17 +149,17 @@ export default function TaskCreateModal({
             </SelectContent>
           </Select>
           {selectedAssistant ? (
-            <div className="flex items-center gap-3 rounded-lg border bg-background px-4 py-3">
+            <div className="flex items-center gap-3 rounded-[12px] border border-[#eaecf2] bg-white px-4 py-3">
               <Avatar className="h-10 w-10">
                 <AvatarFallback>
                   {selectedAssistant.name.slice(0, 1)}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-semibold">
+                <p className="text-[16px] font-semibold">
                   {selectedAssistant.name}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[16px] text-muted-foreground">
                   {selectedAssistant.phone}
                 </p>
               </div>
@@ -169,27 +169,32 @@ export default function TaskCreateModal({
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium">지시자</label>
+            <p className="text-[16px] font-medium">지시자</p>
             <Input value={instructorName} readOnly />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">업무명</label>
+            <p className="text-[16px] font-medium">업무명</p>
             <Input
               placeholder="예: 중등 2학년 1학기 기말고사 채점"
               value={taskTitle}
               onChange={(event) => onChangeTaskTitle(event.target.value)}
+              className="h-10 rounded-[12px] border-[#e9ebf0] bg-[#fcfcfd] placeholder:text-[#8b90a3]"
             />
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium">우선순위</label>
+            <p className="text-[16px] font-medium">우선순위</p>
             <div className="flex flex-wrap gap-2">
               <Button
                 type="button"
                 variant={taskPriority === "URGENT" ? "default" : "secondary"}
-                className="rounded-full"
+                className={
+                  taskPriority === "URGENT"
+                    ? "h-10 rounded-full border-[#3863f6] bg-[#3863f6] text-white hover:bg-[#2f57e8] hover:text-white"
+                    : "h-10 rounded-full border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                }
                 onClick={() => onChangeTaskPriority("URGENT")}
               >
                 긴급
@@ -197,7 +202,11 @@ export default function TaskCreateModal({
               <Button
                 type="button"
                 variant={taskPriority === "HIGH" ? "default" : "secondary"}
-                className="rounded-full"
+                className={
+                  taskPriority === "HIGH"
+                    ? "h-10 rounded-full border-[#3863f6] bg-[#3863f6] text-white hover:bg-[#2f57e8] hover:text-white"
+                    : "h-10 rounded-full border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                }
                 onClick={() => onChangeTaskPriority("HIGH")}
               >
                 높음
@@ -205,7 +214,11 @@ export default function TaskCreateModal({
               <Button
                 type="button"
                 variant={taskPriority === "NORMAL" ? "default" : "secondary"}
-                className="rounded-full"
+                className={
+                  taskPriority === "NORMAL"
+                    ? "h-10 rounded-full border-[#3863f6] bg-[#3863f6] text-white hover:bg-[#2f57e8] hover:text-white"
+                    : "h-10 rounded-full border-[#d6d9e0] bg-white text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+                }
                 onClick={() => onChangeTaskPriority("NORMAL")}
               >
                 보통
@@ -213,7 +226,7 @@ export default function TaskCreateModal({
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">마감 일시</label>
+            <p className="text-[16px] font-medium">마감 일시</p>
             <div className="grid gap-2 sm:grid-cols-2">
               <DatePickerField
                 control={control}
@@ -241,7 +254,7 @@ export default function TaskCreateModal({
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">업무 내용</label>
+          <p className="text-[16px] font-medium">업무 내용</p>
           <TiptapEditor
             content={taskInstructionContent}
             // onChange={onChangeTaskInstructionContent}
@@ -252,7 +265,7 @@ export default function TaskCreateModal({
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">첨부 자료</label>
+            <p className="text-[16px] font-medium">첨부 자료</p>
             <Button
               type="button"
               variant="outline"
@@ -264,7 +277,7 @@ export default function TaskCreateModal({
           </div>
 
           {attachedResources.length === 0 ? (
-            <div className="rounded-lg border border-dashed bg-muted/20 px-4 py-5 text-sm text-muted-foreground">
+            <div className="rounded-[12px] border border-dashed border-[#d6d9e0] bg-[#fcfcfd] px-4 py-5 text-[16px] text-[#8b90a3]">
               선택된 자료가 없습니다. 자료실에서 검색 후 선택해 첨부하세요.
             </div>
           ) : (
@@ -272,13 +285,15 @@ export default function TaskCreateModal({
               {attachedResources.map((resource) => (
                 <div
                   key={resource.id}
-                  className="flex items-center justify-between rounded-lg border bg-muted/20 px-4 py-3"
+                  className="flex items-center justify-between rounded-[12px] border border-[#eaecf2] bg-[#fcfcfd] px-4 py-3"
                 >
                   <div className="flex items-center gap-3">
                     <FileText className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium">{resource.title}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[16px] font-medium">
+                        {resource.title}
+                      </p>
+                      <p className="text-[16px] text-[#8b90a3]">
                         {resource.category} · {resource.updatedAt} ·{" "}
                         {resource.sizeLabel}
                       </p>
@@ -287,7 +302,7 @@ export default function TaskCreateModal({
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-8 px-3 text-xs"
+                    className="h-8 rounded-[10px] border-[#d6d9e0] bg-white px-3 text-[16px] text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
                     onClick={() => onRemoveAttachedResource(resource.id)}
                   >
                     제거
@@ -298,12 +313,16 @@ export default function TaskCreateModal({
           )}
         </div>
 
-        <DialogFooter className="gap-2">
-          <Button variant="outline" className="rounded-full" onClick={onCancel}>
+        <DialogFooter className="gap-2 border-t border-[#eaecf2] pt-4">
+          <Button
+            variant="outline"
+            className="h-10 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
+            onClick={onCancel}
+          >
             취소
           </Button>
           <Button
-            className="rounded-full"
+            className="h-10 rounded-[12px] bg-[#3863f6] px-4 text-white hover:bg-[#2f57e8]"
             onClick={onSubmit}
             disabled={!canSubmit}
           >

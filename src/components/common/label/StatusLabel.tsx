@@ -5,6 +5,7 @@ type LabelProps = {
   children: React.ReactNode;
   showDot?: boolean;
   noBackground?: boolean;
+  className?: string;
 };
 
 export default function StatusLabel({
@@ -12,6 +13,7 @@ export default function StatusLabel({
   children,
   showDot = false,
   noBackground = false,
+  className,
 }: LabelProps) {
   const colorClasses: Record<LabelColor, string> = {
     green: "bg-green-50 text-green-700",
@@ -35,7 +37,7 @@ export default function StatusLabel({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap ${finalClass}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap ${finalClass} ${className ?? ""}`}
     >
       {showDot && (
         <span

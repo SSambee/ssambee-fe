@@ -6,8 +6,8 @@ type SummaryMetricTone = "primary" | "secondary" | "neutral";
 type SummaryMetricCardProps = {
   title: string;
   subtitle: string;
-  value: number;
-  unit: string;
+  value: number | string;
+  unit?: string;
   tone?: SummaryMetricTone;
   className?: string;
 };
@@ -50,6 +50,7 @@ export function SummaryMetricCard({
   className,
 }: SummaryMetricCardProps) {
   const styles = toneStyles[tone];
+  const hasUnit = typeof value === "number" && Boolean(unit);
 
   return (
     <Card
@@ -82,20 +83,24 @@ export function SummaryMetricCard({
         <div className="flex h-full items-end gap-[3px]">
           <p
             className={cn(
-              "text-[40px] font-bold leading-[52px] tracking-[-0.4px]",
+              hasUnit
+                ? "text-[40px] font-bold leading-[52px] tracking-[-0.4px]"
+                : "text-[32px] font-bold leading-[42px] tracking-[-0.32px]",
               styles.value
             )}
           >
             {value}
           </p>
-          <p
-            className={cn(
-              "pb-[7px] text-[28px] font-bold leading-[38px] tracking-[-0.28px]",
-              styles.value
-            )}
-          >
-            {unit}
-          </p>
+          {hasUnit ? (
+            <p
+              className={cn(
+                "pb-[7px] text-[28px] font-bold leading-[38px] tracking-[-0.28px]",
+                styles.value
+              )}
+            >
+              {unit}
+            </p>
+          ) : null}
         </div>
       </CardContent>
     </Card>
