@@ -3,8 +3,9 @@
 import { CheckCircle2, UserPlus } from "lucide-react";
 
 import type { AssistantsApprovalPageViewModel } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsApprovalPage";
+import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
+import { getTeacherAvatarSortByRole } from "@/components/common/avatar/getTeacherAvatarSortByRole";
 import StatusLabel from "@/components/common/label/StatusLabel";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -60,17 +61,23 @@ export default function AssistantsApprovalApplicationsCard({
               const isPending = application.status === "승인 대기";
               const isProcessing =
                 vm.processingApplicationId === application.id;
+              const avatarSort = getTeacherAvatarSortByRole(
+                "ASSISTANT",
+                application.id
+              );
 
               return (
                 <div
                   key={application.id}
                   className="flex flex-wrap items-center gap-4 rounded-lg border bg-background p-4"
                 >
-                  <Avatar className="h-12 w-12">
-                    <AvatarFallback>
-                      {application.name.slice(0, 1)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <TeacherProfileAvatar
+                    seedKey={application.id}
+                    sort={avatarSort}
+                    sizePreset="Medium-2"
+                    label="조교 신청자 아바타"
+                    className="border border-[#f4f6fa]"
+                  />
 
                   <div className="min-w-[200px] flex-1 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">

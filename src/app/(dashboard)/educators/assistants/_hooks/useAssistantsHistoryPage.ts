@@ -65,6 +65,8 @@ const buildHistoryQuery = ({
     page: currentPage,
     limit: PAGE_LIMIT,
     status: statusFilter === "전체" ? undefined : statusQueryMap[statusFilter],
+    workStatus:
+      statusFilter === "전체" ? undefined : statusQueryMap[statusFilter],
     priority:
       priorityFilter === "전체" ? undefined : priorityQueryMap[priorityFilter],
     from: fromDate ? fromDate.toISOString() : undefined,
@@ -174,6 +176,7 @@ export const useAssistantsHistoryPage = () => {
           page: query.page,
           limit: query.limit,
           status: query.status,
+          workStatus: query.workStatus,
         });
         usedAdvancedFilterFallback = true;
       }

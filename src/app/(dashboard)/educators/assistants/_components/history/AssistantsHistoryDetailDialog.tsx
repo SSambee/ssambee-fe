@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import type { AssistantsHistoryPageViewModel } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsHistoryPage";
 import StatusLabel from "@/components/common/label/StatusLabel";
+import { useAssistantWorkDetail } from "@/hooks/useInstructorPost";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,6 +24,21 @@ export default function AssistantsHistoryDetailDialog({
   vm,
 }: AssistantsHistoryDetailDialogProps) {
   const router = useRouter();
+  const selectedTaskId = vm.selectedTask?.id ?? "";
+
+  const { data: selectedTaskDetail, isLoading: isAttachmentLoading } =
+    useAssistantWorkDetail(selectedTaskId, {
+      enabled: Boolean(vm.selectedTask),
+    });
+
+  const attachmentNamesFromDetail = (selectedTaskDetail?.attachments ?? [])
+    .map((attachment) => attachment.filename?.trim())
+    .filter((filename): filename is string => Boolean(filename));
+
+  const attachmentNames =
+    vm.selectedTask && vm.selectedTask.attachmentNames.length > 0
+      ? vm.selectedTask.attachmentNames
+      : attachmentNamesFromDetail;
 
   return (
     <Dialog
@@ -109,19 +125,18 @@ export default function AssistantsHistoryDetailDialog({
               </div>
 
               <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/30 px-4 py-4 text-sm text-muted-foreground">
-                {vm.selectedTask.attachmentNames.length > 0 ? (
+                {attachmentNames.length > 0 ? (
                   <ul className="space-y-2">
-                    {vm.selectedTask.attachmentNames.map(
-                      (attachmentName, index) => (
-                        <li
-                          key={`${attachmentName}-${index}`}
-                          className="truncate"
-                        >
-                          {attachmentName}
-                        </li>
-                      )
-                    )}
+                    {attachmentNames.map((attachmentName) => (
+                      <li key={attachmentName} className="truncate">
+                        {attachmentName}
+                      </li>
+                    ))}
                   </ul>
+                ) : isAttachmentLoading ? (
+                  <p className="text-center">
+                    첨부파일 정보를 불러오는 중입니다.
+                  </p>
                 ) : (
                   <p className="text-center">연결된 첨부파일이 없습니다.</p>
                 )}

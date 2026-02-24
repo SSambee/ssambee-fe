@@ -3,9 +3,10 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { type Assistant, type ResourceLibraryItem } from "@/types/assistants";
+import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
+import { getTeacherAvatarSortByRole } from "@/components/common/avatar/getTeacherAvatarSortByRole";
 import { DatePickerField } from "@/components/common/input/DatePickerField";
 import TiptapEditor from "@/components/common/editor/TiptapEditor";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -87,7 +88,7 @@ export default function TaskCreateModal({
   taskDeadlineTime,
   onChangeTaskDeadlineTime,
   taskInstructionContent,
-  // onChangeTaskInstructionContent,
+  onChangeTaskInstructionContent,
   attachedResources,
   onOpenResourceLibraryModal,
   onRemoveAttachedResource,
@@ -98,6 +99,12 @@ export default function TaskCreateModal({
   const selectedAssistant =
     assistantOptions.find((assistant) => assistant.id === taskAssigneeId) ??
     null;
+  const selectedAssistantAvatarSeed =
+    selectedAssistant?.id ?? selectedAssistant?.name ?? "assistant";
+  const selectedAssistantAvatarSort = getTeacherAvatarSortByRole(
+    "ASSISTANT",
+    selectedAssistantAvatarSeed
+  );
   const { control, reset } = useForm<{ deadlineDate: string }>({
     defaultValues: { deadlineDate: taskDeadlineDate },
   });
@@ -150,11 +157,13 @@ export default function TaskCreateModal({
           </Select>
           {selectedAssistant ? (
             <div className="flex items-center gap-3 rounded-lg border bg-background px-4 py-3">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback>
-                  {selectedAssistant.name.slice(0, 1)}
-                </AvatarFallback>
-              </Avatar>
+              <TeacherProfileAvatar
+                seedKey={selectedAssistantAvatarSeed}
+                sort={selectedAssistantAvatarSort}
+                sizePreset="Medium"
+                label="선택된 조교 아바타"
+                className="border border-[#f4f6fa]"
+              />
               <div>
                 <p className="text-sm font-semibold">
                   {selectedAssistant.name}
@@ -244,7 +253,7 @@ export default function TaskCreateModal({
           <label className="text-sm font-medium">업무 내용</label>
           <TiptapEditor
             content={taskInstructionContent}
-            // onChange={onChangeTaskInstructionContent}
+            onHtmlChange={onChangeTaskInstructionContent}
             placeholder="업무에 대한 상세한 내용을 입력해주세요."
             className="min-h-[240px]"
           />

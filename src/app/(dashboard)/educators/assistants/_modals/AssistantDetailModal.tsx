@@ -5,7 +5,8 @@ import {
   type AssistantDetailDraft,
   type AssistantStatus,
 } from "@/types/assistants";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
+import { getTeacherAvatarSortByRole } from "@/components/common/avatar/getTeacherAvatarSortByRole";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -58,16 +59,22 @@ export default function AssistantDetailModal({
   onCloseDetail,
   onStartEdit,
 }: AssistantDetailModalProps) {
+  const avatarSeed =
+    selectedAssistant?.id ?? selectedAssistant?.name ?? "assistant";
+  const avatarSort = getTeacherAvatarSortByRole("ASSISTANT", avatarSeed);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader className="text-left">
           <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
-              <AvatarFallback>
-                {selectedAssistant?.name.slice(0, 1)}
-              </AvatarFallback>
-            </Avatar>
+            <TeacherProfileAvatar
+              seedKey={avatarSeed}
+              sort={avatarSort}
+              sizePreset="Medium-2"
+              label="조교 프로필 아바타"
+              className="border border-[#f4f6fa]"
+            />
             <div>
               <DialogTitle className="text-2xl font-bold">
                 {selectedAssistant?.name}

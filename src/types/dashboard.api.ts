@@ -65,6 +65,9 @@ export type MgmtAssistantOrderItem = {
   title: string;
   memo?: string | null;
   status: "PENDING" | "IN_PROGRESS" | "END";
+  workStatus?: "PENDING" | "IN_PROGRESS" | "END";
+  assistantName?: string | null;
+  instructorName?: string | null;
   assistant?: {
     id: string;
     name: string;

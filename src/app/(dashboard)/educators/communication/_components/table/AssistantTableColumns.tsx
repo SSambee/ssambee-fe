@@ -24,7 +24,7 @@ export const ASSISTANT_WORKS_COLUMNS: ColumnDefinition<AssistantWorkRow>[] = [
     label: "내용",
     render: (row) => {
       return (
-        <span className="max-w-[200px] truncate text-sm">
+        <span className="block w-[200px] overflow-hidden text-ellipsis whitespace-nowrap text-sm">
           {row.memo || "-"}
         </span>
       );

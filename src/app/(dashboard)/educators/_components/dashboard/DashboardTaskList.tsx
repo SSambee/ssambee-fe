@@ -30,6 +30,7 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
   const description = isAssistant
     ? "강사가 배정한 업무 진행률을 확인하세요"
     : "조교 업무 진행률을 확인하세요";
+  const targetLabel = isAssistant ? "지시 강사" : "담당 조교";
 
   return (
     <section className="space-y-5 rounded-[24px] border border-[#eaecf2] bg-white p-5 sm:p-6">
@@ -72,48 +73,82 @@ export function DashboardTaskList({ tasks }: DashboardTaskListProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {tasks.map((task) => (
-          <div
-            key={task.id}
-            className="overflow-hidden rounded-[20px] border border-[#eaecf2]"
-          >
-            <div className="bg-white px-6 pb-4 pt-6">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex flex-col gap-1">
-                  <p className="text-xl font-semibold text-[#040405]">
-                    {task.title}
-                  </p>
-                  {task.note ? (
-                    <p className="text-base text-[#16161b]/40">{task.note}</p>
-                  ) : null}
-                </div>
-                <span
-                  className={cn(
-                    "inline-flex h-9 w-[72px] items-center justify-center rounded-lg text-sm font-semibold",
-                    statusBadgeClasses[task.status]
-                  )}
-                >
-                  {task.status}
-                </span>
-              </div>
-            </div>
-            <div className="border-t border-[#eaecf2] bg-white px-6 py-4">
-              <div className="flex items-center gap-3.5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#eaecf2] bg-white">
-                  <StudentProfileAvatar
-                    size={32}
-                    seedKey={task.target}
-                    label={`${task.target} 프로필 이미지`}
-                  />
-                </div>
-                <div className="flex items-center gap-1.5 text-lg font-medium text-[#8b90a3]">
-                  <span>담당 조교</span>
-                  <span>{task.target}</span>
+        {tasks.map((task) => {
+          const cardContent = (
+            <>
+              <div className="bg-white px-6 pb-4 pt-6">
+                <div className="mb-6 flex items-start justify-between">
+                  <div className="min-w-0 flex flex-col gap-1">
+                    <p className="truncate text-xl font-semibold text-[#040405]">
+                      {task.title}
+                    </p>
+                    {task.note ? (
+                      <p className="truncate text-base text-[#16161b]/40">
+                        {task.note}
+                      </p>
+                    ) : null}
+                  </div>
+                  <span
+                    className={cn(
+                      "inline-flex h-9 w-[72px] shrink-0 items-center justify-center rounded-lg text-sm font-semibold",
+                      statusBadgeClasses[task.status]
+                    )}
+                  >
+                    {task.status}
+                  </span>
                 </div>
               </div>
+              <div className="border-t border-[#eaecf2] bg-white px-6 py-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-[#eaecf2] bg-white">
+                    <StudentProfileAvatar
+                      size={32}
+                      seedKey={task.target}
+                      label={`${task.target} 프로필 이미지`}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 text-lg font-medium text-[#8b90a3]">
+                    <span>{targetLabel}</span>
+                    <span>{task.target}</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          );
+
+          if (isInstructor) {
+            return (
+              <Link
+                key={task.id}
+                href="/educators/assistants/history"
+                className="overflow-hidden rounded-[20px] border border-[#eaecf2] transition-colors hover:bg-[#f8f9fc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4b72f7] focus-visible:ring-inset"
+              >
+                {cardContent}
+              </Link>
+            );
+          }
+
+          if (isAssistant) {
+            return (
+              <Link
+                key={task.id}
+                href={`/educators/communication/${task.id}?type=works`}
+                className="overflow-hidden rounded-[20px] border border-[#eaecf2] transition-colors hover:bg-[#f8f9fc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4b72f7] focus-visible:ring-inset"
+              >
+                {cardContent}
+              </Link>
+            );
+          }
+
+          return (
+            <div
+              key={task.id}
+              className="overflow-hidden rounded-[20px] border border-[#eaecf2]"
+            >
+              {cardContent}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

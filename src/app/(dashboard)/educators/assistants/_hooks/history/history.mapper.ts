@@ -97,7 +97,9 @@ const normalizePriority = (
   return "보통";
 };
 
-const normalizeStatus = (status: AssistantOrderApi["status"]): TaskStatus => {
+const normalizeStatus = (
+  status: AssistantOrderApi["status"] | AssistantOrderApi["workStatus"]
+): TaskStatus => {
   if (status === "END") return "완료";
   if (status === "IN_PROGRESS") return "진행 중";
   if (status === "PENDING") return "진행전";
@@ -126,6 +128,13 @@ const normalizeAttachmentNames = (
   });
 };
 
+const normalizeName = (value?: string | null) => {
+  if (typeof value !== "string") return null;
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
 export const mapAssistantOrderApiToTask = (
   order: AssistantOrderApi
 ): InstructionTask => {
@@ -135,13 +144,19 @@ export const mapAssistantOrderApiToTask = (
     id: order.id,
     title: order.title,
     subtitle: order.lecture?.title ?? "",
-    assistantName: order.assistant?.name ?? "-",
-    instructorName: order.instructor?.name ?? "-",
+    assistantName:
+      normalizeName(order.assistant?.name) ??
+      normalizeName(order.assistantName) ??
+      "-",
+    instructorName:
+      normalizeName(order.instructor?.name) ??
+      normalizeName(order.instructorName) ??
+      "-",
     issuedAt: toKoreanDateTime(order.createdAt),
     issuedAtTimestamp: toTimestamp(order.createdAt),
     dueAt: toKoreanDateTime(order.deadlineAt),
     priority: normalizePriority(order.priority),
-    status: normalizeStatus(order.status),
+    status: normalizeStatus(order.status ?? order.workStatus),
     description: htmlToPlainText(order.memo),
     attachmentNames,
     attachmentCount: attachmentNames.length,

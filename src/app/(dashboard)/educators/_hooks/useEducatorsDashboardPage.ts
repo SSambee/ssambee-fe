@@ -59,6 +59,11 @@ export const useEducatorsDashboardPage = () => {
       inquiryOrderBy: "latest",
       taskPage: TASKS_PAGE,
       taskLimit: TASKS_LIMIT,
+      viewerType:
+        user?.userType === "INSTRUCTOR" || user?.userType === "ASSISTANT"
+          ? user.userType
+          : undefined,
+      viewerId: user?.id,
     }),
     queryFn: async () => {
       const [dashboardResult, inquiriesResult, tasksResult] =
@@ -114,7 +119,10 @@ export const useEducatorsDashboardPage = () => {
           tasksResult.status === "fulfilled"
             ? mapMgmtAssistantOrdersToTasks(
                 tasksResult.value,
-                user?.name
+                user?.userType === "ASSISTANT" ||
+                  user?.userType === "INSTRUCTOR"
+                  ? user.userType
+                  : undefined
               ).slice(0, TASKS_LIMIT)
             : [],
         timelineItems: timeline.items,

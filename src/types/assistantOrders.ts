@@ -27,9 +27,12 @@ export type AssistantOrderApi = {
   memo?: string | null;
   priority?: AssistantOrderPriority | string | null;
   status?: AssistantOrderStatus | string | null;
+  workStatus?: AssistantOrderStatus | string | null;
   deadlineAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  assistantName?: string | null;
+  instructorName?: string | null;
   assistant?: AssistantOrderRelationApi | null;
   instructor?: AssistantOrderRelationApi | null;
   lecture?: AssistantOrderRelationApi | null;
@@ -54,6 +57,7 @@ export type AssistantOrdersListApi = {
 
 export type AssistantOrdersListQuery = {
   status?: AssistantOrderStatus | string;
+  workStatus?: AssistantOrderStatus | string;
   priority?: AssistantOrderPriority | string;
   from?: string;
   to?: string;

@@ -63,27 +63,57 @@ const mapInquiryStatus = (
 };
 
 const mapTaskStatus = (
-  status: "PENDING" | "IN_PROGRESS" | "END"
+  status: "PENDING" | "IN_PROGRESS" | "END" | undefined
 ): DashboardTask["status"] => {
   if (status === "PENDING") return "대기";
   if (status === "IN_PROGRESS") return "진행 중";
   return "완료";
 };
 
-const mapTaskProgress = (status: "PENDING" | "IN_PROGRESS" | "END") => {
+const mapTaskProgress = (
+  status: "PENDING" | "IN_PROGRESS" | "END" | undefined
+) => {
   if (status === "PENDING") return 0;
   if (status === "IN_PROGRESS") return 50;
   return 100;
 };
 
+const normalizeName = (value?: string | null) => {
+  if (typeof value !== "string") return null;
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+const resolveAssistantName = (order: MgmtAssistantOrderItem) => {
+  return (
+    normalizeName(order.assistant?.name) ?? normalizeName(order.assistantName)
+  );
+};
+
 const resolveTaskTarget = (
   order: MgmtAssistantOrderItem,
-  fallbackTargetName?: string
+  viewerType?: "INSTRUCTOR" | "ASSISTANT"
 ) => {
-  if (order.assistant?.name) return order.assistant.name;
-  if (fallbackTargetName) return fallbackTargetName;
-  if (order.instructor?.name) return order.instructor.name;
-  return "-";
+  if (viewerType === "ASSISTANT") {
+    const assistantName = resolveAssistantName(order);
+    const instructorObjectName = normalizeName(order.instructor?.name);
+    const instructorFieldName = normalizeName(order.instructorName);
+
+    if (instructorObjectName && instructorObjectName !== assistantName) {
+      return instructorObjectName;
+    }
+
+    if (instructorFieldName && instructorFieldName !== assistantName) {
+      return instructorFieldName;
+    }
+
+    return "미확인";
+  }
+
+  const assistantName = resolveAssistantName(order);
+  if (assistantName) return assistantName;
+  return "미배정";
 };
 
 const toSingleLinePreview = (value: string, maxLength = 120) => {
@@ -94,6 +124,48 @@ const toSingleLinePreview = (value: string, maxLength = 120) => {
   }
 
   return `${singleLine.slice(0, maxLength)}...`;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> => {
+  return typeof value === "object" && value !== null;
+};
+
+const extractTextFromRichNode = (node: unknown): string => {
+  if (!isRecord(node)) return "";
+
+  if (typeof node.text === "string") {
+    return node.text;
+  }
+
+  if (node.type === "hardBreak") {
+    return "\n";
+  }
+
+  const attrsLabel =
+    isRecord(node.attrs) && typeof node.attrs.label === "string"
+      ? node.attrs.label
+      : "";
+
+  const childrenText = Array.isArray(node.content)
+    ? node.content.map((child) => extractTextFromRichNode(child)).join(" ")
+    : "";
+
+  return [attrsLabel, childrenText].filter(Boolean).join(" ").trim();
+};
+
+const richTextToPlainText = (value?: string | null) => {
+  if (!value) return "";
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    const extracted = extractTextFromRichNode(parsed).trim();
+
+    if (extracted.length > 0) {
+      return extracted;
+    }
+  } catch {}
+
+  return htmlToPlainText(value);
 };
 
 export const mapMgmtDashboardToStats = (
@@ -167,8 +239,8 @@ export const mapMgmtStudentPostsToInquiries = (
   response: MgmtStudentPostsApi
 ): DashboardInquiry[] => {
   return response.list.map((item) => {
-    const plainTitle = htmlToPlainText(item.title);
-    const plainContent = htmlToPlainText(item.content);
+    const plainTitle = richTextToPlainText(item.title);
+    const plainContent = richTextToPlainText(item.content);
     const messageSource = plainContent || plainTitle;
 
     return {
@@ -185,14 +257,18 @@ export const mapMgmtStudentPostsToInquiries = (
 
 export const mapMgmtAssistantOrdersToTasks = (
   response: MgmtAssistantOrdersApi,
-  fallbackTargetName?: string
+  viewerType?: "INSTRUCTOR" | "ASSISTANT"
 ): DashboardTask[] => {
-  return response.orders.map((item) => ({
-    id: item.id,
-    title: item.title,
-    target: resolveTaskTarget(item, fallbackTargetName),
-    progress: mapTaskProgress(item.status),
-    status: mapTaskStatus(item.status),
-    note: item.memo ?? undefined,
-  }));
+  return response.orders.map((item) => {
+    const normalizedStatus = item.status ?? item.workStatus;
+
+    return {
+      id: item.id,
+      title: item.title,
+      target: resolveTaskTarget(item, viewerType),
+      progress: mapTaskProgress(normalizedStatus),
+      status: mapTaskStatus(normalizedStatus),
+      note: item.memo ?? undefined,
+    };
+  });
 };
