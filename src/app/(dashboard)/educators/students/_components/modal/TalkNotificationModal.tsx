@@ -218,13 +218,7 @@ export function TalkNotificationModal() {
               취소
             </Button>
             <Button
-              className={`cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none ${
-                !messageContent ||
-                selectedStudents.length === 0 ||
-                getExpectedRecipients() === 0
-                  ? "bg-neutral-200 text-neutral-500 cursor-not-allowed border-none"
-                  : ""
-              }`}
+              className="cursor-pointer h-[48px] px-[28px] py-[12px] rounded-[12px] bg-brand-700 hover:bg-brand-800 text-white shadow-none disabled:bg-neutral-200 disabled:text-neutral-500 disabled:cursor-not-allowed"
               variant="default"
               onClick={handleSubmit}
               disabled={

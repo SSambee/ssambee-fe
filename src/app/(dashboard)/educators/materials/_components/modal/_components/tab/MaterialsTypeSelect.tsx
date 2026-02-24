@@ -21,7 +21,8 @@ export default function MaterialsTypeSelect({
       </div>
 
       <div className="grid grid-cols-4 gap-2">
-        <div
+        <button
+          type="button"
           className={`cursor-pointer transition-all rounded-[12px] p-4 flex items-center justify-center border ${
             selectedMaterialsType === "PAPER"
               ? "bg-blue-50 border-blue-600 shadow-sm"
@@ -38,9 +39,10 @@ export default function MaterialsTypeSelect({
           >
             시험지
           </span>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           className={`cursor-pointer transition-all rounded-[12px] p-4 flex items-center justify-center border ${
             selectedMaterialsType === "VIDEO"
               ? "bg-red-50 border-red-600 shadow-sm"
@@ -57,9 +59,10 @@ export default function MaterialsTypeSelect({
           >
             동영상
           </span>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           className={`cursor-pointer transition-all rounded-[12px] p-4 flex items-center justify-center border ${
             selectedMaterialsType === "REQUEST"
               ? "bg-green-50 border-green-600 shadow-sm"
@@ -76,9 +79,10 @@ export default function MaterialsTypeSelect({
           >
             요청 자료
           </span>
-        </div>
+        </button>
 
-        <div
+        <button
+          type="button"
           className={`cursor-pointer transition-all rounded-[12px] p-4 flex items-center justify-center border ${
             selectedMaterialsType === "OTHER"
               ? "bg-gray-50 border-gray-600 shadow-sm"
@@ -95,7 +99,7 @@ export default function MaterialsTypeSelect({
           >
             기타
           </span>
-        </div>
+        </button>
       </div>
     </div>
   );

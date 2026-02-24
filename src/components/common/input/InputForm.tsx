@@ -23,6 +23,7 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
       onReset,
       showReset,
       floating = true,
+      placeholder,
       ...props
     },
     ref
@@ -35,7 +36,7 @@ export const InputForm = forwardRef<HTMLInputElement, InputFormProps>(
           <input
             id={id}
             ref={ref}
-            placeholder={floating ? " " : props.placeholder} // 플로팅일 때만 빈 문자열 유지
+            placeholder={floating ? " " : placeholder} // 플로팅일 때만 빈 문자열 유지
             className={cn(
               "peer w-full h-[58px] px-4 text-base border rounded-lg outline-none transition-all duration-200",
               "focus:ring-2 focus:border-transparent",

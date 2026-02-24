@@ -127,7 +127,7 @@ export function StudentCreateModal() {
 
                 <div className="space-y-2">
                   <Label
-                    htmlFor="studentName"
+                    htmlFor="studentPhone"
                     className="text-muted-foreground"
                   >
                     연락처
