@@ -48,8 +48,9 @@ export default function ScoreChart({
 
   if (!chartData.length) {
     return (
-      <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-        선택된 시험이 없습니다.
+      <div className="flex flex-col gap-1 items-center justify-center h-[300px] text-muted-foreground">
+        <p>선택된 시험이 없어요.</p>
+        <p>시험을 선택하면 성적 추이가 표시돼요</p>
       </div>
     );
   }
@@ -89,7 +90,6 @@ export default function ScoreChart({
             )}
           />
 
-          {/* 반 평균 */}
           <Line
             type="monotone"
             dataKey="classAverage"
@@ -99,7 +99,6 @@ export default function ScoreChart({
             name="반 평균"
           />
 
-          {/* 해당 학생 평균 */}
           <Line
             type="monotone"
             dataKey="score"

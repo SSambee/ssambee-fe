@@ -13,6 +13,7 @@ import {
   studentPostService,
 } from "@/services/instructorPost.service";
 import { CommonPostQuery } from "@/types/communication/commonPost";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 // 공지 알림 대상 조회
 export const useInstructorPostTargets = () => {
@@ -50,6 +51,7 @@ export const useInstructorPostDetail = (
 // 강사 게시글 관련 mutations
 export const useInstructorPostMutations = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   // 공지 생성
   const createNoticeMutation = useMutation({
@@ -62,10 +64,12 @@ export const useInstructorPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("공지사항이 성공적으로 등록되었습니다.");
+      showAlert({ description: "공지사항이 성공적으로 등록되었습니다." });
     },
     onError: () => {
-      alert("공지 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "공지 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -80,10 +84,13 @@ export const useInstructorPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("자료 공유가 성공적으로 등록되었습니다.");
+      showAlert({ description: "자료 공유가 성공적으로 등록되었습니다." });
     },
     onError: () => {
-      alert("자료 공유 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description:
+          "자료 공유 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -107,10 +114,12 @@ export const useInstructorPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("공지사항이 수정되었습니다.");
+      showAlert({ description: "공지사항이 수정되었습니다." });
     },
     onError: () => {
-      alert("공지 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "공지 수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -126,10 +135,12 @@ export const useInstructorPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("공지사항이 삭제되었습니다.");
+      showAlert({ description: "공지사항이 삭제되었습니다." });
     },
     onError: () => {
-      alert("공지 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "공지 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -144,6 +155,7 @@ export const useInstructorPostMutations = () => {
 // 강사 게시글 댓글 관련 mutations
 export const useCreateInstructorPostComment = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   // 강사 게시글 댓글 작성
   const createInstructorPostCommentMutation = useMutation({
@@ -161,10 +173,12 @@ export const useCreateInstructorPostComment = () => {
           refetchType: "active",
         }),
       ]);
-      alert("댓글이 등록되었습니다.");
+      showAlert({ description: "댓글이 등록되었습니다." });
     },
     onError: () => {
-      alert("댓글 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "댓글 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -191,10 +205,12 @@ export const useCreateInstructorPostComment = () => {
           refetchType: "active",
         }),
       ]);
-      alert("댓글이 수정되었습니다.");
+      showAlert({ description: "댓글이 수정되었습니다." });
     },
     onError: () => {
-      alert("댓글 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "댓글 수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -214,10 +230,12 @@ export const useCreateInstructorPostComment = () => {
           refetchType: "active",
         }),
       ]);
-      alert("댓글이 삭제되었습니다.");
+      showAlert({ description: "댓글이 삭제되었습니다." });
     },
     onError: () => {
-      alert("댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "댓글 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -256,6 +274,7 @@ export const useStudentPostDetail = (
 // 학생 문의 답변 관련 mutations
 export const useStudentPostMutations = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   // 학생 문의 답변 생성
   const createStudentPostCommentMutation = useMutation({
@@ -277,10 +296,10 @@ export const useStudentPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("답변이 등록되었습니다.");
+      showAlert({ description: "답변이 등록되었습니다." });
     },
     onError: () => {
-      alert("답변 등록 중 오류가 발생했습니다.");
+      showAlert({ description: "답변 등록 중 오류가 발생했습니다." });
     },
   });
 
@@ -330,10 +349,10 @@ export const useStudentPostMutations = () => {
           refetchType: "active",
         }),
       ]);
-      alert("답변이 삭제되었습니다.");
+      showAlert({ description: "답변이 삭제되었습니다." });
     },
     onError: () => {
-      alert("답변 삭제 중 오류가 발생했습니다.");
+      showAlert({ description: "답변 삭제 중 오류가 발생했습니다." });
     },
   });
 
@@ -373,6 +392,7 @@ export const useAssistantWorkDetail = (
 // 업무 상태 변경
 export const useUpdateAssistantWorkStatus = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   return useMutation({
     mutationFn: ({
@@ -391,10 +411,12 @@ export const useUpdateAssistantWorkStatus = () => {
         queryKey: ["assistantWorks"],
         refetchType: "active",
       });
-      alert("업무 상태가 변경되었습니다.");
+      showAlert({ description: "업무 상태가 변경되었습니다." });
     },
     onError: () => {
-      alert("상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "상태 변경 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 };

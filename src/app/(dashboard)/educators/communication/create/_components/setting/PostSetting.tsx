@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, User } from "lucide-react";
+import { Check } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import SelectBtn from "@/components/common/button/SelectBtn";
 import { TargetRole } from "@/types/communication/instructorPost";
 import { NOTICE_TYPE_OPTIONS } from "@/constants/communication.default";
 import { useInstructorPostTargets } from "@/hooks/useInstructorPost";
+import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 
 type PostSettingProps = {
   selectedClassId: string;
@@ -128,7 +129,7 @@ export default function PostSetting({
             value={selectedClassId}
             onChange={(value) => onClassIdChange(value)}
             placeholder="클래스를 선택하세요"
-            optionSize="sm"
+            optionSize="lg"
             className="text-base px-4 h-[58px] w-full my-2"
             options={classOptions}
           />
@@ -144,7 +145,7 @@ export default function PostSetting({
             value={targetRole}
             onChange={(value) => onTargetRoleChange(value as TargetRole)}
             placeholder="알림 수신 대상 선택"
-            optionSize="sm"
+            optionSize="lg"
             className="h-[58px] w-full my-2"
             options={NOTICE_TYPE_OPTIONS}
           />
@@ -194,20 +195,21 @@ export default function PostSetting({
                     onClick={() => toggleStudent(student.enrollmentId)}
                     className={`cursor-pointer group flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${
                       isSelected
-                        ? "bg-blue-50 border-blue-200 shadow-sm"
-                        : "bg-white border-slate-100 hover:border-slate-300 hover:shadow-sm"
+                        ? "border-blue-200 shadow-sm"
+                        : "bg-white hover:border-slate-300 hover:shadow-sm"
                     }`}
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
                       <div
-                        className={`p-2.5 rounded-lg border shadow-sm transition-colors ${
+                        className={`w-[40px] h-[40px] ${
                           isSelected
                             ? "bg-white border-blue-100"
-                            : "bg-slate-50 border-slate-100"
+                            : "bg-white border-slate-100"
                         }`}
                       >
-                        <User
-                          className={`h-4 w-4 ${isSelected ? "text-blue-500" : "text-slate-400"}`}
+                        <StudentProfileAvatar
+                          sizePreset="Medium"
+                          seedKey={student.enrollmentId}
                         />
                       </div>
 

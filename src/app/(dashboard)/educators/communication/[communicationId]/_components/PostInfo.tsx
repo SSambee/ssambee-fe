@@ -217,7 +217,7 @@ export default function PostInfo({
                 {isPending && (
                   <Button
                     variant="default"
-                    className="w-full gap-2 font-bold transition-all shadow-sm bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md"
+                    className="w-full h-[50px] gap-2 font-bold transition-all shadow-sm bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md"
                     onClick={() => updateWorkStatus?.("IN_PROGRESS")}
                   >
                     <PlayCircle className="h-4 w-4" />
@@ -228,7 +228,7 @@ export default function PostInfo({
                 {isInProgress && (
                   <Button
                     variant="default"
-                    className="w-full gap-2 font-bold transition-all shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-md"
+                    className="w-full h-[50px] gap-2 font-bold transition-all shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-md"
                     onClick={() => updateWorkStatus?.("END")}
                   >
                     <CheckCircle2 className="h-4 w-4" />
@@ -239,7 +239,7 @@ export default function PostInfo({
                 {isEnd && (
                   <Button
                     variant="outline"
-                    className="w-full gap-2 font-bold transition-all shadow-sm bg-white hover:bg-slate-100 text-slate-600 border-slate-200"
+                    className="w-full h-[50px] gap-2 font-bold transition-all shadow-sm bg-white hover:bg-slate-100 text-slate-600 border-slate-200"
                     onClick={() => updateWorkStatus?.("IN_PROGRESS")}
                   >
                     <PlayCircle className="h-4 w-4" />

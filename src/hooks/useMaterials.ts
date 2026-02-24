@@ -4,6 +4,7 @@ import { MaterialsType } from "@/types/materials.type";
 import { materialsService } from "@/services/materials.service";
 import { studentPostService } from "@/services/instructorPost.service";
 import { myPostServiceSVC } from "@/services/SVC/studentPost.service";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 export const useMaterials = (params: {
   page: number;
@@ -13,6 +14,7 @@ export const useMaterials = (params: {
   search?: string | undefined;
 }) => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
 
   // 목록 조회
   const materialsQuery = useQuery({
@@ -28,11 +30,13 @@ export const useMaterials = (params: {
         queryKey: ["materials"],
         refetchType: "active",
       });
-      alert("학습 자료가 성공적으로 등록되었습니다.");
+      showAlert({ description: "학습 자료가 성공적으로 등록되었습니다." });
     },
     onError: (error) => {
       console.error("등록 실패:", error);
-      alert("자료 등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "자료 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -56,11 +60,13 @@ export const useMaterials = (params: {
         queryKey: ["materials"],
         refetchType: "active",
       });
-      alert("자료가 수정되었습니다.");
+      showAlert({ description: "자료가 수정되었습니다." });
     },
     onError: (error) => {
       console.error("수정 실패:", error);
-      alert("자료 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "자료 수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -72,11 +78,13 @@ export const useMaterials = (params: {
         queryKey: ["materials"],
         refetchType: "active",
       });
-      alert("자료가 삭제되었습니다.");
+      showAlert({ description: "자료가 삭제되었습니다." });
     },
     onError: (error) => {
       console.error("삭제 실패:", error);
-      alert("자료 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
+      showAlert({
+        description: "자료 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+      });
     },
   });
 
@@ -96,6 +104,8 @@ export const useMaterialDetail = (id: string) => {
 type DownloadRole = "EDUCATORS" | "LEARNERS";
 
 export const useDownloadMaterial = (role: DownloadRole) => {
+  const { showAlert } = useDialogAlert();
+
   return useMutation({
     mutationFn: async ({
       materialsId,
@@ -144,7 +154,7 @@ export const useDownloadMaterial = (role: DownloadRole) => {
       const { url, type } = response.data;
 
       if (!url) {
-        alert("유효한 URL이 없습니다.");
+        showAlert({ description: "유효한 URL이 없습니다." });
         return;
       }
 
@@ -167,7 +177,7 @@ export const useDownloadMaterial = (role: DownloadRole) => {
       }
     },
     onError: () => {
-      alert("다운로드 정보를 가져오는데 실패했습니다.");
+      showAlert({ description: "다운로드 정보를 가져오는데 실패했습니다." });
     },
   });
 };

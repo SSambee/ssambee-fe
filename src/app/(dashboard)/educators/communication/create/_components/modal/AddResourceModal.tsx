@@ -80,28 +80,28 @@ export default function AddResourceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
-      <DialogContent className="max-h-[90vh] max-w-4xl flex flex-col p-6 overflow-hidden">
-        <DialogHeader className="text-left">
-          <DialogTitle className="text-xl font-bold">
+      <DialogContent className="max-h-[90vh] max-w-4xl flex flex-col overflow-hidden p-[32px]">
+        <DialogHeader className="text-left space-y-1">
+          <DialogTitle className="text-[24px] font-bold text-label-normal">
             자료실 검색 및 첨부 선택
           </DialogTitle>
-          <DialogDescription>
-            필요한 자료를 검색해 선택한 뒤 업무 지시에 첨부합니다.
+          <DialogDescription className="text-[18px] font-medium text-label-alternative">
+            필요한 자료를 검색해 첨부해보세요.
           </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4 grid gap-3 md:grid-cols-[1fr_180px]">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
             <Input
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
               placeholder="자료명 또는 분류로 검색"
-              className="pl-9"
+              className="h-14 pl-11 pr-4 text-base placeholder:text-base"
             />
           </div>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger>
+            <SelectTrigger className="h-14 text-base">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -114,7 +114,7 @@ export default function AddResourceModal({
           </Select>
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="mt-4 flex items-center justify-between text-sm text-slate-500 font-medium">
           <span>
             {isLoading
               ? "검색 결과 로딩 중..."
@@ -123,17 +123,17 @@ export default function AddResourceModal({
           <span>선택 {tempSelected.length}건</span>
         </div>
 
-        <div className="mt-2 flex-1 overflow-y-auto space-y-2 rounded-lg border bg-background p-2">
+        <div className="mt-2 flex-1 overflow-y-auto space-y-2 rounded-xl border border-slate-200 bg-slate-50/30 p-3 scrollbar-hide">
           {isLoading ? (
-            <div className="rounded-md px-4 py-10 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl px-4 py-10 text-center text-base text-slate-500">
               자료실 데이터를 불러오는 중입니다.
             </div>
           ) : error ? (
-            <div className="rounded-md px-4 py-10 text-center text-sm text-destructive">
+            <div className="rounded-xl px-4 py-10 text-center text-base text-red-500">
               데이터를 불러오는 중 에러가 발생했습니다.
             </div>
           ) : attachments.length === 0 ? (
-            <div className="rounded-md px-4 py-10 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl px-4 py-10 text-center text-base text-slate-500">
               검색 조건에 맞는 자료가 없습니다.
             </div>
           ) : (
@@ -149,13 +149,13 @@ export default function AddResourceModal({
                   onClick={() => handleToggleSelection(item)}
                   className={`group flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
                     isChecked
-                      ? "bg-blue-50/50 border-blue-200 shadow-sm"
+                      ? "bg-white border-blue-200"
                       : "bg-white border-transparent hover:bg-slate-50/80 hover:border-slate-200"
                   }`}
                 >
                   <div className="flex items-center gap-4 overflow-hidden">
                     <div
-                      className={`p-2.5 rounded-lg border shadow-sm transition-colors ${
+                      className={`p-2.5 rounded-lg border transition-colors ${
                         isChecked
                           ? "bg-white border-blue-100"
                           : "bg-slate-50 border-slate-100"
@@ -194,7 +194,7 @@ export default function AddResourceModal({
                       checked={isChecked}
                       className={`h-5 w-5 transition-all ${
                         isChecked
-                          ? "border-blue-600 bg-blue-600"
+                          ? "border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
                           : "border-slate-300"
                       }`}
                     />
@@ -205,20 +205,20 @@ export default function AddResourceModal({
           )}
         </div>
 
-        <DialogFooter className="mt-6 gap-2">
+        <DialogFooter className="mt-4 gap-2">
           <Button
             type="button"
             variant="outline"
-            className="rounded-full px-6"
             onClick={handleCancel}
+            className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
           >
             취소
           </Button>
           <Button
             type="button"
-            className="rounded-full px-6"
             onClick={handleApply}
             disabled={isLoading || !!error}
+            className="h-14 w-auto min-w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-6 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             선택 자료 첨부 ({tempSelected.length})
           </Button>

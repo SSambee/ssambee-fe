@@ -68,17 +68,17 @@ export default function LectureDetailPage() {
         />
       </div>
 
-      {/* 성적 변화 그래프 */}
       <Card>
         <CardContent className="p-8">
           <div className="flex items-center justify-between pb-16">
-            <p className="text-[24px] font-bold">
+            <p className="text-[24px] font-bold text-neutral-700">
               성적 변화 추이{" "}
-              <span className="text-[24px] text-brand-700">
-                {selectedExamIds.length}개
-              </span>
+              {selectedExamIds.length > 0 && (
+                <span className="text-[24px] text-brand-700">
+                  {selectedExamIds.length}개
+                </span>
+              )}
             </p>
-            {/* 선택 초기화 버튼 */}
             <div>
               {selectedExamIds.length > 0 && (
                 <Button variant="outline" onClick={handleResetSelection}>
@@ -97,11 +97,12 @@ export default function LectureDetailPage() {
         </CardContent>
       </Card>
 
-      {/* 시험 목록 테이블 */}
       <Card>
         <CardContent className="p-6">
           <div className="pb-3">
-            <p className="text-sm font-bold text-muted-foreground">시험 목록</p>
+            <p className="font-bold text-neutral-700 text-[20px] py-[11px]">
+              시험 목록
+            </p>
           </div>
 
           {grades.length > 0 ? (

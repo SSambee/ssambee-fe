@@ -33,15 +33,15 @@ export function StudentFilter({
   lectureOptions,
 }: StudentFilterProps) {
   return (
-    <div className="border rounded-lg p-4 mt-[74px]">
-      <div className="w-full flex flex-col items-start gap-2 mb-3">
-        <h2 className="text-lg font-semibold mr-1">수업 선택</h2>
+    <div className="border rounded-[20px] px-[40px] py-[32px] mt-[34px]">
+      <div className="w-full flex flex-col items-start gap-2">
+        <h2 className="text-[24px] font-semibold mb-[16px]">수업 선택</h2>
 
         <div className="w-full flex flex-wrap items-center gap-4">
           <div className="w-full lg:w-[280px] shrink-0 h-14">
             <SelectBtn
               className="text-base px-4 h-full w-full"
-              optionSize="sm"
+              optionSize="lg"
               value={query.lecture ?? "all"}
               placeholder="전체 수업"
               options={lectureOptions.map((option) => ({
@@ -77,7 +77,7 @@ export function StudentFilter({
 
           <div className="flex-1 flex flex-wrap sm:flex-nowrap justify-end items-center gap-3 h-full text-base">
             <Input
-              className="h-14 w-full sm:flex-1 min-w-[200px] max-w-[400px] p-4 text-base placeholder:text-base"
+              className="h-[56px] w-full sm:flex-1 min-w-[200px] max-w-[400px] p-4 text-base placeholder:text-base shadow-none border border-neutral-200 rounded-[12px]"
               placeholder="이름, 전화번호로 검색해보세요"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -86,7 +86,7 @@ export function StudentFilter({
               <div className="h-full">
                 <SelectBtn
                   className="text-base px-4 h-full w-full"
-                  optionSize="sm"
+                  optionSize="lg"
                   value={query.year ?? "all"}
                   placeholder="학년 선택"
                   options={GRADE_SELECT_OPTIONS}
@@ -102,7 +102,7 @@ export function StudentFilter({
               <div className="h-full">
                 <SelectBtn
                   className="text-base px-4 h-full w-full"
-                  optionSize="sm"
+                  optionSize="lg"
                   value={query.status ?? "all"}
                   placeholder="상태 선택"
                   options={STATUS_SELECT_OPTIONS}

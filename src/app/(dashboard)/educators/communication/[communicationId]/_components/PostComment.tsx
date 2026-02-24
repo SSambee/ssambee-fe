@@ -117,7 +117,7 @@ export default function PostComment({
               </div>
               <Button
                 onClick={handleSubmitAnswer}
-                className="h-11 px-8 rounded-xl text-[14px] font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-100 transition-all active:scale-95 flex items-center gap-2"
+                className="h-14 w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer"
               >
                 {isNoticePost ? "댓글 등록" : "답변 등록"}
               </Button>

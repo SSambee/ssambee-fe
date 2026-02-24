@@ -81,7 +81,7 @@ export default function SelectBtn({
         disabled={disabled}
         className={cn(
           baseClasses,
-          "[&>svg]:hidden outline-none",
+          "[&>svg]:hidden outline-none rounded-[12px]",
           stateClasses,
           disabled ? disabledClasses : "",
           className
@@ -96,7 +96,7 @@ export default function SelectBtn({
           )}
         </div>
       </SelectTrigger>
-      <SelectContent className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-none!">
+      <SelectContent className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-none! rounded-[12px]">
         {options.map((option) => (
           <SelectItem
             key={option.value}

@@ -5,7 +5,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { InputForm } from "@/components/common/input/InputForm";
 import { TextareaForm } from "@/components/common/input/TextareaForm";
 import FileUploadField from "@/components/common/input/FileUploadField";
@@ -129,83 +128,87 @@ export default function OtherTypeForm({
   }, [imageFile, initialData?.id, imageRemoved]);
 
   return (
-    <Card>
-      <CardContent className="p-6 space-y-6">
-        <div>
-          <h3 className="font-semibold text-lg mb-2">
-            {mode === "create" ? "기타 자료 등록" : "기타 자료"}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {mode === "create"
-              ? "이미지 등의 자료를 업로드합니다."
-              : mode === "view"
-                ? "기타 자료 정보를 확인합니다."
-                : "기타 자료 정보를 수정합니다."}
-          </p>
+    <div
+      className={`space-y-4 border rounded-[20px] bg-white ${mode !== "create" ? "shadow-sm p-10" : "px-[24px] py-[16px]"}`}
+    >
+      <div className="py-4">
+        <h3
+          className={`font-semibold text-label-neutral ${mode !== "create" ? "text-[20px]" : "text-[18px]"}`}
+        >
+          {mode === "create" ? "기타 자료 등록" : "기타 자료"}
+        </h3>
+        <p
+          className={`text-muted-foreground ${mode !== "create" ? "text-[18px]" : "text-sm"}`}
+        >
+          {mode === "create"
+            ? "이미지 등의 자료를 업로드합니다."
+            : mode === "view"
+              ? "기타 자료 정보를 확인합니다."
+              : "기타 자료 정보를 수정합니다."}
+        </p>
+      </div>
+
+      <div className="space-y-4 pb-4">
+        <div className="grid grid-cols-4 gap-2">
+          <div className="col-span-3">
+            <InputForm
+              label="제목"
+              id="title"
+              error={errors.title?.message}
+              disabled={isDisabled}
+              {...register("title")}
+            />
+          </div>
+
+          <div className="col-span-1">
+            <InputForm
+              label="등록자"
+              id="writer"
+              readOnly
+              className="bg-white"
+              {...register("writer")}
+            />
+          </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-4 gap-2 ">
-            <div className="col-span-3">
-              <InputForm
-                label="제목"
-                id="title"
-                error={errors.title?.message}
-                disabled={isDisabled}
-                {...register("title")}
-              />
-            </div>
+        <TextareaForm
+          label="세부 내용"
+          id="description"
+          error={errors.description?.message}
+          disabled={isDisabled}
+          {...register("description")}
+        />
 
-            <div className="col-span-1">
-              <InputForm
-                label="등록자"
-                id="writer"
-                readOnly
-                className="bg-gray-50"
-                {...register("writer")}
+        {!isDisabled && (
+          <FileUploadField
+            label="이미지"
+            file={imageFile}
+            onFileChange={handleImageChange}
+            accept="image/*"
+            error={errors.image?.message as string}
+            showPreview={true}
+            externalPreviewUrl={displayImageUrl}
+          />
+        )}
+
+        {isDisabled && displayImageUrl && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              이미지
+            </label>
+            <div className="border border-neutral-200 rounded-[12px] p-4 bg-white">
+              <Image
+                src={displayImageUrl}
+                alt={initialData?.title || "이미지"}
+                width={400}
+                height={300}
+                unoptimized={true}
+                className="max-w-full h-auto max-h-[300px] rounded-[12px] object-contain"
               />
             </div>
           </div>
-
-          <TextareaForm
-            label="세부 내용"
-            id="description"
-            error={errors.description?.message}
-            disabled={isDisabled}
-            {...register("description")}
-          />
-
-          {!isDisabled && (
-            <FileUploadField
-              label="이미지"
-              file={imageFile}
-              onFileChange={handleImageChange}
-              accept="image/*"
-              error={errors.image?.message as string}
-              showPreview={true}
-              externalPreviewUrl={displayImageUrl}
-            />
-          )}
-
-          {isDisabled && displayImageUrl && (
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                이미지
-              </label>
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <Image
-                  src={displayImageUrl}
-                  alt={initialData?.title || "이미지"}
-                  width={400}
-                  height={300}
-                  unoptimized={true}
-                  className="max-w-full h-auto max-h-[300px] rounded-lg object-contain"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 }

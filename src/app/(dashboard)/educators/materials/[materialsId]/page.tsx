@@ -175,43 +175,43 @@ export default function MaterialsDetailPage() {
 
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <div className="flex items-center justify-between">
-        <Title
-          title={mode === "view" ? "학습 자료 상세" : "학습 자료 수정"}
-          description={
-            mode === "view"
-              ? "학습 자료의 상세 정보를 확인합니다."
-              : "학습 자료 정보를 수정합니다."
-          }
-        />
+      <Title
+        title={mode === "view" ? "학습 자료 상세" : "학습 자료 수정"}
+        description={
+          mode === "view"
+            ? "학습 자료의 상세 정보를 확인합니다."
+            : "학습 자료 정보를 수정합니다."
+        }
+      />
 
-        <div className="flex gap-2">
+      <div className="space-y-8">
+        <div className="flex flex-wrap items-center justify-end gap-3">
           {mode === "view" ? (
             <>
               {material.type !== "VIDEO" && (
                 <Button
                   variant="outline"
                   onClick={handleDownload}
-                  className="cursor-pointer"
+                  className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
                 >
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-5 w-5" />
                   다운로드
                 </Button>
               )}
               <Button
                 variant="outline"
                 onClick={handleEdit}
-                className="cursor-pointer"
+                className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
               >
-                <Edit className="h-4 w-4 mr-2" />
+                <Edit className="h-5 w-5" />
                 수정
               </Button>
               <Button
                 variant="outline"
                 onClick={handleDelete}
-                className="cursor-pointer"
+                className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-5 w-5" />
                 삭제
               </Button>
             </>
@@ -220,35 +220,35 @@ export default function MaterialsDetailPage() {
               <Button
                 variant="outline"
                 onClick={handleCancel}
-                className="cursor-pointer"
+                className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
               >
                 취소
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={!isFormValid || updateMutation.isPending}
-                className={`cursor-pointer ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
+                className="h-14 w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updateMutation.isPending ? "저장 중..." : "저장"}
               </Button>
             </>
           )}
         </div>
+
+        <div>{renderForm()}</div>
+
+        {mode === "view" && (
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
+            >
+              목록으로
+            </Button>
+          </div>
+        )}
       </div>
-
-      {renderForm()}
-
-      {mode === "view" && (
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="cursor-pointer"
-          >
-            목록으로
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
