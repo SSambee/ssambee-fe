@@ -18,9 +18,6 @@ export const metadata: Metadata = {
   },
   description: DEFAULT_DESCRIPTION,
   keywords: ["학원 관리", "학생 관리", "수업 운영", "조교 관리", "SSam B"],
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,

@@ -142,7 +142,7 @@ export default function ExperienceSectionClient() {
           </motion.p>
         </motion.div>
 
-        <div className="overflow-hidden" aria-label="SSam B 사용자 후기">
+        <section className="overflow-hidden" aria-label="SSam B 사용자 후기">
           <motion.div
             className="flex w-max gap-4"
             animate={
@@ -162,65 +162,70 @@ export default function ExperienceSectionClient() {
                   }
             }
           >
-            {marqueeTestimonials.map((testimonial, index) => (
-              <motion.article
-                key={`${testimonial.id}-${index}`}
-                className="relative h-[220px] w-[260px] shrink-0 overflow-hidden rounded-2xl bg-[#476ff7] px-6 py-6 shadow-[0px_0px_40px_0px_rgba(92,127,248,0.2)]"
-                initial={
-                  prefersReducedMotion
-                    ? undefined
-                    : { opacity: 0, y: 16, scale: 0.98 }
-                }
-                whileInView={
-                  prefersReducedMotion
-                    ? undefined
-                    : { opacity: 1, y: 0, scale: 1 }
-                }
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{
-                  duration: 0.42,
-                  ease: "easeOut",
-                  delay: prefersReducedMotion ? 0 : index * 0.07,
-                }}
-                whileHover={
-                  prefersReducedMotion
-                    ? undefined
-                    : {
-                        y: -7,
-                        scale: 1.025,
-                        boxShadow: "0px 28px 56px 0px rgba(55,86,170,0.32)",
-                      }
-                }
-              >
-                <div className="absolute inset-0 bg-[#f4f6fe] opacity-10" />
-                <div className="relative flex h-full flex-col justify-between">
-                  <div className="space-y-3">
-                    <ReviewRoleAvatar
-                      role={testimonial.role}
-                      seedKey={`${testimonial.id}-${testimonial.name}`}
-                    />
-                    <div>
-                      <div className="flex items-center gap-1.5 text-[16px] leading-6 tracking-[-0.16px]">
-                        <p className="font-semibold text-[#f4f6fe]">
-                          {testimonial.name}
-                        </p>
-                        <p className="font-medium text-[#ced9fd]">
-                          {testimonial.role}
+            {marqueeTestimonials.map((testimonial, index) => {
+              const isDuplicate = index >= testimonials.length;
+
+              return (
+                <motion.article
+                  key={`${testimonial.id}-${index}`}
+                  aria-hidden={isDuplicate}
+                  className="relative h-[220px] w-[260px] shrink-0 overflow-hidden rounded-2xl bg-[#476ff7] px-6 py-6 shadow-[0px_0px_40px_0px_rgba(92,127,248,0.2)]"
+                  initial={
+                    prefersReducedMotion
+                      ? undefined
+                      : { opacity: 0, y: 16, scale: 0.98 }
+                  }
+                  whileInView={
+                    prefersReducedMotion
+                      ? undefined
+                      : { opacity: 1, y: 0, scale: 1 }
+                  }
+                  viewport={{ once: true, amount: 0.25 }}
+                  transition={{
+                    duration: 0.42,
+                    ease: "easeOut",
+                    delay: prefersReducedMotion ? 0 : index * 0.07,
+                  }}
+                  whileHover={
+                    prefersReducedMotion
+                      ? undefined
+                      : {
+                          y: -7,
+                          scale: 1.025,
+                          boxShadow: "0px 28px 56px 0px rgba(55,86,170,0.32)",
+                        }
+                  }
+                >
+                  <div className="absolute inset-0 bg-[#f4f6fe] opacity-10" />
+                  <div className="relative flex h-full flex-col justify-between">
+                    <div className="space-y-3">
+                      <ReviewRoleAvatar
+                        role={testimonial.role}
+                        seedKey={`${testimonial.id}-${testimonial.name}`}
+                      />
+                      <div>
+                        <div className="flex items-center gap-1.5 text-[16px] leading-6 tracking-[-0.16px]">
+                          <p className="font-semibold text-[#f4f6fe]">
+                            {testimonial.name}
+                          </p>
+                          <p className="font-medium text-[#ced9fd]">
+                            {testimonial.role}
+                          </p>
+                        </div>
+                        <p className="text-lg leading-5 tracking-tight text-[#f9d14c]">
+                          ★★★★★
                         </p>
                       </div>
-                      <p className="text-lg leading-5 tracking-tight text-[#f9d14c]">
-                        ★★★★★
-                      </p>
                     </div>
+                    <p className="whitespace-pre-line text-[13px] font-normal leading-5 tracking-[-0.13px] text-[#ced9fd]">
+                      {testimonial.content}
+                    </p>
                   </div>
-                  <p className="whitespace-pre-line text-[13px] font-normal leading-5 tracking-[-0.13px] text-[#ced9fd]">
-                    {testimonial.content}
-                  </p>
-                </div>
-              </motion.article>
-            ))}
+                </motion.article>
+              );
+            })}
           </motion.div>
-        </div>
+        </section>
       </div>
     </section>
   );
