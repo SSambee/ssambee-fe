@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
+import { KAKAO_MESSAGE_LIMITS } from "@/constants/kakao";
 
 // 공통 수신자 타입
 export type NotificationRecipient = {
@@ -264,12 +265,24 @@ export function KakaoNotificationModal({
 
           {/* 메시지 내용 */}
           <div className="space-y-3">
-            <h3 className="text-[14px] font-semibold text-[#6b6f80]">
-              메시지 내용
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[14px] font-semibold text-[#6b6f80]">
+                메시지 내용
+              </h3>
+              <span
+                className={`text-[12px] font-medium tabular-nums ${
+                  message.length > KAKAO_MESSAGE_LIMITS.DESCRIPTION
+                    ? "text-[#e55b5b]"
+                    : "text-[#8b90a3]"
+                }`}
+              >
+                {message.length} / {KAKAO_MESSAGE_LIMITS.DESCRIPTION}
+              </span>
+            </div>
             <Textarea
               placeholder="전송할 메시지를 입력하세요"
               className="min-h-[120px] resize-none rounded-[12px] border-[#d6d9e0] bg-[#fcfcfd] p-4 text-[14px] leading-6 text-[#4a4d5c] placeholder:text-[#8b90a3] focus:border-[#3863f6] focus:ring-[#3863f6]/20"
+              maxLength={KAKAO_MESSAGE_LIMITS.DESCRIPTION}
               value={message}
               onChange={(event) => setMessage(event.target.value)}
             />

@@ -10,6 +10,7 @@ import {
   saveStudentReport,
   uploadGradeReportFile,
 } from "@/services/exams/report.service";
+import { sendKakaoMemo } from "@/services/kakao.service";
 import type { ReportTemplateExamData } from "@/types/report";
 import { createReportPreviewImageFile } from "@/utils/report-preview-image";
 
@@ -174,11 +175,16 @@ export const useSimpleReportTemplateActions = ({
         throw new Error("성적표 다운로드 URL을 가져오지 못했습니다.");
       }
 
+      await sendKakaoMemo({
+        title: `${examData.studentName} | ${examData.examName} 성적표`,
+        description: `점수: ${examData.score}점 · 석차: ${examData.rank}/${examData.totalStudents}`,
+        imageUrl: imageUploadResult.reportUrl ?? undefined,
+        webUrl: downloadUrl,
+      });
+
       await showAlert({
-        title: "발송 준비 완료",
-        description: imageUploadResult.reportUrl
-          ? "PDF와 미리보기 이미지 업로드가 완료되었습니다. 카카오톡 발송 기능은 현재 연동 준비 중입니다."
-          : "성적표 파일 업로드가 완료되었습니다. 카카오톡 발송 기능은 현재 연동 준비 중입니다.",
+        title: "발송 완료",
+        description: "카카오톡으로 성적표가 전송되었습니다.",
       });
     } catch (error) {
       console.error("Report send failed:", error);
