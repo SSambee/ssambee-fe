@@ -14,7 +14,7 @@ import {
   CheckedIcon,
   EyeClosedIcon,
   EyeOpenIcon,
-  GoogleIcon,
+  // GoogleIcon,
   UncheckedIcon,
 } from "@/components/icons/AuthIcons";
 
