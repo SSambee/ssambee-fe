@@ -73,10 +73,10 @@ export default function LoginForm({ selectedRole }: LoginFormProps) {
   };
 
   // 구글 로그인
-  const handleGoogleLogin = () => {
-    console.log("구글 로그인 요청");
-    // TODO: 구글 OAuth
-  };
+  // const handleGoogleLogin = () => {
+  //   console.log("구글 로그인 요청");
+  //   // TODO: 구글 OAuth
+  // };
 
   const footerContent =
     FOOTER_CONFIG[selectedRole as keyof typeof FOOTER_CONFIG] ||
