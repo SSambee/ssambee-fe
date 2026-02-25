@@ -2,8 +2,6 @@
 
 ![SSam B Logo](assets/ssam-b-logo.png)
 
-# SSam B 프론트엔드
-
 **학원/수업 운영을 위한 통합 플랫폼**
 
 강사/조교(MGMT)와 학생/학부모(SVC)를 위한 직관적인 대시보드와 관리 시스템
