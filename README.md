@@ -4,7 +4,6 @@
 
 **학원/수업 운영을 위한 통합 플랫폼**
 
-
 수업 운영부터 학생 관리까지 SSam B에서 한번에 운영하세요
 
 ![Ssam B Landing](assets/ssamb_landing.png)
@@ -34,6 +33,7 @@
 - [🚢 배포 및 운영](#-배포-및-운영)
 
 ---
+
 ## ❤️ 프로젝트 개요
 
 ~~
@@ -91,6 +91,7 @@
 ## 🛠 기술 스택
 
 ### 🏗 Core
+
 <p>
   <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white"/>
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
@@ -99,6 +100,7 @@
 </p>
 
 ### 🎨 UI / UX
+
 <p>
   <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
   <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white"/>
@@ -109,6 +111,7 @@
 </p>
 
 ### ⚙ State & Data
+
 <p>
   <img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Zustand-443E38?style=for-the-badge"/>
@@ -118,6 +121,7 @@
 </p>
 
 ### 🩺 Quality
+
 <p>
   <img src="https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white"/>
   <img src="https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white"/>
@@ -126,6 +130,7 @@
 </p>
 
 ---
+
 ## 🌐 시스템 아키텍처
 
 ~~
@@ -134,15 +139,15 @@
 
 ## 🛸 팀 소개
 
-
 ## 👥 팀원 소개
 
-| 👑 박창기 | 이유리 | 임경민 | 김윤기 |
-| :---: | :---: | :---: | :---: |
-| ![창기](https://github.com/p-changki.png?s=20) | ![유리](https://github.com/yoorrll.png?s=20)| ![경민](https://github.com/play-ancora-gyungmin.png?s=20) | ![윤기](https://github.com/rklpoi5678.png?s=20) |
-| PM & 프론트 | 프론트 | 백엔드 | 백엔드 & 배포 |
+|                   👑 박창기                    |                    이유리                    |                          임경민                           |                     김윤기                      |
+| :--------------------------------------------: | :------------------------------------------: | :-------------------------------------------------------: | :---------------------------------------------: |
+| ![창기](https://github.com/p-changki.png?s=20) | ![유리](https://github.com/yoorrll.png?s=20) | ![경민](https://github.com/play-ancora-gyungmin.png?s=20) | ![윤기](https://github.com/rklpoi5678.png?s=20) |
+|                  PM & 프론트                   |                    프론트                    |                          백엔드                           |                  백엔드 & 배포                  |
 
 ---
+
 ## 🥊 트러블 슈팅
 
 ~~

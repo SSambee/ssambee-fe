@@ -19,39 +19,79 @@ import SelectBtn from "@/components/common/button/SelectBtn";
 import { useModal } from "@/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
+import { sendKakaoMemo } from "@/services/kakao.service";
+import { KAKAO_MESSAGE_LIMITS } from "@/constants/kakao";
+import { useDialogAlert } from "@/hooks/useDialogAlert";
 
 type SendTarget = "all" | "student" | "parent";
 
 export function TalkNotificationModal() {
   const { isOpen, closeModal } = useModal();
+  const { showAlert } = useDialogAlert();
   const [sendChannel, setSendChannel] = useState("kakao");
   const [sendTarget, setSendTarget] = useState<SendTarget>("all");
   const [messageContent, setMessageContent] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-  const {
-    selectedStudents,
-    selectedStudentIds,
-    removeStudent,
-    resetSelection,
-  } = useStudentSelectionStore();
+  const { selectedStudents, removeStudent, resetSelection } =
+    useStudentSelectionStore();
 
-  const getExpectedRecipients = () => {
-    const studentCount = selectedStudents.length;
-    if (sendTarget === "all") return studentCount * 2; // 학생 + 학부모
-    return studentCount;
-  };
-
-  const handleSubmit = () => {
-    console.log({
-      studentIds: selectedStudentIds,
-      sendChannel,
-      sendTarget,
-      messageContent,
+  const getRecipientStats = () => {
+    const studentCount = selectedStudents.filter((s) => s.phoneNumber).length;
+    const parentCount = selectedStudents.filter((s) => s.parentPhone).length;
+    const expectedRecipients =
+      sendTarget === "all"
+        ? studentCount + parentCount
+        : sendTarget === "student"
+          ? studentCount
+          : parentCount;
+    const deliverableStudents = selectedStudents.filter((student) => {
+      if (sendTarget === "student") return Boolean(student.phoneNumber);
+      if (sendTarget === "parent") return Boolean(student.parentPhone);
+      return Boolean(student.phoneNumber || student.parentPhone);
     });
 
-    resetForm();
-    resetSelection();
-    closeModal();
+    return { expectedRecipients, deliverableStudents };
+  };
+
+  const handleSubmit = async () => {
+    const { expectedRecipients, deliverableStudents } = getRecipientStats();
+    const nameList = deliverableStudents.map((s) => s.name).join(", ");
+    const targetLabel =
+      sendTarget === "all"
+        ? "학생+학부모"
+        : sendTarget === "student"
+          ? "학생"
+          : "학부모";
+
+    if (expectedRecipients === 0) {
+      await showAlert({
+        title: "전송 불가",
+        description: "선택한 발송 대상의 연락처가 없습니다.",
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      await sendKakaoMemo({
+        title: `[알림] ${expectedRecipients}명 대상 (${targetLabel})`,
+        description: `${messageContent}\n\n수신 대상: ${nameList}`,
+        webUrl: window.location.origin,
+        buttonTitle: "홈페이지로 가기",
+      });
+      resetForm();
+      resetSelection();
+      closeModal();
+    } catch (error) {
+      console.error("Talk notification send failed:", error);
+      await showAlert({
+        title: "전송 실패",
+        description: "카카오 알림 전송 중 오류가 발생했습니다.",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const resetForm = () => {
@@ -89,7 +129,7 @@ export function TalkNotificationModal() {
                 발송 설정
               </h3>
               <p className="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                총 예상 수신: {getExpectedRecipients()}명
+                총 예상 수신: {getRecipientStats().expectedRecipients}명
               </p>
             </div>
             <div className="w-full grid grid-cols-2 gap-4 items-start pb-2">
@@ -189,15 +229,27 @@ export function TalkNotificationModal() {
           </div>
 
           <div className="space-y-4 border rounded-[20px] px-[24px] py-[16px] bg-surface-normal-light-alternative">
-            <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
-              메시지 내용
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[18px] font-semibold text-label-neutral py-[11px]">
+                메시지 내용
+              </h3>
+              <span
+                className={`text-[12px] font-medium tabular-nums ${
+                  messageContent.length > KAKAO_MESSAGE_LIMITS.DESCRIPTION
+                    ? "text-red-500"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {messageContent.length} / {KAKAO_MESSAGE_LIMITS.DESCRIPTION}
+              </span>
+            </div>
             <div className="space-y-2">
               <Textarea
                 value={messageContent}
                 onChange={(e) => setMessageContent(e.target.value)}
                 placeholder="전송할 메시지를 입력하세요"
                 className="text-base p-4 min-h-[160px] w-full rounded-[12px] bg-white border border-neutral-200 shadow-none focus-visible:ring-blue-500"
+                maxLength={KAKAO_MESSAGE_LIMITS.DESCRIPTION}
                 rows={6}
               />
             </div>
@@ -224,10 +276,11 @@ export function TalkNotificationModal() {
               disabled={
                 !messageContent ||
                 selectedStudents.length === 0 ||
-                getExpectedRecipients() === 0
+                getRecipientStats().expectedRecipients === 0 ||
+                isSending
               }
             >
-              알림 전송
+              {isSending ? "전송 중..." : "알림 전송"}
             </Button>
           </div>
         </DialogFooter>

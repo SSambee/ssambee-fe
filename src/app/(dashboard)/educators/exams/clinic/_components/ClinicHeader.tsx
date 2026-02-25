@@ -9,6 +9,7 @@ import {
   KakaoNotificationModal,
   NotificationRecipient,
 } from "@/components/common/modals/KakaoNotificationModal";
+import { sendKakaoMemo } from "@/services/kakao.service";
 import type { ClinicStudent } from "@/types/clinics";
 
 type ClinicHeaderProps = {
@@ -17,6 +18,8 @@ type ClinicHeaderProps = {
   onSendNotification: () => void;
   isSending?: boolean;
 };
+
+type NotificationTargetType = "all" | "student" | "parent";
 
 export function ClinicHeader({
   students,
@@ -50,6 +53,45 @@ export function ClinicHeader({
   const handleOpenModal = () => {
     if (selectedIds.length > 0) {
       setIsModalOpen(true);
+    }
+  };
+
+  const handleSend = async (
+    recipients: NotificationRecipient[],
+    message: string,
+    targetType: NotificationTargetType
+  ) => {
+    const targetLabel =
+      targetType === "all"
+        ? "학생+학부모"
+        : targetType === "student"
+          ? "학생"
+          : "학부모";
+    const deliverableRecipients = recipients.filter((recipient) => {
+      if (targetType === "student") return Boolean(recipient.phone);
+      if (targetType === "parent") return Boolean(recipient.parentPhone);
+      return Boolean(recipient.phone || recipient.parentPhone);
+    });
+
+    if (deliverableRecipients.length === 0) {
+      throw new Error("No available recipients for selected target type.");
+    }
+
+    const nameList = deliverableRecipients.map((r) => r.name).join(", ");
+
+    try {
+      await sendKakaoMemo({
+        title: `[클리닉 알림] ${deliverableRecipients.length}명 대상 (${targetLabel})`,
+        description: `발송 대상: ${targetLabel}\n${message}\n\n수신 대상: ${nameList}`,
+        webUrl: window.location.origin,
+        buttonTitle: "홈페이지로 가기",
+      });
+
+      // 기존 완료 처리 로직 실행
+      onSendNotification();
+    } catch (error) {
+      console.error("Clinic notification send failed:", error);
+      throw error;
     }
   };
 
@@ -97,7 +139,9 @@ export function ClinicHeader({
         title="클리닉 알림 발송 준비"
         subtitle="클리닉 대상자 발송 정보 확인"
         defaultMessage={clinicDefaultMessage}
-        sendAction={() => onSendNotification()}
+        sendAction={(recipients, message, targetType) =>
+          handleSend(recipients, message, targetType)
+        }
       />
     </>
   );
