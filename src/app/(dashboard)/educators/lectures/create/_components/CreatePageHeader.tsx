@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 
 type CreatePageHeaderProps = {
   isSaved: boolean;
+  isSubmitting: boolean;
   onSave: () => void;
   onCancel: () => void;
 };
 
 export function CreatePageHeader({
   isSaved,
+  isSubmitting,
   onSave,
   onCancel,
 }: CreatePageHeaderProps) {
@@ -27,10 +29,10 @@ export function CreatePageHeader({
         <div className="flex items-center gap-2 sm:gap-3">
           <Button
             onClick={onSave}
-            disabled={isSaved}
+            disabled={isSaved || isSubmitting}
             className="h-12 w-[112px] rounded-[12px] bg-[#3863f6] px-0 text-[14px] font-semibold leading-5 tracking-[-0.14px] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] sm:h-14 sm:w-[140px] sm:text-[16px] sm:leading-[24px] sm:tracking-[-0.16px]"
           >
-            개설하기
+            {isSubmitting ? "개설 중..." : "개설하기"}
           </Button>
           <Button
             onClick={onCancel}

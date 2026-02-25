@@ -14,6 +14,7 @@ export default function LectureCreatePage() {
     <div className="min-h-screen bg-[#f4f6fa]">
       <CreatePageHeader
         isSaved={state.isSaved}
+        isSubmitting={state.isSubmitting}
         onSave={actions.save}
         onCancel={actions.cancel}
       />
