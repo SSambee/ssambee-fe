@@ -7,7 +7,7 @@
 
 수업 운영부터 학생 관리까지 SSam B에서 한번에 운영하세요
 
-![Ssam B Landing](assets/landing.png)
+![Ssam B Landing](assets/ssamb_landing.png)
 
 </div>
 
@@ -26,6 +26,7 @@
 - [🛠 기술 스택](#-기술-스택)
 - [🌐 시스템 아키텍처](#-시스템-아키텍처)
 - [🛸 팀 소개](#-팀-소개)
+- [🥊 트러블 슈팅](#-트러블-슈팅)
 - [🚀 빠른 시작](#-빠른-시작)
 - [📂 프로젝트 구조](#-프로젝트-구조)
 - [🔒 권한 및 인증](#-권한-및-인증)
@@ -140,6 +141,11 @@
 | :---: | :---: | :---: | :---: |
 | ![창기](https://github.com/p-changki.png?s=20) | ![유리](https://github.com/yoorrll.png?s=20)| ![경민](https://github.com/play-ancora-gyungmin.png?s=20) | ![윤기](https://github.com/rklpoi5678.png?s=20) |
 | PM & 프론트 | 프론트 | 백엔드 | 백엔드 & 배포 |
+
+---
+## 🥊 트러블 슈팅
+
+~~
 
 ---
 
