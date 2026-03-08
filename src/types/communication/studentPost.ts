@@ -92,7 +92,6 @@ export type GetStudentPostDetailResponse = {
 // commonPostComment 타입 사용
 
 // 학생 문의 댓글 생성 & 수정
-export type CreateStudentPostCommentRequest = {
-  content: string;
-  materialIds?: string[];
-};
+export type CreateStudentPostCommentRequest =
+  | { content: string; materialIds?: string[] }
+  | FormData;
