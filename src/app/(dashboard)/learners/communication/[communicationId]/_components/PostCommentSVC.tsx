@@ -1,6 +1,7 @@
 import { Edit, Trash2, X, Paperclip, Save } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { JSONContent } from "@tiptap/react";
+import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ export default function PostCommentSVC({
               <TiptapEditor
                 content={answerContent}
                 onChange={setAnswerContent}
+                onFileUpload={setSelectedFile}
                 placeholder={
                   isNoticePost
                     ? "댓글을 입력하세요..."
@@ -139,7 +141,7 @@ function CommentItemSVC({
   onDelete,
 }: {
   comment: CommonPostComment;
-  onUpdate: (id: string, content: JSONContent) => void;
+  onUpdate: (id: string, content: JSONContent, file?: File | null) => void;
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -162,6 +164,13 @@ function CommentItemSVC({
   const [editContent, setEditContent] = useState<JSONContent>(() =>
     getParsedContent(comment.content)
   );
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  const images =
+    comment.attachments?.filter((f) =>
+      f.filename?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+    ) || [];
 
   // 작성자 표기
   const { authorRole, instructor, assistant, enrollment } = comment;
@@ -199,8 +208,9 @@ function CommentItemSVC({
       await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
-    onUpdate(comment.id, editContent);
+    onUpdate(comment.id, editContent, editFile);
     setIsEditing(false);
+    setEditFile(null);
   };
 
   return (
@@ -242,6 +252,7 @@ function CommentItemSVC({
                   onClick={() => {
                     setIsEditing(false);
                     setEditContent(getParsedContent(comment.content));
+                    setEditFile(null);
                   }}
                   className="h-8 w-8 p-0 text-slate-400"
                 >
@@ -277,6 +288,46 @@ function CommentItemSVC({
             onChange={setEditContent}
             className="min-h-[120px] border-blue-100 shadow-sm"
           />
+          {/* 파일 선택 UI */}
+          <div className="mt-2">
+            <input
+              type="file"
+              accept="image/*"
+              ref={editFileInputRef}
+              onChange={(e) => setEditFile(e.target.files?.[0] ?? null)}
+              className="hidden"
+            />
+            {editFile ? (
+              <div className="p-2 bg-slate-50 border rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Paperclip className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm text-slate-700 truncate max-w-[200px]">
+                    {editFile.name}
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditFile(null);
+                    if (editFileInputRef.current)
+                      editFileInputRef.current.value = "";
+                  }}
+                  className="h-7 w-7 p-0 hover:text-red-500"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => editFileInputRef.current?.click()}
+                className="gap-2 text-slate-500 h-8 px-3 text-sm"
+              >
+                <Paperclip className="h-4 w-4" />
+                이미지 교체
+              </Button>
+            )}
+          </div>
           <p className="text-[10px] text-slate-400 mt-1">
             내용 수정 후 상단의 체크 버튼을 눌러주세요.
           </p>
@@ -287,6 +338,27 @@ function CommentItemSVC({
           readOnly={true}
           className="pt-2 px-2"
         />
+      )}
+
+      {images.length > 0 && (
+        <div className="px-2 mt-2 space-y-3">
+          {images.map((img) => (
+            <div
+              key={img.id || img.filename}
+              className="relative w-full overflow-hidden rounded-lg cursor-pointer bg-slate-50/50"
+              onClick={() => window.open(img.fileUrl, "_blank")}
+            >
+              <Image
+                src={img.fileUrl}
+                alt={img.filename}
+                width={800}
+                height={400}
+                className="w-full h-auto object-contain max-h-[400px]"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
