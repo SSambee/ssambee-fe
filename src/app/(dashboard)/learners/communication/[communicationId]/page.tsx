@@ -67,6 +67,7 @@ export default function CommunicationDetailPageSVC() {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState<JSONContent>({});
+  const [editFile, setEditFile] = useState<File | null>(null);
   const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -114,6 +115,7 @@ export default function CommunicationDetailPageSVC() {
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
+    setEditFile(null);
   };
 
   // 게시글 수정 저장
@@ -126,16 +128,26 @@ export default function CommunicationDetailPageSVC() {
       return;
     }
 
-    // 서버에는 무조건 stringify 해서 전송
-    const payloadContent = JSON.stringify(editContent);
+    // 서버에는 FormData로 전송
+    const formData = new FormData();
+    formData.append("title", editTitle.trim());
+    formData.append("content", JSON.stringify(editContent));
+    if (editFile) {
+      formData.append("file", editFile);
+    }
 
     if (!isNoticePost) {
       updatePostSVC.mutate(
         {
           postId: communicationId,
-          payload: { title: editTitle, content: payloadContent },
+          payload: formData,
         },
-        { onSuccess: () => setIsEditing(false) }
+        {
+          onSuccess: () => {
+            setIsEditing(false);
+            setEditFile(null);
+          },
+        }
       );
     }
   };
@@ -182,16 +194,20 @@ export default function CommunicationDetailPageSVC() {
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    const payload = { content: JSON.stringify(answerContent) };
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(answerContent));
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
 
     if (isNoticePost) {
       createInstructorPostCommentSVC.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     } else {
       createCommentSVC.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     }
@@ -200,24 +216,32 @@ export default function CommunicationDetailPageSVC() {
   //댓글 수정
   const handleUpdateComment = async (
     commentId: string,
-    content: JSONContent
+    content: JSONContent,
+    file?: File | null
   ) => {
     if (!content || !content.content || content.content.length === 0) {
       await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
 
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(content));
+
+    if (file) {
+      formData.append("file", file);
+    }
+
     if (isNoticePost) {
       updateInstructorPostCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content: JSON.stringify(content) },
+        payload: formData,
       });
     } else {
       updateCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content: JSON.stringify(content) },
+        payload: formData,
       });
     }
   };
@@ -311,6 +335,8 @@ export default function CommunicationDetailPageSVC() {
             setEditTitle={setEditTitle}
             editContent={editContent}
             setEditContent={setEditContent}
+            editFile={editFile}
+            setEditFile={setEditFile}
             noticePostData={noticePostData}
             inquiryPostData={inquiryPostData}
             currentData={currentData}
