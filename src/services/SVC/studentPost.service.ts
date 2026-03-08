@@ -176,11 +176,15 @@ export const myPostServiceSVC = {
   updateStudentPostCommentSVC: async (
     postId: string,
     commentId: string,
-    payload: CreateStudentPostCommentRequest
+    payload: CreateStudentPostCommentRequest | FormData
   ) => {
+    const isFormData = payload instanceof FormData;
     const { data } = await axiosClientSVC.patch<ApiResponse<CommonPostComment>>(
       `/student-posts/${postId}/comments/${commentId}`,
-      payload
+      payload,
+      {
+        headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+      }
     );
     return data.data;
   },
