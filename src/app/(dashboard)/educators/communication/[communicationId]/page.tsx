@@ -187,36 +187,54 @@ export default function CommunicationDetailPage() {
       if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    const payload = { content: JSON.stringify(answerContent) };
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(answerContent));
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
 
     if (isNoticePost) {
       createInstructorPostCommentMutation.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     } else {
       createStudentPostCommentMutation.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     }
   };
 
   //댓글 수정
-  const handleUpdateComment = (commentId: string, content: JSONContent) => {
-    const payload = { content: JSON.stringify(content) };
+  const handleUpdateComment = async (
+    commentId: string,
+    content: JSONContent,
+    file?: File | null
+  ) => {
+    if (!content || !content.content || content.content.length === 0) {
+      await showAlert({ description: "내용을 입력해주세요." });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(content));
+
+    if (file) {
+      formData.append("file", file);
+    }
 
     if (isNoticePost) {
       updateInstructorPostCommentMutation.mutate({
         postId: communicationId,
         commentId,
-        payload,
+        payload: formData,
       });
     } else {
       updateStudentPostCommentMutation.mutate({
         postId: communicationId,
         commentId,
-        payload,
+        payload: formData,
       });
     }
   };
