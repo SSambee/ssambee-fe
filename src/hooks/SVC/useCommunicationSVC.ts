@@ -7,6 +7,7 @@ import {
   CreateStudentPostCommentRequest,
   UpdateStudentPostStatusRequest,
 } from "@/types/communication/studentPost";
+import { CreateInstructorPostCommentRequest } from "@/types/communication/instructorPost";
 import { CommonPostQuery } from "@/types/communication/commonPost";
 import {
   instructorPostServiceSVC,
@@ -51,7 +52,7 @@ export const useInstructorPostCommentMutationsSVC = () => {
       payload,
     }: {
       postId: string;
-      payload: CreateStudentPostCommentRequest;
+      payload: FormData | CreateInstructorPostCommentRequest;
     }) =>
       instructorPostServiceSVC.createInstructorPostCommentSVC(postId, payload),
     onSuccess: async (_, variables) => {
@@ -83,7 +84,7 @@ export const useInstructorPostCommentMutationsSVC = () => {
     }: {
       postId: string;
       commentId: string;
-      payload: CreateStudentPostCommentRequest;
+      payload: FormData | CreateInstructorPostCommentRequest;
     }) =>
       instructorPostServiceSVC.updateInstructorPostCommentSVC(
         postId,
@@ -235,7 +236,7 @@ export const useStudentPostMutationsSVC = () => {
       payload,
     }: {
       postId: string;
-      payload: UpdateStudentPostRequest;
+      payload: FormData | UpdateStudentPostRequest;
     }) => myPostServiceSVC.updateStudentPostSVC(postId, payload),
     onSuccess: async (_, variables) => {
       const { postId } = variables;
@@ -357,7 +358,7 @@ export const useStudentPostCommentMutationsSVC = () => {
     }: {
       postId: string;
       commentId: string;
-      payload: CreateStudentPostCommentRequest;
+      payload: FormData | CreateStudentPostCommentRequest;
     }) =>
       myPostServiceSVC.updateStudentPostCommentSVC(postId, commentId, payload),
     onSuccess: async (_, variables) => {
