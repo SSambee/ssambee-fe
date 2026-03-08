@@ -347,6 +347,13 @@ function CommentItemSVC({
               key={img.id || img.filename}
               className="relative w-full overflow-hidden rounded-lg cursor-pointer bg-slate-50/50"
               onClick={() => window.open(img.fileUrl, "_blank")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  window.open(img.fileUrl, "_blank");
+                }
+              }}
+              role="button"
+              tabIndex={0}
             >
               <Image
                 src={img.fileUrl}
