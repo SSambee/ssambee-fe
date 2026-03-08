@@ -141,12 +141,7 @@ export default function TiptapEditor({
 
         {onFileUpload && (
           <>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="hidden" // 화면에서 숨김
-            />
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} />
             <ToolbarButton onClick={() => fileInputRef.current?.click()}>
               <Paperclip className="h-4 w-4" />
             </ToolbarButton>
