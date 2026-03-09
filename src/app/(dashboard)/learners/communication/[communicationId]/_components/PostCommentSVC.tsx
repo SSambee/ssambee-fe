@@ -26,7 +26,11 @@ type PostCommentSVCProps = {
   fileInputRef: React.RefObject<HTMLInputElement>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmitAnswer: () => void;
-  onUpdateComment: (commentId: string, content: JSONContent) => void;
+  onUpdateComment: (
+    commentId: string,
+    content: JSONContent,
+    file?: File | null
+  ) => void;
   onDeleteComment: (commentId: string) => void;
 };
 
