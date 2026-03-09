@@ -280,11 +280,13 @@ export default function CommunicationDetailPage() {
       return;
     }
 
+    const isStudentPost = !isNoticePost && !isWorksPost;
+
     downloadMaterial({
-      materialsId: file.materialId, // 공지사항일 때 존재
-      attachmentId: file.id, // 문의글일 때 존재
-      fileUrl: file.fileUrl, // 직접 다운로드
-      isNotice: isNoticePost,
+      materialsId: file.materialId, // 공지사항/업무의 자료실 링크일 때
+      attachmentId: isStudentPost ? file.id : undefined, // 학생 문의글일 때만 존재
+      fileUrl: file.fileUrl, // 직접 업로드된 파일
+      isNotice: !isStudentPost,
     });
   };
 
