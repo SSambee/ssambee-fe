@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Search } from "lucide-react";
+import { FileText, Search, Check } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useModal } from "@/providers/ModalProvider";
-import { Checkbox } from "@/components/ui/checkbox";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useMaterials } from "@/hooks/useMaterials";
@@ -22,6 +21,7 @@ import { Materials, MaterialsType } from "@/types/materials.type";
 import {
   MATERIALS_TYPE_OPTIONS,
   MATERIALS_TYPE_LABEL,
+  MATERIALS_ICONS,
 } from "@/constants/communication.default";
 
 type AddResourceModalProps = {
@@ -134,6 +134,10 @@ export default function AddResourceModal({
             attachments.map((item) => {
               const isChecked = tempSelected.some((m) => m.id === item.id);
 
+              const IconComponent =
+                MATERIALS_ICONS[item.type as keyof typeof MATERIALS_ICONS] ||
+                FileText;
+
               return (
                 <div
                   key={item.id}
@@ -143,7 +147,7 @@ export default function AddResourceModal({
                   onClick={() => handleToggleSelection(item)}
                   className={`group flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
                     isChecked
-                      ? "bg-white border-blue-200"
+                      ? "bg-white border-blue-200 shadow-sm"
                       : "bg-white border-transparent hover:bg-slate-50/80 hover:border-slate-200"
                   }`}
                 >
@@ -155,7 +159,7 @@ export default function AddResourceModal({
                           : "bg-slate-50 border-slate-100"
                       }`}
                     >
-                      <FileText
+                      <IconComponent
                         className={`h-5 w-5 ${isChecked ? "text-blue-500" : "text-slate-400"}`}
                       />
                     </div>
@@ -185,15 +189,16 @@ export default function AddResourceModal({
                     </div>
                   </div>
 
-                  <div className="flex items-center pr-2">
-                    <Checkbox
-                      checked={isChecked}
-                      className={`h-5 w-5 transition-all ${
-                        isChecked
-                          ? "border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white"
-                          : "border-slate-300"
-                      }`}
-                    />
+                  <div
+                    className={`mr-1 h-5 w-5 rounded-full border flex items-center justify-center transition-all ${
+                      isChecked
+                        ? "bg-blue-600 border-blue-600"
+                        : "bg-white border-slate-200 group-hover:border-slate-400"
+                    }`}
+                  >
+                    {isChecked && (
+                      <Check className="h-3 w-3 text-white stroke-[3px]" />
+                    )}
                   </div>
                 </div>
               );
