@@ -14,6 +14,7 @@ import {
 } from "@/services/instructorPost.service";
 import { CommonPostQuery } from "@/types/communication/commonPost";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
+import { dashboardKeys } from "@/constants/query-keys";
 
 // 공지 알림 대상 조회
 export const useInstructorPostTargets = () => {
@@ -289,11 +290,12 @@ export const useStudentPostMutations = () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["studentPost", variables.postId],
-          refetchType: "active",
         }),
         queryClient.invalidateQueries({
           queryKey: ["studentPosts"],
-          refetchType: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.educatorsHome(),
         }),
       ]);
       showAlert({ description: "답변이 등록되었습니다." });
@@ -319,7 +321,12 @@ export const useStudentPostMutations = () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["studentPost", variables.postId],
-          refetchType: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["studentPosts"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.educatorsHome(),
         }),
       ]);
       showAlert({ description: "답변이 수정되었습니다." });
@@ -342,11 +349,12 @@ export const useStudentPostMutations = () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["studentPost", variables.postId],
-          refetchType: "active",
         }),
         queryClient.invalidateQueries({
           queryKey: ["studentPosts"],
-          refetchType: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.educatorsHome(),
         }),
       ]);
       showAlert({ description: "답변이 삭제되었습니다." });
