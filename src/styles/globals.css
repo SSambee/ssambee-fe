@@ -367,4 +367,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  body[data-scroll-locked] {
+    overflow: auto !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+  body[data-scroll-locked] {
+    pointer-events: auto !important;
+  }
 }

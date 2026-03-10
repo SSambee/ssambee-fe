@@ -96,7 +96,10 @@ export default function SelectBtn({
           )}
         </div>
       </SelectTrigger>
-      <SelectContent className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-none! rounded-[12px]">
+      <SelectContent
+        position="popper"
+        className="bg-white border border-gray-200 shadow-none! rounded-[12px]"
+      >
         {options.map((option) => (
           <SelectItem
             key={option.value}
