@@ -159,12 +159,20 @@ export default function CommunicationDetailPageSVC() {
 
   // 게시글 삭제
   const handleDelete = () => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
-    if (!isNoticePost) {
-      deletePostSVC.mutate(communicationId, {
-        onSuccess: () => router.push("/learners/communication"),
-      });
-    }
+    openModal(
+      <CheckModal
+        title="게시글 삭제"
+        description="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        onConfirm={() => {
+          if (!isNoticePost) {
+            deletePostSVC.mutate(communicationId, {
+              onSuccess: () => router.push("/learners/communication"),
+            });
+          }
+        }}
+      />
+    );
   };
 
   // 댓글 작성

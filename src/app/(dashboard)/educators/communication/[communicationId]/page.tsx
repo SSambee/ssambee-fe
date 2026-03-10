@@ -158,12 +158,20 @@ export default function CommunicationDetailPage() {
 
   // 게시글 삭제
   const handleDelete = () => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
-    if (isNoticePost) {
-      deleteNoticeMutation.mutate(communicationId, {
-        onSuccess: () => router.push("/educators/communication"),
-      });
-    }
+    openModal(
+      <CheckModal
+        title="게시글 삭제"
+        description="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        onConfirm={() => {
+          if (isNoticePost) {
+            deleteNoticeMutation.mutate(communicationId, {
+              onSuccess: () => router.push("/educators/communication"),
+            });
+          }
+        }}
+      />
+    );
   };
 
   // 댓글 작성
