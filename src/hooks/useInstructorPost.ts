@@ -1,10 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import {
   CreateInstructorPostCommentRequest,
   CreateInstructorPostRequest,
   UpdateInstructorPostRequest,
   UpdateAssistantWorkStatus,
+  GetInstructorPostTargetsResponse,
 } from "@/types/communication/instructorPost";
 import { CreateStudentPostCommentRequest } from "@/types/communication/studentPost";
 import {
@@ -17,12 +23,13 @@ import { useDialogAlert } from "@/hooks/useDialogAlert";
 import { dashboardKeys } from "@/constants/query-keys";
 
 // 공지 알림 대상 조회
-export const useInstructorPostTargets = () => {
-  return useQuery({
-    queryKey: ["instructorPostsTargets"],
-    queryFn: () => instructorPostService.getInstructorPostTargets(),
-  });
-};
+export const useInstructorPostTargets =
+  (): UseQueryResult<GetInstructorPostTargetsResponse> => {
+    return useQuery({
+      queryKey: ["instructorPostsTargets"],
+      queryFn: () => instructorPostService.getInstructorPostTargets(),
+    });
+  };
 
 // 공지 목록 조회
 export const useInstructorPosts = (
