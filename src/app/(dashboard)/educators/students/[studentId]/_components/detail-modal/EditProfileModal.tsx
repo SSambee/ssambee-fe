@@ -39,7 +39,6 @@ const getFormDataOnly = (
     schoolYear: data.schoolYear ?? "",
     studentPhone: data.studentPhone ?? "",
     parentPhone: data.parentPhone ?? "",
-    email: data.email ?? "",
     memo: data.memo ?? "",
   };
 };
