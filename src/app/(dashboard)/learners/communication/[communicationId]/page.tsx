@@ -70,6 +70,8 @@ export default function CommunicationDetailPageSVC() {
   const [editFile, setEditFile] = useState<File | null>(null);
   const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [shouldRemoveExistingFile, setShouldRemoveExistingFile] =
+    useState(false);
 
   if (isLoadingNotice || isLoadingInquiry) {
     return (
@@ -110,12 +112,14 @@ export default function CommunicationDetailPageSVC() {
         });
       }
     }
+    setShouldRemoveExistingFile(false);
     setIsEditing(true);
   };
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditFile(null);
+    setShouldRemoveExistingFile(false);
   };
 
   // 게시글 수정 저장
@@ -128,24 +132,40 @@ export default function CommunicationDetailPageSVC() {
       return;
     }
 
-    // 서버에는 FormData로 전송
-    const formData = new FormData();
-    formData.append("title", editTitle.trim());
-    formData.append("content", JSON.stringify(editContent));
+    let payload:
+      | FormData
+      | { title: string; content: string; attachments?: [] };
+
     if (editFile) {
+      const formData = new FormData();
+      formData.append("title", editTitle.trim());
+      formData.append("content", JSON.stringify(editContent));
       formData.append("file", editFile);
+      payload = formData;
+    } else if (shouldRemoveExistingFile) {
+      payload = {
+        title: editTitle.trim(),
+        content: JSON.stringify(editContent),
+        attachments: [],
+      };
+    } else {
+      payload = {
+        title: editTitle.trim(),
+        content: JSON.stringify(editContent),
+      };
     }
 
     if (!isNoticePost) {
       updatePostSVC.mutate(
         {
           postId: communicationId,
-          payload: formData,
+          payload,
         },
         {
           onSuccess: () => {
             setIsEditing(false);
             setEditFile(null);
+            setShouldRemoveExistingFile(false);
           },
         }
       );
@@ -349,6 +369,8 @@ export default function CommunicationDetailPageSVC() {
             inquiryPostData={inquiryPostData}
             currentData={currentData}
             handleAttachmentClick={handleAttachmentClick}
+            shouldRemoveExistingFile={shouldRemoveExistingFile}
+            setShouldRemoveExistingFile={setShouldRemoveExistingFile}
           />
 
           <PostCommentSVC

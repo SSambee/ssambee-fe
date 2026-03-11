@@ -28,6 +28,8 @@ type PostContentSVCProps = {
     | GetStudentPostDetailResponse
     | undefined;
   handleAttachmentClick: (file: CommonPostAttachment) => void;
+  shouldRemoveExistingFile: boolean;
+  setShouldRemoveExistingFile: (val: boolean) => void;
 };
 
 export default function PostContentSVC({
@@ -43,6 +45,8 @@ export default function PostContentSVC({
   inquiryPostData,
   currentData,
   handleAttachmentClick,
+  shouldRemoveExistingFile,
+  setShouldRemoveExistingFile,
 }: PostContentSVCProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,7 +75,9 @@ export default function PostContentSVC({
         {isEditing ? (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">제목</Label>
+              <Label htmlFor="title" className="sr-only">
+                제목
+              </Label>
               <Input
                 id="title"
                 value={editTitle}
@@ -85,72 +91,109 @@ export default function PostContentSVC({
               className="min-h-[200px]"
             />
 
-            {/* 첨부 파일 교체 UI */}
-            <div className="space-y-2 pt-2 border-t">
-              <p className="text-sm font-medium text-slate-600 flex items-center gap-2">
-                <Paperclip className="h-4 w-4" />
-                첨부 파일
-              </p>
-
-              {/* 새로 선택한 파일 미리보기 */}
-              {editFile ? (
-                <div className="p-2 bg-slate-50 border rounded-lg flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-blue-500" />
-                    <span className="text-sm text-slate-700 truncate max-w-[260px]">
-                      {editFile.name}
-                    </span>
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setEditFile(null);
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    className="h-7 w-7 p-0 hover:text-red-500"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-              ) : existingAttachments.length > 0 ? (
-                /* 기존 파일 목록 + 교체 버튼 */
-                <div className="space-y-2">
-                  {existingAttachments.map((f) => (
-                    <div
-                      key={f.id || f.filename}
-                      className="flex items-center gap-2 p-2 bg-slate-50 border rounded-lg"
-                    >
-                      <FileText className="h-4 w-4 text-blue-500 shrink-0" />
-                      <span className="text-sm text-slate-700 truncate">
-                        {decodeUtf8(f.filename)}
-                      </span>
-                    </div>
-                  ))}
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="gap-2 text-slate-500 h-8 px-3 text-sm"
-                  >
-                    <Paperclip className="h-4 w-4" />
-                    파일 교체
-                  </Button>
-                </div>
-              ) : (
-                /* 첨부 없을 때 업로드 버튼 */
+            <div className="space-y-3 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-medium">첨부파일</Label>
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="gap-2 text-slate-500 h-8 px-3 text-sm"
+                  className="h-auto py-2 px-3 text-sm gap-2 rounded-lg border-neutral-200 hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
                 >
                   <Paperclip className="h-4 w-4" />
-                  파일 첨부
+                  파일 선택
                 </Button>
-              )}
+              </div>
+
+              <div
+                className={`rounded-xl border-2 border-dashed p-4 transition-colors ${
+                  (existingAttachments.length > 0 &&
+                    !shouldRemoveExistingFile) ||
+                  editFile
+                    ? "bg-slate-50/50 border-slate-200"
+                    : "bg-white border-slate-100"
+                }`}
+              >
+                {editFile ? (
+                  <div className="group flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm transition-all hover:border-blue-300">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
+                        <FileText className="h-4 w-4 text-slate-400 group-hover:text-blue-500" />
+                      </div>
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="text-sm font-medium text-slate-700 truncate max-w-[180px]">
+                          {editFile.name}
+                        </span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                          새 파일
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setEditFile(null);
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
+                      }}
+                      className="h-7 w-7 p-0 rounded-full hover:bg-red-50 hover:text-red-500"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : existingAttachments.length > 0 &&
+                  !shouldRemoveExistingFile ? (
+                  existingAttachments.map((f) => (
+                    <div
+                      key={f.id || f.filename}
+                      className="group flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm transition-all hover:border-blue-300"
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
+                          <FileText className="h-4 w-4 text-slate-400 group-hover:text-blue-500" />
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-sm font-medium text-slate-700 truncate max-w-[180px]">
+                            {decodeUtf8(f.filename)}
+                          </span>
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                            기존 자료
+                          </span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShouldRemoveExistingFile(true)}
+                        className="h-7 w-7 p-0 rounded-full hover:bg-red-50 hover:text-red-500"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-8 flex flex-col items-center justify-center space-y-2">
+                    <div className="p-3 bg-slate-50 rounded-full">
+                      <Paperclip className="h-6 w-6 text-slate-300" />
+                    </div>
+                    <p className="text-sm text-slate-400">
+                      파일을 선택하여 첨부하세요
+                    </p>
+                  </div>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-400 px-1">
+                * 하나의 파일만 첨부할 수 있습니다.
+              </p>
 
               <input
                 type="file"
                 ref={fileInputRef}
-                onChange={(e) => setEditFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setEditFile(file);
+                  if (file) {
+                    setShouldRemoveExistingFile(false);
+                  }
+                }}
                 className="hidden"
               />
             </div>

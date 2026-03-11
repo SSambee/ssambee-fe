@@ -24,6 +24,9 @@ import {
   WorkStatus,
 } from "@/types/communication/instructorPost";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
+import { Materials } from "@/types/materials.type";
+
+import AddResourceModal from "../create/_components/modal/AddResourceModal";
 
 import PostInfo from "./_components/PostInfo";
 import PostContent from "./_components/PostContent";
@@ -79,6 +82,10 @@ export default function CommunicationDetailPage() {
   const [editContent, setEditContent] = useState<JSONContent>({});
   const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedMaterials, setSelectedMaterials] = useState<Materials[]>([]);
+  const [removedAttachmentIds, setRemovedAttachmentIds] = useState<string[]>(
+    []
+  );
 
   if (isLoadingNotice || isLoadingInquiry || isLoadingWorks) {
     return (
@@ -122,12 +129,16 @@ export default function CommunicationDetailPage() {
       setEditTitle(inquiryPostData.title);
       setEditContent(safeParse(inquiryPostData.content));
     }
+    setSelectedMaterials([]);
+    setRemovedAttachmentIds([]);
     setIsEditing(true);
   };
 
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
+    setSelectedMaterials([]);
+    setRemovedAttachmentIds([]);
   };
 
   // 게시글 수정 저장
@@ -142,6 +153,15 @@ export default function CommunicationDetailPage() {
 
     const payloadContent = JSON.stringify(editContent);
 
+    const existingAttachments = currentData?.attachments || [];
+    const remainingMaterialIds = existingAttachments
+      .filter((att) => !removedAttachmentIds.includes(att.id))
+      .map((att) => att.materialId)
+      .filter((id): id is string => !!id);
+
+    const newMaterialIds = selectedMaterials.map((m) => m.id);
+    const allMaterialIds = [...remainingMaterialIds, ...newMaterialIds];
+
     if (isNoticePost) {
       updateNoticeMutation.mutate(
         {
@@ -149,9 +169,16 @@ export default function CommunicationDetailPage() {
           payload: {
             title: editTitle,
             content: payloadContent,
+            materialIds: allMaterialIds,
           },
         },
-        { onSuccess: () => setIsEditing(false) }
+        {
+          onSuccess: () => {
+            setIsEditing(false);
+            setSelectedMaterials([]);
+            setRemovedAttachmentIds([]);
+          },
+        }
       );
     }
   };
@@ -298,6 +325,27 @@ export default function CommunicationDetailPage() {
     });
   };
 
+  // 자료실 모달 열기
+  const handleOpenAddResourceModal = () => {
+    openModal(
+      <AddResourceModal
+        key={`modal-${selectedMaterials.map((m) => m.id).join(",")}`}
+        onChange={(updatedList) => setSelectedMaterials(updatedList)}
+        initialSelected={selectedMaterials}
+      />
+    );
+  };
+
+  // 기존 첨부파일 삭제
+  const handleRemoveExistingAttachment = (attachmentId: string) => {
+    setRemovedAttachmentIds((prev) => [...prev, attachmentId]);
+  };
+
+  // 새로 추가한 자료 삭제
+  const handleRemoveNewMaterial = (materialId: string) => {
+    setSelectedMaterials((prev) => prev.filter((m) => m.id !== materialId));
+  };
+
   // 조교 업무 상태 변경
   const handleUpdateWorkStatus = (workStatus: WorkStatus) => {
     if (!isWorksPost) return;
@@ -372,6 +420,11 @@ export default function CommunicationDetailPage() {
             worksPostData={worksPostData ?? undefined}
             currentData={currentData}
             handleAttachmentClick={handleAttachmentClick}
+            selectedMaterials={selectedMaterials}
+            removedAttachmentIds={removedAttachmentIds}
+            handleOpenAddResourceModal={handleOpenAddResourceModal}
+            handleRemoveExistingAttachment={handleRemoveExistingAttachment}
+            handleRemoveNewMaterial={handleRemoveNewMaterial}
           />
 
           {!isWorksPost && (
