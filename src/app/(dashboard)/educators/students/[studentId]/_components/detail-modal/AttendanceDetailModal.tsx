@@ -72,9 +72,12 @@ export default function AttendanceDetailModal({
 
   const handleConfirmDelete = async () => {
     if (selectedAttendanceId) {
-      await deleteAttendance.mutateAsync(selectedAttendanceId);
-      setSelectedAttendanceId(null);
-      setShowDeleteModal(false);
+      try {
+        await deleteAttendance.mutateAsync(selectedAttendanceId);
+      } finally {
+        setSelectedAttendanceId(null);
+        setShowDeleteModal(false);
+      }
     }
   };
 

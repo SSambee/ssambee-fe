@@ -1,6 +1,6 @@
 /**
  * @param text 분할할 텍스트
- * @param chunkSize 분할 단위 (기본값: 15)
+ * @param chunkSize 분할 단위 (기본값: 25)
  * @returns 분할된 텍스트 배열 또는 "-"
  */
 export const formatTextWithLineBreaks = (
