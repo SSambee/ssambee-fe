@@ -76,7 +76,7 @@ export const CheckModal = ({
           {!hideCancel ? (
             <Button
               variant="outline"
-              className="h-[46px] flex-1 rounded-[10px] border-0 bg-[#e1e7fe] px-7 text-[14px] font-semibold leading-[20px] tracking-[-0.14px] text-[#3863f6] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#d5defe]"
+              className="cursor-pointer h-[46px] flex-1 rounded-[10px] border-0 bg-[#e1e7fe] px-7 text-[14px] font-semibold leading-[20px] tracking-[-0.14px] text-[#3863f6] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#d5defe]"
               onClick={handleCancel}
             >
               {cancelText}
@@ -85,7 +85,7 @@ export const CheckModal = ({
 
           <Button
             variant="default"
-            className={`h-[46px] rounded-[10px] bg-[#3863f6] px-7 text-[14px] font-semibold leading-[20px] tracking-[-0.14px] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] ${hideCancel ? "max-w-[196px]" : "flex-1"}`}
+            className={`cursor-pointer h-[46px] rounded-[10px] bg-[#3863f6] px-7 text-[14px] font-semibold leading-[20px] tracking-[-0.14px] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] ${hideCancel ? "max-w-[196px]" : "flex-1"}`}
             onClick={handleConfirm}
             disabled={confirmDisabled || isConfirming}
           >
