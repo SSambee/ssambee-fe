@@ -216,7 +216,7 @@ export default function StudentDetailPage() {
             </Button>
             <Button
               disabled={hasNoInProgressLecture}
-              className={`h-10 rounded-[12px] px-6 text-[16px] font-semibold shadow-none ${
+              className={`h-10 rounded-[12px] px-6 text-[16px] font-semibold shadow-md ${
                 hasNoInProgressLecture
                   ? "bg-neutral-200 text-neutral-500 cursor-not-allowed"
                   : "bg-brand-700 hover:bg-brand-800 text-white"

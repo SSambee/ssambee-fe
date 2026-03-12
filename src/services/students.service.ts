@@ -111,6 +111,10 @@ export const createAttendanceAPI = (
     >(`/lectures/${lectureId}/enrollments/${enrollmentId}/attendances`, data)
     .then((res) => res.data);
 
+// 수강생 개별 출결 삭제
+export const deleteAttendanceAPI = (attendanceId: string) =>
+  axiosClient.delete(`/attendances/${attendanceId}`);
+
 // 강의 성적 차트 조회
 export const getLectureEnrollmentDetailAPI = (lectureEnrollmentId: string) =>
   axiosClient
