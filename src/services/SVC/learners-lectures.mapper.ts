@@ -82,6 +82,7 @@ export const summarizeLectureAttendances = (
     totalCount > 0 ? (presentCount / totalCount) * 100 : null;
 
   const records: AttendanceList[] = safeAttendances.map((attendance) => ({
+    id: attendance.id,
     date: attendance.date,
     status: attendance.status,
     memo: attendance.memo ?? null,
