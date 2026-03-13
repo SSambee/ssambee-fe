@@ -289,7 +289,13 @@ function ScheduleCreateModalComponent({
         </div>
 
         {formError ? (
-          <p className="text-xs text-destructive">{formError}</p>
+          <p
+            role="alert"
+            aria-live="assertive"
+            className="text-xs text-destructive"
+          >
+            {formError}
+          </p>
         ) : null}
 
         <div className="flex items-center gap-2">

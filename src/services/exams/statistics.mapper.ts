@@ -115,12 +115,11 @@ export const buildReportFromStatistics = (
     statistics?.examStats?.averageScore ?? 0
   );
   const apiHighestScore = statistics?.examStats?.highestScore;
+  const maxScoreFromRows = scores.length > 0 ? Math.max(...scores) : 0;
   const maxScore =
-    apiHighestScore != null && apiHighestScore > 0
-      ? apiHighestScore
-      : scores.length > 0
-        ? Math.max(...scores)
-        : 0;
+    apiHighestScore != null
+      ? Math.max(apiHighestScore, maxScoreFromRows)
+      : maxScoreFromRows;
 
   return {
     overview: {
