@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -20,23 +21,26 @@ export function LandingHeroSection() {
 
       <header className="relative z-10 bg-transparent">
         <div className="mx-auto flex h-[110px] w-full max-w-[1920px] items-center justify-between px-6 lg:px-[210px]">
-          <Link
-            href="/"
-            className="text-[38px] font-semibold leading-10 tracking-[-0.38px] text-[#3863f6]"
-          >
-            ssam B
+          <Link href="/">
+            <Image
+              src="/brand/ssam-b.svg"
+              alt="SSam B"
+              width={160}
+              height={52}
+              priority
+            />
           </Link>
 
           <div className="flex items-center gap-3">
             <Button
               asChild
-              className="h-12 rounded-xl bg-[#3863f6] px-7 text-sm font-semibold text-white shadow-[0px_0px_14px_0px_rgba(138,138,138,0.08)]"
+              className="h-12 rounded-xl bg-[#3863f6] px-7 text-sm font-semibold text-white shadow-[0px_0px_14px_0px_rgba(138,138,138,0.08)] hover:bg-[#2554f5]"
             >
               <Link href="/educators/login">로그인</Link>
             </Button>
             <Button
               asChild
-              className="h-12 rounded-xl border border-[#ced9fd] bg-[#f4f6fe] px-7 text-sm font-semibold text-[#3863f6] shadow-[0px_0px_14px_0px_rgba(138,138,138,0.08)]"
+              className="h-12 rounded-xl border border-[#ced9fd] bg-[#f4f6fe] px-7 text-sm font-semibold text-[#3863f6] shadow-[0px_0px_14px_0px_rgba(138,138,138,0.08)] hover:bg-[#e1e7fe]"
             >
               <Link href="/learners/login">학생 로그인</Link>
             </Button>

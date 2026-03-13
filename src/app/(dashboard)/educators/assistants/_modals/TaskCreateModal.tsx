@@ -87,7 +87,7 @@ export default function TaskCreateModal({
   taskDeadlineTime,
   onChangeTaskDeadlineTime,
   taskInstructionContent,
-  // onChangeTaskInstructionContent,
+  onChangeTaskInstructionContent,
   attachedResources,
   onOpenResourceLibraryModal,
   onRemoveAttachedResource,
@@ -277,7 +277,7 @@ export default function TaskCreateModal({
           <p className="text-[16px] font-medium">업무 내용</p>
           <TiptapEditor
             content={taskInstructionContent}
-            // onChange={onChangeTaskInstructionContent}
+            onHtmlChange={onChangeTaskInstructionContent}
             placeholder="업무에 대한 상세한 내용을 입력해주세요."
             className="min-h-[240px]"
           />

@@ -19,6 +19,7 @@ export type MyProfileApiResponse = {
   bio?: string | null;
   phoneVerified?: boolean | null;
   lectures?: ProfileApiLecture[];
+  instructorLectures?: ProfileApiLecture[];
 };
 
 export type UpdateMyProfilePayload = {

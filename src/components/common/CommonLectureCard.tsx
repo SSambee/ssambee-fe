@@ -16,6 +16,7 @@ export interface CommonLectureCardProps {
   onClick?: () => void;
   action?: React.ReactNode;
   className?: string;
+  statusBadge?: React.ReactNode;
 }
 
 export function CommonLectureCard({
@@ -30,6 +31,7 @@ export function CommonLectureCard({
   onClick,
   action,
   className,
+  statusBadge,
 }: CommonLectureCardProps) {
   return (
     <Card
@@ -52,6 +54,7 @@ export function CommonLectureCard({
           <span className="inline-flex items-center rounded-lg bg-[#e9ebf0] px-3 py-1.5 text-[13px] font-semibold leading-[18px] tracking-[-0.13px] text-[#5e6275]">
             {schoolYear}
           </span>
+          {statusBadge}
         </div>
 
         <h3 className="line-clamp-1 text-[20px] font-semibold leading-7 tracking-[-0.2px]">
