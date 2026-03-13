@@ -2,7 +2,6 @@ import StatusLabel from "@/components/common/label/StatusLabel";
 import { GetInstructorPostsResponse } from "@/types/communication/instructorPost";
 import { ColumnDefinition } from "@/components/common/table/DataTable";
 import { formatYMDFromISO } from "@/utils/date";
-import { NOTICE_TYPE_LABEL } from "@/constants/communication.default";
 
 type NoticeRow = GetInstructorPostsResponse["list"][number];
 
