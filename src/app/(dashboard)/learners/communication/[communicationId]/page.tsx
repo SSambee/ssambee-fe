@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { JSONContent } from "@tiptap/react";
 
@@ -34,7 +34,6 @@ export default function CommunicationDetailPageSVC() {
   const typeParam = searchParams.get("type");
   const type: "notice" | "inquiry" =
     typeParam === "notice" ? "notice" : "inquiry";
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isNoticePost = type === "notice";
 
@@ -219,7 +218,6 @@ export default function CommunicationDetailPageSVC() {
     const handleSuccess = () => {
       setAnswerContent({}); // 초기화 시 빈 객체
       setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const formData = new FormData();
@@ -303,12 +301,6 @@ export default function CommunicationDetailPageSVC() {
     );
   };
 
-  // 자료 변경
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setSelectedFile(file);
-  };
-
   // 자료 다운로드
   const handleAttachmentClick = (file: CommonPostAttachment) => {
     const isVideo =
@@ -385,8 +377,6 @@ export default function CommunicationDetailPageSVC() {
             setAnswerContent={setAnswerContent}
             selectedFile={selectedFile}
             setSelectedFile={setSelectedFile}
-            fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-            handleFileChange={handleFileChange}
             handleSubmitAnswer={handleSubmitAnswer}
             onUpdateComment={handleUpdateComment}
             onDeleteComment={handleDeleteComment}

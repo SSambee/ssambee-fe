@@ -1,5 +1,5 @@
 import { Edit, Trash2, X, Paperclip, Save } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { JSONContent } from "@tiptap/react";
 import Image from "next/image";
 
@@ -23,8 +23,6 @@ type PostCommentProps = {
   setAnswerContent: (val: JSONContent) => void;
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmitAnswer: () => void;
   onUpdateComment: (
     commentId: string,
@@ -42,8 +40,6 @@ export default function PostComment({
   setAnswerContent,
   selectedFile,
   setSelectedFile,
-  fileInputRef,
-  handleFileChange,
   handleSubmitAnswer,
   onUpdateComment,
   onDeleteComment,
@@ -114,18 +110,13 @@ export default function PostComment({
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </div>
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] text-slate-400 px-1">
+                * 이미지 파일만 첨부할 수 있습니다.
+              </p>
               <Button
                 onClick={handleSubmitAnswer}
-                className="h-14 w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer"
+                className="h-14 w-[140px] gap-1 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer"
               >
                 {isNoticePost ? "댓글 등록" : "답변 등록"}
               </Button>
@@ -173,7 +164,6 @@ function CommentItem({
   );
   const [editFile, setEditFile] = useState<File | null>(null);
   const [removeExistingImage, setRemoveExistingImage] = useState(false);
-  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const images =
     comment.attachments?.filter((f) =>
@@ -302,76 +292,14 @@ function CommentItem({
           <TiptapEditor
             content={editContent}
             onChange={setEditContent}
+            onFileUpload={(file) => {
+              setEditFile(file);
+              setRemoveExistingImage(false);
+            }}
+            attachment={editFile}
+            onRemoveAttachment={() => setEditFile(null)}
             className="min-h-[120px] border-blue-100 shadow-sm"
           />
-          {/* 파일 선택 UI */}
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <input
-              type="file"
-              accept="image/*"
-              ref={editFileInputRef}
-              onChange={(e) => {
-                setEditFile(e.target.files?.[0] ?? null);
-                // 새 파일 선택 시 삭제 플래그 해제
-                if (e.target.files?.[0]) setRemoveExistingImage(false);
-              }}
-              className="hidden"
-            />
-            {editFile ? (
-              <div className="p-2 bg-slate-50 border rounded-lg flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Paperclip className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm text-slate-700 truncate max-w-[200px]">
-                    {editFile.name}
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setEditFile(null);
-                    if (editFileInputRef.current)
-                      editFileInputRef.current.value = "";
-                  }}
-                  className="h-7 w-7 p-0 hover:text-red-500"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => editFileInputRef.current?.click()}
-                className="gap-2 text-slate-500 h-8 px-3 text-sm"
-              >
-                <Paperclip className="h-4 w-4" />
-                이미지 교체
-              </Button>
-            )}
-            {/* 기존 이미지가 있고 새 파일 미선택 시 삭제 버튼 표시 */}
-            {images.length > 0 &&
-              !editFile &&
-              (removeExistingImage ? (
-                <Button
-                  variant="outline"
-                  onClick={() => setRemoveExistingImage(false)}
-                  className="gap-2 text-blue-500 h-8 px-3 text-sm"
-                >
-                  이미지 복원
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  onClick={() => setRemoveExistingImage(true)}
-                  className="gap-2 text-red-500 hover:text-red-600 h-8 px-3 text-sm"
-                >
-                  <X className="h-4 w-4" />
-                  이미지 삭제
-                </Button>
-              ))}
-          </div>
-          <p className="text-[10px] text-slate-400 mt-1">
-            내용 수정 후 상단의 체크 버튼을 눌러주세요.
-          </p>
         </div>
       ) : (
         <TiptapEditor
@@ -383,11 +311,40 @@ function CommentItem({
 
       {images.length > 0 &&
         (isEditing && removeExistingImage ? (
-          <div className="px-2 mt-2 py-3 border border-dashed border-red-200 rounded-lg bg-red-50/50 text-center text-sm text-red-400">
-            저장 시 이미지가 삭제됩니다
+          <div className="mt-4">
+            <div className="rounded-xl border-2 border-dashed p-4 transition-colors bg-white border-slate-100 relative">
+              <div className="py-8 flex flex-col items-center justify-center space-y-2">
+                <div className="p-3 bg-slate-50 rounded-full">
+                  <Paperclip className="h-6 w-6 text-slate-300" />
+                </div>
+                <p className="text-sm text-slate-400">
+                  이미지만 첨부할 수 있습니다.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setRemoveExistingImage(false)}
+                className="absolute top-2 right-2 h-8 w-8 p-0 rounded-full hover:bg-red-50 hover:text-red-500"
+                title="복원"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        ) : (
-          <div className="px-2 mt-2 space-y-3">
+        ) : isEditing && editFile ? null : (
+          <div className="mt-4 space-y-3 relative">
+            {isEditing && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setRemoveExistingImage(true)}
+                className="absolute top-2 right-2 z-10 h-8 w-8 p-0 rounded-full bg-white/95 hover:bg-red-50 hover:text-red-600 border shadow-sm"
+                title="삭제"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
             {images.map((img) => (
               <div
                 key={img.id || img.filename}

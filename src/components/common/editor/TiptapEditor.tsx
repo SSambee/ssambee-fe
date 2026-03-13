@@ -27,7 +27,7 @@ type TiptapEditorProps = {
   placeholder?: string;
   className?: string;
   onFileUpload?: (file: File) => void;
-  attachment?: File;
+  attachment?: File | null;
   onRemoveAttachment?: () => void;
 };
 

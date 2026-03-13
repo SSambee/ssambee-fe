@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { JSONContent } from "@tiptap/react";
 
@@ -39,7 +39,6 @@ export default function CommunicationDetailPage() {
   const searchParams = useSearchParams();
   const communicationId = params.communicationId as string;
   const type = searchParams.get("type") as "notice" | "inquiry" | "works";
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { showAlert } = useDialogAlert();
   const { openModal } = useModal();
 
@@ -219,7 +218,6 @@ export default function CommunicationDetailPage() {
     const handleSuccess = () => {
       setAnswerContent({});
       setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
     const formData = new FormData();
@@ -301,12 +299,6 @@ export default function CommunicationDetailPage() {
         }}
       />
     );
-  };
-
-  // 자료 변경
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setSelectedFile(file);
   };
 
   // 자료 다운로드
@@ -445,8 +437,6 @@ export default function CommunicationDetailPage() {
               setAnswerContent={setAnswerContent}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
-              fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-              handleFileChange={handleFileChange}
               handleSubmitAnswer={handleSubmitAnswer}
               onUpdateComment={handleUpdateComment}
               onDeleteComment={handleDeleteComment}
