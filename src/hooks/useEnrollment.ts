@@ -124,6 +124,8 @@ export const useEnrollmentDetail = (id: string) =>
 // 수강생 정보 수정
 export const useUpdateEnrollment = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
+
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEnrollmentInfo }) =>
       api.updateEnrollmentAPI(id, data),
@@ -134,6 +136,10 @@ export const useUpdateEnrollment = () => {
       queryClient.invalidateQueries({
         queryKey: ["enrollments", "detail", id],
       });
+      showAlert({ description: "수강생 정보가 수정되었습니다." });
+    },
+    onError: () => {
+      showAlert({ description: "수강생 정보 수정에 실패했습니다." });
     },
   });
 };

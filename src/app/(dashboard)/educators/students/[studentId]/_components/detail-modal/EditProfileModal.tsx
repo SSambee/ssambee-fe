@@ -24,8 +24,7 @@ import { GRADE_SELECTING_OPTIONS } from "@/constants/students.default";
 import { Textarea } from "@/components/ui/textarea";
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
-import { useDialogAlert } from "@/hooks/useDialogAlert";
-import { formatYMDFromISO } from "@/utils/date";
+import { formatYMDFromISO, toISOFromYMD } from "@/utils/date";
 
 type EditProfileModalProps = {
   studentData: EditProfileFormDataType;
@@ -51,7 +50,6 @@ export default function EditProfileModal({
 }: EditProfileModalProps) {
   const { isOpen, closeModal } = useModal();
   const [isEditMode, setIsEditMode] = useState(false);
-  const { showAlert } = useDialogAlert();
 
   // 수강생 정보 수정
   const { mutate: updateStudent, isPending } = useUpdateEnrollment();
@@ -86,7 +84,12 @@ export default function EditProfileModal({
     // dirtyFields 기준으로 변경된 데이터만 추출
     const changedData = Object.keys(dirtyFields).reduce((acc, key) => {
       const field = key as keyof EditProfileFormData;
-      acc[field] = data[field];
+      let value = data[field];
+      // registeredAt: YYYY-MM-DD → ISO 8601
+      if (field === "registeredAt" && typeof value === "string") {
+        value = toISOFromYMD(value) as EditProfileFormData["registeredAt"];
+      }
+      acc[field] = value;
       return acc;
     }, {} as Partial<EditProfileFormData>);
 
@@ -96,20 +99,7 @@ export default function EditProfileModal({
       return;
     }
 
-    updateStudent(
-      { id: studentData.id, data: changedData },
-      {
-        onSuccess: () => {
-          console.log("수강생 정보 수정 성공:", changedData);
-
-          setIsEditMode(false);
-          closeModal();
-        },
-        onError: async () => {
-          await showAlert({ description: "수강생 정보 수정에 실패했습니다." });
-        },
-      }
-    );
+    updateStudent({ id: studentData.id, data: changedData });
   };
 
   const handleClose = () => {

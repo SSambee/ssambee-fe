@@ -25,3 +25,9 @@ export const formatDateYMD = (isoDate?: string | null) => {
   if (Number.isNaN(date.getTime())) return undefined;
   return date.toLocaleDateString("sv-SE");
 };
+
+// YYYY-MM-DD를 ISO 8601 datetime 문자열로 변환\
+export const toISOFromYMD = (yyyyMmDd: string): string => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(yyyyMmDd)) return yyyyMmDd;
+  return `${yyyyMmDd}T00:00:00.000Z`;
+};
