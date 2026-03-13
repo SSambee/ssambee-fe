@@ -60,7 +60,7 @@ export const DEFAULT_LECTURE: Lecture = {
 };
 
 export const LECTURE_STATUS_BADGE_CLASSES = {
-  개강전: "bg-blue-100 text-blue-800",
-  진행중: "bg-green-100 text-green-800",
-  완료: "bg-gray-100 text-gray-800",
+  개강전: "bg-[#e1e7fe] text-[#3863f6]",
+  진행중: "bg-[#fee2e2] text-[#ef4444]",
+  완료: "bg-[#e9ebf0] text-[#8b90a3]",
 } as const;

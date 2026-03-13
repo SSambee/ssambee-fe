@@ -10,6 +10,7 @@ import { LectureFormInput } from "@/validation/lecture.validation";
 import {
   LECTURE_GRADES,
   LECTURE_STATUS_OPTIONS,
+  LECTURE_SUBJECTS,
 } from "@/constants/lectures.constants";
 
 type LectureInfoSectionProps = {
@@ -24,9 +25,15 @@ export function LectureInfoSection({
   const { register, setValue } = form;
   const { errors } = useFormState({ control: form.control });
 
+  const subjectValue =
+    useWatch({ control: form.control, name: "subject" }) ?? "";
   const schoolYearValue =
     useWatch({ control: form.control, name: "schoolYear" }) ?? "";
   const statusValue = useWatch({ control: form.control, name: "status" }) ?? "";
+  const subjectOptions = LECTURE_SUBJECTS.map((subject) => ({
+    label: subject,
+    value: subject,
+  }));
   const schoolYearOptions = LECTURE_GRADES.map((grade) => ({
     label: grade,
     value: grade,
@@ -43,6 +50,7 @@ export function LectureInfoSection({
           강의 기본정보
         </h2>
         <div className="mt-10 flex flex-col gap-8">
+          <input type="hidden" {...register("subject")} />
           <input type="hidden" {...register("schoolYear")} />
           <input type="hidden" {...register("status")} />
 
@@ -55,7 +63,7 @@ export function LectureInfoSection({
               {...register("name")}
               placeholder="수업명"
               disabled={disabled}
-              className="h-14 rounded-[12px] border-[#d6d9e0] px-4 pr-3 text-[16px] font-medium leading-6 tracking-[-0.16px] placeholder:text-[#8b90a3]"
+              className="h-14 rounded-[12px] border-[#d6d9e0] px-4 pr-3 text-[16px] md:text-[16px] font-medium leading-6 tracking-[-0.16px] placeholder:text-[#8b90a3]"
             />
             {!errors.name && (
               <p className="mt-2 pl-3 text-[13px] font-medium leading-[18px] tracking-[-0.13px] text-[rgba(22,22,27,0.4)]">
@@ -71,12 +79,21 @@ export function LectureInfoSection({
             <label htmlFor="lecture-subject" className="sr-only">
               과목
             </label>
-            <Input
+            <SelectBtn
               id="lecture-subject"
-              {...register("subject")}
+              value={subjectValue}
               placeholder="과목"
+              options={subjectOptions}
+              onChange={(value) =>
+                setValue("subject", value, {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                })
+              }
+              variant="figma"
+              className="font-medium tracking-[-0.16px] text-[#8b90a3]"
+              isError={Boolean(errors.subject)}
               disabled={disabled}
-              className="h-14 rounded-[12px] border-[#d6d9e0] px-4 pr-3 text-[16px] font-medium leading-6 tracking-[-0.16px] placeholder:text-[#8b90a3]"
             />
             {errors.subject && (
               <p className="mt-1 text-xs text-red-500">
