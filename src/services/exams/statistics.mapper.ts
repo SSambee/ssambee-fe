@@ -114,9 +114,13 @@ export const buildReportFromStatistics = (
   const averageScore = roundToOneDecimal(
     statistics?.examStats?.averageScore ?? 0
   );
+  const apiHighestScore = statistics?.examStats?.highestScore;
   const maxScore =
-    statistics?.examStats?.highestScore ??
-    (scores.length > 0 ? Math.max(...scores) : 0);
+    apiHighestScore != null && apiHighestScore > 0
+      ? apiHighestScore
+      : scores.length > 0
+        ? Math.max(...scores)
+        : 0;
 
   return {
     overview: {
