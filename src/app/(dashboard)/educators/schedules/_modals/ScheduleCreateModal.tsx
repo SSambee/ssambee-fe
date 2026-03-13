@@ -123,36 +123,14 @@ function ScheduleCreateModalComponent({
         showClose={false}
         className="w-[calc(100vw-32px)] max-h-[86vh] max-w-[610px] gap-5 overflow-y-auto border-none bg-white p-5 shadow-[0_0_14px_rgba(138,138,138,0.16)] sm:gap-6 sm:rounded-[24px] sm:p-6"
       >
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="text-[22px] font-bold leading-8 tracking-[-0.24px] text-[#040405]">
-              {modalTitle}
-            </DialogTitle>
-            <p className="text-[16px] font-medium leading-6 tracking-[-0.16px] text-[rgba(22,22,27,0.4)]">
-              {modalSubtitle}
-            </p>
-          </DialogHeader>
-
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              className="h-11 w-[112px] rounded-[12px] bg-[#3863f6] px-6 text-[14px] font-semibold leading-5 tracking-[-0.14px] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
-              onClick={handlePrimaryAction}
-              disabled={isActionLocked}
-            >
-              {primaryActionLabel}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-11 w-[112px] rounded-[12px] border-none bg-[#e1e7fe] px-6 text-[14px] font-semibold leading-5 tracking-[-0.14px] text-[#3863f6] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#d3ddfe]"
-              onClick={handleSecondaryAction}
-              disabled={isActionLocked}
-            >
-              취소
-            </Button>
-          </div>
-        </div>
+        <DialogHeader className="space-y-1 text-left">
+          <DialogTitle className="text-[22px] font-bold leading-8 tracking-[-0.24px] text-[#040405]">
+            {modalTitle}
+          </DialogTitle>
+          <p className="text-[16px] font-medium leading-6 tracking-[-0.16px] text-[rgba(22,22,27,0.4)]">
+            {modalSubtitle}
+          </p>
+        </DialogHeader>
 
         <div className="rounded-[20px] border border-[#e9ebf0] bg-[#fcfcfd] px-5 pb-5 pt-4">
           <div className="space-y-5">
@@ -310,18 +288,33 @@ function ScheduleCreateModalComponent({
           </div>
         </div>
 
-        <div className="flex items-start justify-between">
-          {formError ? (
-            <p className="text-xs text-destructive">{formError}</p>
-          ) : (
-            <span />
-          )}
+        {formError ? (
+          <p className="text-xs text-destructive">{formError}</p>
+        ) : null}
 
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            className="h-11 flex-1 rounded-[12px] bg-[#3863f6] text-[14px] font-semibold leading-5 tracking-[-0.14px] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
+            onClick={handlePrimaryAction}
+            disabled={isActionLocked}
+          >
+            {primaryActionLabel}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 flex-1 rounded-[12px] border-none bg-[#e1e7fe] text-[14px] font-semibold leading-5 tracking-[-0.14px] text-[#3863f6] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#d3ddfe]"
+            onClick={handleSecondaryAction}
+            disabled={isActionLocked}
+          >
+            취소
+          </Button>
           {isEditMode ? (
             <Button
               type="button"
               variant="outline"
-              className="h-auto border-none p-0 text-[14px] font-semibold leading-5 text-destructive shadow-none hover:bg-transparent"
+              className="h-11 flex-1 rounded-[12px] border-none bg-[#fee2e2] text-[14px] font-semibold leading-5 tracking-[-0.14px] text-[#ef4444] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#fecaca]"
               onClick={onDelete}
               disabled={isActionLocked}
             >

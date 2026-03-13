@@ -127,7 +127,7 @@
 .eduops-calendar .rbc-time-view {
   border: 1px solid var(--eduops-calendar-border);
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   background: #ffffff;
 }
 

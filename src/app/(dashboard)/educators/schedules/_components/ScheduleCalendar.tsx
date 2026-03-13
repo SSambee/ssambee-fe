@@ -186,7 +186,7 @@ function ScheduleCalendarComponent({
           }}
           messages={calendarMessages}
           className="eduops-calendar"
-          style={{ height: 872 }}
+          style={{ minHeight: 872 }}
         />
       </CardContent>
     </Card>
