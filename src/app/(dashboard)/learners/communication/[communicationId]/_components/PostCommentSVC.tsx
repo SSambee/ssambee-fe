@@ -29,7 +29,8 @@ type PostCommentSVCProps = {
   onUpdateComment: (
     commentId: string,
     content: JSONContent,
-    file?: File | null
+    file?: File | null,
+    removeImage?: boolean
   ) => void;
   onDeleteComment: (commentId: string) => void;
 };
@@ -145,7 +146,12 @@ function CommentItemSVC({
   onDelete,
 }: {
   comment: CommonPostComment;
-  onUpdate: (id: string, content: JSONContent, file?: File | null) => void;
+  onUpdate: (
+    id: string,
+    content: JSONContent,
+    file?: File | null,
+    removeImage?: boolean
+  ) => void;
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -169,6 +175,7 @@ function CommentItemSVC({
     getParsedContent(comment.content)
   );
   const [editFile, setEditFile] = useState<File | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
   const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const images =
@@ -212,9 +219,16 @@ function CommentItemSVC({
       await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
-    onUpdate(comment.id, editContent, editFile);
+    // 새 파일이 있으면 교체(백엔드가 자동 삭제), 없으면 removeExistingImage 플래그 전달
+    onUpdate(
+      comment.id,
+      editContent,
+      editFile,
+      !editFile && removeExistingImage
+    );
     setIsEditing(false);
     setEditFile(null);
+    setRemoveExistingImage(false);
   };
 
   return (
@@ -257,6 +271,7 @@ function CommentItemSVC({
                     setIsEditing(false);
                     setEditContent(getParsedContent(comment.content));
                     setEditFile(null);
+                    setRemoveExistingImage(false);
                   }}
                   className="h-8 w-8 p-0 text-slate-400"
                 >
@@ -293,12 +308,16 @@ function CommentItemSVC({
             className="min-h-[120px] border-blue-100 shadow-sm"
           />
           {/* 파일 선택 UI */}
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <input
               type="file"
               accept="image/*"
               ref={editFileInputRef}
-              onChange={(e) => setEditFile(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                setEditFile(e.target.files?.[0] ?? null);
+                // 새 파일 선택 시 삭제 플래그 해제
+                if (e.target.files?.[0]) setRemoveExistingImage(false);
+              }}
               className="hidden"
             />
             {editFile ? (
@@ -331,6 +350,27 @@ function CommentItemSVC({
                 이미지 교체
               </Button>
             )}
+            {/* 기존 이미지가 있고 새 파일 미선택 시 삭제 버튼 표시 */}
+            {images.length > 0 &&
+              !editFile &&
+              (removeExistingImage ? (
+                <Button
+                  variant="outline"
+                  onClick={() => setRemoveExistingImage(false)}
+                  className="gap-2 text-blue-500 h-8 px-3 text-sm"
+                >
+                  이미지 복원
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => setRemoveExistingImage(true)}
+                  className="gap-2 text-red-500 hover:text-red-600 h-8 px-3 text-sm"
+                >
+                  <X className="h-4 w-4" />
+                  이미지 삭제
+                </Button>
+              ))}
           </div>
           <p className="text-[10px] text-slate-400 mt-1">
             내용 수정 후 상단의 체크 버튼을 눌러주세요.
@@ -344,33 +384,48 @@ function CommentItemSVC({
         />
       )}
 
-      {images.length > 0 && (
-        <div className="px-2 mt-2 space-y-3">
-          {images.map((img) => (
-            <div
-              key={img.id || img.filename}
-              className="relative w-full overflow-hidden rounded-lg cursor-pointer bg-slate-50/50"
-              onClick={() => window.open(img.fileUrl, "_blank")}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  window.open(img.fileUrl, "_blank");
+      {images.length > 0 &&
+        (isEditing && removeExistingImage ? (
+          <div className="px-2 mt-2 py-3 border border-dashed border-red-200 rounded-lg bg-red-50/50 text-center text-sm text-red-400">
+            저장 시 이미지가 삭제됩니다
+          </div>
+        ) : (
+          <div className="px-2 mt-2 space-y-3">
+            {images.map((img) => (
+              <div
+                key={img.id || img.filename}
+                className={`relative w-full overflow-hidden rounded-lg bg-slate-50/50 ${
+                  isEditing ? "opacity-100" : "cursor-pointer"
+                }`}
+                onClick={
+                  isEditing
+                    ? undefined
+                    : () => window.open(img.fileUrl, "_blank")
                 }
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              <Image
-                src={img.fileUrl}
-                alt={img.filename}
-                width={800}
-                height={400}
-                className="w-full h-auto object-contain max-h-[400px]"
-                loading="lazy"
-              />
-            </div>
-          ))}
-        </div>
-      )}
+                onKeyDown={
+                  isEditing
+                    ? undefined
+                    : (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          window.open(img.fileUrl, "_blank");
+                        }
+                      }
+                }
+                role={isEditing ? undefined : "button"}
+                tabIndex={isEditing ? undefined : 0}
+              >
+                <Image
+                  src={img.fileUrl}
+                  alt={img.filename}
+                  width={800}
+                  height={400}
+                  className="w-full h-auto object-contain max-h-[400px]"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        ))}
     </div>
   );
 }

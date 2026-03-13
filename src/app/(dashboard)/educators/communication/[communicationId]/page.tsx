@@ -245,7 +245,8 @@ export default function CommunicationDetailPage() {
   const handleUpdateComment = async (
     commentId: string,
     content: JSONContent,
-    file?: File | null
+    file?: File | null,
+    removeImage?: boolean
   ) => {
     if (!content || !content.content || content.content.length === 0) {
       await showAlert({ description: "내용을 입력해주세요." });
@@ -257,6 +258,10 @@ export default function CommunicationDetailPage() {
 
     if (file) {
       formData.append("file", file);
+    }
+
+    if (removeImage) {
+      formData.append("removeAttachments", "true");
     }
 
     if (isNoticePost) {
