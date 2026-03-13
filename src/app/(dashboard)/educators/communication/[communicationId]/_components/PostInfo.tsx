@@ -108,9 +108,9 @@ export default function PostInfo({
                       <div className="flex flex-wrap gap-x-1.5 gap-y-1">
                         {noticePostData?.targets &&
                         noticePostData.targets.length > 0 ? (
-                          noticePostData.targets.map((target) => (
+                          noticePostData.targets.map((target, index) => (
                             <span
-                              key={target.id}
+                              key={`${target.id}-${index}`}
                               className="text-[14px] font-semibold text-slate-700"
                             >
                               {target.enrollment.studentName}
