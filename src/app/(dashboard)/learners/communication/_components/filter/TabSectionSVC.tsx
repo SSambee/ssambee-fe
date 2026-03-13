@@ -33,7 +33,7 @@ export default function TabSectionSVC() {
 
   // 검색어 상태 및 디바운스
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // 요청 쿼리
   const [query, setQuery] = useState<PostFilterQuery>({

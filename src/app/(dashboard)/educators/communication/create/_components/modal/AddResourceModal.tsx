@@ -35,7 +35,7 @@ export default function AddResourceModal({
 }: AddResourceModalProps) {
   const { isOpen, closeModal } = useModal();
   const [searchKeyword, setSearchKeyword] = useState("");
-  const debouncedSearch = useDebounce(searchKeyword, 500);
+  const debouncedSearch = useDebounce(searchKeyword, 300);
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [tempSelected, setTempSelected] =
     useState<Materials[]>(initialSelected);
