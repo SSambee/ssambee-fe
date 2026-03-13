@@ -160,6 +160,7 @@ export type UpdateEnrollmentInfo = {
   school?: string;
   schoolYear?: string;
   status?: StudentStatus;
+  registeredAt?: string;
   memo?: string | null;
 };
 

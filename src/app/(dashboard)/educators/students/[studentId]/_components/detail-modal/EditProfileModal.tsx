@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
+import { formatYMDFromISO } from "@/utils/date";
 
 type EditProfileModalProps = {
   studentData: EditProfileFormDataType;
@@ -39,6 +40,8 @@ const getFormDataOnly = (
     schoolYear: data.schoolYear ?? "",
     studentPhone: data.studentPhone ?? "",
     parentPhone: data.parentPhone ?? "",
+    registeredAt:
+      formatYMDFromISO(data.registeredAt) ?? data.registeredAt ?? "",
     memo: data.memo ?? "",
   };
 };
@@ -110,7 +113,7 @@ export default function EditProfileModal({
   };
 
   const handleClose = () => {
-    reset(studentData); // 변경사항 초기화
+    reset(getFormDataOnly(studentData)); // 변경사항 초기화
     setIsEditMode(false);
     closeModal();
   };
@@ -124,7 +127,7 @@ export default function EditProfileModal({
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          reset(studentData);
+          reset(getFormDataOnly(studentData));
           setIsEditMode(false);
           closeModal();
         }
@@ -241,6 +244,23 @@ export default function EditProfileModal({
                     setValue("parentPhone", "", { shouldDirty: true })
                   }
                   showReset={isEditMode && !!watchedParentPhone}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="registeredAt" className="text-muted-foreground">
+                  학생 등록일
+                </Label>
+                <InputForm
+                  id="registeredAt"
+                  label="학생 등록일"
+                  {...register("registeredAt")}
+                  type="date"
+                  placeholder="등록일 선택"
+                  disabled={!isEditMode}
+                  floating={false}
+                  className="bg-white border border-neutral-200 rounded-[12px]"
+                  error={errors.registeredAt?.message}
                 />
               </div>
 

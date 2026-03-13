@@ -37,6 +37,7 @@ export const editProfileSchema = studentBaseSchema.extend({
     .min(1, "이메일을 입력해주세요")
     .optional()
     .or(z.literal("")), // 빈 문자열 허용(미등록 학생일 경우)
+  registeredAt: z.string().optional(),
   memo: z.string().optional(),
 });
 
