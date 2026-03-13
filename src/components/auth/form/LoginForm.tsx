@@ -24,14 +24,14 @@ type LoginFormProps = {
 
 const FOOTER_CONFIG = {
   STUDENT: {
-    question: "아직 계정이 없으신가요?",
-    action: "회원가입하기",
-    href: "/learners/register",
+    question: "",
+    action: "",
+    href: "",
   },
   PARENT: {
-    question: "아직 계정이 없으신가요?",
-    action: "회원가입하기",
-    href: "/learners/register",
+    question: "",
+    action: "",
+    href: "",
   },
   DEFAULT: {
     question: "관리자 권한이 필요하신가요?",
