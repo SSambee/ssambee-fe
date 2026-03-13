@@ -45,6 +45,10 @@ export default function PostInfoSVC({
 
   const canAction = isRegistered || isCompleted;
 
+  const isImportant = noticePostData?.isImportant;
+  const noticeLabel = isImportant ? "공지" : "자료";
+  const noticeColor = isImportant ? "blue" : "green";
+
   return (
     <Card className="border shadow-sm">
       <CardContent className="p-0">
@@ -67,7 +71,7 @@ export default function PostInfoSVC({
                 </Label>
                 <div className="mt-1">
                   {isNoticePost ? (
-                    <StatusLabel color="blue">공지</StatusLabel>
+                    <StatusLabel color={noticeColor}>{noticeLabel}</StatusLabel>
                   ) : (
                     <StatusLabel color="gray">문의</StatusLabel>
                   )}

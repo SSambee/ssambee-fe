@@ -50,6 +50,10 @@ export default function PostInfo({
   const isInProgress = workStatus === "IN_PROGRESS";
   const isEnd = workStatus === "END";
 
+  const isImportant = noticePostData?.isImportant;
+  const noticeLabel = isImportant ? "공지" : "자료";
+  const noticeColor = isImportant ? "blue" : "green";
+
   return (
     <Card className="border shadow-sm">
       <CardContent className="p-0">
@@ -72,7 +76,7 @@ export default function PostInfo({
                 </Label>
                 <div className="mt-1">
                   {isNoticePost ? (
-                    <StatusLabel color="blue">공지</StatusLabel>
+                    <StatusLabel color={noticeColor}>{noticeLabel}</StatusLabel>
                   ) : isWorksPost ? (
                     <StatusLabel color="blue">업무</StatusLabel>
                   ) : (
