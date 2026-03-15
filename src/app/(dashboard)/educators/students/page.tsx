@@ -41,7 +41,7 @@ export default function StudentsListPage() {
 
   // 검색어
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // 체크박스 스토어
   const {

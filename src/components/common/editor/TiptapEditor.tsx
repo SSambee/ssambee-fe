@@ -27,7 +27,7 @@ type TiptapEditorProps = {
   placeholder?: string;
   className?: string;
   onFileUpload?: (file: File) => void;
-  attachment?: File;
+  attachment?: File | null;
   onRemoveAttachment?: () => void;
 };
 
@@ -145,7 +145,7 @@ export default function TiptapEditor({
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              className="hidden" // 화면에서 숨김
+              className="hidden"
             />
             <ToolbarButton onClick={() => fileInputRef.current?.click()}>
               <Paperclip className="h-4 w-4" />

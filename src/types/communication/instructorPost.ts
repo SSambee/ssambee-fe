@@ -127,10 +127,9 @@ export type GetInstructorPostDetailResponse = {
 // commonPostComment 타입 사용
 
 // 강사 게시글 댓글 생성 & 수정
-export type CreateInstructorPostCommentRequest = {
-  content: string;
-  materialIds?: string[];
-};
+export type CreateInstructorPostCommentRequest =
+  | { content: string; materialIds?: string[] }
+  | FormData;
 
 export type WorkStatus = "PENDING" | "IN_PROGRESS" | "END";
 export type PriorityStatus = "NORMAL" | "HIGH" | "URGENT";

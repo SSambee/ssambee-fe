@@ -50,6 +50,10 @@ export default function PostInfo({
   const isInProgress = workStatus === "IN_PROGRESS";
   const isEnd = workStatus === "END";
 
+  const isImportant = noticePostData?.isImportant;
+  const noticeLabel = isImportant ? "공지" : "자료";
+  const noticeColor = isImportant ? "blue" : "green";
+
   return (
     <Card className="border shadow-sm">
       <CardContent className="p-0">
@@ -72,7 +76,7 @@ export default function PostInfo({
                 </Label>
                 <div className="mt-1">
                   {isNoticePost ? (
-                    <StatusLabel color="blue">공지</StatusLabel>
+                    <StatusLabel color={noticeColor}>{noticeLabel}</StatusLabel>
                   ) : isWorksPost ? (
                     <StatusLabel color="blue">업무</StatusLabel>
                   ) : (
@@ -91,13 +95,35 @@ export default function PostInfo({
                   <Label className="text-xs text-slate-400 font-medium">
                     수신 대상
                   </Label>
-                  <p className="mt-0.5 text-[14px] font-semibold text-slate-700">
-                    {noticePostData?.scope === "GLOBAL"
-                      ? "전체 클래스"
-                      : noticePostData?.scope === "LECTURE"
-                        ? "특정 클래스"
-                        : "특정 학생"}
-                  </p>
+                  <div className="mt-0.5 flex flex-wrap gap-1">
+                    {noticePostData?.scope === "GLOBAL" ? (
+                      <p className="text-[14px] font-semibold text-slate-700">
+                        전체 클래스
+                      </p>
+                    ) : noticePostData?.scope === "LECTURE" ? (
+                      <p className="text-[14px] font-semibold text-slate-700">
+                        특정 클래스
+                      </p>
+                    ) : (
+                      <div className="flex flex-wrap gap-x-1.5 gap-y-1">
+                        {noticePostData?.targets &&
+                        noticePostData.targets.length > 0 ? (
+                          noticePostData.targets.map((target, index) => (
+                            <span
+                              key={`${target.id}-${index}`}
+                              className="text-[14px] font-semibold text-slate-700"
+                            >
+                              {target.enrollment.studentName}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[14px] font-semibold text-slate-700">
+                            대상 없음
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

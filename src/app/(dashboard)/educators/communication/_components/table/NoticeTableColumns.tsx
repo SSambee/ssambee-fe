@@ -2,7 +2,6 @@ import StatusLabel from "@/components/common/label/StatusLabel";
 import { GetInstructorPostsResponse } from "@/types/communication/instructorPost";
 import { ColumnDefinition } from "@/components/common/table/DataTable";
 import { formatYMDFromISO } from "@/utils/date";
-import { NOTICE_TYPE_LABEL } from "@/constants/communication.default";
 
 type NoticeRow = GetInstructorPostsResponse["list"][number];
 
@@ -24,7 +23,7 @@ export const NOTICE_POST_COLUMNS: ColumnDefinition<NoticeRow>[] = [
     render: (row) => {
       const commentCount = row._count.comments;
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-[350px] min-w-0">
           <span className="max-w-[350px] truncate font-medium">
             {row.title}
           </span>
@@ -52,14 +51,19 @@ export const NOTICE_POST_COLUMNS: ColumnDefinition<NoticeRow>[] = [
     key: "authorRole",
     label: "열람 권한",
     render: (row) => {
-      const info =
-        NOTICE_TYPE_LABEL[row.targetRole as keyof typeof NOTICE_TYPE_LABEL] ??
-        NOTICE_TYPE_LABEL.ALL;
-
+      const role = row.targetRole;
       return (
-        <div className="w-[50px] flex items-center">
-          <StatusLabel noBackground color={info.color}>
-            {info.label}
+        <div className="flex items-center gap-1">
+          <StatusLabel color={"gray"} noBackground={role !== "ALL"}>
+            전체
+          </StatusLabel>
+          <p className="text-xs text-slate-500">/</p>
+          <StatusLabel color={"gray"} noBackground={role !== "STUDENT"}>
+            학생
+          </StatusLabel>
+          <p className="text-xs text-slate-500">/</p>
+          <StatusLabel color={"gray"} noBackground={role !== "PARENT"}>
+            학부모
           </StatusLabel>
         </div>
       );

@@ -33,7 +33,7 @@ export default function TabSectionSVC() {
 
   // 검색어 상태 및 디바운스
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   // 요청 쿼리
   const [query, setQuery] = useState<PostFilterQuery>({
@@ -150,7 +150,7 @@ export default function TabSectionSVC() {
         />
       )}
 
-      <div className="min-h-[550px]">
+      <div>
         {isLoading ? (
           <div className="flex items-center justify-center h-[550px]">
             <p className="text-muted-foreground">로딩 중...</p>

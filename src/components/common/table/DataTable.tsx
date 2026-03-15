@@ -19,6 +19,7 @@ type CommonDataTableProps<T> = {
   columns: ColumnDefinition<T>[];
   onRowClick?: (record: T) => void;
   emptyMessage?: string;
+  compact?: boolean;
 };
 
 export default function DataTable<T extends { id: string }>({
@@ -26,6 +27,7 @@ export default function DataTable<T extends { id: string }>({
   columns,
   onRowClick,
   emptyMessage = "기록이 없습니다.",
+  compact = false,
 }: CommonDataTableProps<T>) {
   return (
     <div className="overflow-x-auto rounded-[20px] border border-[#eaecf2]">
@@ -35,7 +37,7 @@ export default function DataTable<T extends { id: string }>({
             {columns.map((col) => (
               <TableHead
                 key={col.key}
-                className="h-[66px] text-lg font-semibold text-neutral-400 px-6 whitespace-nowrap"
+                className={`${compact ? "h-[50px] text-sm" : "h-[66px] text-lg"} font-semibold text-neutral-400 px-6 whitespace-nowrap`}
               >
                 {col.label}
               </TableHead>
@@ -49,7 +51,7 @@ export default function DataTable<T extends { id: string }>({
               <TableRow
                 key={record.id}
                 tabIndex={onRowClick ? 0 : undefined}
-                className={`h-[70px] border-neutral-100 ${
+                className={`${compact ? "h-[52px]" : "h-[70px]"} border-neutral-100 ${
                   onRowClick
                     ? "cursor-pointer hover:bg-surface-normal-light-alternative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-inset"
                     : ""
@@ -59,7 +61,10 @@ export default function DataTable<T extends { id: string }>({
                   if (
                     target.closest("button") ||
                     target.closest("a") ||
-                    target.closest("input")
+                    target.closest("input") ||
+                    target.closest('[role="checkbox"]') ||
+                    target.closest("[data-radix-select-trigger]") ||
+                    target.closest(".prevent-click")
                   ) {
                     return;
                   }
@@ -75,7 +80,11 @@ export default function DataTable<T extends { id: string }>({
                 {columns.map((col) => (
                   <TableCell
                     key={`${record.id}-${col.key}`}
-                    className="text-lg font-medium text-label-normal px-6 whitespace-nowrap"
+                    className={`${compact ? "text-sm" : "text-lg"} font-medium text-label-normal px-6 whitespace-nowrap ${
+                      col.key === "select" || col.key === "statusSelect"
+                        ? "prevent-click"
+                        : ""
+                    }`}
                   >
                     {col.render(record)}
                   </TableCell>

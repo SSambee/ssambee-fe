@@ -102,7 +102,7 @@ export const EDIT_PROFILE_FORM_DEFAULTS: EditProfileFormDataType = {
   schoolYear: "",
   studentPhone: "",
   parentPhone: "",
-  email: "",
+  registeredAt: "",
   memo: "",
 };
 

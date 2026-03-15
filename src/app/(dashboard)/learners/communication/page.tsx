@@ -17,7 +17,7 @@ export default function LearnersCommunicationPage() {
         </p>
       </section>
 
-      <div className="space-y-8">
+      <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-end gap-3">
           <Button
             variant="default"
@@ -30,7 +30,7 @@ export default function LearnersCommunicationPage() {
 
         <Suspense
           fallback={
-            <div className="flex items-center justify-center h-[550px]">
+            <div className="flex items-center justify-center h-[300px]">
               <p className="text-muted-foreground">로딩 중...</p>
             </div>
           }

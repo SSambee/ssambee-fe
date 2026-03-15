@@ -10,7 +10,7 @@ type LectureStatusBadgeProps = {
 export function LectureStatusBadge({ status }: LectureStatusBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${LECTURE_STATUS_BADGE_CLASSES[status]}`}
+      className={`inline-flex items-center rounded-lg px-3 py-1.5 text-[13px] font-semibold leading-[18px] tracking-[-0.13px] ${LECTURE_STATUS_BADGE_CLASSES[status]}`}
     >
       {status}
     </span>

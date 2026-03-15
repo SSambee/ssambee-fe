@@ -201,12 +201,16 @@ export function TalkNotificationModal() {
                         {student.name}
                       </p>
                       <div className="flex flex-col sm:flex-row sm:gap-3 mt-0.5">
-                        <p className="text-[12px] text-label-alternative">
-                          학생 | {student.phoneNumber}
-                        </p>
-                        <p className="text-[12px] text-label-alternative">
-                          부모 | {student.parentPhone}
-                        </p>
+                        {(sendTarget === "all" || sendTarget === "student") && (
+                          <p className="text-[12px] text-label-alternative">
+                            학생 | {student.phoneNumber}
+                          </p>
+                        )}
+                        {(sendTarget === "all" || sendTarget === "parent") && (
+                          <p className="text-[12px] text-label-alternative">
+                            학부모 | {student.parentPhone}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

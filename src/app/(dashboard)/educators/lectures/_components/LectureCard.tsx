@@ -12,6 +12,8 @@ import { CommonLectureCard } from "@/components/common/CommonLectureCard";
 import { useModal } from "@/providers/ModalProvider";
 import { useAuthContext } from "@/providers/AuthProvider";
 
+import { LectureStatusBadge } from "./LectureStatusBadge";
+
 type LectureCardProps = {
   lecture: Lecture;
 };
@@ -104,6 +106,9 @@ export function LectureCard({ lecture }: LectureCardProps) {
       currentStudents={lecture.currentStudents}
       instructorName={lecture.instructor}
       onClick={() => openDetailModal(lecture.id)}
+      statusBadge={
+        lecture.status ? <LectureStatusBadge status={lecture.status} /> : null
+      }
       action={
         <Button
           type="button"

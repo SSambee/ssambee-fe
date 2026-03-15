@@ -44,7 +44,8 @@ export const mapMyProfileApiToView = (payload: MyProfileApiResponse) => {
     role: mapProfileRole(payload.userType),
   };
 
-  const lectures = payload.lectures?.map(mapLectureApiToView) ?? [];
+  const rawLectures = payload.lectures ?? payload.instructorLectures ?? [];
+  const lectures = rawLectures.map(mapLectureApiToView);
 
   return { profile, lectures };
 };

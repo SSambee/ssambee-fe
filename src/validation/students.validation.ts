@@ -35,9 +35,9 @@ export const editProfileSchema = studentBaseSchema.extend({
     .string()
     .trim()
     .min(1, "이메일을 입력해주세요")
-    .email("올바른 이메일 형식이 아닙니다")
     .optional()
     .or(z.literal("")), // 빈 문자열 허용(미등록 학생일 경우)
+  registeredAt: z.string().optional(),
   memo: z.string().optional(),
 });
 

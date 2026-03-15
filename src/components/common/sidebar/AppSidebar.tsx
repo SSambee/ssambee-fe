@@ -37,14 +37,14 @@ const instructorMenuItems = [
     icon: Home,
   },
   {
-    title: "학생 관리",
-    url: "/educators/students",
-    icon: GraduationCap,
-  },
-  {
     title: "수업 관리",
     url: "/educators/lectures",
     icon: BookOpen,
+  },
+  {
+    title: "학생 관리",
+    url: "/educators/students",
+    icon: GraduationCap,
   },
   {
     title: "스케줄 관리",
@@ -80,14 +80,14 @@ const assistantMenuItems = [
     icon: Home,
   },
   {
-    title: "학생 관리",
-    url: "/educators/students",
-    icon: GraduationCap,
-  },
-  {
     title: "수업 관리",
     url: "/educators/lectures",
     icon: BookOpen,
+  },
+  {
+    title: "학생 관리",
+    url: "/educators/students",
+    icon: GraduationCap,
   },
   {
     title: "스케줄 관리",
@@ -172,13 +172,13 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="border-r border-[#e9ebf0] [&_[data-slot=sidebar-inner]]:bg-white">
-      <SidebarHeader className="pl-10 pr-8 py-8">
-        <Link href={homeHref} className="inline-flex items-center">
+      <SidebarHeader className="pl-6 pr-8 py-8">
+        <Link href={homeHref} className="inline-flex items-start">
           <Image
             src="/brand/ssam-b.svg"
             alt="ssam B"
-            width={98}
-            height={28}
+            width={138}
+            height={68}
             priority
           />
         </Link>
@@ -211,7 +211,7 @@ export function AppSidebar() {
             <SidebarMenuButton
               onClick={handleLogout}
               disabled={loading}
-              className="h-14 gap-[14px] rounded-[12px] px-6 py-4 text-[18px] leading-[26px] tracking-[-0.18px] font-semibold text-[rgba(22,22,27,0.28)] hover:bg-transparent hover:text-inherit"
+              className="h-14 gap-[14px] rounded-[12px] px-6 py-4 text-[18px] leading-[26px] tracking-[-0.18px] font-semibold text-[rgba(22,22,27,0.28)] hover:bg-transparent hover:text-inherit cursor-pointer"
             >
               <LogOut className="size-[18px] text-current" />
               <span>{loading ? "로그아웃 중..." : "로그아웃"}</span>

@@ -160,6 +160,7 @@ export type UpdateEnrollmentInfo = {
   school?: string;
   schoolYear?: string;
   status?: StudentStatus;
+  registeredAt?: string;
   memo?: string | null;
 };
 
@@ -180,6 +181,7 @@ export type GetEnrollmentAttendance = {
 
 // Attendance 타입 (테이블 표시용)
 export type AttendanceList = {
+  id: string;
   date: string;
   status: AttendanceStatus;
   memo?: string | null;

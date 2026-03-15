@@ -45,7 +45,7 @@ export const useLectureCreatePage = () => {
 
   const lectureForm = useForm<LectureFormInput>({
     resolver: zodResolver(lectureFormSchema),
-    mode: "onChange",
+    mode: "onSubmit",
     defaultValues: {
       name: "",
       subject: "",

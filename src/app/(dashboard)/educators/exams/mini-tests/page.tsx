@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowLeft,
   Loader2,
   Save,
   Search,
@@ -11,7 +10,6 @@ import {
   Eye,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 import { cn } from "@/lib/utils";
+
+import { ExamsNavigationTabs } from "../_components/ExamsNavigationTabs";
 
 import { MiniTestsStudentTable } from "./_components/MiniTestsStudentTable";
 import { useMiniTestsPage } from "./_hooks/useMiniTestsPage";
@@ -86,29 +86,18 @@ export default function MiniTestsPage() {
     <div className="container mx-auto space-y-8 p-6">
       <section className="-mx-6 -mt-6 border-b border-[#e9ebf0] bg-white px-6 py-6 sm:px-8 sm:py-7">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-          <div className="flex items-start gap-4">
-            <Button
-              variant="outline"
-              className="h-11 w-11 rounded-full border-[#d6d9e0] bg-white p-0 text-[#6b6f80] hover:bg-[#fcfcfd] hover:text-[#5e6275]"
-              asChild
-            >
-              <Link href="/educators/exams" aria-label="시험 관리로 이동">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div className="space-y-1.5">
-              <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
-                미니테스트
-              </h1>
-              <p className="text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
-                카테고리별 미니테스트 결과를 입력하고 관리합니다.
+          <div className="space-y-1.5">
+            <h1 className="text-[30px] font-bold leading-[1.2] tracking-[-0.03em] text-[#040405] sm:text-[36px] sm:leading-[48px]">
+              미니테스트
+            </h1>
+            <p className="text-[16px] font-medium leading-6 tracking-[-0.01em] text-[rgba(22,22,27,0.4)] sm:text-[20px] sm:leading-7 sm:tracking-[-0.02em]">
+              카테고리별 미니테스트 결과를 입력하고 관리합니다.
+            </p>
+            {feedbackMessage ? (
+              <p className="text-[13px] font-semibold leading-5 tracking-[-0.13px] text-[#3863f6]">
+                {feedbackMessage}
               </p>
-              {feedbackMessage ? (
-                <p className="text-[13px] font-semibold leading-5 tracking-[-0.13px] text-[#3863f6]">
-                  {feedbackMessage}
-                </p>
-              ) : null}
-            </div>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -158,6 +147,8 @@ export default function MiniTestsPage() {
           </div>
         </div>
       </section>
+
+      <ExamsNavigationTabs />
 
       <div className="grid gap-6 xl:grid-cols-[320px_1fr] xl:items-start">
         <div className="space-y-6">

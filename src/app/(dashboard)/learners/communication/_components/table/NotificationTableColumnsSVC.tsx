@@ -2,7 +2,6 @@ import StatusLabel from "@/components/common/label/StatusLabel";
 import { GetInstructorPostsResponse } from "@/types/communication/instructorPost";
 import { ColumnDefinition } from "@/components/common/table/DataTable";
 import { formatYMDFromISO } from "@/utils/date";
-import { NOTICE_TYPE_LABEL } from "@/constants/communication.default";
 
 type NoticeRow = GetInstructorPostsResponse["list"][number];
 
@@ -45,23 +44,6 @@ export const NOTICE_TABLE_COLUMNS_SVC: ColumnDefinition<NoticeRow>[] = [
         <span className="text-sm">
           {row.scope === "LECTURE" ? row.lectureTitle : "미지정"}
         </span>
-      );
-    },
-  },
-  {
-    key: "authorRole",
-    label: "열람 권한",
-    render: (row) => {
-      const info =
-        NOTICE_TYPE_LABEL[row.targetRole as keyof typeof NOTICE_TYPE_LABEL] ??
-        NOTICE_TYPE_LABEL.ALL;
-
-      return (
-        <div className="w-[50px] flex items-center">
-          <StatusLabel noBackground color={info.color}>
-            {info.label}
-          </StatusLabel>
-        </div>
       );
     },
   },

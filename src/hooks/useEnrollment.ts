@@ -12,6 +12,7 @@ import {
   UpdateEnrollmentInfo,
 } from "@/types/students.type";
 import { getTodayYMD } from "@/utils/date";
+import { deleteAttendanceAPI } from "@/services/students.service";
 
 // 강의 목록 조회
 export const useLecturesList = (query?: { page?: number; limit?: number }) =>
@@ -123,6 +124,8 @@ export const useEnrollmentDetail = (id: string) =>
 // 수강생 정보 수정
 export const useUpdateEnrollment = () => {
   const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
+
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEnrollmentInfo }) =>
       api.updateEnrollmentAPI(id, data),
@@ -133,6 +136,10 @@ export const useUpdateEnrollment = () => {
       queryClient.invalidateQueries({
         queryKey: ["enrollments", "detail", id],
       });
+      showAlert({ description: "수강생 정보가 수정되었습니다." });
+    },
+    onError: () => {
+      showAlert({ description: "수강생 정보 수정에 실패했습니다." });
     },
   });
 };
@@ -174,6 +181,33 @@ export const useCreateAttendance = (
       console.error("출결 등록 실패:", error);
       showAlert({
         description: "출결 등록에 실패했습니다. 다시 시도해주세요.",
+      });
+    },
+  });
+};
+
+// 수강생 개별 출결 삭제
+export const useDeleteAttendance = (
+  lectureId?: string,
+  enrollmentId?: string
+) => {
+  const queryClient = useQueryClient();
+  const { showAlert } = useDialogAlert();
+  return useMutation({
+    mutationFn: (attendanceId: string) => deleteAttendanceAPI(attendanceId),
+    onSuccess: () => {
+      showAlert({ description: "출결 삭제가 완료되었습니다." });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
+      if (lectureId && enrollmentId) {
+        queryClient.invalidateQueries({
+          queryKey: ["enrollments", "attendances", lectureId, enrollmentId],
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("출결 삭제 실패:", error);
+      showAlert({
+        description: "출결 삭제에 실패했습니다. 다시 시도해주세요.",
       });
     },
   });

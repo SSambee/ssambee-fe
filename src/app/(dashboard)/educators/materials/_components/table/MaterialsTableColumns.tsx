@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Download } from "lucide-react";
 
 import { Materials } from "@/types/materials.type";
@@ -25,12 +24,7 @@ export const MATERIALS_TABLE_COLUMNS = ({
     key: "title",
     label: "자료명",
     render: (row: Materials) => (
-      <Link
-        href={`/educators/materials/${row.id}`}
-        className="font-medium hover:text-primary hover:underline block w-[400px]"
-      >
-        {row.title || "-"}
-      </Link>
+      <span className="font-medium block w-[400px]">{row.title || "-"}</span>
     ),
   },
   {

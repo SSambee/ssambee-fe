@@ -1,6 +1,7 @@
 import { Edit, Trash2, X, Paperclip, Save } from "lucide-react";
 import { useState } from "react";
 import { JSONContent } from "@tiptap/react";
+import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,10 +23,13 @@ type PostCommentProps = {
   setAnswerContent: (val: JSONContent) => void;
   selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmitAnswer: () => void;
-  onUpdateComment: (commentId: string, content: JSONContent) => void;
+  onUpdateComment: (
+    commentId: string,
+    content: JSONContent,
+    file?: File | null,
+    removeImage?: boolean
+  ) => void;
   onDeleteComment: (commentId: string) => void;
 };
 
@@ -36,8 +40,6 @@ export default function PostComment({
   setAnswerContent,
   selectedFile,
   setSelectedFile,
-  fileInputRef,
-  handleFileChange,
   handleSubmitAnswer,
   onUpdateComment,
   onDeleteComment,
@@ -75,6 +77,7 @@ export default function PostComment({
             <TiptapEditor
               content={answerContent}
               onChange={setAnswerContent}
+              onFileUpload={setSelectedFile}
               placeholder={
                 isNoticePost
                   ? "댓글을 입력하세요..."
@@ -82,7 +85,7 @@ export default function PostComment({
               }
               className="h-[200px]"
             />
-            {!isNoticePost && selectedFile && (
+            {selectedFile && (
               <div className="p-3 bg-slate-50 border rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg border shadow-sm">
@@ -107,18 +110,13 @@ export default function PostComment({
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </div>
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] text-slate-400 px-1">
+                * 이미지 파일만 첨부할 수 있습니다.
+              </p>
               <Button
                 onClick={handleSubmitAnswer}
-                className="h-14 w-[140px] gap-2.5 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer"
+                className="h-14 w-[140px] gap-1 rounded-xl border border-[#3863f6] bg-[#3863f6] px-0 text-base font-semibold tracking-[-0.01em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8] cursor-pointer"
               >
                 {isNoticePost ? "댓글 등록" : "답변 등록"}
               </Button>
@@ -137,7 +135,12 @@ function CommentItem({
   onDelete,
 }: {
   comment: CommonPostComment;
-  onUpdate: (id: string, content: JSONContent) => void;
+  onUpdate: (
+    id: string,
+    content: JSONContent,
+    file?: File | null,
+    removeImage?: boolean
+  ) => void;
   onDelete: (id: string) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -159,6 +162,13 @@ function CommentItem({
   const [editContent, setEditContent] = useState<JSONContent>(() =>
     getParsedContent(comment.content)
   );
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [removeExistingImage, setRemoveExistingImage] = useState(false);
+
+  const images =
+    comment.attachments?.filter((f) =>
+      f.filename?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+    ) || [];
 
   // 수정 완료
   const handleSave = async () => {
@@ -170,8 +180,16 @@ function CommentItem({
       await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
-    onUpdate(comment.id, editContent);
+    // 새 파일이 있으면 교체(백엔드가 자동 삭제), 없으면 removeExistingImage 플래그 전달
+    onUpdate(
+      comment.id,
+      editContent,
+      editFile,
+      !editFile && removeExistingImage
+    );
     setIsEditing(false);
+    setEditFile(null);
+    setRemoveExistingImage(false);
   };
 
   // 작성자 표기
@@ -239,6 +257,8 @@ function CommentItem({
                   onClick={() => {
                     setIsEditing(false);
                     setEditContent(getParsedContent(comment.content));
+                    setEditFile(null);
+                    setRemoveExistingImage(false);
                   }}
                   className="h-8 w-8 p-0 text-slate-400"
                 >
@@ -272,11 +292,14 @@ function CommentItem({
           <TiptapEditor
             content={editContent}
             onChange={setEditContent}
+            onFileUpload={(file) => {
+              setEditFile(file);
+              setRemoveExistingImage(false);
+            }}
+            attachment={editFile}
+            onRemoveAttachment={() => setEditFile(null)}
             className="min-h-[120px] border-blue-100 shadow-sm"
           />
-          <p className="text-[10px] text-slate-400 mt-1">
-            내용 수정 후 상단의 체크 버튼을 눌러주세요.
-          </p>
         </div>
       ) : (
         <TiptapEditor
@@ -285,6 +308,80 @@ function CommentItem({
           className="pt-2 px-2"
         />
       )}
+
+      {images.length > 0 &&
+        (isEditing && removeExistingImage ? (
+          <div className="mt-4">
+            <div className="rounded-xl border-2 border-dashed p-4 transition-colors bg-white border-slate-100 relative">
+              <div className="py-8 flex flex-col items-center justify-center space-y-2">
+                <div className="p-3 bg-slate-50 rounded-full">
+                  <Paperclip className="h-6 w-6 text-slate-300" />
+                </div>
+                <p className="text-sm text-slate-400">
+                  이미지만 첨부할 수 있습니다.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setRemoveExistingImage(false)}
+                className="absolute top-2 right-2 h-8 w-8 p-0 rounded-full hover:bg-red-50 hover:text-red-500"
+                title="복원"
+                aria-label="첨부 이미지 복원"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        ) : isEditing && editFile ? null : (
+          <div className="mt-4 space-y-3 relative">
+            {isEditing && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setRemoveExistingImage(true)}
+                className="absolute top-2 right-2 z-10 h-8 w-8 p-0 rounded-full bg-white/95 hover:bg-red-50 hover:text-red-600 border shadow-sm"
+                title="삭제"
+                aria-label="첨부 이미지 삭제"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+            {images.map((img) => (
+              <div
+                key={img.id || img.filename}
+                className={`relative w-full overflow-hidden rounded-lg bg-slate-50/50 ${
+                  isEditing ? "opacity-100" : "cursor-pointer"
+                }`}
+                onClick={
+                  isEditing
+                    ? undefined
+                    : () => window.open(img.fileUrl, "_blank")
+                }
+                onKeyDown={
+                  isEditing
+                    ? undefined
+                    : (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          window.open(img.fileUrl, "_blank");
+                        }
+                      }
+                }
+                role={isEditing ? undefined : "button"}
+                tabIndex={isEditing ? undefined : 0}
+              >
+                <Image
+                  src={img.fileUrl}
+                  alt={img.filename}
+                  width={800}
+                  height={400}
+                  className="w-full h-auto object-contain max-h-[400px]"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        ))}
     </div>
   );
 }

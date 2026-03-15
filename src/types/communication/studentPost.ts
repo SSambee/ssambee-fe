@@ -35,7 +35,13 @@ export type GetMyChildrenResponse = ChildInfo[];
 
 // 학생 문의 생성
 export type CreateStudentPostRequest =
-  | { title: string; content: string; lectureId: string; file?: File }
+  | {
+      title: string;
+      content: string;
+      lectureId: string;
+      file?: File;
+      attachments?: string[];
+    }
   | FormData;
 
 // 학부모 문의 생성
@@ -92,7 +98,6 @@ export type GetStudentPostDetailResponse = {
 // commonPostComment 타입 사용
 
 // 학생 문의 댓글 생성 & 수정
-export type CreateStudentPostCommentRequest = {
-  content: string;
-  materialIds?: string[];
-};
+export type CreateStudentPostCommentRequest =
+  | { content: string; materialIds?: string[] }
+  | FormData;

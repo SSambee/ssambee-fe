@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { JSONContent } from "@tiptap/react";
 
@@ -24,6 +24,9 @@ import {
   WorkStatus,
 } from "@/types/communication/instructorPost";
 import { GetStudentPostDetailResponse } from "@/types/communication/studentPost";
+import { Materials } from "@/types/materials.type";
+
+import AddResourceModal from "../create/_components/modal/AddResourceModal";
 
 import PostInfo from "./_components/PostInfo";
 import PostContent from "./_components/PostContent";
@@ -36,7 +39,6 @@ export default function CommunicationDetailPage() {
   const searchParams = useSearchParams();
   const communicationId = params.communicationId as string;
   const type = searchParams.get("type") as "notice" | "inquiry" | "works";
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { showAlert } = useDialogAlert();
   const { openModal } = useModal();
 
@@ -79,6 +81,10 @@ export default function CommunicationDetailPage() {
   const [editContent, setEditContent] = useState<JSONContent>({});
   const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedMaterials, setSelectedMaterials] = useState<Materials[]>([]);
+  const [removedAttachmentIds, setRemovedAttachmentIds] = useState<string[]>(
+    []
+  );
 
   if (isLoadingNotice || isLoadingInquiry || isLoadingWorks) {
     return (
@@ -122,12 +128,16 @@ export default function CommunicationDetailPage() {
       setEditTitle(inquiryPostData.title);
       setEditContent(safeParse(inquiryPostData.content));
     }
+    setSelectedMaterials([]);
+    setRemovedAttachmentIds([]);
     setIsEditing(true);
   };
 
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
+    setSelectedMaterials([]);
+    setRemovedAttachmentIds([]);
   };
 
   // 게시글 수정 저장
@@ -142,6 +152,15 @@ export default function CommunicationDetailPage() {
 
     const payloadContent = JSON.stringify(editContent);
 
+    const existingAttachments = currentData?.attachments || [];
+    const remainingMaterialIds = existingAttachments
+      .filter((att) => !removedAttachmentIds.includes(att.id))
+      .map((att) => att.materialId)
+      .filter((id): id is string => !!id);
+
+    const newMaterialIds = selectedMaterials.map((m) => m.id);
+    const allMaterialIds = [...remainingMaterialIds, ...newMaterialIds];
+
     if (isNoticePost) {
       updateNoticeMutation.mutate(
         {
@@ -149,21 +168,36 @@ export default function CommunicationDetailPage() {
           payload: {
             title: editTitle,
             content: payloadContent,
+            materialIds: allMaterialIds,
           },
         },
-        { onSuccess: () => setIsEditing(false) }
+        {
+          onSuccess: () => {
+            setIsEditing(false);
+            setSelectedMaterials([]);
+            setRemovedAttachmentIds([]);
+          },
+        }
       );
     }
   };
 
   // 게시글 삭제
   const handleDelete = () => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
-    if (isNoticePost) {
-      deleteNoticeMutation.mutate(communicationId, {
-        onSuccess: () => router.push("/educators/communication"),
-      });
-    }
+    openModal(
+      <CheckModal
+        title="게시글 삭제"
+        description="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        onConfirm={() => {
+          if (isNoticePost) {
+            deleteNoticeMutation.mutate(communicationId, {
+              onSuccess: () => router.push("/educators/communication"),
+            });
+          }
+        }}
+      />
+    );
   };
 
   // 댓글 작성
@@ -184,39 +218,61 @@ export default function CommunicationDetailPage() {
     const handleSuccess = () => {
       setAnswerContent({});
       setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    const payload = { content: JSON.stringify(answerContent) };
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(answerContent));
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
 
     if (isNoticePost) {
       createInstructorPostCommentMutation.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     } else {
       createStudentPostCommentMutation.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     }
   };
 
   //댓글 수정
-  const handleUpdateComment = (commentId: string, content: JSONContent) => {
-    const payload = { content: JSON.stringify(content) };
+  const handleUpdateComment = async (
+    commentId: string,
+    content: JSONContent,
+    file?: File | null,
+    removeImage?: boolean
+  ) => {
+    if (!content || !content.content || content.content.length === 0) {
+      await showAlert({ description: "내용을 입력해주세요." });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(content));
+
+    if (file) {
+      formData.append("file", file);
+    }
+
+    if (removeImage) {
+      formData.append("removeAttachments", "true");
+    }
 
     if (isNoticePost) {
       updateInstructorPostCommentMutation.mutate({
         postId: communicationId,
         commentId,
-        payload,
+        payload: formData,
       });
     } else {
       updateStudentPostCommentMutation.mutate({
         postId: communicationId,
         commentId,
-        payload,
+        payload: formData,
       });
     }
   };
@@ -245,12 +301,6 @@ export default function CommunicationDetailPage() {
     );
   };
 
-  // 자료 변경
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setSelectedFile(file);
-  };
-
   // 자료 다운로드
   const handleAttachmentClick = (file: CommonPostAttachment) => {
     const isVideo =
@@ -262,12 +312,35 @@ export default function CommunicationDetailPage() {
       return;
     }
 
+    const isStudentPost = !isNoticePost && !isWorksPost;
+
     downloadMaterial({
-      materialsId: file.materialId, // 공지사항일 때 존재
-      attachmentId: file.id, // 문의글일 때 존재
-      fileUrl: file.fileUrl, // 직접 다운로드
-      isNotice: isNoticePost,
+      materialsId: file.materialId, // 공지사항/업무의 자료실 링크일 때
+      attachmentId: isStudentPost ? file.id : undefined, // 학생 문의글일 때만 존재
+      fileUrl: file.fileUrl, // 직접 업로드된 파일
+      isNotice: !isStudentPost,
     });
+  };
+
+  // 자료실 모달 열기
+  const handleOpenAddResourceModal = () => {
+    openModal(
+      <AddResourceModal
+        key={`modal-${selectedMaterials.map((m) => m.id).join(",")}`}
+        onChange={(updatedList) => setSelectedMaterials(updatedList)}
+        initialSelected={selectedMaterials}
+      />
+    );
+  };
+
+  // 기존 첨부파일 삭제
+  const handleRemoveExistingAttachment = (attachmentId: string) => {
+    setRemovedAttachmentIds((prev) => [...prev, attachmentId]);
+  };
+
+  // 새로 추가한 자료 삭제
+  const handleRemoveNewMaterial = (materialId: string) => {
+    setSelectedMaterials((prev) => prev.filter((m) => m.id !== materialId));
   };
 
   // 조교 업무 상태 변경
@@ -281,23 +354,24 @@ export default function CommunicationDetailPage() {
 
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Title
-          title={
-            isNoticePost
-              ? "공지사항 상세"
-              : isWorksPost
-                ? "조교 업무 상세"
-                : "문의 상세"
-          }
-          description={
-            isEditing
-              ? "게시글을 수정 중입니다."
-              : isWorksPost
-                ? "업무의 상세 내용을 확인하세요."
-                : "게시글의 상세 내용을 확인하세요."
-          }
-        />
+      <Title
+        title={
+          isNoticePost
+            ? "공지사항 상세"
+            : isWorksPost
+              ? "조교 업무 상세"
+              : "문의 상세"
+        }
+        description={
+          isEditing
+            ? "게시글을 수정 중입니다."
+            : isWorksPost
+              ? "업무의 상세 내용을 확인하세요."
+              : "게시글의 상세 내용을 확인하세요."
+        }
+      />
+
+      <div className="flex items-center justify-end">
         <PostAction
           isEditing={isEditing}
           isMine={
@@ -344,6 +418,11 @@ export default function CommunicationDetailPage() {
             worksPostData={worksPostData ?? undefined}
             currentData={currentData}
             handleAttachmentClick={handleAttachmentClick}
+            selectedMaterials={selectedMaterials}
+            removedAttachmentIds={removedAttachmentIds}
+            handleOpenAddResourceModal={handleOpenAddResourceModal}
+            handleRemoveExistingAttachment={handleRemoveExistingAttachment}
+            handleRemoveNewMaterial={handleRemoveNewMaterial}
           />
 
           {!isWorksPost && (
@@ -359,8 +438,6 @@ export default function CommunicationDetailPage() {
               setAnswerContent={setAnswerContent}
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
-              fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-              handleFileChange={handleFileChange}
               handleSubmitAnswer={handleSubmitAnswer}
               onUpdateComment={handleUpdateComment}
               onDeleteComment={handleDeleteComment}

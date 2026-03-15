@@ -1,3 +1,11 @@
+import {
+  FileImage,
+  ClipboardList,
+  FileText,
+  LayoutGrid,
+  PlayCircle,
+} from "lucide-react";
+
 // options label - 문의 탭 필터
 export const ANSWER_STATUS_OPTIONS = [
   { label: "전체", value: "ALL" },
@@ -83,6 +91,15 @@ export const MATERIALS_TYPE_OPTIONS = [
   { label: "요청 자료", value: "REQUEST" },
   { label: "기타", value: "OTHER" },
 ];
+
+// 자료 분류 아이콘
+export const MATERIALS_ICONS = {
+  ALL: LayoutGrid, // 전체
+  PAPER: FileText, // 시험지
+  VIDEO: PlayCircle, // 동영상
+  REQUEST: ClipboardList, // 요청 자료
+  OTHER: FileImage, // 기타
+} as const;
 
 // 자료 분류 라벨
 export const MATERIALS_TYPE_LABEL = {

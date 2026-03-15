@@ -2,6 +2,8 @@
 
 import { Pagination } from "@/components/common/pagination/Pagination";
 
+import { ExamsNavigationTabs } from "../_components/ExamsNavigationTabs";
+
 import { ClinicHeader } from "./_components/ClinicHeader";
 import { ClinicStats } from "./_components/ClinicStats";
 import { ClinicFilters } from "./_components/ClinicFilters";
@@ -51,6 +53,7 @@ export default function ClinicPage() {
         onSendNotification={handleMarkCompleted}
         isSending={isMarkingCompleted}
       />
+      <ExamsNavigationTabs />
       {selectedIds.length > 0 && (
         <div className="sticky top-4 z-10 inline-flex w-fit rounded-[14px] border border-[#dce4ff] bg-[#f4f7ff]/95 px-4 py-2.5 text-[13px] font-semibold text-[#3863f6] shadow-[0_6px_20px_rgba(56,99,246,0.08)] backdrop-blur">
           선택 {selectedIds.length}명 · 완료 처리 예정

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { JSONContent } from "@tiptap/react";
 
@@ -34,7 +34,6 @@ export default function CommunicationDetailPageSVC() {
   const typeParam = searchParams.get("type");
   const type: "notice" | "inquiry" =
     typeParam === "notice" ? "notice" : "inquiry";
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isNoticePost = type === "notice";
 
@@ -67,8 +66,11 @@ export default function CommunicationDetailPageSVC() {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState<JSONContent>({});
+  const [editFile, setEditFile] = useState<File | null>(null);
   const [answerContent, setAnswerContent] = useState<JSONContent>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [shouldRemoveExistingFile, setShouldRemoveExistingFile] =
+    useState(false);
 
   if (isLoadingNotice || isLoadingInquiry) {
     return (
@@ -109,11 +111,14 @@ export default function CommunicationDetailPageSVC() {
         });
       }
     }
+    setShouldRemoveExistingFile(false);
     setIsEditing(true);
   };
   // 게시글 수정 취소
   const handleCancelEdit = () => {
     setIsEditing(false);
+    setEditFile(null);
+    setShouldRemoveExistingFile(false);
   };
 
   // 게시글 수정 저장
@@ -126,16 +131,42 @@ export default function CommunicationDetailPageSVC() {
       return;
     }
 
-    // 서버에는 무조건 stringify 해서 전송
-    const payloadContent = JSON.stringify(editContent);
+    let payload:
+      | FormData
+      | { title: string; content: string; attachments?: [] };
+
+    if (editFile) {
+      const formData = new FormData();
+      formData.append("title", editTitle.trim());
+      formData.append("content", JSON.stringify(editContent));
+      formData.append("file", editFile);
+      payload = formData;
+    } else if (shouldRemoveExistingFile) {
+      payload = {
+        title: editTitle.trim(),
+        content: JSON.stringify(editContent),
+        attachments: [],
+      };
+    } else {
+      payload = {
+        title: editTitle.trim(),
+        content: JSON.stringify(editContent),
+      };
+    }
 
     if (!isNoticePost) {
       updatePostSVC.mutate(
         {
           postId: communicationId,
-          payload: { title: editTitle, content: payloadContent },
+          payload,
         },
-        { onSuccess: () => setIsEditing(false) }
+        {
+          onSuccess: () => {
+            setIsEditing(false);
+            setEditFile(null);
+            setShouldRemoveExistingFile(false);
+          },
+        }
       );
     }
   };
@@ -159,12 +190,20 @@ export default function CommunicationDetailPageSVC() {
 
   // 게시글 삭제
   const handleDelete = () => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
-    if (!isNoticePost) {
-      deletePostSVC.mutate(communicationId, {
-        onSuccess: () => router.push("/learners/communication"),
-      });
-    }
+    openModal(
+      <CheckModal
+        title="게시글 삭제"
+        description="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        onConfirm={() => {
+          if (!isNoticePost) {
+            deletePostSVC.mutate(communicationId, {
+              onSuccess: () => router.push("/learners/communication"),
+            });
+          }
+        }}
+      />
+    );
   };
 
   // 댓글 작성
@@ -179,19 +218,22 @@ export default function CommunicationDetailPageSVC() {
     const handleSuccess = () => {
       setAnswerContent({}); // 초기화 시 빈 객체
       setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     };
 
-    const payload = { content: JSON.stringify(answerContent) };
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(answerContent));
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
 
     if (isNoticePost) {
       createInstructorPostCommentSVC.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     } else {
       createCommentSVC.mutate(
-        { postId: communicationId, payload },
+        { postId: communicationId, payload: formData },
         { onSuccess: handleSuccess }
       );
     }
@@ -200,24 +242,37 @@ export default function CommunicationDetailPageSVC() {
   //댓글 수정
   const handleUpdateComment = async (
     commentId: string,
-    content: JSONContent
+    content: JSONContent,
+    file?: File | null,
+    removeImage?: boolean
   ) => {
     if (!content || !content.content || content.content.length === 0) {
       await showAlert({ description: "내용을 입력해주세요." });
       return;
     }
 
+    const formData = new FormData();
+    formData.append("content", JSON.stringify(content));
+
+    if (file) {
+      formData.append("file", file);
+    }
+
+    if (removeImage) {
+      formData.append("removeAttachments", "true");
+    }
+
     if (isNoticePost) {
       updateInstructorPostCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content: JSON.stringify(content) },
+        payload: formData,
       });
     } else {
       updateCommentSVC.mutate({
         postId: communicationId,
         commentId,
-        payload: { content: JSON.stringify(content) },
+        payload: formData,
       });
     }
   };
@@ -246,12 +301,6 @@ export default function CommunicationDetailPageSVC() {
     );
   };
 
-  // 자료 변경
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setSelectedFile(file);
-  };
-
   // 자료 다운로드
   const handleAttachmentClick = (file: CommonPostAttachment) => {
     const isVideo =
@@ -264,7 +313,7 @@ export default function CommunicationDetailPageSVC() {
     }
     downloadMaterial({
       materialsId: file.materialId,
-      attachmentId: file.id,
+      attachmentId: !isNoticePost ? file.id : undefined,
       fileUrl: file.fileUrl,
       isNotice: isNoticePost,
     });
@@ -272,15 +321,16 @@ export default function CommunicationDetailPageSVC() {
 
   return (
     <div className="container mx-auto space-y-8 p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <Title
-          title={isNoticePost ? "공지사항 상세" : "문의 상세"}
-          description={
-            isEditing
-              ? "게시글을 수정 중입니다."
-              : "게시글의 상세 내용을 확인하세요."
-          }
-        />
+      <Title
+        title={isNoticePost ? "공지사항 상세" : "문의 상세"}
+        description={
+          isEditing
+            ? "게시글을 수정 중입니다."
+            : "게시글의 상세 내용을 확인하세요."
+        }
+      />
+
+      <div className="flex items-center justify-end">
         <PostActionSVC
           isEditing={isEditing}
           isMine={currentData.isMine ?? false}
@@ -311,10 +361,14 @@ export default function CommunicationDetailPageSVC() {
             setEditTitle={setEditTitle}
             editContent={editContent}
             setEditContent={setEditContent}
+            editFile={editFile}
+            setEditFile={setEditFile}
             noticePostData={noticePostData}
             inquiryPostData={inquiryPostData}
             currentData={currentData}
             handleAttachmentClick={handleAttachmentClick}
+            shouldRemoveExistingFile={shouldRemoveExistingFile}
+            setShouldRemoveExistingFile={setShouldRemoveExistingFile}
           />
 
           <PostCommentSVC
@@ -324,8 +378,6 @@ export default function CommunicationDetailPageSVC() {
             setAnswerContent={setAnswerContent}
             selectedFile={selectedFile}
             setSelectedFile={setSelectedFile}
-            fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-            handleFileChange={handleFileChange}
             handleSubmitAnswer={handleSubmitAnswer}
             onUpdateComment={handleUpdateComment}
             onDeleteComment={handleDeleteComment}

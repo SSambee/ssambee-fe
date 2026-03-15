@@ -132,7 +132,6 @@ export default function AuthLayout({
                 <div
                   key={index}
                   className="rounded-lg overflow-hidden shrink-0"
-                  style={{ backgroundColor: "#5E80F8" }}
                 >
                   <Image
                     src={src}

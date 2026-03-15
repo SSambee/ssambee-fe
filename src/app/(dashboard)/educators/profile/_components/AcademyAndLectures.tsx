@@ -1,4 +1,4 @@
-import { Clock3, Search, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { Lecture } from "@/types/profile.type";
@@ -25,13 +25,6 @@ export function AcademyAndLectures({
             <span className="text-xl font-bold tracking-tight text-[#8b90a3] xl:text-2xl">
               {lectures.length}개
             </span>
-          </div>
-
-          <div className="flex h-[56px] items-center gap-3 rounded-[12px] border border-[#d6d9e0] bg-[#fcfcfd] px-4">
-            <Search className="h-5 w-5 text-[#8b90a3]" />
-            <p className="text-[16px] font-medium text-[#8b90a3]">
-              담당 강의를 검색해보세요
-            </p>
           </div>
         </div>
 
@@ -69,15 +62,9 @@ export function AcademyAndLectures({
                       </span>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-[18px] font-medium leading-[26px] tracking-[-0.02em] text-[#6b6f80]">
-                        <Clock3 className="h-5 w-5" />
-                        <span>시간 정보 없음</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[18px] font-medium leading-[26px] tracking-[-0.02em] text-[#6b6f80]">
-                        <Users className="h-5 w-5" />
-                        <span>{lecture.studentCount}명</span>
-                      </div>
+                    <div className="flex items-center gap-2 text-[18px] font-medium leading-[26px] tracking-[-0.02em] text-[#6b6f80]">
+                      <Users className="h-5 w-5" />
+                      <span>{lecture.studentCount}명</span>
                     </div>
                   </div>
 

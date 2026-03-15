@@ -130,7 +130,7 @@ export const myPostServiceSVC = {
   // 내 문의 수정
   updateStudentPostSVC: async (
     postId: string,
-    payload: UpdateStudentPostRequest
+    payload: UpdateStudentPostRequest | FormData
   ) => {
     const { data } = await axiosClientSVC.patch<
       ApiResponse<GetStudentPostDetailResponse>
@@ -173,7 +173,7 @@ export const myPostServiceSVC = {
   updateStudentPostCommentSVC: async (
     postId: string,
     commentId: string,
-    payload: CreateStudentPostCommentRequest
+    payload: CreateStudentPostCommentRequest | FormData
   ) => {
     const { data } = await axiosClientSVC.patch<ApiResponse<CommonPostComment>>(
       `/student-posts/${postId}/comments/${commentId}`,

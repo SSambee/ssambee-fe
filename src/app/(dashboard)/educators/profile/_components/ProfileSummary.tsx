@@ -1,14 +1,6 @@
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
-import {
-  BookOpen,
-  Building2,
-  Calendar,
-  Edit,
-  Mail,
-  Phone,
-  Settings,
-} from "lucide-react";
+import { Building2, Calendar, Edit, Mail, Phone, Settings } from "lucide-react";
 
 import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
 import { getTeacherAvatarSortByRole } from "@/components/common/avatar/getTeacherAvatarSortByRole";
@@ -88,16 +80,6 @@ export function ProfileSummary({
             </p>
             <p className="text-base font-medium text-[#16161b]/88">
               {profile.academyName}
-            </p>
-          </div>
-
-          <div className="flex h-[42px] items-center gap-3">
-            <BookOpen className="h-6 w-6 text-[#6b6f80]" />
-            <p className="w-[88px] text-base font-medium text-[#6b6f80]">
-              담당과목
-            </p>
-            <p className="text-base font-medium text-[#16161b]/88">
-              {profile.subjects.length > 0 ? profile.subjects.join(", ") : "-"}
             </p>
           </div>
 

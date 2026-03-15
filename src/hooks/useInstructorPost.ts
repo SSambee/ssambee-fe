@@ -1,10 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import {
   CreateInstructorPostCommentRequest,
   CreateInstructorPostRequest,
   UpdateInstructorPostRequest,
   UpdateAssistantWorkStatus,
+  GetInstructorPostTargetsResponse,
 } from "@/types/communication/instructorPost";
 import { CreateStudentPostCommentRequest } from "@/types/communication/studentPost";
 import {
@@ -14,14 +20,16 @@ import {
 } from "@/services/instructorPost.service";
 import { CommonPostQuery } from "@/types/communication/commonPost";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
+import { dashboardKeys } from "@/constants/query-keys";
 
 // 공지 알림 대상 조회
-export const useInstructorPostTargets = () => {
-  return useQuery({
-    queryKey: ["instructorPostsTargets"],
-    queryFn: () => instructorPostService.getInstructorPostTargets(),
-  });
-};
+export const useInstructorPostTargets =
+  (): UseQueryResult<GetInstructorPostTargetsResponse> => {
+    return useQuery({
+      queryKey: ["instructorPostsTargets"],
+      queryFn: () => instructorPostService.getInstructorPostTargets(),
+    });
+  };
 
 // 공지 목록 조회
 export const useInstructorPosts = (
@@ -289,11 +297,12 @@ export const useStudentPostMutations = () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["studentPost", variables.postId],
-          refetchType: "active",
         }),
         queryClient.invalidateQueries({
           queryKey: ["studentPosts"],
-          refetchType: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.educatorsHome(),
         }),
       ]);
       showAlert({ description: "답변이 등록되었습니다." });
@@ -319,7 +328,12 @@ export const useStudentPostMutations = () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["studentPost", variables.postId],
-          refetchType: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["studentPosts"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.educatorsHome(),
         }),
       ]);
       showAlert({ description: "답변이 수정되었습니다." });
@@ -342,11 +356,12 @@ export const useStudentPostMutations = () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["studentPost", variables.postId],
-          refetchType: "active",
         }),
         queryClient.invalidateQueries({
           queryKey: ["studentPosts"],
-          refetchType: "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: dashboardKeys.educatorsHome(),
         }),
       ]);
       showAlert({ description: "답변이 삭제되었습니다." });

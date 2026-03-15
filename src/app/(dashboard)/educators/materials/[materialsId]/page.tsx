@@ -176,7 +176,7 @@ export default function MaterialsDetailPage() {
   };
 
   return (
-    <div className="container mx-auto space-y-8 p-6">
+    <div className="container mx-auto space-y-8 p-6 mb-10">
       <Title
         title={mode === "view" ? "학습 자료 상세" : "학습 자료 수정"}
         description={
@@ -216,6 +216,14 @@ export default function MaterialsDetailPage() {
                 <Trash2 className="h-5 w-5" />
                 삭제
               </Button>
+
+              <Button
+                variant="outline"
+                onClick={() => router.back()}
+                className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
+              >
+                목록으로
+              </Button>
             </>
           ) : (
             <>
@@ -238,18 +246,6 @@ export default function MaterialsDetailPage() {
         </div>
 
         <div>{renderForm()}</div>
-
-        {mode === "view" && (
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => router.back()}
-              className="h-14 w-[140px] gap-2.5 rounded-xl border-neutral-200 px-0 text-base font-semibold tracking-[-0.01em] text-neutral-500 shadow-none hover:border-brand-500 hover:text-brand-500 transition-colors cursor-pointer"
-            >
-              목록으로
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );
