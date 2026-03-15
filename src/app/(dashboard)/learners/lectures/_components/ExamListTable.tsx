@@ -90,10 +90,10 @@ export default function ExamListTable({
                     </span>
                   </TableCell>
                   <TableCell className="px-6 py-5 text-center text-base font-bold text-brand-700">
-                    {grade.score}점
+                    {Number(grade.score).toFixed(1)}점
                   </TableCell>
                   <TableCell className="px-6 py-5 text-center text-base text-neutral-500">
-                    {exam.average}점
+                    {Number(exam.average).toFixed(1)}점
                   </TableCell>
                   <TableCell className="px-6 py-5 text-center text-base text-neutral-500">
                     <span className="font-semibold text-neutral-700">

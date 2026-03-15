@@ -12,6 +12,7 @@ export const mockProfile: Profile = {
   bio: "10년 경력의 영어 전문 강사입니다.",
   createdAt: "2026-02-01T09:00:00Z",
   role: "INSTRUCTOR",
+  instructorName: null,
 };
 
 export const mockLectures: Lecture[] = [

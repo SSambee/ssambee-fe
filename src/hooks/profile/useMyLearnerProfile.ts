@@ -8,8 +8,10 @@ import {
 import {
   fetchMyLearnerProfileAPI,
   updateMyLearnerProfileAPI,
+  linkChildAPI,
 } from "@/services/learnersProfile.service";
 import type { LearnersProfileUpdateFormData } from "@/validation/learners-profile.validation";
+import type { LinkChildFormData } from "@/validation/learners-profile.validation";
 
 export const useMyLearnerProfile = () => {
   const queryClient = useQueryClient();
@@ -45,6 +47,22 @@ export const useMyLearnerProfile = () => {
     },
   });
 
+  const linkChildMutation = useMutation({
+    mutationFn: (payload: LinkChildFormData) =>
+      linkChildAPI({
+        name: payload.name.trim(),
+        phoneNumber: payload.phoneNumber,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: profileKeys.learnerMe() });
+    },
+    onError: (error) => {
+      const normalizedError =
+        error instanceof Error ? error : new Error(String(error));
+      console.error("자녀 연동 실패:", normalizedError.message);
+    },
+  });
+
   return {
     profile: profileQuery.data ?? null,
     isPending: profileQuery.isPending,
@@ -53,5 +71,7 @@ export const useMyLearnerProfile = () => {
     refetch: profileQuery.refetch,
     updateProfile: updateMutation.mutateAsync,
     isUpdating: updateMutation.isPending,
+    linkChild: linkChildMutation.mutateAsync,
+    isLinkingChild: linkChildMutation.isPending,
   };
 };

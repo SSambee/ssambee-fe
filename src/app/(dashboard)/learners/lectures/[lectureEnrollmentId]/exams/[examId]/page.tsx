@@ -114,14 +114,14 @@ export default function LearnersExamDetailPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="내 점수"
-          value={detail.score}
+          value={Number(detail.score).toFixed(1)}
           unit="점"
           icon={Trophy}
           trend="score"
         />
         <MetricCard
           label="학급 평균"
-          value={detail.classAverage}
+          value={Number(detail.classAverage).toFixed(1)}
           unit="점"
           icon={Users}
         />

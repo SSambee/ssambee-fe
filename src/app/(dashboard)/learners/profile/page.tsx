@@ -6,7 +6,10 @@ import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
 import { useModal } from "@/providers/ModalProvider";
 import { useMyLearnerProfile } from "@/hooks/profile/useMyLearnerProfile";
-import type { LearnersProfileUpdateFormData } from "@/validation/learners-profile.validation";
+import type {
+  LearnersProfileUpdateFormData,
+  LinkChildFormData,
+} from "@/validation/learners-profile.validation";
 import { PhoneChangeModal } from "@/app/(dashboard)/educators/profile/_components/modal/PhoneChangeModal";
 import { SettingsSecurityModal } from "@/app/(dashboard)/educators/profile/_components/modal/SettingsSecurityModal";
 
@@ -19,8 +22,15 @@ export default function LearnersProfilePage() {
   useSetBreadcrumb([{ label: "프로필" }]);
 
   const { openModal, closeModal } = useModal();
-  const { profile, isPending, isError, updateProfile, isUpdating } =
-    useMyLearnerProfile();
+  const {
+    profile,
+    isPending,
+    isError,
+    updateProfile,
+    isUpdating,
+    linkChild,
+    isLinkingChild,
+  } = useMyLearnerProfile();
   const { showAlert } = useDialogAlert();
 
   const profileRef = useRef(profile);
@@ -28,6 +38,7 @@ export default function LearnersProfilePage() {
   const updateProfileRef = useRef(updateProfile);
   const closeModalRef = useRef(closeModal);
   const showAlertRef = useRef(showAlert);
+  const linkChildRef = useRef(linkChild);
 
   useEffect(() => {
     profileRef.current = profile;
@@ -48,6 +59,10 @@ export default function LearnersProfilePage() {
   useEffect(() => {
     showAlertRef.current = showAlert;
   }, [showAlert]);
+
+  useEffect(() => {
+    linkChildRef.current = linkChild;
+  }, [linkChild]);
 
   const handleProfileUpdate = useCallback(
     async (data: LearnersProfileUpdateFormData) => {
@@ -70,6 +85,10 @@ export default function LearnersProfilePage() {
     []
   );
 
+  const handleLinkChild = useCallback(async (data: LinkChildFormData) => {
+    await linkChildRef.current(data);
+  }, []);
+
   const handleEditClick = () => {
     if (!profile) return;
 
@@ -84,7 +103,15 @@ export default function LearnersProfilePage() {
   const handleSettingsClick = () => {
     if (!profile) return;
 
-    openModal(<SettingsSecurityModal email={profile.email} />);
+    openModal(
+      <SettingsSecurityModal
+        email={profile.email}
+        onLinkChild={
+          profile.userType === "PARENT" ? handleLinkChild : undefined
+        }
+        isLinkingChild={isLinkingChild}
+      />
+    );
   };
 
   const handlePhoneChangeClick = () => {

@@ -137,7 +137,9 @@ const CustomTooltip = ({
           <div className="grid grid-cols-2 gap-x-4">
             <div>
               <p className="mb-2 text-[#8b90a3]">점수</p>
-              <p className="font-semibold text-[#3863f6]">{data.score}점</p>
+              <p className="font-semibold text-[#3863f6]">
+                {Number(data.score).toFixed(1)}점
+              </p>
             </div>
             <div>
               <p className="mb-2 text-[#8b90a3]">석차</p>
@@ -149,7 +151,7 @@ const CustomTooltip = ({
         </div>
 
         <div className="mt-6 border-t border-dashed border-[#e9ebf0] pt-3 text-[11px] text-[#8b90a3]">
-          반 평균 | {data.classAverage}점
+          반 평균 | {Number(data.classAverage).toFixed(1)}점
         </div>
       </div>
     );

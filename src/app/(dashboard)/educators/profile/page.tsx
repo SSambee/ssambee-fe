@@ -99,7 +99,11 @@ export default function ProfilePage() {
 
       <AcademyAndLectures
         academyName={profile.academyName}
-        teacherName={profile.name}
+        teacherName={
+          profile.role === "ASSISTANT" && profile.instructorName
+            ? profile.instructorName
+            : profile.name
+        }
         lectures={lectures}
       />
     </div>

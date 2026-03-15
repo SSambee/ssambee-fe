@@ -39,9 +39,11 @@ export function AcademyAndLectures({
                 >
                   <div className="space-y-6 px-6 pb-4 pt-6">
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-lg bg-[#e1e7fe] px-3 py-2 text-[14px] font-semibold leading-5 tracking-[-0.02em] text-[#2554f5]">
-                        {academyName}
-                      </span>
+                      {academyName !== "-" && (
+                        <span className="rounded-lg bg-[#e1e7fe] px-3 py-2 text-[14px] font-semibold leading-5 tracking-[-0.02em] text-[#2554f5]">
+                          {academyName}
+                        </span>
+                      )}
                       <span className="rounded-lg bg-[#e9ebf0] px-3 py-2 text-[14px] font-semibold leading-5 tracking-[-0.02em] text-[#5e6275]">
                         {lecture.target}
                       </span>

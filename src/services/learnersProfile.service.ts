@@ -22,3 +22,25 @@ export const updateMyLearnerProfileAPI = async (
 
   return data.data;
 };
+
+export type LinkChildPayload = {
+  name: string;
+  phoneNumber: string;
+};
+
+type LinkChildApiResponse = {
+  id: string;
+  name: string;
+  phoneNumber: string;
+};
+
+export const linkChildAPI = async (
+  payload: LinkChildPayload
+): Promise<LinkChildApiResponse> => {
+  const { data } = await axiosClientSVC.post<ApiResponse<LinkChildApiResponse>>(
+    "/children",
+    payload
+  );
+
+  return data.data;
+};

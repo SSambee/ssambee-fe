@@ -20,6 +20,7 @@ export type MyProfileApiResponse = {
   phoneVerified?: boolean | null;
   lectures?: ProfileApiLecture[];
   instructorLectures?: ProfileApiLecture[];
+  instructor?: { id: string; name: string } | null;
 };
 
 export type UpdateMyProfilePayload = {

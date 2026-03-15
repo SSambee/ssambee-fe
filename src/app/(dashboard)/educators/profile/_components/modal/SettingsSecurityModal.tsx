@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Lock, UserX } from "lucide-react";
+import { ArrowLeft, Lock, Users, UserX } from "lucide-react";
 
 import {
   Dialog,
@@ -24,15 +24,26 @@ import {
   type PasswordChangeFormData,
   type VerificationCodeFormData,
 } from "@/validation/profile.validation";
+import {
+  linkChildSchema,
+  type LinkChildFormData,
+} from "@/validation/learners-profile.validation";
 import { EyeClosedIcon, EyeOpenIcon } from "@/components/icons/AuthIcons";
+import { formatPhoneNumber } from "@/utils/phone";
 
-type ViewMode = "menu" | "password";
+type ViewMode = "menu" | "password" | "linkChild";
 
 type SettingsSecurityModalProps = {
   email: string;
+  onLinkChild?: (data: LinkChildFormData) => Promise<unknown>;
+  isLinkingChild?: boolean;
 };
 
-export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
+export function SettingsSecurityModal({
+  email,
+  onLinkChild,
+  isLinkingChild,
+}: SettingsSecurityModalProps) {
   const { isOpen, closeModal, openModal } = useModal();
   const { user } = useAuthContext();
   const [viewMode, setViewMode] = useState<ViewMode>("menu");
@@ -70,9 +81,26 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     mode: "onChange",
   });
 
+  const {
+    register: registerChild,
+    handleSubmit: handleChildSubmit,
+    formState: { errors: childErrors, isValid: isChildValid },
+    setValue: setChildValue,
+    reset: resetChild,
+    control: childControl,
+  } = useForm<LinkChildFormData>({
+    resolver: zodResolver(linkChildSchema),
+    mode: "onChange",
+  });
+
   const currentPasswordValue = useWatch({ control, name: "currentPassword" });
   const newPasswordValue = useWatch({ control, name: "newPassword" });
   const confirmPasswordValue = useWatch({ control, name: "confirmPassword" });
+  const childNameValue = useWatch({ control: childControl, name: "name" });
+  const childPhoneValue = useWatch({
+    control: childControl,
+    name: "phoneNumber",
+  });
 
   const handleClose = () => {
     setViewMode("menu");
@@ -82,6 +110,7 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     setFeedbackTone("success");
     resetCode();
     reset();
+    resetChild();
     setShowNewPwd(false);
     setShowConfirmPwd(false);
     closeModal();
@@ -99,6 +128,7 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     setFeedbackTone("success");
     resetCode();
     reset();
+    resetChild();
     setShowNewPwd(false);
     setShowConfirmPwd(false);
   };
@@ -170,6 +200,24 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     }
   };
 
+  const onLinkChildSubmit = async (data: LinkChildFormData) => {
+    setFeedbackMessage(null);
+
+    try {
+      await onLinkChild?.(data);
+      setFeedbackTone("success");
+      setFeedbackMessage("자녀가 연동되었습니다.");
+      setTimeout(() => handleClose(), 1000);
+    } catch (error) {
+      setFeedbackTone("error");
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : "자녀 연동 중 오류가 발생했습니다."
+      );
+    }
+  };
+
   const handleWithdrawal = () => {
     openModal(
       <CheckModal
@@ -185,6 +233,13 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
     );
   };
 
+  const dialogTitle =
+    viewMode === "menu"
+      ? "설정 및 보안"
+      : viewMode === "password"
+        ? "비밀번호 변경"
+        : "자녀 연동하기";
+
   return (
     <Dialog
       open={isOpen}
@@ -197,11 +252,11 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
       <DialogContent className="w-[calc(100vw-32px)] max-h-[88vh] max-w-[620px] gap-0 overflow-y-auto rounded-[24px] border-0 bg-white p-0 shadow-[0_0_14px_rgba(138,138,138,0.16)]">
         <DialogHeader className="gap-2 border-b border-[#e9ebf0] px-6 pb-5 pt-6 sm:px-8">
           <DialogTitle className="text-[24px] font-bold leading-8 tracking-[-0.02em] text-[#040405]">
-            {viewMode === "menu" ? "설정 및 보안" : "비밀번호 변경"}
+            {dialogTitle}
           </DialogTitle>
         </DialogHeader>
 
-        {viewMode === "menu" ? (
+        {viewMode === "menu" && (
           <div className="space-y-4 px-6 pb-6 pt-6 sm:px-8 sm:pb-8">
             <Button
               variant="outline"
@@ -211,6 +266,16 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
               <Lock className="mr-3 h-5 w-5" />
               비밀번호 변경하기
             </Button>
+            {user?.userType === "PARENT" && onLinkChild && (
+              <Button
+                variant="outline"
+                className="h-14 w-full justify-start rounded-[12px] border border-[#d6d9e0] bg-white px-5 text-[16px] font-semibold tracking-[-0.02em] text-[#4a4d5c] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#fcfcfd]"
+                onClick={() => setViewMode("linkChild")}
+              >
+                <Users className="mr-3 h-5 w-5" />
+                자녀 연동하기
+              </Button>
+            )}
             <Button
               variant="outline"
               className="h-14 w-full justify-start rounded-[12px] border border-[#fee2e2] bg-[#fff7f7] px-5 text-[16px] font-semibold tracking-[-0.02em] text-[#dc2626] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#ffefef] hover:text-[#b91c1c]"
@@ -220,7 +285,9 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
               서비스 탈퇴하기
             </Button>
           </div>
-        ) : (
+        )}
+
+        {viewMode === "password" && (
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-5 px-6 pb-6 pt-6 sm:px-8 sm:pb-8"
@@ -377,6 +444,77 @@ export function SettingsSecurityModal({ email }: SettingsSecurityModalProps) {
                 disabled={!isVerified || !isValid}
               >
                 변경하기
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {viewMode === "linkChild" && (
+          <form
+            onSubmit={handleChildSubmit(onLinkChildSubmit)}
+            className="space-y-5 px-6 pb-6 pt-6 sm:px-8 sm:pb-8"
+          >
+            {feedbackMessage ? (
+              <p
+                className={`rounded-[12px] border px-4 py-3 text-[14px] font-medium leading-5 tracking-[-0.02em] ${
+                  feedbackTone === "success"
+                    ? "border-[#ced9fd] bg-[#f4f6fe] text-[#3863f6]"
+                    : "border-[#fee2e2] bg-[#fff7f7] text-[#dc2626]"
+                }`}
+              >
+                {feedbackMessage}
+              </p>
+            ) : null}
+
+            <InputForm
+              label="자녀 이름"
+              type="text"
+              placeholder="자녀 이름을 입력해주세요"
+              {...registerChild("name")}
+              error={childErrors.name?.message}
+              showReset={!!childNameValue}
+              onReset={() =>
+                setChildValue("name", "", { shouldValidate: true })
+              }
+              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium tracking-[-0.02em] text-[#2b2e3a]"
+            />
+
+            <InputForm
+              label="자녀 전화번호"
+              type="tel"
+              placeholder="010-0000-0000"
+              {...registerChild("phoneNumber", {
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const formatted = formatPhoneNumber(e.target.value);
+                  setChildValue("phoneNumber", formatted, {
+                    shouldValidate: true,
+                  });
+                },
+              })}
+              error={childErrors.phoneNumber?.message}
+              showReset={!!childPhoneValue}
+              onReset={() =>
+                setChildValue("phoneNumber", "", { shouldValidate: true })
+              }
+              className="h-14 rounded-[12px] border-[#d6d9e0] bg-white px-4 text-[16px] font-medium tracking-[-0.02em] text-[#2b2e3a]"
+            />
+
+            <div className="mt-6 flex gap-2 border-t border-[#e9ebf0] pt-5">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 flex-1 rounded-[12px] border border-[#ced9fd] bg-[#f4f6fe] text-[14px] font-semibold tracking-[-0.02em] text-[#3863f6] shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#e8edfe]"
+                onClick={handleBack}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                뒤로 가기
+              </Button>
+              <Button
+                type="submit"
+                className="h-12 flex-1 rounded-[12px] bg-[#3863f6] text-[14px] font-semibold tracking-[-0.02em] text-white shadow-[0_0_14px_rgba(138,138,138,0.08)] hover:bg-[#2f57e8]"
+                disabled={!isChildValid || isLinkingChild}
+              >
+                {isLinkingChild ? "연동 중..." : "연동하기"}
               </Button>
             </div>
           </form>

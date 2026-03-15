@@ -14,8 +14,11 @@ const toResourceLibraryItem = (material: Materials): ResourceLibraryItem => ({
   title: material.title,
   category: getResourceLibraryCategoryByMaterialsType(material.type),
   updatedAt: material.date,
-  sizeLabel:
-    material.file?.name ?? (material.link?.trim() ? "링크 자료" : "파일 없음"),
+  sizeLabel: material.file?.name
+    ? material.title
+    : material.link?.trim()
+      ? "링크 자료"
+      : "파일 없음",
 });
 
 const getErrorMessage = (error: unknown) => {

@@ -10,6 +10,7 @@ export type Profile = {
   bio: string;
   createdAt: string;
   role: "INSTRUCTOR" | "ASSISTANT";
+  instructorName: string | null;
 };
 
 export type Lecture = {
