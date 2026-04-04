@@ -1,4 +1,4 @@
-import { axiosClient, axiosClientSVC } from "@/services/axiosClient";
+import { axiosClient, axiosClientSVC } from "@/shared/common/api/axiosClient";
 import type { ApiResponse } from "@/types/api";
 import type {
   MyProfileApiResponse,
