@@ -6,8 +6,6 @@ export type BankForm = {
   name: string;
   phone: string;
   email: string;
-  address: string;
-  addressDetail: string;
   bank: string;
   depositorName: string;
   receiptType: ReceiptType;
@@ -26,8 +24,6 @@ export const INITIAL_FORM: BankForm = {
   name: "",
   phone: "",
   email: "",
-  address: "",
-  addressDetail: "",
   bank: "",
   depositorName: "",
   receiptType: "none",

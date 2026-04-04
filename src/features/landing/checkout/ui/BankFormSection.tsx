@@ -108,28 +108,6 @@ export function BankFormSection({ amount, onSubmit }: Props) {
               clearErrors("email");
             }}
           />
-          <InputForm
-            id="address"
-            label="주소"
-            error={errors.address?.message}
-            {...register("address")}
-            showReset={!!formValues.address}
-            onReset={() => {
-              setValue("address", "");
-              clearErrors("address");
-            }}
-          />
-          <InputForm
-            id="addressDetail"
-            label="상세 주소"
-            error={errors.addressDetail?.message}
-            {...register("addressDetail")}
-            showReset={!!formValues.addressDetail}
-            onReset={() => {
-              setValue("addressDetail", "");
-              clearErrors("addressDetail");
-            }}
-          />
         </div>
       </div>
 
