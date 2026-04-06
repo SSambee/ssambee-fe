@@ -35,6 +35,11 @@ export const API_URL_TYPE: Record<Role, LoginURLType> = {
   PARENT: "SVC",
 };
 
+/** 로그인 직후·랜딩 헤더 등에서 역할별 대시보드 홈 경로 */
+export function getDashboardHomePath(userType: Role): string {
+  return API_URL_TYPE[userType] === "MGMT" ? "/educators" : "/learners";
+}
+
 export function useAuth() {
   const router = useRouter();
   const queryClient = useQueryClient();

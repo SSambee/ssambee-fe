@@ -1,8 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { TOKENS, TokenAdd } from "@/features/landing/pricing/lib/types";
+import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
 
 function CheckIcon() {
   return (
@@ -71,11 +70,11 @@ function TokenCard({
 }
 
 export function TokenAddSection() {
-  const router = useRouter();
+  const { goToCheckout } = useEducatorCheckoutNavigation();
 
   const handleSelect = (addon: TokenAdd) => {
     const params = new URLSearchParams({ tokenId: addon.id });
-    router.push(`/checkout?${params.toString()}`);
+    goToCheckout(params);
   };
 
   return (

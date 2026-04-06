@@ -1,17 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { Plan, PLANS } from "@/features/landing/pricing/lib/types";
+import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
 
 import { PlanCard } from "./PlanCard";
 
 export function PlanCardList() {
-  const router = useRouter();
+  const { goToCheckout } = useEducatorCheckoutNavigation();
 
   const handleSelect = (plan: Plan) => {
     const params = new URLSearchParams({ planId: plan.id });
-    router.push(`/checkout?${params.toString()}`);
+    goToCheckout(params);
   };
 
   return (

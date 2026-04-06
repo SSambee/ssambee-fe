@@ -10,7 +10,34 @@ import {
 import { usePathname } from "next/navigation";
 
 import { getSessionAPI } from "@/services/auth.service";
-import { Role } from "@/types/auth.type";
+import type { Role } from "@/types/auth.type";
+
+/** 랜딩 등 공개 구간: MGMT/SVC 쿠키 중 어느 쪽이든 로그인 상태를 반영 */
+function shouldProbeBothSessionRoles(pathname: string): boolean {
+  return (
+    pathname === "/" ||
+    pathname.startsWith("/pricing") ||
+    pathname.startsWith("/checkout")
+  );
+}
+
+async function fetchSessionUser(pathname: string) {
+  if (shouldProbeBothSessionRoles(pathname)) {
+    const mgmtRes = await getSessionAPI("MGMT");
+    const mgmtUser = mgmtRes.data?.data?.user;
+    if (mgmtUser) {
+      return mgmtUser;
+    }
+    const svcRes = await getSessionAPI("SVC");
+    return svcRes.data?.data?.user ?? null;
+  }
+
+  const role: "MGMT" | "SVC" = pathname.startsWith("/learners")
+    ? "SVC"
+    : "MGMT";
+  const res = await getSessionAPI(role);
+  return res.data?.data?.user ?? null;
+}
 
 export type AuthUser = {
   id: string;
@@ -44,7 +71,6 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   );
   const [isLoading, setIsLoading] = useState(!serverProvided);
   const pathname = usePathname();
-  const role = pathname.startsWith("/learners") ? "SVC" : "MGMT";
 
   useEffect(() => {
     if (serverProvided) {
@@ -55,13 +81,11 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
 
     const initAuth = async () => {
       try {
-        const response = await getSessionAPI(role);
+        const userData = await fetchSessionUser(pathname);
 
         if (cancelled) {
           return;
         }
-
-        const userData = response.data?.data?.user;
 
         if (userData) {
           setUser(userData);
@@ -87,7 +111,7 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
     return () => {
       cancelled = true;
     };
-  }, [role, serverProvided]);
+  }, [pathname, serverProvided]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, isLoading }}>

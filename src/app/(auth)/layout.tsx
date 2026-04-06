@@ -1,9 +1,9 @@
-import Providers from "@/app/providers/Providers";
+import AuthBoundaryProvider from "@/app/providers/AuthBoundaryProvider";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <Providers>{children}</Providers>;
+  return <AuthBoundaryProvider>{children}</AuthBoundaryProvider>;
 }

@@ -83,15 +83,6 @@ export async function getServerSession(
   }
 }
 
-// 비로그인 상태면 로그인 페이지로 리다이렉트
-export async function requireAuth(loginPath: string): Promise<void> {
-  const isAuthenticated = await hasSession();
-
-  if (!isAuthenticated) {
-    redirect(loginPath);
-  }
-}
-
 // 비로그인 상태 또는 권한 없으면 리다이렉트
 export async function requireAuthWithRole(options: {
   loginPath: string;

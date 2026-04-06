@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { PLANS, TOKENS } from "@/features/landing/pricing/lib/types";
 import { PaymentMethod } from "@/features/landing/checkout/lib/types";
 
@@ -25,6 +26,7 @@ export function CheckoutClient({
   initialTokenId,
 }: CheckoutClientProps) {
   const router = useRouter();
+  const { user } = useAuthContext();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
@@ -100,7 +102,7 @@ export function CheckoutClient({
 
           <div className="p-6 bg-white border border-gray-200 rounded-2xl">
             {paymentMethod === "card" ? (
-              <TossPaymentsWidget amount={amount} />
+              <TossPaymentsWidget amount={amount} customerUserId={user?.id} />
             ) : (
               <BankFormSection amount={amount} onSubmit={handleBankSubmit} />
             )}

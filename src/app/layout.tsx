@@ -8,6 +8,7 @@ import "react-day-picker/dist/style.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 import "@/styles/globals.css";
+import Providers from "@/app/providers/Providers";
 import { pretendard } from "@/styles/fonts";
 
 const DEFAULT_SITE_URL = "http://localhost:3000";
@@ -84,7 +85,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${pretendard.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
         <Analytics />
         <SpeedInsights />
       </body>

@@ -2,8 +2,8 @@ import {
   mapServerSessionToAuthUser,
   requireAuthWithRole,
 } from "@/shared/common/lib/auth/session";
+import AuthBoundaryProvider from "@/app/providers/AuthBoundaryProvider";
 import { DashboardLayoutContent } from "@/app/providers/DashboardLayoutContent";
-import Providers from "@/app/providers/Providers";
 
 export default async function EducatorsDashboardLayout({
   children,
@@ -18,12 +18,12 @@ export default async function EducatorsDashboardLayout({
   });
 
   return (
-    <Providers initialUser={mapServerSessionToAuthUser(sessionUser)}>
+    <AuthBoundaryProvider initialUser={mapServerSessionToAuthUser(sessionUser)}>
       <DashboardLayoutContent>
         <div className="flex">
           <main className="flex-1">{children}</main>
         </div>
       </DashboardLayoutContent>
-    </Providers>
+    </AuthBoundaryProvider>
   );
 }
