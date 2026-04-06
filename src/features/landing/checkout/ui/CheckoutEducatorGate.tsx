@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/app/providers/AuthProvider";
 import { useModal } from "@/app/providers/ModalProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
-import { isEducatorRole } from "@/features/landing/lib/educatorRole";
+
+import { isEducatorRole } from "../../../../shared/landing/lib/educatorRole";
 
 import { CheckoutClient } from "./CheckoutClient";
 
