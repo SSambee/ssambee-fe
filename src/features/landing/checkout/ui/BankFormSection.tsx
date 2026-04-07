@@ -28,7 +28,7 @@ const CUSTOMER_TYPE_OPTIONS: { value: CustomerType; label: string }[] = [
 
 type Props = {
   amount: number;
-  onSubmit: () => void;
+  onSubmit: (data: BankForm) => void;
 };
 
 function StepLabel({ number, label }: { number: number; label: string }) {
@@ -59,8 +59,8 @@ export function BankFormSection({ amount, onSubmit }: Props) {
 
   const formValues = useWatch({ control });
 
-  const handleFormSubmit = () => {
-    onSubmit();
+  const handleFormSubmit = (data: BankForm) => {
+    onSubmit(data);
   };
 
   return (

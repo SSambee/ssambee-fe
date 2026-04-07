@@ -26,7 +26,7 @@ export default async function CheckoutPage({
   const tokenId = !planId ? params.tokenId : undefined;
 
   return (
-    <div className="py-15">
+    <div className="py-16">
       <CheckoutEducatorGate initialPlanId={planId} initialTokenId={tokenId} />
     </div>
   );
