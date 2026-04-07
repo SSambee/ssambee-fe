@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "d34widfoq1o1xc.cloudfront.net",
       },
+      {
+        protocol: "https",
+        hostname: "static.toss.im",
+        pathname: "/illusts/**",
+      },
     ],
   },
 };
