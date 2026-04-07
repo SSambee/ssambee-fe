@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 
@@ -13,11 +14,12 @@ function FailContent() {
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-[600px] rounded-2xl bg-white p-10 shadow-lg flex flex-col items-center">
-        <img
-          width="100"
-          height="100"
+        <Image
+          width={100}
+          height={100}
           src="https://static.toss.im/lotties/error-spot-no-loop-space-apng.png"
           alt="결제 실패 애니메이션"
+          unoptimized
           className="block"
         />
 

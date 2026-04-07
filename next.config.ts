@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "static.toss.im",
-        pathname: "/illusts/**",
+        pathname: "/{illusts,lotties}/**",
       },
     ],
   },
