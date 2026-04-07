@@ -27,6 +27,7 @@ export function CheckoutClient({
 }: CheckoutClientProps) {
   const router = useRouter();
   const { user } = useAuthContext();
+  const userId = user?.id ?? "";
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
@@ -102,7 +103,7 @@ export function CheckoutClient({
 
           <div className="p-6 bg-white border border-gray-200 rounded-2xl">
             {paymentMethod === "card" ? (
-              <TossPaymentsWidget amount={amount} customerUserId={user?.id} />
+              <TossPaymentsWidget amount={amount} userId={userId} />
             ) : (
               <BankFormSection amount={amount} onSubmit={handleBankSubmit} />
             )}

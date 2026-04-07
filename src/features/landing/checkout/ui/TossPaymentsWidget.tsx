@@ -1,43 +1,109 @@
-export function TossPaymentsWidget({ amount }: { amount: number }) {
+import {
+  loadTossPayments,
+  TossPaymentsWidgets,
+} from "@tosspayments/tosspayments-sdk";
+import { useEffect, useState } from "react";
+
+const clientKey = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY ?? "";
+
+type TossPaymentsWidgetProps = {
+  amount: number;
+  userId: string;
+};
+
+export function TossPaymentsWidget({
+  amount,
+  userId,
+}: TossPaymentsWidgetProps) {
+  const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
+  const customerKey = userId;
+
+  useEffect(() => {
+    async function fetchPaymentWidgets() {
+      if (!clientKey) return;
+
+      // SDK 초기화
+      const tossPayments = await loadTossPayments(clientKey);
+
+      // 위젯 인스턴스 생성
+      const widgets = tossPayments.widgets({ customerKey });
+
+      // 결제 금액 설정
+      await widgets.setAmount({
+        currency: "KRW",
+        value: amount,
+      });
+
+      setWidgets(widgets);
+    }
+
+    fetchPaymentWidgets();
+  }, [amount, customerKey]);
+
+  useEffect(() => {
+    async function renderWidgets() {
+      if (widgets == null) return;
+
+      // 결제 수단 위젯 렌더링
+      await widgets.renderPaymentMethods({
+        selector: "#payment-method",
+        variantKey: "DEFAULT",
+      });
+
+      // 이용약관 위젯 렌더링
+      await widgets.renderAgreement({
+        selector: "#agreement",
+        variantKey: "AGREEMENT",
+      });
+    }
+
+    renderWidgets();
+  }, [widgets]);
+
+  const handlePaymentRequest = async () => {
+    if (widgets == null) return;
+
+    try {
+      //결제 요청
+      await widgets.requestPayment({
+        orderId: `order_${Math.random().toString(36).slice(2, 11)}`,
+        orderName: "쌤비 이용권 결제",
+        successUrl: `${window.location.origin}/payment/success`,
+        failUrl: `${window.location.origin}/payment/fail`,
+      });
+    } catch (error) {
+      console.error("결제 요청 중 에러 발생:", error);
+    }
+  };
   return (
     <div className="space-y-4">
       <div
         id="payment-method"
         className="min-h-[220px] border border-gray-200 rounded-xl overflow-hidden"
       >
-        <div className="flex items-center justify-center h-[220px] bg-gray-50 text-sm text-gray-400">
-          <div className="space-y-2 text-center">
-            <div className="flex items-center justify-center w-10 h-10 mx-auto rounded-full bg-blue-50">
-              <svg
-                className="w-5 h-5 text-brand-700"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                />
-              </svg>
-            </div>
-            <p className="font-medium text-gray-600">토스페이먼츠 결제 위젯</p>
-            <p className="text-xs text-gray-400"></p>
+        {!widgets && (
+          <div className="flex items-center justify-center h-[220px] bg-gray-50 text-sm text-gray-400">
+            <p className="animate-pulse">결제 수단을 불러오는 중...</p>
           </div>
-        </div>
+        )}
       </div>
 
       <div
         id="agreement"
         className="min-h-[80px] border border-gray-200 rounded-xl overflow-hidden"
       >
-        <div className="flex items-center h-[80px] px-4 bg-gray-50 text-sm text-gray-400">
-          약관 동의 영역
-        </div>
+        {!widgets && (
+          <div className="flex items-center justify-center h-[80px] px-4 bg-gray-50 text-sm text-gray-400">
+            약관 로딩 중...
+          </div>
+        )}
       </div>
 
-      <button className="w-full py-4 bg-brand-700 hover:bg-[#2952e0] text-white rounded-xl font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99] shadow-lg shadow-blue-100">
+      <button
+        onClick={handlePaymentRequest}
+        disabled={!widgets}
+        className="w-full py-4 bg-brand-700 hover:bg-[#2952e0] text-white rounded-xl font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99] shadow-lg shadow-blue-100"
+      >
         {amount.toLocaleString("ko-KR")}원 결제하기
       </button>
 
