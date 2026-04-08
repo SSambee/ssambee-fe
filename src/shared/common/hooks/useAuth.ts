@@ -173,7 +173,7 @@ export function useAuth() {
       setUser(null);
       queryClient.clear();
 
-      router.replace(targetPath);
+      window.location.href = targetPath;
     } catch (err) {
       console.error("로그아웃 처리 중 문제가 발생했습니다.", err);
     } finally {

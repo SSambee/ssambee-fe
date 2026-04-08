@@ -44,7 +44,7 @@ function TokenCard({
           <span className="mb-1 text-sm text-gray-500">원</span>
         </div>
         <p className="text-xs text-gray-400 mt-0.5">
-          건당 {Math.round(addon.price / addon.count)}원
+          건당 {addon.count > 0 ? Math.round(addon.price / addon.count) : 0}원
         </p>
       </div>
 

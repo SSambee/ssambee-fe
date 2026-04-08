@@ -68,8 +68,8 @@ export function TossPaymentsWidget({
       await widgets.requestPayment({
         orderId: `order_${Math.random().toString(36).slice(2, 11)}`,
         orderName: "쌤비 이용권 결제",
-        successUrl: `${window.location.origin}/payment/success`,
-        failUrl: `${window.location.origin}/payment/fail`,
+        successUrl: `${window.location.origin}/checkout/payment/success`,
+        failUrl: `${window.location.origin}/checkout/payment/fail`,
       });
     } catch (error) {
       console.error("결제 요청 중 에러 발생:", error);
