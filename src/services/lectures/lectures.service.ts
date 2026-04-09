@@ -1,4 +1,4 @@
-import { axiosClient } from "@/services/axiosClient";
+import { axiosClient } from "@/shared/common/api/axiosClient";
 import { ApiResponse } from "@/types/api";
 import type { LectureStudent } from "@/types/lectures";
 import type {

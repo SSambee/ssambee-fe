@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { ModalProvider } from "./ModalProvider";
-import { AuthProvider } from "./AuthProvider";
 
 const ReactQueryDevtools = dynamic(
   () =>
@@ -38,9 +37,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       {process.env.NODE_ENV === "development" ? (
         <ReactQueryDevtools initialIsOpen={false} />
       ) : null}
-      <AuthProvider>
-        <ModalProvider>{children}</ModalProvider>
-      </AuthProvider>
+      <ModalProvider>{children}</ModalProvider>
     </QueryClientProvider>
   );
 }

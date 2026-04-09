@@ -1,4 +1,4 @@
-import { requireAuthWithRole } from "@/lib/auth/auth";
+import { requireAuthWithRole } from "@/shared/common/lib/auth/session";
 
 export default async function AssistantManagementLayout({
   children,

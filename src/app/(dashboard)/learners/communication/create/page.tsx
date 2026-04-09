@@ -16,7 +16,7 @@ import {
   AuthorRole,
   CreateStudentPostRequest,
 } from "@/types/communication/studentPost";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { CreateStudentParentPostRequest } from "@/types/communication/studentPost";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
 

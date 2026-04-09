@@ -19,7 +19,7 @@ import {
   type ProfileUpdateFormData,
 } from "@/validation/profile.validation";
 import type { Profile } from "@/types/profile.type";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 
 type ProfileEditModalProps = {
   profile: Profile;

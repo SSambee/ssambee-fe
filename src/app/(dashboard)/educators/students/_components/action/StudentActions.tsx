@@ -1,7 +1,7 @@
 import { ArrowLeftRight, CheckCircle2, Send, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { LectureStatus } from "@/types/students.type";
 
 import { StudentChangeModal } from "../modal/ClassChangeModal";

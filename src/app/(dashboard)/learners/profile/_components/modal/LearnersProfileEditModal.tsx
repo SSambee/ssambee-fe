@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { InputForm } from "@/components/common/input/InputForm";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { formatPhoneNumber } from "@/utils/phone";
 import {
   learnersProfileUpdateSchema,

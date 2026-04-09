@@ -4,7 +4,7 @@ import {
   MaterialQueryParams,
   MaterialsDetailResponse,
 } from "@/types/materials.type";
-import { axiosClient, axiosClientSVC } from "@/services/axiosClient";
+import { axiosClient, axiosClientSVC } from "@/shared/common/api/axiosClient";
 
 export const materialsService = {
   // 자료 목록 조회

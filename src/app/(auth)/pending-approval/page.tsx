@@ -1,7 +1,7 @@
 "use client";
 import { Lock } from "lucide-react";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/shared/common/hooks/useAuth";
 
 export default function PendingApprovalPage() {
   const { signout, loading } = useAuth();

@@ -16,7 +16,7 @@ import {
   useSchoolStore,
 } from "@/stores/registered.store";
 import { REGISTER_FORM_DEFAULTS } from "@/constants/auth.defaults";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/shared/common/hooks/useAuth";
 import { phoneNumberFormatter } from "@/utils/phone";
 import { InputForm } from "@/components/common/input/InputForm";
 import {

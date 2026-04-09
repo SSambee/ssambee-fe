@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import {
   examFormSchema,

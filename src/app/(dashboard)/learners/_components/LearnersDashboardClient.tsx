@@ -1,7 +1,7 @@
 "use client";
 
 import Title from "@/components/common/header/Title";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { useLearnersDashboardSVC } from "@/hooks/SVC/useLearnersDashboardSVC";
 
 import { DashboardInquiryTable } from "./dashboard/DashboardInquiryTable";

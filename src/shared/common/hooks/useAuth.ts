@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
 import {
   signinAPI,
@@ -34,6 +34,11 @@ export const API_URL_TYPE: Record<Role, LoginURLType> = {
   STUDENT: "SVC",
   PARENT: "SVC",
 };
+
+/** 로그인 직후·랜딩 헤더 등에서 역할별 대시보드 홈 경로 */
+export function getDashboardHomePath(userType: Role): string {
+  return API_URL_TYPE[userType] === "MGMT" ? "/educators" : "/learners";
+}
 
 export function useAuth() {
   const router = useRouter();
@@ -168,9 +173,10 @@ export function useAuth() {
       setUser(null);
       queryClient.clear();
 
-      window.location.replace(targetPath);
+      window.location.href = targetPath;
     } catch (err) {
       console.error("로그아웃 처리 중 문제가 발생했습니다.", err);
+    } finally {
       setLoading(false);
     }
   };

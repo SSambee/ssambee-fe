@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import {
   MaterialsType,
   PaperFormData,
@@ -19,7 +19,7 @@ import {
   RequestFormData,
   OtherFormData,
 } from "@/types/materials.type";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { useMaterials } from "@/hooks/useMaterials";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
 

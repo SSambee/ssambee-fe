@@ -8,7 +8,7 @@ import Link from "next/link";
 import { loginSchema } from "@/validation/auth.validation";
 import { LoginFormData, Role } from "@/types/auth.type";
 import { LOGIN_FORM_DEFAULTS } from "@/constants/auth.defaults";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/shared/common/hooks/useAuth";
 import { InputForm } from "@/components/common/input/InputForm";
 import {
   CheckedIcon,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import Title from "@/components/common/header/Title";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
 import {
   PaginationType,

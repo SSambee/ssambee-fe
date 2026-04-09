@@ -15,7 +15,7 @@ import {
   PaginationType,
   PostFilterQuery,
 } from "@/types/communication/commonPost";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 
 import NotificationFilter from "../filter/NotificationFilter";
 import { NOTICE_POST_COLUMNS } from "../table/NoticeTableColumns";

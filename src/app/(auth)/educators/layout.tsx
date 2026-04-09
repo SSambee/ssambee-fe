@@ -1,4 +1,4 @@
-import { requireGuest } from "@/lib/auth/auth";
+import { requireGuest } from "@/shared/common/lib/auth/session";
 
 export default async function EducatorsAuthLayout({
   children,

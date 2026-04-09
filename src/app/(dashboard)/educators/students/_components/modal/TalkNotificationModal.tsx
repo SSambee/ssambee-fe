@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import SelectBtn from "@/components/common/button/SelectBtn";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
 import { StudentProfileAvatar } from "@/components/common/avatar/StudentProfileAvatar";
 import { sendKakaoMemo } from "@/services/kakao.service";

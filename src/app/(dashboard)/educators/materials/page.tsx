@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import Title from "@/components/common/header/Title";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { MaterialsType, Materials } from "@/types/materials.type";
 import DataTable from "@/components/common/table/DataTable";
 import { Pagination } from "@/components/common/pagination/Pagination";

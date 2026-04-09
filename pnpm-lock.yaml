@@ -83,6 +83,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^3.19.0
         version: 3.19.0
+      '@tosspayments/tosspayments-sdk':
+        specifier: ^2.6.0
+        version: 2.6.0
       '@vercel/analytics':
         specifier: ^1.6.1
         version: 1.6.1(next@16.1.6(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
@@ -2317,6 +2320,9 @@ packages:
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
+
+  '@tosspayments/tosspayments-sdk@2.6.0':
+    resolution: {integrity: sha512-d/9tCj5d+Jbj312bWYXo9dtGNzQaWRxTKWmw6rTwuDgw5g4mrJWV9dP9qiN6/x9PYaphbYDjxGenguHoVQXTGA==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -9043,6 +9049,8 @@ snapshots:
       '@tiptap/pm': 3.19.0
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
+
+  '@tosspayments/tosspayments-sdk@2.6.0': {}
 
   '@tybys/wasm-util@0.10.1':
     dependencies:

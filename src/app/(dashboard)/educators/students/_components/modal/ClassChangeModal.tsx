@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { useStudentSelectionStore } from "@/stores/studentsList.store";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { useLecturesList, useMigrateStudents } from "@/hooks/useEnrollment";

@@ -1,4 +1,4 @@
-import { axiosClient } from "@/services/axiosClient";
+import { axiosClient } from "@/shared/common/api/axiosClient";
 import { KAKAO_MESSAGE_LIMITS, trimKakaoMessage } from "@/constants/kakao";
 
 type KakaoMemoRequest = {

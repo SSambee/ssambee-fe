@@ -26,9 +26,9 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { Role } from "@/types/auth.type";
-import { API_URL_TYPE, useAuth } from "@/hooks/useAuth";
+import { API_URL_TYPE, useAuth } from "@/shared/common/hooks/useAuth";
 
 const instructorMenuItems = [
   {
@@ -152,9 +152,6 @@ export function AppSidebar() {
   const { user } = useAuthContext();
   const { signout, loading } = useAuth();
   const menuItems = getMenuItems(user?.userType);
-  const isEducatorHome =
-    user?.userType === "INSTRUCTOR" || user?.userType === "ASSISTANT";
-  const homeHref = isEducatorHome ? "/educators" : "/learners";
   const pathname = usePathname();
 
   // 로그아웃 핸들러
@@ -173,7 +170,7 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-[#e9ebf0] [&_[data-slot=sidebar-inner]]:bg-white">
       <SidebarHeader className="pl-6 pr-8 py-8">
-        <Link href={homeHref} className="inline-flex items-start">
+        <Link href={"/"} className="inline-flex items-start">
           <Image
             src="/brand/ssam-b.svg"
             alt="ssam B"

@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "d34widfoq1o1xc.cloudfront.net",
       },
+      {
+        protocol: "https",
+        hostname: "static.toss.im",
+        pathname: "/{illusts,lotties}/**",
+      },
     ],
   },
   // 프로덕션(실제 운영 도메인)일 떄는 프록시를 아예 끕니다.

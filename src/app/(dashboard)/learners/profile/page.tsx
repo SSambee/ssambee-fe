@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { useMyLearnerProfile } from "@/hooks/profile/useMyLearnerProfile";
 import type {
   LearnersProfileUpdateFormData,

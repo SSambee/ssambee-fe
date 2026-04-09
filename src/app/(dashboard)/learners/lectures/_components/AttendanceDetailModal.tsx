@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { AttendanceList, AttendanceStatus } from "@/types/students.type";
 import { formatYMDFromISO } from "@/utils/date";
 import { formatTextWithLineBreaks } from "@/utils/formatTextWithLineBreaks";

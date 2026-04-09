@@ -1,13 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { SESSION_COOKIE_NAMES } from "@/shared/common/lib/auth/session-token";
+import type { AuthUser } from "@/app/providers/AuthProvider";
 import { Role } from "@/types/auth.type";
-
-// better-auth 쿠키
-const SESSION_COOKIE_NAMES = [
-  "ssambee-auth.session_token",
-  "__Secure-ssambee-auth.session_token",
-] as const;
 
 // 강사/조교, 학생/학부모 전용 API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -87,15 +83,6 @@ export async function getServerSession(
   }
 }
 
-// 비로그인 상태면 로그인 페이지로 리다이렉트
-export async function requireAuth(loginPath: string): Promise<void> {
-  const isAuthenticated = await hasSession();
-
-  if (!isAuthenticated) {
-    redirect(loginPath);
-  }
-}
-
 // 비로그인 상태 또는 권한 없으면 리다이렉트
 export async function requireAuthWithRole(options: {
   loginPath: string;
@@ -159,4 +146,16 @@ export async function requireGuest(
 
   // 쿠키는 있는데 user가 null이면 세션 만료
   // 리다이렉트하지 않고 로그인 페이지를 보여줌 (무한 루프 탈출)
+}
+
+/** `requireAuthWithRole` 결과 → AuthProvider `initialUser` (profile 등 미전달) */
+export function mapServerSessionToAuthUser(
+  user: SessionUser & { profile?: SessionProfile | null }
+): AuthUser {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    userType: user.userType,
+  };
 }

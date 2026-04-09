@@ -20,10 +20,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthContext } from "@/providers/AuthProvider";
-import { useBreadcrumb } from "@/providers/BreadcrumbProvider";
-import { useAuth } from "@/hooks/useAuth";
-import { API_URL_TYPE } from "@/hooks/useAuth";
+import { useAuthContext } from "@/app/providers/AuthProvider";
+import { useBreadcrumb } from "@/app/providers/BreadcrumbProvider";
+import { useAuth } from "@/shared/common/hooks/useAuth";
+import { API_URL_TYPE } from "@/shared/common/hooks/useAuth";
 import { Role } from "@/types/auth.type";
 
 import { StudentProfileAvatar } from "../avatar/StudentProfileAvatar";

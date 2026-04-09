@@ -1,4 +1,4 @@
-import { axiosClientSVC } from "@/services/axiosClient";
+import { axiosClientSVC } from "@/shared/common/api/axiosClient";
 import { ApiResponse } from "@/types/api";
 import {
   CommonPostComment,

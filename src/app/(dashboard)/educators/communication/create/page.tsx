@@ -13,7 +13,7 @@ import {
   TargetRole,
 } from "@/types/communication/instructorPost";
 import { useInstructorPostMutations } from "@/hooks/useInstructorPost";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { Materials } from "@/types/materials.type";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
 

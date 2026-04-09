@@ -1,4 +1,4 @@
-import { axiosClient } from "@/services/axiosClient";
+import { axiosClient } from "@/shared/common/api/axiosClient";
 import type { ApiResponse } from "@/types/api";
 
 export type ExamReportAssignment = {

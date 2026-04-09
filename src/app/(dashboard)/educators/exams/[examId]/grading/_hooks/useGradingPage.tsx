@@ -9,7 +9,7 @@ import {
 } from "next/navigation";
 
 import { CheckModal } from "@/components/common/modals/CheckModal";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import type { GradingStudent } from "@/types/grading";
 
 import { useGradingData } from "./useGradingData";

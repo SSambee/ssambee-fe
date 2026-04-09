@@ -1,17 +1,25 @@
-import { requireAuthWithRole } from "@/lib/auth/auth";
+import {
+  mapServerSessionToAuthUser,
+  requireAuthWithRole,
+} from "@/shared/common/lib/auth/session";
+import AuthBoundaryProvider from "@/app/providers/AuthBoundaryProvider";
+import { DashboardLayoutContent } from "@/app/providers/DashboardLayoutContent";
 
 export default async function LearnersDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // 비로그인 상태면 로그인 페이지로, 권한 없으면 educators로 리다이렉트
-  await requireAuthWithRole({
+  const sessionUser = await requireAuthWithRole({
     loginPath: "/learners/login",
     allowedRoles: ["STUDENT", "PARENT"],
     role: "SVC",
     fallbackPath: "/educators",
   });
 
-  return <>{children}</>;
+  return (
+    <AuthBoundaryProvider initialUser={mapServerSessionToAuthUser(sessionUser)}>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </AuthBoundaryProvider>
+  );
 }

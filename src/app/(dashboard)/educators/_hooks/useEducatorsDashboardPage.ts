@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { dashboardKeys } from "@/constants/query-keys";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import {
   mapMgmtAssistantOrdersToTasks,
   mapMgmtDashboardToClinics,

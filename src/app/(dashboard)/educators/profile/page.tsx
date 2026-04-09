@@ -4,7 +4,7 @@ import { mapProfileUpdateFormToApi } from "@/mappers/profile.mapper";
 import { useMyProfile } from "@/hooks/profile/useMyProfile";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
 import type { ProfileUpdateFormData } from "@/validation/profile.validation";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 
 import { ProfileSummary } from "./_components/ProfileSummary";
 import { AcademyAndLectures } from "./_components/AcademyAndLectures";

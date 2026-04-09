@@ -56,6 +56,31 @@ export function LandingHeroSection() {
             SSam B에서 한번에 운영하세요
           </h1>
 
+          <div className="my-10 flex justify-center">
+            <Button
+              asChild
+              variant="outline"
+              className="group h-8 rounded-xl border border-brand-700 bg-white/50 px-5 text-[15px] font-medium text-brand-700 backdrop-blur-sm transition-all hover:bg-[#3863f6] hover:text-white"
+            >
+              <Link href="/pricing" className="flex items-center gap-1.5">
+                요금제 살펴보기
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="transition-transform group-hover:translate-x-0.5"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </Link>
+            </Button>
+          </div>
+
           <div className="mt-auto w-full max-w-[960px]">
             <HeroDashboardPreview />
           </div>

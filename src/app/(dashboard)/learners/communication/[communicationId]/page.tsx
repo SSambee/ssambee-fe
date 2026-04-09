@@ -16,7 +16,7 @@ import {
 import { useStudentPostDetailSVC } from "@/hooks/SVC/useCommunicationSVC";
 import { CommonPostAttachment } from "@/types/communication/commonPost";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 
 import PostActionSVC from "./_components/PostActionSVC";

@@ -9,8 +9,8 @@ import { Lecture } from "@/types/lectures";
 import { useLectureDetailModalStore } from "@/stores/lectures";
 import { useDeleteLecture } from "@/hooks/lectures/useDeleteLecture";
 import { CommonLectureCard } from "@/components/common/CommonLectureCard";
-import { useModal } from "@/providers/ModalProvider";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useModal } from "@/app/providers/ModalProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 
 import { LectureStatusBadge } from "./LectureStatusBadge";
 

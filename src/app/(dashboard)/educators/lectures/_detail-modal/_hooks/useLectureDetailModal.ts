@@ -3,8 +3,8 @@
 import { createElement, useCallback, useMemo, useState } from "react";
 
 import { CheckModal } from "@/components/common/modals/CheckModal";
-import { useAuthContext } from "@/providers/AuthProvider";
-import { useModal } from "@/providers/ModalProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { mapLectureStatusToApi } from "@/services/lectures/lectures.service";
 import { Lecture, LectureStatus } from "@/types/lectures";
 import { useLectureDetail } from "@/hooks/lectures/useLectureDetail";

@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { TeacherProfileAvatar } from "@/components/common/avatar/TeacherProfileAvatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { DashboardTask } from "@/types/dashboard";
 
 type DashboardTaskListProps = {

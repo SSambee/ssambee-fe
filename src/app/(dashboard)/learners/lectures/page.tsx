@@ -8,7 +8,7 @@ import StatusLabel from "@/components/common/label/StatusLabel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { phoneNumberFormatter } from "@/utils/phone";
 
 import { useLearnerLecturesPage } from "./_hooks/useLearnerLecturesPage";

@@ -9,8 +9,11 @@ import {
   SignupParentUser,
   SignupStudentUser,
 } from "@/types/auth.type";
-
-import { axiosClient, axiosClientPublic, axiosClientSVC } from "./axiosClient";
+import {
+  axiosClient,
+  axiosClientPublic,
+  axiosClientSVC,
+} from "@/shared/common/api/axiosClient";
 
 // 인증코드 검증 API
 export const verifyAuthCodeAPI = async (signupCode: string) => {

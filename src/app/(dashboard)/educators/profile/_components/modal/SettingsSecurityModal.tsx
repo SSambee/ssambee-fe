@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { InputForm } from "@/components/common/input/InputForm";
-import { useModal } from "@/providers/ModalProvider";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useModal } from "@/app/providers/ModalProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import { verifyEmailAPI } from "@/services/auth.service";
 import { changeMyPasswordAPI } from "@/services/profile.service";

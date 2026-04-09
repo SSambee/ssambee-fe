@@ -17,7 +17,7 @@ import {
 import { useDownloadMaterial } from "@/hooks/useMaterials";
 import { CommonPostAttachment } from "@/types/communication/commonPost";
 import { useDialogAlert } from "@/hooks/useDialogAlert";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import {
   GetInstructorPostDetailResponse,

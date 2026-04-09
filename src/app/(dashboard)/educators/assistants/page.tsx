@@ -4,7 +4,7 @@ import AssistantsManageLayout from "@/app/(dashboard)/educators/assistants/_comp
 import AssistantsManageModals from "@/app/(dashboard)/educators/assistants/_components/manage/AssistantsManageModals";
 import { useAssistantsManagePage } from "@/app/(dashboard)/educators/assistants/_hooks/useAssistantsManagePage";
 import { useSetBreadcrumb } from "@/hooks/useBreadcrumb";
-import { useAuthContext } from "@/providers/AuthProvider";
+import { useAuthContext } from "@/app/providers/AuthProvider";
 
 export default function AssistantsPage() {
   useSetBreadcrumb([{ label: "조교 관리" }]);

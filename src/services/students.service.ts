@@ -14,7 +14,7 @@ import {
   LectureEnrollmentDetail,
 } from "@/types/students.type";
 
-import { axiosClient } from "./axiosClient";
+import { axiosClient } from "../shared/common/api/axiosClient";
 
 // 수강생 리스트 API ---------------------
 

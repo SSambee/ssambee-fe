@@ -13,7 +13,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useModal } from "@/providers/ModalProvider";
+import { useModal } from "@/app/providers/ModalProvider";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useMaterials } from "@/hooks/useMaterials";
