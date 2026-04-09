@@ -52,6 +52,15 @@ const nextConfig: NextConfig = {
           destination: "https://ssambee-be.onrender.com/api/mgmt/:path*",
         },
         {
+          source: "/api/svc/:path*",
+          destination: "https://ssambee-be.onrender.com/api/svc/:path*",
+        },
+        {
+          source: "/api/public/:path*",
+          destination: "https://ssambee-be.onrender.com/api/public/:path*",
+        },
+        // Better Auth 기본 API 프록시
+        {
           source: "/api/auth/:path*",
           destination: "https://ssambee-be.onrender.com/api/auth/:path*",
         },
