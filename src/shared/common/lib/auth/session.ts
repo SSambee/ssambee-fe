@@ -6,8 +6,10 @@ import type { AuthUser } from "@/app/providers/AuthProvider";
 import { Role } from "@/types/auth.type";
 
 // 강사/조교, 학생/학부모 전용 API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const API_BASE_URL_SVC = process.env.NEXT_PUBLIC_API_BASE_URL_SVC;
+const BACKEND_URL = process.env.SERVER_API_URL || "http://localhost:4000";
+
+const API_BASE_URL = `${BACKEND_URL}/api/mgmt/v1`;
+const API_BASE_URL_SVC = `${BACKEND_URL}/api/svc/v1`;
 
 // 조교 가입 승인 상태
 type SignStatus = "PENDING" | "REJECTED" | "SIGNED" | "EXPIRED";
