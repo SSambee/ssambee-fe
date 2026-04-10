@@ -22,8 +22,8 @@ export function LandingFooterSection() {
         />
 
         <nav className="flex w-full items-center justify-between text-[16px] font-semibold leading-6 tracking-[-0.16px] text-[#8b90a3]">
-          <Link href="#">이용약관</Link>
-          <Link href="#">개인정보 처리방침</Link>
+          <Link href="/terms">이용약관</Link>
+          <Link href="/privacy">개인정보 처리방침</Link>
           <Link href="#">고객센터</Link>
         </nav>
 

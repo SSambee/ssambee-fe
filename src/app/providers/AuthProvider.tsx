@@ -17,7 +17,9 @@ function shouldProbeBothSessionRoles(pathname: string): boolean {
   return (
     pathname === "/" ||
     pathname.startsWith("/pricing") ||
-    pathname.startsWith("/checkout")
+    pathname.startsWith("/checkout") ||
+    pathname.startsWith("/terms") ||
+    pathname.startsWith("/privacy")
   );
 }
 

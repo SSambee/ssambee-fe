@@ -15,10 +15,16 @@ export function DashboardFooter() {
           priority
         />
         <nav className="flex w-full items-center justify-between text-[16px] font-semibold leading-6 tracking-[-0.16px] text-gray-400">
-          <Link href="#" className="transition-colors hover:text-neutral-700">
+          <Link
+            href="/terms"
+            className="transition-colors hover:text-neutral-700"
+          >
             이용약관
           </Link>
-          <Link href="#" className="transition-colors hover:text-neutral-700">
+          <Link
+            href="/privacy"
+            className="transition-colors hover:text-neutral-700"
+          >
             개인정보 처리방침
           </Link>
           <Link href="#" className="transition-colors hover:text-neutral-700">
