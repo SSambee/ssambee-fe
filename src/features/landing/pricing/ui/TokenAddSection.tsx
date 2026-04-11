@@ -1,6 +1,7 @@
 "use client";
 
-import { TOKENS, TokenAdd } from "@/features/landing/pricing/lib/types";
+import { TokenAdd } from "@/features/landing/pricing/lib/types";
+import { TOKENS } from "@/features/landing/pricing/lib/constants";
 import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
 
 function CheckIcon() {

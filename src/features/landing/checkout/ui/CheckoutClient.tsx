@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthContext } from "@/app/providers/AuthProvider";
-import { PLANS, TOKENS } from "@/features/landing/pricing/lib/types";
+import { PLANS, TOKENS } from "@/features/landing/pricing/lib/constants";
 import { PaymentMethod } from "@/features/landing/checkout/lib/types";
 import { PAYMENT_METHODS } from "@/features/landing/checkout/lib/constants";
 

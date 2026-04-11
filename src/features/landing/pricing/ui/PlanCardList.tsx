@@ -1,6 +1,7 @@
 "use client";
 
-import { Plan, PLANS } from "@/features/landing/pricing/lib/types";
+import { Plan } from "@/features/landing/pricing/lib/types";
+import { PLANS } from "@/features/landing/pricing/lib/constants";
 import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
 
 import { PlanCard } from "./PlanCard";
