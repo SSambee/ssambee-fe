@@ -66,53 +66,7 @@ export function BankFormSection({ amount, onSubmit }: Props) {
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div>
-        <StepLabel number={1} label="기본 정보" />
-        <div className="space-y-4">
-          <InputForm
-            id="name"
-            label="이름"
-            error={errors.name?.message}
-            {...register("name")}
-            showReset={!!formValues.name}
-            onReset={() => {
-              setValue("name", "");
-              clearErrors("name");
-            }}
-          />
-          <InputForm
-            id="phone"
-            label="전화번호"
-            type="tel"
-            error={errors.phone?.message}
-            {...register("phone", {
-              onChange: (e) => {
-                const formatted = phoneNumberFormatter(e.target.value);
-                setValue("phone", formatted);
-              },
-            })}
-            showReset={!!formValues.phone}
-            onReset={() => {
-              setValue("phone", "");
-              clearErrors("phone");
-            }}
-          />
-          <InputForm
-            id="email"
-            label="이메일"
-            type="email"
-            error={errors.email?.message}
-            {...register("email")}
-            showReset={!!formValues.email}
-            onReset={() => {
-              setValue("email", "");
-              clearErrors("email");
-            }}
-          />
-        </div>
-      </div>
-
-      <div>
-        <StepLabel number={2} label="입금 정보" />
+        <StepLabel number={1} label="입금 정보" />
         <div className="p-4 mb-4 text-sm border border-blue-100 bg-blue-50 rounded-xl">
           <p className="font-semibold text-brand-700 mb-1">입금 계좌</p>
           <p className="text-gray-700">국민은행 123-456-789012 · (주)도코코</p>
@@ -156,7 +110,7 @@ export function BankFormSection({ amount, onSubmit }: Props) {
       </div>
 
       <div>
-        <StepLabel number={3} label="결제 증빙 신청" />
+        <StepLabel number={2} label="결제 증빙 신청" />
         <div className="grid grid-cols-3 gap-2 mb-4">
           {RECEIPT_TYPE_OPTIONS.map((opt) => (
             <button

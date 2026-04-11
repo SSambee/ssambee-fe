@@ -3,9 +3,6 @@ export type ReceiptType = "none" | "cash" | "tax";
 export type CustomerType = "personal" | "business";
 
 export type BankForm = {
-  name: string;
-  phone: string;
-  email: string;
   bank: string;
   depositorName: string;
   receiptType: ReceiptType;
@@ -21,9 +18,6 @@ export type BankForm = {
 };
 
 export const INITIAL_FORM: BankForm = {
-  name: "",
-  phone: "",
-  email: "",
   bank: "",
   depositorName: "",
   receiptType: "none",
