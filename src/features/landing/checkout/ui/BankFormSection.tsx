@@ -8,23 +8,14 @@ import SelectBtn from "@/components/common/button/SelectBtn";
 import { phoneNumberFormatter } from "@/utils/phone";
 import {
   BankForm,
-  ReceiptType,
-  CustomerType,
   BANKS,
   INITIAL_FORM,
 } from "@/features/landing/checkout/lib/types";
 import { bankFormSchema } from "@/features/landing/checkout/lib/validation";
-
-const RECEIPT_TYPE_OPTIONS: { value: ReceiptType; label: string }[] = [
-  { value: "none", label: "미신청" },
-  { value: "cash", label: "현금영수증" },
-  { value: "tax", label: "세금계산서" },
-];
-
-const CUSTOMER_TYPE_OPTIONS: { value: CustomerType; label: string }[] = [
-  { value: "personal", label: "개인" },
-  { value: "business", label: "사업자" },
-];
+import {
+  RECEIPT_TYPE_OPTIONS,
+  CUSTOMER_TYPE_OPTIONS,
+} from "@/features/landing/checkout/lib/constants";
 
 type Props = {
   amount: number;

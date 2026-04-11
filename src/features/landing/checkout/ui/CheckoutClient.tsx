@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/app/providers/AuthProvider";
 import { PLANS, TOKENS } from "@/features/landing/pricing/lib/types";
 import { PaymentMethod } from "@/features/landing/checkout/lib/types";
+import { PAYMENT_METHODS } from "@/features/landing/checkout/lib/constants";
 
 import { PlanSummaryCard } from "./PlanSummaryCard";
 import { TossPaymentsWidget } from "./TossPaymentsWidget";
@@ -15,11 +16,6 @@ type CheckoutClientProps = {
   initialPlanId?: string;
   initialTokenId?: string;
 };
-
-const PAYMENT_METHODS = [
-  { value: "card", label: "💳 카드 결제" },
-  { value: "bank", label: "🏦 무통장 입금" },
-] as { value: PaymentMethod; label: string }[];
 
 export function CheckoutClient({
   initialPlanId,
