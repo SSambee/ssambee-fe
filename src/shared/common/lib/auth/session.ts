@@ -92,13 +92,7 @@ export async function requireAuthWithRole(options: {
 }): Promise<SessionUser & { profile?: SessionProfile | null }> {
   const { loginPath, allowedRoles, role, fallbackPath } = options;
 
-  // 쿠키 체크
-  const isAuthenticated = await hasSession();
-  if (!isAuthenticated) {
-    redirect(loginPath);
-  }
-
-  // 세션 정보 가져오기
+  // 세션 정보 가져오기 (proxy에서 이미 쿠키 체크됨)
   const user = await getServerSession(role);
 
   // 세션 정보가 없으면 로그인 페이지로
