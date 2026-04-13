@@ -9,11 +9,13 @@ const clientKey = process.env.NEXT_PUBLIC_TOSS_PAYMENTS_CLIENT_KEY ?? "";
 type TossPaymentsWidgetProps = {
   amount: number;
   userId: string;
+  productId: string;
 };
 
 export function TossPaymentsWidget({
   amount,
   userId,
+  productId,
 }: TossPaymentsWidgetProps) {
   const [widgets, setWidgets] = useState<TossPaymentsWidgets | null>(null);
   const customerKey = userId;
@@ -64,11 +66,10 @@ export function TossPaymentsWidget({
     if (widgets == null) return;
 
     try {
-      //결제 요청
       await widgets.requestPayment({
         orderId: `order_${Math.random().toString(36).slice(2, 11)}`,
         orderName: "쌤비 이용권 결제",
-        successUrl: `${window.location.origin}/checkout/payment/success`,
+        successUrl: `${window.location.origin}/checkout/payment/success?productId=${productId}`,
         failUrl: `${window.location.origin}/checkout/payment/fail`,
       });
     } catch (error) {

@@ -1,8 +1,11 @@
 "use client";
 
-import { TokenAdd } from "@/features/landing/pricing/lib/types";
-import { TOKENS } from "@/features/landing/pricing/lib/constants";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { TokenAdd } from "@/features/landing/pricing/types";
 import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
+import { pricingQueries } from "@/shared/pricing/api/query";
+import { useCheckoutStore } from "@/shared/common/store/useCheckoutStore";
 
 function CheckIcon() {
   return (
@@ -31,10 +34,10 @@ function TokenCard({
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xl">💬</span>
           <h3 className="text-base font-bold text-gray-900 transition-colors duration-300 group-hover:text-brand-700">
-            카카오톡 {addon.count.toLocaleString("ko-KR")}건
+            {addon.name}
           </h3>
         </div>
-        <p className="text-xs text-gray-500">추가 발송 토큰 1회 충전</p>
+        <p className="text-xs text-gray-500">{addon.description}</p>
       </div>
 
       <div className="mb-6">
@@ -44,20 +47,27 @@ function TokenCard({
           </span>
           <span className="mb-1 text-sm text-gray-500">원</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">
-          건당 {addon.count > 0 ? Math.round(addon.price / addon.count) : 0}원
-        </p>
+        {addon.rechargeCreditAmount > 0 && (
+          <p className="text-xs text-gray-400 mt-0.5">
+            건당{" "}
+            {Math.round(
+              addon.price / addon.rechargeCreditAmount
+            ).toLocaleString("ko-KR")}
+            원
+          </p>
+        )}
       </div>
 
       <ul className="flex-1 mb-6 space-y-2">
-        <li className="flex items-start gap-2 text-sm text-gray-600">
-          <CheckIcon />
-          카카오톡 {addon.count.toLocaleString("ko-KR")}건 즉시 충전
-        </li>
-        <li className="flex items-start gap-2 text-sm text-gray-600">
-          <CheckIcon />
-          {addon.options}
-        </li>
+        {addon.highlights.map((highlight, index) => (
+          <li
+            key={index}
+            className="flex items-start gap-2 text-sm text-gray-600"
+          >
+            <CheckIcon />
+            {highlight}
+          </li>
+        ))}
       </ul>
 
       <button
@@ -72,14 +82,19 @@ function TokenCard({
 
 export function TokenAddSection() {
   const { goToCheckout } = useEducatorCheckoutNavigation();
+  const { data } = useSuspenseQuery(pricingQueries.products());
+  const setSelectedToken = useCheckoutStore((state) => state.setSelectedToken);
+
+  const tokens = data.creditPackProducts;
 
   const handleSelect = (addon: TokenAdd) => {
+    setSelectedToken(addon);
     const params = new URLSearchParams({ tokenId: addon.id });
     goToCheckout(params);
   };
 
   return (
-    <section className="max-w-5xl px-4 mx-auto">
+    <section className="px-4 mx-auto">
       <div className="mb-10 text-center">
         <div className="inline-flex items-center gap-2 bg-yellow-50 border border-yellow-100 text-yellow-700 text-xs font-semibold px-3.5 py-1.5 rounded-full mb-6">
           💬 카카오톡 추가 토큰
@@ -93,8 +108,16 @@ export function TokenAddSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {TOKENS.map((addon) => (
+      <div
+        className={`grid gap-6 mx-auto ${
+          tokens.length === 1
+            ? "grid-cols-1 max-w-md"
+            : tokens.length === 2
+              ? "grid-cols-1 md:grid-cols-2 max-w-3xl"
+              : "grid-cols-1 md:grid-cols-3 max-w-5xl"
+        }`}
+      >
+        {tokens.map((addon: TokenAdd) => (
           <TokenCard key={addon.id} addon={addon} onSelect={handleSelect} />
         ))}
       </div>

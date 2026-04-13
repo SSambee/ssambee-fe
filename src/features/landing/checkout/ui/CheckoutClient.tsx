@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { useAuthContext } from "@/app/providers/AuthProvider";
-import { PLANS, TOKENS } from "@/features/landing/pricing/lib/constants";
-import { PaymentMethod } from "@/features/landing/checkout/lib/types";
+import { PaymentMethod } from "@/features/landing/checkout/types";
 import { PAYMENT_METHODS } from "@/features/landing/checkout/lib/constants";
+import { pricingQueries } from "@/shared/pricing/api/query";
+import { useCheckoutStore } from "@/shared/common/store/useCheckoutStore";
+import { PassSingleProduct, CreditPackProduct } from "@/shared/pricing/types";
 
 import { PlanSummaryCard } from "./PlanSummaryCard";
 import { TossPaymentsWidget } from "./TossPaymentsWidget";
@@ -27,23 +30,33 @@ export function CheckoutClient({
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
-  const currentPlan = initialPlanId
-    ? (PLANS.find((p) => p.id === initialPlanId) ?? PLANS[0])
-    : PLANS[0];
+  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const selectedToken = useCheckoutStore((state) => state.selectedToken);
 
-  const currentToken = initialTokenId
-    ? (TOKENS.find((t) => t.id === initialTokenId) ?? TOKENS[0])
-    : null;
+  const { data } = useSuspenseQuery(pricingQueries.products());
 
-  const tokenInfo = currentToken;
+  const currentPlan =
+    selectedPlan ??
+    (initialPlanId
+      ? (data.passSingleProducts.find(
+          (p: PassSingleProduct) => p.id === initialPlanId
+        ) ?? data.passSingleProducts[0])
+      : data.passSingleProducts[0]);
 
-  const amount =
-    initialTokenId && currentToken ? currentToken.price : currentPlan.price;
+  const currentToken =
+    selectedToken ??
+    (initialTokenId
+      ? (data.creditPackProducts.find(
+          (t: CreditPackProduct) => t.id === initialTokenId
+        ) ?? null)
+      : null);
 
-  const handleBankSubmit = () => {
-    alert(
-      "무통장 입금 신청이 완료되었습니다. 입금 확인 후 안내 메일을 보내드립니다."
-    );
+  const amount = currentToken?.price ?? currentPlan.price;
+  const productId = currentToken?.id ?? currentPlan.id;
+
+  const handleBankSuccess = () => {
+    // 성공 후 입금 대기 페이지로 이동
+    router.push("/entitlement-pending");
   };
 
   return (
@@ -77,7 +90,7 @@ export function CheckoutClient({
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8 items-start">
         <div className="lg:sticky lg:top-20">
-          <PlanSummaryCard plan={currentPlan} tokenInfo={tokenInfo} />
+          <PlanSummaryCard plan={currentPlan} tokenInfo={currentToken} />
         </div>
 
         <div className="space-y-6">
@@ -99,9 +112,17 @@ export function CheckoutClient({
 
           <div className="p-6 bg-white border border-gray-200 rounded-2xl">
             {paymentMethod === "card" ? (
-              <TossPaymentsWidget amount={amount} userId={userId} />
+              <TossPaymentsWidget
+                amount={amount}
+                userId={userId}
+                productId={productId}
+              />
             ) : (
-              <BankFormSection amount={amount} onSubmit={handleBankSubmit} />
+              <BankFormSection
+                amount={amount}
+                productId={productId}
+                onSuccess={handleBankSuccess}
+              />
             )}
           </div>
         </div>

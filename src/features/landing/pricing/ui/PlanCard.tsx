@@ -1,4 +1,4 @@
-import { Plan } from "@/features/landing/pricing/lib/types";
+import { Plan } from "@/features/landing/pricing/types";
 
 export function PlanCard({
   plan,
@@ -27,8 +27,8 @@ export function PlanCard({
       </div>
 
       <ul className="flex-1 mb-8 space-y-3">
-        {plan.features.map((f) => (
-          <li key={f} className="flex items-start gap-2.5 text-sm">
+        {plan.highlights.map((highlight, index) => (
+          <li key={index} className="flex items-start gap-2.5 text-sm">
             <svg
               className="w-4 h-4 mt-0.5 shrink-0 transition-colors duration-300 text-gray-400 group-hover:text-brand-700"
               fill="none"
@@ -42,7 +42,7 @@ export function PlanCard({
                 d="M5 13l4 4L19 7"
               />
             </svg>
-            <span className="text-gray-600">{f}</span>
+            <span className="text-gray-600">{highlight}</span>
           </li>
         ))}
       </ul>
@@ -51,7 +51,7 @@ export function PlanCard({
         onClick={() => onSelect(plan)}
         className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 cursor-pointer hover:scale-[1.02] bg-brand-700 text-white hover:bg-[#2952e0] active:scale-[0.98]"
       >
-        {plan.cta}
+        시작하기
       </button>
     </div>
   );

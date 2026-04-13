@@ -6,20 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { phoneNumberFormatter } from "@/utils/phone";
-import {
-  BankForm,
-  BANKS,
-  INITIAL_FORM,
-} from "@/features/landing/checkout/lib/types";
+import { BankForm } from "@/features/landing/checkout/types";
 import { bankFormSchema } from "@/features/landing/checkout/lib/validation";
 import {
+  BANKS,
+  INITIAL_FORM,
   RECEIPT_TYPE_OPTIONS,
   CUSTOMER_TYPE_OPTIONS,
 } from "@/features/landing/checkout/lib/constants";
+import { useBankPayment } from "@/features/landing/checkout/hooks/useBankPayment";
+import { BankPaymentRequest } from "@/shared/checkout/types";
 
 type Props = {
   amount: number;
-  onSubmit: (data: BankForm) => void;
+  productId: string;
+  onSuccess?: () => void;
 };
 
 function StepLabel({ number, label }: { number: number; label: string }) {
@@ -33,7 +34,7 @@ function StepLabel({ number, label }: { number: number; label: string }) {
   );
 }
 
-export function BankFormSection({ amount, onSubmit }: Props) {
+export function BankFormSection({ amount, productId, onSuccess }: Props) {
   const {
     register,
     handleSubmit,
@@ -49,9 +50,44 @@ export function BankFormSection({ amount, onSubmit }: Props) {
   });
 
   const formValues = useWatch({ control });
+  const { mutate, isPending } = useBankPayment();
 
   const handleFormSubmit = (data: BankForm) => {
-    onSubmit(data);
+    const paymentRequest: BankPaymentRequest = {
+      productId,
+      quantity: 1,
+      depositorName: data.depositorName,
+      depositorBankName: data.bank,
+    };
+
+    // 결제 증빙 신청 처리
+    if (data.receiptType === "cash") {
+      // 현금영수증: 개인은 휴대폰번호, 사업자는 사업자등록번호를 phoneNumber로 전달
+      paymentRequest.receiptRequest = {
+        type: "CASH_RECEIPT",
+        phoneNumber:
+          data.customerType === "personal"
+            ? data.cashReceiptPhone
+            : data.businessNumber,
+      };
+    } else if (data.receiptType === "tax") {
+      paymentRequest.receiptRequest = {
+        type: "BUSINESS_RECEIPT",
+        businessRegistrationNumber: data.businessNumber,
+        businessName: data.businessName,
+        representativeName: data.ceoName,
+        taxInvoiceEmail: data.businessEmail,
+        businessType: data.businessType,
+        businessCategory: data.businessCategory,
+        businessAddress: data.businessAddress,
+      };
+    }
+
+    mutate(paymentRequest, {
+      onSuccess: () => {
+        onSuccess?.();
+      },
+    });
   };
 
   const bankName = process.env.NEXT_PUBLIC_BANK_NAME || "은행명";
@@ -270,9 +306,12 @@ export function BankFormSection({ amount, onSubmit }: Props) {
 
       <button
         type="submit"
-        className="w-full py-4 bg-brand-700 hover:bg-[#2952e0] text-white rounded-xl font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99] shadow-lg shadow-blue-100"
+        disabled={isPending}
+        className="w-full py-4 bg-brand-700 hover:bg-[#2952e0] text-white rounded-xl font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99] shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {amount.toLocaleString("ko-KR")}원 무통장 입금 신청하기
+        {isPending
+          ? "신청 중..."
+          : `${amount.toLocaleString("ko-KR")}원 무통장 입금 신청하기`}
       </button>
 
       <p className="text-xs text-center text-gray-400">

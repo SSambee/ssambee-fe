@@ -12,6 +12,7 @@ function SuccessContent() {
   const orderId = searchParams.get("orderId");
   const amount = searchParams.get("amount");
   const paymentKey = searchParams.get("paymentKey");
+  const productId = searchParams.get("productId");
   const orderName = searchParams.get("orderName") || "쌤비 이용권";
 
   useEffect(() => {
@@ -23,6 +24,7 @@ function SuccessContent() {
           orderId,
           amount,
           paymentKey,
+          productId,
         });
       } catch (error: unknown) {
         if (isAxiosError(error)) {
@@ -43,7 +45,7 @@ function SuccessContent() {
     };
 
     confirmPayment();
-  }, [router, orderId, amount, paymentKey]);
+  }, [router, orderId, amount, paymentKey, productId]);
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
