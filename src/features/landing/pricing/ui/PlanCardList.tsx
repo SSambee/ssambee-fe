@@ -3,14 +3,14 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { Plan } from "@/features/landing/pricing/types";
-import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
+import { useInstructorCheckoutNavigation } from "@/features/landing/pricing/hooks/useInstructorCheckoutNavigation";
 import { pricingQueries } from "@/shared/landing/pricing/api/query";
 import { useCheckoutStore } from "@/shared/common/store/useCheckoutStore";
 
 import { PlanCard } from "./PlanCard";
 
 export function PlanCardList() {
-  const { goToCheckout } = useEducatorCheckoutNavigation();
+  const { goToCheckout } = useInstructorCheckoutNavigation();
   const { data } = useSuspenseQuery(pricingQueries.products());
   const setSelectedPlan = useCheckoutStore((state) => state.setSelectedPlan);
 

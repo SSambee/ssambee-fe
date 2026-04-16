@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { TokenAdd } from "@/features/landing/pricing/types";
-import { useEducatorCheckoutNavigation } from "@/features/landing/pricing/hooks/useEducatorCheckoutNavigation";
+import { useInstructorCheckoutNavigation } from "@/features/landing/pricing/hooks/useInstructorCheckoutNavigation";
 import { pricingQueries } from "@/shared/landing/pricing/api/query";
 import { useCheckoutStore } from "@/shared/common/store/useCheckoutStore";
 
@@ -81,7 +81,7 @@ function TokenCard({
 }
 
 export function TokenAddSection() {
-  const { goToCheckout } = useEducatorCheckoutNavigation();
+  const { goToCheckout } = useInstructorCheckoutNavigation();
   const { data } = useSuspenseQuery(pricingQueries.products());
   const setSelectedToken = useCheckoutStore((state) => state.setSelectedToken);
 

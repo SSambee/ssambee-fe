@@ -1,7 +1,4 @@
-import { redirect } from "next/navigation";
-
-import { CheckoutEducatorGate } from "@/features/landing/checkout/ui/CheckoutEducatorGate";
-import { hasSession } from "@/shared/common/lib/auth/session";
+import { CheckoutClient } from "@/features/landing/checkout/ui/CheckoutClient";
 
 type SearchParams = {
   planId?: string;
@@ -16,10 +13,6 @@ type CheckoutPageProps = {
 export default async function CheckoutPage({
   searchParams,
 }: CheckoutPageProps) {
-  if (!(await hasSession())) {
-    redirect("/educators/login");
-  }
-
   const params = await searchParams;
 
   const planId = params.planId;
@@ -27,7 +20,7 @@ export default async function CheckoutPage({
 
   return (
     <div className="py-16">
-      <CheckoutEducatorGate initialPlanId={planId} initialTokenId={tokenId} />
+      <CheckoutClient initialPlanId={planId} initialTokenId={tokenId} />
     </div>
   );
 }
