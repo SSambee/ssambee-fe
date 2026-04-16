@@ -57,8 +57,15 @@ export function CheckoutClient({
   const amount = currentToken?.price ?? currentPlan.price;
   const productId = currentToken?.id ?? currentPlan.id;
 
-  const handleBankSuccess = () => {
-    // 성공 후 입금 대기 페이지로 이동
+  const handleBankSuccess = ({
+    hadActiveEntitlement,
+  }: {
+    hadActiveEntitlement: boolean;
+  }) => {
+    if (hadActiveEntitlement) {
+      router.push("/educators");
+      return;
+    }
     router.push("/entitlement-pending");
   };
 

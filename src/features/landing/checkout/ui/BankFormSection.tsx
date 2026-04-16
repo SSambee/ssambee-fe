@@ -16,11 +16,13 @@ import {
 } from "@/features/landing/checkout/lib/constants";
 import { useBankPayment } from "@/features/landing/checkout/hooks/useBankPayment";
 import { BankPaymentRequest } from "@/shared/landing/checkout/types";
+import { getSessionAPI } from "@/services/auth.service";
 
 type Props = {
   amount: number;
   productId: string;
-  onSuccess?: () => void;
+  /** 결제 요청 직전에 활성 이용권이 있었으면 true (재결제 → 대시보드 등) */
+  onSuccess?: (result: { hadActiveEntitlement: boolean }) => void;
 };
 
 function StepLabel({ number, label }: { number: number; label: string }) {
@@ -52,7 +54,16 @@ export function BankFormSection({ amount, productId, onSuccess }: Props) {
   const formValues = useWatch({ control });
   const { mutate, isPending } = useBankPayment();
 
-  const handleFormSubmit = (data: BankForm) => {
+  const handleFormSubmit = async (data: BankForm) => {
+    let hadActiveEntitlement = false;
+    try {
+      const sessionRes = await getSessionAPI("MGMT");
+      const ae = sessionRes.data?.data?.profile?.activeEntitlement;
+      hadActiveEntitlement = ae?.status === "ACTIVE";
+    } catch {
+      hadActiveEntitlement = false;
+    }
+
     const paymentRequest: BankPaymentRequest = {
       productId,
       quantity: 1,
@@ -85,7 +96,7 @@ export function BankFormSection({ amount, productId, onSuccess }: Props) {
 
     mutate(paymentRequest, {
       onSuccess: () => {
-        onSuccess?.();
+        onSuccess?.({ hadActiveEntitlement });
       },
     });
   };
