@@ -27,6 +27,10 @@ export type ActiveEntitlement =
     }
   | {
       status: "PENDING_DEPOSIT";
+      /** 취소 API 경로 `billing/payments/{paymentId}/cancel` */
+      paymentId: string;
+      requestedAt?: string;
+      productName?: string;
     };
 
 // 역할 선택 버튼

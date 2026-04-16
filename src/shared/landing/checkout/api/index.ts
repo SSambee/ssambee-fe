@@ -12,3 +12,13 @@ export const createBankPayment = async (
   );
   return response.data;
 };
+
+/** 응답 `data`는 프론트에서 미사용 — 필요해지면 그때 타입만 좁히면 됨 */
+export const cancelBankPayment = async (
+  paymentId: string
+): Promise<ApiResponse<unknown>> => {
+  const response = await axiosClient.post<ApiResponse<unknown>>(
+    `billing/payments/${paymentId}/cancel`
+  );
+  return response.data;
+};

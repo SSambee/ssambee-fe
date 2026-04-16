@@ -145,6 +145,37 @@ export async function requireInstructorEntitlement(
   // status === "ACTIVE"인 경우 통과
 }
 
+/**
+ * `/entitlement-pending` 전용 — 세션의 `activeEntitlement.status`가 `PENDING_DEPOSIT`일 때만 진입.
+ * (강사 · 무통장 입금 대기만 해당)
+ */
+export async function requireEntitlementPendingPage(): Promise<
+  SessionUser & { profile?: SessionProfile | null }
+> {
+  const user = await requireAuthWithRole({
+    loginPath: "/educators/login",
+    allowedRoles: ["INSTRUCTOR"],
+    role: "MGMT",
+    fallbackPath: "/pricing",
+  });
+
+  const activeEntitlement = user.profile?.activeEntitlement;
+
+  if (!activeEntitlement) {
+    redirect("/no-entitlement");
+  }
+
+  if (activeEntitlement.status === "ACTIVE") {
+    redirect("/educators");
+  }
+
+  if (activeEntitlement.status !== "PENDING_DEPOSIT") {
+    redirect("/no-entitlement");
+  }
+
+  return user;
+}
+
 // 로그인 상태면 대시보드로 리다이렉트
 export async function requireGuest(
   dashboardPath: string,

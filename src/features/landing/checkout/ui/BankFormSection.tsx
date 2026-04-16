@@ -2,6 +2,7 @@
 
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
@@ -15,12 +16,19 @@ import {
   CUSTOMER_TYPE_OPTIONS,
 } from "@/features/landing/checkout/lib/constants";
 import { useBankPayment } from "@/features/landing/checkout/hooks/useBankPayment";
-import { BankPaymentRequest } from "@/shared/landing/checkout/types";
+import { seedPendingDepositPaymentCache } from "@/features/landing/checkout/hooks/usePendingDepositPayment";
+import type { ApiResponse } from "@/shared/common/types/api";
+import type {
+  BankPaymentRequest,
+  BankPaymentResponse,
+} from "@/shared/landing/checkout/types";
 import { getSessionAPI } from "@/services/auth.service";
 
 type Props = {
   amount: number;
   productId: string;
+  /** 요약 카드·입금 대기 페이지 표시용 상품명 */
+  productDisplayName: string;
   /** 결제 요청 직전에 활성 이용권이 있었으면 true (재결제 → 대시보드 등) */
   onSuccess?: (result: { hadActiveEntitlement: boolean }) => void;
 };
@@ -36,7 +44,12 @@ function StepLabel({ number, label }: { number: number; label: string }) {
   );
 }
 
-export function BankFormSection({ amount, productId, onSuccess }: Props) {
+export function BankFormSection({
+  amount,
+  productId,
+  productDisplayName,
+  onSuccess,
+}: Props) {
   const {
     register,
     handleSubmit,
@@ -53,6 +66,7 @@ export function BankFormSection({ amount, productId, onSuccess }: Props) {
 
   const formValues = useWatch({ control });
   const { mutate, isPending } = useBankPayment();
+  const queryClient = useQueryClient();
 
   const handleFormSubmit = async (data: BankForm) => {
     let hadActiveEntitlement = false;
@@ -95,7 +109,15 @@ export function BankFormSection({ amount, productId, onSuccess }: Props) {
     }
 
     mutate(paymentRequest, {
-      onSuccess: () => {
+      onSuccess: (apiRes: ApiResponse<BankPaymentResponse>) => {
+        const paymentId = apiRes?.data?.paymentId;
+        if (paymentId && !hadActiveEntitlement) {
+          seedPendingDepositPaymentCache(queryClient, {
+            paymentId,
+            requestedAt: new Date().toISOString(),
+            productName: productDisplayName,
+          });
+        }
         onSuccess?.({ hadActiveEntitlement });
       },
     });

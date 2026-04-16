@@ -150,6 +150,7 @@ export function CheckoutClient({
               <BankFormSection
                 amount={amount}
                 productId={productId}
+                productDisplayName={currentToken?.name ?? currentPlan.name}
                 onSuccess={handleBankSuccess}
               />
             )}
