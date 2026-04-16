@@ -69,8 +69,7 @@ export function DashboardSidebarFooterPanel() {
                 <p className="font-medium">
                   © 2026 Ssambee. All Rights Reserved.
                 </p>
-                <p>상호명: 공공구일</p>
-                <p>대표: 김윤기</p>
+                <p>상호명: 공공구일 | 대표: 김윤기</p>
                 <p>사업장소재지: 대구광역시 달서구 월배로94길 60</p>
                 <p>사업자등록번호: 242-77-00590</p>
                 <p>대표전화: 010-2180-6913</p>

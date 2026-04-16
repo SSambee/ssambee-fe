@@ -8,7 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { DashboardSidebarFooterPanel } from "@/shared/common/ui/DashboardFooter";
+import { DashboardSidebarFooterPanel } from "@/shared/common/ui/sidebar/DashboardFooter";
 
 type AppSidebarFooterProps = {
   loading: boolean;
