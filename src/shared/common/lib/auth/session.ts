@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { SESSION_COOKIE_NAMES } from "@/shared/common/lib/auth/session-token";
 import type { AuthUser } from "@/app/providers/AuthProvider";
-import { Role } from "@/types/auth.type";
+import { Role, ActiveEntitlement } from "@/types/auth.type";
 
 // 강사/조교, 학생/학부모 전용 API
 const BACKEND_URL = process.env.SERVER_API_URL || "http://localhost:4000";
@@ -22,7 +22,8 @@ type SessionUser = {
 };
 
 type SessionProfile = {
-  signStatus: SignStatus;
+  signStatus?: SignStatus;
+  activeEntitlement?: ActiveEntitlement | null;
 };
 
 // 서버 컴포넌트에서 세션 쿠키 존재 여부 확인
@@ -94,13 +95,7 @@ export async function requireAuthWithRole(options: {
 }): Promise<SessionUser & { profile?: SessionProfile | null }> {
   const { loginPath, allowedRoles, role, fallbackPath } = options;
 
-  // 쿠키 체크
-  const isAuthenticated = await hasSession();
-  if (!isAuthenticated) {
-    redirect(loginPath);
-  }
-
-  // 세션 정보 가져오기
+  // 세션 정보 가져오기 (proxy에서 이미 쿠키 체크됨)
   const user = await getServerSession(role);
 
   // 세션 정보가 없으면 로그인 페이지로
@@ -123,6 +118,61 @@ export async function requireAuthWithRole(options: {
   if (!allowedRoles.includes(user.userType)) {
     // 권한이 없으면 fallback 경로로 리다이렉트
     redirect(fallbackPath);
+  }
+
+  return user;
+}
+
+// 강사 활성 이용권 체크
+export async function requireInstructorEntitlement(
+  user: SessionUser & { profile?: SessionProfile | null }
+): Promise<void> {
+  // 강사가 아니면 체크하지 않음
+  if (user.userType !== "INSTRUCTOR") {
+    return;
+  }
+
+  const activeEntitlement = user.profile?.activeEntitlement;
+
+  // 활성 이용권이 없는 경우
+  if (!activeEntitlement) {
+    redirect("/no-entitlement");
+  }
+
+  // 입금 대기 중인 경우
+  if (activeEntitlement.status === "PENDING_DEPOSIT") {
+    redirect("/entitlement-pending");
+  }
+
+  // status === "ACTIVE"인 경우 통과
+}
+
+/**
+ * `/entitlement-pending` 전용 — 세션의 `activeEntitlement.status`가 `PENDING_DEPOSIT`일 때만 진입.
+ * (강사 · 무통장 입금 대기만 해당)
+ */
+export async function requireEntitlementPendingPage(): Promise<
+  SessionUser & { profile?: SessionProfile | null }
+> {
+  const user = await requireAuthWithRole({
+    loginPath: "/educators/login",
+    allowedRoles: ["INSTRUCTOR"],
+    role: "MGMT",
+    fallbackPath: "/pricing",
+  });
+
+  const activeEntitlement = user.profile?.activeEntitlement;
+
+  if (!activeEntitlement) {
+    redirect("/no-entitlement");
+  }
+
+  if (activeEntitlement.status === "ACTIVE") {
+    redirect("/educators");
+  }
+
+  if (activeEntitlement.status !== "PENDING_DEPOSIT") {
+    redirect("/no-entitlement");
   }
 
   return user;

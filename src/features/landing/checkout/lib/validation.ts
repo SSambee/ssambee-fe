@@ -2,24 +2,9 @@ import { z } from "zod";
 
 import { KR_PHONE_REGEX } from "@/constants/regex";
 
-import { BANKS } from "./types";
+import { BANKS } from "./constants";
 
 export const bankFormBaseSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, "이름을 입력해주세요")
-    .min(2, "이름은 최소 2자 이상이어야 합니다"),
-  phone: z
-    .string()
-    .trim()
-    .min(1, "전화번호를 입력해주세요")
-    .regex(KR_PHONE_REGEX, "전화번호 형식이 올바르지 않습니다"),
-  email: z
-    .string()
-    .trim()
-    .min(1, "이메일을 입력해주세요")
-    .email("올바른 이메일 형식이 아닙니다"),
   bank: z
     .string()
     .trim()

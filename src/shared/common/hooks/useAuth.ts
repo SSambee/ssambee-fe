@@ -139,7 +139,6 @@ export function useAuth() {
         setUser(user);
 
         // 역할별 메인 페이지(대시보드) 이동
-        // TODO: 강사/조교/학생/학부모 구분한 라우팅
         if (apiRole === "MGMT") {
           router.push("/educators");
         } else {
@@ -163,9 +162,6 @@ export function useAuth() {
   };
 
   const signout = async (apiRole: LoginURLType) => {
-    const targetPath =
-      apiRole === "MGMT" ? "/educators/login" : "/learners/login";
-
     try {
       setLoading(true);
       await signoutAPI(apiRole);
@@ -173,7 +169,7 @@ export function useAuth() {
       setUser(null);
       queryClient.clear();
 
-      window.location.href = targetPath;
+      window.location.href = "/";
     } catch (err) {
       console.error("로그아웃 처리 중 문제가 발생했습니다.", err);
     } finally {

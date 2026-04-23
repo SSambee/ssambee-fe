@@ -12,7 +12,6 @@ import {
   FileText,
   FolderOpen,
   Home,
-  LogOut,
 } from "lucide-react";
 
 import {
@@ -24,11 +23,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useAuthContext } from "@/app/providers/AuthProvider";
 import { Role } from "@/types/auth.type";
 import { API_URL_TYPE, useAuth } from "@/shared/common/hooks/useAuth";
+import { AppSidebarFooter } from "@/components/common/sidebar/AppSidebarFooter";
 
 const instructorMenuItems = [
   {
@@ -202,20 +201,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="mt-auto px-4 pb-6">
-        <SidebarMenu className="gap-3">
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={handleLogout}
-              disabled={loading}
-              className="h-14 gap-[14px] rounded-[12px] px-6 py-4 text-[18px] leading-[26px] tracking-[-0.18px] font-semibold text-[rgba(22,22,27,0.28)] hover:bg-transparent hover:text-inherit cursor-pointer"
-            >
-              <LogOut className="size-[18px] text-current" />
-              <span>{loading ? "로그아웃 중..." : "로그아웃"}</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+      <AppSidebarFooter loading={loading} onLogout={handleLogout} />
     </Sidebar>
   );
 }

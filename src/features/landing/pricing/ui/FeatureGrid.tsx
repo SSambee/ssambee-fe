@@ -1,4 +1,4 @@
-import { FEATURE_HIGHLIGHTS } from "@/features/landing/pricing/lib/types";
+import { FEATURE_HIGHLIGHTS } from "@/features/landing/pricing/lib/constants";
 
 export function FeatureGrid() {
   return (
