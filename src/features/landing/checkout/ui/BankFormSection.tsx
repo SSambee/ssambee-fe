@@ -2,33 +2,35 @@
 
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { InputForm } from "@/components/common/input/InputForm";
 import SelectBtn from "@/components/common/button/SelectBtn";
 import { phoneNumberFormatter } from "@/utils/phone";
+import { BankForm } from "@/features/landing/checkout/types";
+import { bankFormSchema } from "@/features/landing/checkout/lib/validation";
 import {
-  BankForm,
-  ReceiptType,
-  CustomerType,
   BANKS,
   INITIAL_FORM,
-} from "@/features/landing/checkout/lib/types";
-import { bankFormSchema } from "@/features/landing/checkout/lib/validation";
-
-const RECEIPT_TYPE_OPTIONS: { value: ReceiptType; label: string }[] = [
-  { value: "none", label: "미신청" },
-  { value: "cash", label: "현금영수증" },
-  { value: "tax", label: "세금계산서" },
-];
-
-const CUSTOMER_TYPE_OPTIONS: { value: CustomerType; label: string }[] = [
-  { value: "personal", label: "개인" },
-  { value: "business", label: "사업자" },
-];
+  RECEIPT_TYPE_OPTIONS,
+  CUSTOMER_TYPE_OPTIONS,
+} from "@/features/landing/checkout/lib/constants";
+import { useBankPayment } from "@/features/landing/checkout/hooks/useBankPayment";
+import { seedPendingDepositPaymentCache } from "@/features/landing/checkout/hooks/usePendingDepositPayment";
+import type { ApiResponse } from "@/shared/common/types/api";
+import type {
+  BankPaymentRequest,
+  BankPaymentResponse,
+} from "@/shared/landing/checkout/types";
+import { getSessionAPI } from "@/services/auth.service";
 
 type Props = {
   amount: number;
-  onSubmit: (data: BankForm) => void;
+  productId: string;
+  /** 요약 카드·입금 대기 페이지 표시용 상품명 */
+  productDisplayName: string;
+  /** 결제 요청 직전에 활성 이용권이 있었으면 true (재결제 → 대시보드 등) */
+  onSuccess?: (result: { hadActiveEntitlement: boolean }) => void;
 };
 
 function StepLabel({ number, label }: { number: number; label: string }) {
@@ -42,7 +44,12 @@ function StepLabel({ number, label }: { number: number; label: string }) {
   );
 }
 
-export function BankFormSection({ amount, onSubmit }: Props) {
+export function BankFormSection({
+  amount,
+  productId,
+  productDisplayName,
+  onSuccess,
+}: Props) {
   const {
     register,
     handleSubmit,
@@ -58,64 +65,77 @@ export function BankFormSection({ amount, onSubmit }: Props) {
   });
 
   const formValues = useWatch({ control });
+  const { mutate, isPending } = useBankPayment();
+  const queryClient = useQueryClient();
 
-  const handleFormSubmit = (data: BankForm) => {
-    onSubmit(data);
+  const handleFormSubmit = async (data: BankForm) => {
+    let hadActiveEntitlement = false;
+    try {
+      const sessionRes = await getSessionAPI("MGMT");
+      const ae = sessionRes.data?.data?.profile?.activeEntitlement;
+      hadActiveEntitlement = ae?.status === "ACTIVE";
+    } catch {
+      hadActiveEntitlement = false;
+    }
+
+    const paymentRequest: BankPaymentRequest = {
+      productId,
+      quantity: 1,
+      depositorName: data.depositorName,
+      depositorBankName: data.bank,
+    };
+
+    // 결제 증빙 신청 처리
+    if (data.receiptType === "cash") {
+      // 현금영수증: 개인은 휴대폰번호, 사업자는 사업자등록번호를 phoneNumber로 전달
+      paymentRequest.receiptRequest = {
+        type: "CASH_RECEIPT",
+        phoneNumber:
+          data.customerType === "personal"
+            ? data.cashReceiptPhone
+            : data.businessNumber,
+      };
+    } else if (data.receiptType === "tax") {
+      paymentRequest.receiptRequest = {
+        type: "BUSINESS_RECEIPT",
+        businessRegistrationNumber: data.businessNumber,
+        businessName: data.businessName,
+        representativeName: data.ceoName,
+        taxInvoiceEmail: data.businessEmail,
+        businessType: data.businessType,
+        businessCategory: data.businessCategory,
+        businessAddress: data.businessAddress,
+      };
+    }
+
+    mutate(paymentRequest, {
+      onSuccess: (apiRes: ApiResponse<BankPaymentResponse>) => {
+        const paymentId = apiRes?.data?.paymentId;
+        if (paymentId && !hadActiveEntitlement) {
+          seedPendingDepositPaymentCache(queryClient, {
+            paymentId,
+            requestedAt: new Date().toISOString(),
+            productName: productDisplayName,
+          });
+        }
+        onSuccess?.({ hadActiveEntitlement });
+      },
+    });
   };
+
+  const bankName = process.env.NEXT_PUBLIC_BANK_NAME || "은행명";
+  const accountNumber = process.env.NEXT_PUBLIC_ACCOUNT_NUMBER || "계좌번호";
+  const companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || "예금주명";
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div>
-        <StepLabel number={1} label="기본 정보" />
-        <div className="space-y-4">
-          <InputForm
-            id="name"
-            label="이름"
-            error={errors.name?.message}
-            {...register("name")}
-            showReset={!!formValues.name}
-            onReset={() => {
-              setValue("name", "");
-              clearErrors("name");
-            }}
-          />
-          <InputForm
-            id="phone"
-            label="전화번호"
-            type="tel"
-            error={errors.phone?.message}
-            {...register("phone", {
-              onChange: (e) => {
-                const formatted = phoneNumberFormatter(e.target.value);
-                setValue("phone", formatted);
-              },
-            })}
-            showReset={!!formValues.phone}
-            onReset={() => {
-              setValue("phone", "");
-              clearErrors("phone");
-            }}
-          />
-          <InputForm
-            id="email"
-            label="이메일"
-            type="email"
-            error={errors.email?.message}
-            {...register("email")}
-            showReset={!!formValues.email}
-            onReset={() => {
-              setValue("email", "");
-              clearErrors("email");
-            }}
-          />
-        </div>
-      </div>
-
-      <div>
-        <StepLabel number={2} label="입금 정보" />
+        <StepLabel number={1} label="입금 정보" />
         <div className="p-4 mb-4 text-sm border border-blue-100 bg-blue-50 rounded-xl">
           <p className="font-semibold text-brand-700 mb-1">입금 계좌</p>
-          <p className="text-gray-700">국민은행 123-456-789012 · (주)도코코</p>
+          <p className="text-gray-700">
+            {bankName} {accountNumber} · {companyName}
+          </p>
           <p className="mt-1 text-xs text-gray-500">
             입금 확인 후 영업일 기준 1일 이내 이용 가능
           </p>
@@ -156,7 +176,7 @@ export function BankFormSection({ amount, onSubmit }: Props) {
       </div>
 
       <div>
-        <StepLabel number={3} label="결제 증빙 신청" />
+        <StepLabel number={2} label="결제 증빙 신청" />
         <div className="grid grid-cols-3 gap-2 mb-4">
           {RECEIPT_TYPE_OPTIONS.map((opt) => (
             <button
@@ -319,9 +339,12 @@ export function BankFormSection({ amount, onSubmit }: Props) {
 
       <button
         type="submit"
-        className="w-full py-4 bg-brand-700 hover:bg-[#2952e0] text-white rounded-xl font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99] shadow-lg shadow-blue-100"
+        disabled={isPending}
+        className="w-full py-4 bg-brand-700 hover:bg-[#2952e0] text-white rounded-xl font-bold text-base transition-all duration-200 cursor-pointer active:scale-[0.99] shadow-lg shadow-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {amount.toLocaleString("ko-KR")}원 무통장 입금 신청하기
+        {isPending
+          ? "신청 중..."
+          : `${amount.toLocaleString("ko-KR")}원 무통장 입금 신청하기`}
       </button>
 
       <p className="text-xs text-center text-gray-400">

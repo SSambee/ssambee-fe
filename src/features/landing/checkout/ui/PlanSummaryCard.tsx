@@ -1,4 +1,4 @@
-import { Plan, TokenAdd } from "@/features/landing/pricing/lib/types";
+import { Plan, TokenAdd } from "@/features/landing/pricing/types";
 
 type PlanSummaryCardProps = {
   plan: Plan;
@@ -51,9 +51,7 @@ export function PlanSummaryCard({ plan, tokenInfo }: PlanSummaryCardProps) {
         </div>
         <div>
           <p className="font-bold text-gray-900">
-            {isToken
-              ? `카카오톡 ${tokenInfo!.count.toLocaleString("ko-KR")}건 추가`
-              : plan.name}
+            {isToken ? tokenInfo!.name : plan.name}
           </p>
           <p className="text-xs text-gray-500">
             {isToken ? "추가 발송 토큰 1회 충전" : plan.description}
@@ -64,9 +62,7 @@ export function PlanSummaryCard({ plan, tokenInfo }: PlanSummaryCardProps) {
       <div className="pt-4 border-t border-gray-100">
         <div className="flex justify-between text-sm mb-4">
           <span className="text-gray-500">
-            {isToken
-              ? `카카오톡 ${tokenInfo!.count.toLocaleString("ko-KR")}건`
-              : `${plan.name} (월간)`}
+            {isToken ? tokenInfo!.name : `${plan.name} (월간)`}
           </span>
           <span className="font-medium text-gray-800">
             {amount.toLocaleString("ko-KR")}원{!isToken && "/월"}
@@ -86,13 +82,13 @@ export function PlanSummaryCard({ plan, tokenInfo }: PlanSummaryCardProps) {
             포함 기능
           </p>
           <ul className="space-y-2">
-            {plan.features.map((f) => (
+            {plan.highlights.map((h, i) => (
               <li
-                key={f}
+                key={i}
                 className="flex items-start gap-2 text-sm text-gray-600"
               >
                 <CheckIcon />
-                {f}
+                {h}
               </li>
             ))}
           </ul>
@@ -102,14 +98,15 @@ export function PlanSummaryCard({ plan, tokenInfo }: PlanSummaryCardProps) {
       {isToken && (
         <div className="pt-5 mt-5 border-t border-gray-100">
           <ul className="space-y-2">
-            <li className="flex items-start gap-2 text-sm text-gray-600">
-              <CheckIcon />
-              카카오톡 {tokenInfo!.count.toLocaleString("ko-KR")}건 즉시 충전
-            </li>
-            <li className="flex items-start gap-2 text-sm text-gray-600">
-              <CheckIcon />
-              {tokenInfo!.options}
-            </li>
+            {tokenInfo!.highlights.map((h, i) => (
+              <li
+                key={i}
+                className="flex items-start gap-2 text-sm text-gray-600"
+              >
+                <CheckIcon />
+                {h}
+              </li>
+            ))}
           </ul>
         </div>
       )}

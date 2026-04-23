@@ -14,7 +14,7 @@ function CheckCircleIcon() {
   );
 }
 
-const BADGES = ["언제든 해지 가능", "토스 안전 결제", "첫 달 환불 보장"];
+const BADGES = ["언제든 해지 가능", "7일 이내 미사용 환불"];
 
 export function TrustBadges() {
   return (

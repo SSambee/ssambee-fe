@@ -2,6 +2,7 @@
 
 import type { AuthUser } from "./AuthProvider";
 import { AuthProvider } from "./AuthProvider";
+import { ModalProvider } from "./ModalProvider";
 
 type AuthBoundaryProviderProps = {
   children: React.ReactNode;
@@ -13,5 +14,9 @@ export default function AuthBoundaryProvider({
   children,
   initialUser,
 }: AuthBoundaryProviderProps) {
-  return <AuthProvider initialUser={initialUser}>{children}</AuthProvider>;
+  return (
+    <AuthProvider initialUser={initialUser}>
+      <ModalProvider>{children}</ModalProvider>
+    </AuthProvider>
+  );
 }

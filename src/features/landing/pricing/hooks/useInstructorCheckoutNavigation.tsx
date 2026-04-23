@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/app/providers/AuthProvider";
 import { useModal } from "@/app/providers/ModalProvider";
 import { CheckModal } from "@/components/common/modals/CheckModal";
-import { isEducatorRole } from "@/shared/landing/lib/educatorRole";
 
-export function useEducatorCheckoutNavigation() {
+export function useInstructorCheckoutNavigation() {
   const router = useRouter();
   const { user, isLoading } = useAuthContext();
   const { openModal } = useModal();
@@ -30,7 +29,7 @@ export function useEducatorCheckoutNavigation() {
       return;
     }
 
-    if (!isEducatorRole(user.userType)) {
+    if (user.userType !== "INSTRUCTOR") {
       openModal(
         <CheckModal
           title="안내"

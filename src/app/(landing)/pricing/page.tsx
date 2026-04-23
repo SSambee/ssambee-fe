@@ -3,6 +3,9 @@ import { TrustBadges } from "@/features/landing/pricing/ui/TrustBadges";
 import { TokenAddSection } from "@/features/landing/pricing/ui/TokenAddSection";
 import { PlanCardList } from "@/features/landing/pricing/ui/PlanCardList";
 
+// 빌드 시 정적 프리렌더에서 /billing/products를 호출하면 CI 등(API URL 미설정)에서 실패함
+export const dynamic = "force-dynamic";
+
 export default function PricingPage() {
   return (
     <>

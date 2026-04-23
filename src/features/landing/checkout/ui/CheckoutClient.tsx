@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { CreditCard } from "lucide-react";
 
-import { useAuthContext } from "@/app/providers/AuthProvider";
-import { PLANS, TOKENS } from "@/features/landing/pricing/lib/types";
-import { PaymentMethod } from "@/features/landing/checkout/lib/types";
+import { PaymentMethod } from "@/features/landing/checkout/types";
+import { PAYMENT_METHODS } from "@/features/landing/checkout/lib/constants";
+import { pricingQueries } from "@/shared/landing/pricing/api/query";
+import { useCheckoutStore } from "@/shared/common/store/useCheckoutStore";
+import {
+  PassSingleProduct,
+  CreditPackProduct,
+} from "@/shared/landing/pricing/types";
 
 import { PlanSummaryCard } from "./PlanSummaryCard";
-import { TossPaymentsWidget } from "./TossPaymentsWidget";
+// import { TossPaymentsWidget } from "./TossPaymentsWidget";
 import { BankFormSection } from "./BankFormSection";
 
 type CheckoutClientProps = {
@@ -16,38 +23,50 @@ type CheckoutClientProps = {
   initialTokenId?: string;
 };
 
-const PAYMENT_METHODS = [
-  { value: "card", label: "💳 카드 결제" },
-  { value: "bank", label: "🏦 무통장 입금" },
-] as { value: PaymentMethod; label: string }[];
-
 export function CheckoutClient({
   initialPlanId,
   initialTokenId,
 }: CheckoutClientProps) {
   const router = useRouter();
-  const { user } = useAuthContext();
-  const userId = user?.id ?? "";
+  // const { user } = useAuthContext();
+  // const userId = user?.id ?? "";
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
 
-  const currentPlan = initialPlanId
-    ? (PLANS.find((p) => p.id === initialPlanId) ?? PLANS[0])
-    : PLANS[0];
+  const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
+  const selectedToken = useCheckoutStore((state) => state.selectedToken);
 
-  const currentToken = initialTokenId
-    ? (TOKENS.find((t) => t.id === initialTokenId) ?? TOKENS[0])
-    : null;
+  const { data } = useSuspenseQuery(pricingQueries.products());
 
-  const tokenInfo = currentToken;
+  const currentPlan =
+    selectedPlan ??
+    (initialPlanId
+      ? (data.passSingleProducts.find(
+          (p: PassSingleProduct) => p.id === initialPlanId
+        ) ?? data.passSingleProducts[0])
+      : data.passSingleProducts[0]);
 
-  const amount =
-    initialTokenId && currentToken ? currentToken.price : currentPlan.price;
+  const currentToken =
+    selectedToken ??
+    (initialTokenId
+      ? (data.creditPackProducts.find(
+          (t: CreditPackProduct) => t.id === initialTokenId
+        ) ?? null)
+      : null);
 
-  const handleBankSubmit = () => {
-    alert(
-      "무통장 입금 신청이 완료되었습니다. 입금 확인 후 안내 메일을 보내드립니다."
-    );
+  const amount = currentToken?.price ?? currentPlan.price;
+  const productId = currentToken?.id ?? currentPlan.id;
+
+  const handleBankSuccess = ({
+    hadActiveEntitlement,
+  }: {
+    hadActiveEntitlement: boolean;
+  }) => {
+    if (hadActiveEntitlement) {
+      router.push("/educators");
+      return;
+    }
+    router.push("/entitlement-pending");
   };
 
   return (
@@ -81,7 +100,7 @@ export function CheckoutClient({
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8 items-start">
         <div className="lg:sticky lg:top-20">
-          <PlanSummaryCard plan={currentPlan} tokenInfo={tokenInfo} />
+          <PlanSummaryCard plan={currentPlan} tokenInfo={currentToken} />
         </div>
 
         <div className="space-y-6">
@@ -103,9 +122,37 @@ export function CheckoutClient({
 
           <div className="p-6 bg-white border border-gray-200 rounded-2xl">
             {paymentMethod === "card" ? (
-              <TossPaymentsWidget amount={amount} userId={userId} />
+              <>
+                {/* 개발 완료 후 아래 주석 해제
+                <TossPaymentsWidget
+                  amount={amount}
+                  userId={userId}
+                  productId={productId}
+                />
+                */}
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <div className="flex items-center justify-center w-20 h-20 mb-6 rounded-full bg-brand-50">
+                    <CreditCard className="w-10 h-10 text-brand-600" />
+                  </div>
+
+                  <h2 className="mb-3 text-xl font-bold text-gray-900">
+                    카드 결제 서비스 준비 중
+                  </h2>
+
+                  <p className="text-[15px] leading-relaxed text-gray-600">
+                    현재 토스 결제 기능을 준비 중입니다.
+                    <br />
+                    무통장 입금 기능을 이용해주세요.
+                  </p>
+                </div>
+              </>
             ) : (
-              <BankFormSection amount={amount} onSubmit={handleBankSubmit} />
+              <BankFormSection
+                amount={amount}
+                productId={productId}
+                productDisplayName={currentToken?.name ?? currentPlan.name}
+                onSuccess={handleBankSuccess}
+              />
             )}
           </div>
         </div>

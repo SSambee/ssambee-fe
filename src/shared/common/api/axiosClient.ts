@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 
-import { ApiResponse } from "@/types/api";
+import { ApiResponse } from "@/shared/common/types/api";
 
 export const axiosClientPublic = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL_PUBLIC,
@@ -56,5 +56,6 @@ const attachErrorInterceptor = (client: typeof axiosClient) => {
   );
 };
 
+attachErrorInterceptor(axiosClientPublic);
 attachErrorInterceptor(axiosClient);
 attachErrorInterceptor(axiosClientSVC);
