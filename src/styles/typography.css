@@ -1,0 +1,53 @@
+:root {
+  --font-size-display-1: 56px;
+  --line-height-display-1: 1.286;
+  --letter-spacing-display-1: -0.00179em;
+
+  --font-size-display-2: 40px;
+  --line-height-display-2: 1.3;
+  --letter-spacing-display-2: -0.0025em;
+
+  --font-size-title-1: 36px;
+  --line-height-title-1: 1.334;
+  --letter-spacing-title-1: -0.00278em;
+
+  --font-size-title-2: 28px;
+  --line-height-title-2: 1.358;
+  --letter-spacing-title-2: -0.00357em;
+
+  --font-size-title-3: 24px;
+  --line-height-title-3: 1.334;
+  --letter-spacing-title-3: -0.00417em;
+
+  --font-size-heading-1: 22px;
+  --line-height-heading-1: 1.364;
+  --letter-spacing-heading-1: -0.00455em;
+
+  --font-size-heading-2: 20px;
+  --line-height-heading-2: 1.4;
+  --letter-spacing-heading-2: -0.005em;
+
+  --font-size-body-1: 18px;
+  --line-height-body-1: 1.445;
+  --letter-spacing-body-1: -0.0055em;
+
+  --font-size-body-2: 16px;
+  --line-height-body-2: 1.5;
+  --letter-spacing-body-2: -0.00625em;
+
+  --font-size-label-1: 14px;
+  --line-height-label-1: 1.429;
+  --letter-spacing-label-1: -0.0071em;
+
+  --font-size-label-2: 13px;
+  --line-height-label-2: 1.385;
+  --letter-spacing-label-2: -0.00769em;
+
+  --font-size-caption-1: 12px;
+  --line-height-caption-1: 1.334;
+  --letter-spacing-caption-1: -0.0083em;
+
+  --font-size-caption-2: 11px;
+  --line-height-caption-2: 1.273;
+  --letter-spacing-caption-2: -0.0083em;
+}

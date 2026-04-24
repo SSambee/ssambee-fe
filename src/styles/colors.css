@@ -1,0 +1,65 @@
+@theme {
+  --font-pretendard: var(--font-pretendard);
+  --font-mono: var(--font-pretendard);
+
+  --color-background: #d9d9d9;
+  --color-brand-25: #f4f6fe;
+  --color-brand-50: #e1e7fe;
+  --color-brand-100: #ced9fd;
+  --color-brand-200: #a9bbfb;
+  --color-brand-300: #96adfa;
+  --color-brand-400: #708ff9;
+  --color-brand-500: #5e80f8;
+  --color-brand-600: #4b72f7;
+  --color-brand-700: #3863f6;
+  --color-brand-800: #2554f5;
+  --color-brand-900: #1246f4;
+
+  --color-neutral-50: #f4f6fa;
+  --color-neutral-100: #e9ebf0;
+  --color-neutral-200: #d6d9e0;
+  --color-neutral-300: #b0b4c2;
+  --color-neutral-400: #8b90a3;
+  --color-neutral-500: #6b6f80;
+  --color-neutral-600: #5e6275;
+  --color-neutral-700: #4a4d5c;
+  --color-neutral-800: #2b2e3a;
+  --color-neutral-900: #1e212b;
+  --color-neutral-950: #0f1117;
+
+  --color-label-normal: #040405;
+  --color-label-strong: #000000;
+  --color-label-neutral: rgba(22, 22, 27, 0.88);
+  --color-label-alternative: rgba(22, 22, 27, 0.4);
+  --color-label-assistive: rgba(22, 22, 27, 0.28);
+  --color-label-disable: rgba(22, 22, 27, 0.16);
+  --color-label-inverse-normal: #ffffff;
+  --color-label-inverse-neutral: rgba(255, 255, 255, 0.88);
+  --color-label-inverse-alternative: rgba(255, 255, 255, 0.4);
+  --color-label-inverse-assistive: rgba(255, 255, 255, 0.28);
+  --color-label-inverse-disable: rgba(255, 255, 255, 0.16);
+
+  --color-surface-normal-light: #ffffff;
+  --color-surface-normal-light-alternative: #f7f8fa;
+  --color-surface-elevated-light: #fcfcfd;
+  --color-surface-elevated-light-alternative: #dadde3;
+  --color-surface-dim-normal: rgba(15, 23, 42, 0.2);
+  --color-surface-dim-neutral: rgba(15, 23, 42, 0.12);
+  --color-surface-dim-strong: rgba(15, 23, 42, 0.3);
+
+  --color-status-positive-light: #dcfce7;
+  --color-status-positive-normal: #16a34a;
+  --color-status-positive-dark: #166534;
+  --color-status-negative-light: #fee2e2;
+  --color-status-negative-normal: #ef4444;
+  --color-status-negative-dark: #b91c1c;
+  --color-status-warning-light: #fef3c7;
+  --color-status-warning-normal: #f59e0b;
+  --color-status-warning-dark: #92400e;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-pretendard), sans-serif;
+  }
+}

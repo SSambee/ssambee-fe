@@ -1,0 +1,378 @@
+@import "tailwindcss";
+@import "./typography.css";
+@import "./colors.css";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+.eduops-date-picker.rdp-root {
+  --rdp-accent-color: #3863f6;
+  --rdp-accent-background-color: #f4f6fe;
+  --rdp-day-height: 32px;
+  --rdp-day-width: 32px;
+  --rdp-day_button-height: 32px;
+  --rdp-day_button-width: 32px;
+  --rdp-day_button-border-radius: 999px;
+  --rdp-day_button-border: 0;
+  --rdp-selected-border: 0;
+  --rdp-nav_button-height: 24px;
+  --rdp-nav_button-width: 24px;
+  --rdp-nav-height: 30px;
+  --rdp-weekday-opacity: 1;
+  --rdp-weekday-padding: 0;
+  --rdp-outside-opacity: 1;
+  --rdp-today-color: #3863f6;
+
+  background: #ffffff;
+  border: 1px solid #f4f6fa;
+  border-radius: 12px;
+  box-shadow: 0 0 14px rgba(138, 138, 138, 0.16);
+  padding: 16px 10px;
+}
+
+.eduops-date-picker .rdp-months,
+.eduops-date-picker .rdp-month,
+.eduops-date-picker .rdp-month_grid {
+  width: 230px;
+}
+
+.eduops-date-picker .rdp-month_grid {
+  border-collapse: separate;
+  border-spacing: 1px 0;
+}
+
+.eduops-date-picker .rdp-month_caption {
+  height: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.14px;
+  color: rgba(22, 22, 27, 0.88);
+  justify-content: center;
+}
+
+.eduops-date-picker .rdp-caption_label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.14px;
+}
+
+.eduops-date-picker .rdp-nav {
+  inset: 0;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.eduops-date-picker .rdp-button_previous,
+.eduops-date-picker .rdp-button_next {
+  color: #8b90a3;
+}
+
+.eduops-date-picker .rdp-chevron {
+  fill: #8b90a3;
+}
+
+.eduops-date-picker .rdp-weekday {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: -0.13px;
+  color: rgba(22, 22, 27, 0.4);
+}
+
+.eduops-date-picker .rdp-week {
+  height: 32px;
+}
+
+.eduops-date-picker .rdp-day {
+  width: 32px;
+  height: 32px;
+}
+
+.eduops-date-picker .rdp-day_button {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.14px;
+  color: rgba(22, 22, 27, 0.88);
+}
+
+.eduops-date-picker .rdp-selected .rdp-day_button {
+  background: #3863f6;
+  color: #ffffff;
+}
+
+.eduops-date-picker .rdp-today:not(.rdp-selected) .rdp-day_button {
+  background: #f4f6fe;
+  color: #3863f6;
+}
+
+.eduops-date-picker .rdp-outside .rdp-day_button {
+  color: rgba(22, 22, 27, 0.2);
+}
+
+.eduops-calendar {
+  --eduops-calendar-border: #e9ebf0;
+  --eduops-calendar-muted: #8b90a3;
+  --eduops-calendar-text: #4a4d5c;
+  --eduops-calendar-soft: #fcfcfd;
+}
+
+.eduops-calendar .rbc-month-view,
+.eduops-calendar .rbc-time-view {
+  border: 1px solid var(--eduops-calendar-border);
+  border-radius: 8px;
+  overflow: visible;
+  background: #ffffff;
+}
+
+.eduops-calendar .rbc-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  padding: 12px 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--eduops-calendar-muted);
+  background: #f4f6fa;
+  border-bottom: 1px solid var(--eduops-calendar-border);
+}
+
+.eduops-calendar .rbc-month-row {
+  min-height: 160px;
+}
+
+.eduops-calendar .rbc-month-row + .rbc-month-row,
+.eduops-calendar .rbc-time-content,
+.eduops-calendar .rbc-time-header-content {
+  border-color: var(--eduops-calendar-border);
+}
+
+.eduops-calendar .rbc-day-bg {
+  background: #fcfcfd;
+  border-left: 1px solid var(--eduops-calendar-border);
+}
+
+.eduops-calendar .rbc-off-range-bg {
+  background: #f8fafc;
+}
+
+.eduops-calendar .rbc-off-range {
+  color: rgba(139, 144, 163, 0.88);
+}
+
+.eduops-calendar .rbc-date-cell {
+  padding: 12px 0 0;
+  text-align: center;
+}
+
+.eduops-calendar .rbc-date-cell > a {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.18px;
+  color: var(--eduops-calendar-text);
+}
+
+.eduops-calendar .rbc-today,
+.eduops-calendar .rbc-today.rbc-off-range-bg {
+  background: var(--eduops-calendar-soft);
+}
+
+.eduops-calendar-day.is-weekend {
+  background: #fcfcfd;
+}
+
+.eduops-calendar-day.is-today {
+  box-shadow: inset 0 0 0 2px rgba(112, 143, 249, 0.28);
+}
+
+.eduops-calendar .rbc-event {
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: none;
+}
+
+.eduops-calendar .rbc-event-label {
+  display: none;
+}
+
+.eduops-calendar .rbc-event-content {
+  height: auto;
+}
+
+.eduops-calendar-event-card {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.eduops-calendar-event-time {
+  display: none;
+}
+
+.eduops-calendar-event-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: -0.13px;
+  color: #4a4d5c;
+}
+
+.eduops-calendar-event-meta {
+  display: none;
+}
+
+.eduops-calendar .rbc-show-more {
+  color: #4b72f7;
+  font-weight: 600;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-pretendard);
+  --font-mono: var(--font-pretendard);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* body {
+  font-family: var(--font-sans);
+} */
+
+@layer utilities {
+  .btn-primary {
+    @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
+  }
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  body[data-scroll-locked] {
+    overflow: auto !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+  body[data-scroll-locked] {
+    pointer-events: auto !important;
+  }
+}
