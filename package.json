@@ -74,6 +74,8 @@
     "recharts": "^3.7.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "winston": "^3.19.0",
+    "winston-loki": "^6.1.4",
     "zod": "^4.3.5",
     "zustand": "^5.0.10"
   },
