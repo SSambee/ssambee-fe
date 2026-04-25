@@ -75,7 +75,7 @@ export type GetEnrollmentList = {
   };
   lecture: {
     title: string;
-  };
+  } | null;
 };
 
 // 수강생 목록 조회 페이지네이션

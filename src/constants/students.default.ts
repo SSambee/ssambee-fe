@@ -39,6 +39,8 @@ export const STATUS_SELECT_OPTIONS = [
   ...STATUS_SETTING_OPTIONS,
 ];
 
+export const LECTURE_FILTER_UNASSIGNED = "unassigned" as const;
+
 // 앱 설치 상태 매핑
 export const APP_INSTALL_LABEL = {
   INSTALLED: { label: "가입", color: "green" },

@@ -17,7 +17,10 @@ import {
   useUpdateAllAttendance,
   useUpdateEnrollment,
 } from "@/hooks/useEnrollment";
-import { STUDENT_STATUS_LABEL } from "@/constants/students.default";
+import {
+  LECTURE_FILTER_UNASSIGNED,
+  STUDENT_STATUS_LABEL,
+} from "@/constants/students.default";
 import { Pagination } from "@/components/common/pagination/Pagination";
 import { CheckModal } from "@/components/common/modals/CheckModal";
 import { getTodayYMD } from "@/utils/date";
@@ -56,6 +59,7 @@ export default function StudentsListPage() {
   const { data: lectures = [] } = useLecturesList({ page: 1, limit: 100 });
   const lectureOptions = [
     { label: "전체 수업", value: "all", status: null },
+    { label: "미배정", value: LECTURE_FILTER_UNASSIGNED, status: null },
     ...lectures.map((l) => ({
       label: l.title,
       value: l.id,
@@ -101,9 +105,14 @@ export default function StudentsListPage() {
   const { mutate: updateAllAttendance, isPending: isUpdating } =
     useUpdateAllAttendance();
 
+  const attendanceLectureId =
+    query.lecture && query.lecture !== LECTURE_FILTER_UNASSIGNED
+      ? query.lecture
+      : null;
+
   // 현재 선택된 수업의 상세 정보 찾기
-  const selectedLectureInfo = query.lecture
-    ? lectures.find((l) => l.id === query.lecture)
+  const selectedLectureInfo = attendanceLectureId
+    ? lectures.find((l) => l.id === attendanceLectureId)
     : null;
 
   // 현재 페이지의 모든 학생이 선택되었는지 여부 확인
@@ -119,7 +128,7 @@ export default function StudentsListPage() {
         name: s.studentName,
         phoneNumber: s.studentPhone,
         parentPhone: s.parentPhone,
-        title: s.lecture.title,
+        title: s.lecture?.title || "-",
       }));
       addStudents(studentsToSelect);
     } else {
@@ -167,7 +176,7 @@ export default function StudentsListPage() {
   };
 
   const handleAttendanceClick = () => {
-    if (selectedStudentIds.length === 0 || !query.lecture) return;
+    if (selectedStudentIds.length === 0 || !attendanceLectureId) return;
 
     openModal(
       <CheckModal
@@ -177,7 +186,7 @@ export default function StudentsListPage() {
         onConfirm={() => {
           updateAllAttendance(
             {
-              lectureId: query.lecture ?? "",
+              lectureId: attendanceLectureId,
               enrollmentIds: selectedStudentIds,
               status: "PRESENT",
             },
@@ -205,7 +214,7 @@ export default function StudentsListPage() {
         name: student.studentName,
         phoneNumber: student.studentPhone,
         parentPhone: student.parentPhone,
-        title: student.lecture.title,
+        title: student.lecture?.title || "-",
       }),
     onNavigate: handleNavigate,
     onStatusChange: handleStatusChange,
@@ -232,7 +241,7 @@ export default function StudentsListPage() {
 
       <StudentActions
         selectedStudentIds={selectedStudentIds}
-        queryLecture={query.lecture ?? null}
+        queryLecture={attendanceLectureId}
         isUpdating={isUpdating}
         selectedLectureStatus={selectedLectureInfo?.status}
         onAttendanceClick={handleAttendanceClick}

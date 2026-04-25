@@ -281,43 +281,51 @@ export default function StudentDetailPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {enrolledLectures
-            .slice(0, visibleLectures)
-            .map((lecture: GetEnrollmentDetail["lectures"][0]) => {
-              const scheduleMeta = getScheduleMeta(lecture.lectureTimes);
+        {enrolledLectures.length === 0 ? (
+          <p className="rounded-[20px] border border-dashed border-neutral-200 bg-neutral-50/50 py-12 text-center text-sm text-neutral-500">
+            배정된 수업이 없습니다.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {enrolledLectures
+                .slice(0, visibleLectures)
+                .map((lecture: GetEnrollmentDetail["lectures"][0]) => {
+                  const scheduleMeta = getScheduleMeta(lecture.lectureTimes);
 
-              return (
-                <CommonLectureCard
-                  key={lecture.id}
-                  subject={lecture.subject}
-                  schoolYear={lecture.schoolYear}
-                  title={lecture.title}
-                  scheduleDays={scheduleMeta.scheduleDays}
-                  scheduleTime={scheduleMeta.scheduleTime}
-                  hasSchedule={scheduleMeta.hasSchedule}
-                  instructorName={enrollmentData.instructorName}
-                  onClick={() =>
-                    router.push(
-                      `/educators/students/${studentId}/lectures/${lecture.lectureEnrollmentId}`
-                    )
-                  }
-                  className="h-full"
-                />
-              );
-            })}
-        </div>
+                  return (
+                    <CommonLectureCard
+                      key={lecture.id}
+                      subject={lecture.subject}
+                      schoolYear={lecture.schoolYear}
+                      title={lecture.title}
+                      scheduleDays={scheduleMeta.scheduleDays}
+                      scheduleTime={scheduleMeta.scheduleTime}
+                      hasSchedule={scheduleMeta.hasSchedule}
+                      instructorName={enrollmentData.instructorName}
+                      onClick={() =>
+                        router.push(
+                          `/educators/students/${studentId}/lectures/${lecture.lectureEnrollmentId}`
+                        )
+                      }
+                      className="h-full"
+                    />
+                  );
+                })}
+            </div>
 
-        {visibleLectures < enrolledLectures.length && (
-          <div className="flex justify-center pt-4">
-            <Button
-              variant="outline"
-              className="h-12 rounded-[12px] border border-neutral-200 bg-white px-6 text-[16px] font-semibold text-neutral-400 hover:bg-neutral-50"
-              onClick={handleLoadMore}
-            >
-              더보기 ({enrolledLectures.length - visibleLectures})
-            </Button>
-          </div>
+            {visibleLectures < enrolledLectures.length && (
+              <div className="flex justify-center pt-4">
+                <Button
+                  variant="outline"
+                  className="h-12 rounded-[12px] border border-neutral-200 bg-white px-6 text-[16px] font-semibold text-neutral-400 hover:bg-neutral-50"
+                  onClick={handleLoadMore}
+                >
+                  더보기 ({enrolledLectures.length - visibleLectures})
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

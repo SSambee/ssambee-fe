@@ -17,6 +17,7 @@ export const useDeleteLecture = (options?: UseDeleteLectureOptions) => {
       queryClient.invalidateQueries({ queryKey: lectureKeys.lists() });
       queryClient.invalidateQueries({ queryKey: lectureKeys.todays() });
       queryClient.invalidateQueries({ queryKey: lectureKeys.all });
+      queryClient.invalidateQueries({ queryKey: ["enrollments"] });
       options?.onSuccess?.();
     },
     onError: (error) => {
