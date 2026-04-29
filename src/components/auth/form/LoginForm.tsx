@@ -200,7 +200,17 @@ export default function LoginForm({ selectedRole }: LoginFormProps) {
         Google로 로그인하기
       </button> */}
 
-      <div className="flex items-center justify-center gap-2 text-center text-4 text-neutral-400 mt-14">
+      <div className="flex items-center justify-center gap-2 text-center text-4 text-neutral-400 mt-14 mb-2">
+        <p>비밀번호를 잊으셨나요?</p>
+        <Link
+          href="/forgot-password"
+          className="text-blue-700 hover:text-blue-500 font-semibold transition-colors duration-200"
+        >
+          비밀번호 찾기
+        </Link>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 text-center text-4 text-neutral-400">
         <p>{footerContent.question}</p>
         <Link
           href={footerContent.href}
