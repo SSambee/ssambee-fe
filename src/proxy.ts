@@ -14,6 +14,13 @@ const LEARNERS_PUBLIC_PREFIXES = [
   "/learners/register",
 ] as const;
 
+// 로그인 후 조교/이용권 상태 게이트 — 세션 없이 URL 직접 접근 시 리다이렉트
+const SESSION_GATE_PATHS = [
+  "/pending-approval",
+  "/no-entitlement",
+  "/entitlement-pending",
+] as const;
+
 function hasSessionCookie(request: NextRequest): boolean {
   return SESSION_COOKIE_NAMES.some((name) => request.cookies.has(name));
 }
@@ -26,6 +33,12 @@ function isPublicEducatorsPath(pathname: string): boolean {
 
 function isPublicLearnersPath(pathname: string): boolean {
   return LEARNERS_PUBLIC_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
+
+function isSessionGatePath(pathname: string): boolean {
+  return SESSION_GATE_PATHS.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
 }
@@ -53,9 +66,22 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (isSessionGatePath(pathname)) {
+    if (!hasSessionCookie(request)) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/educators/:path*", "/learners/:path*"],
+  matcher: [
+    "/educators/:path*",
+    "/learners/:path*",
+    "/pending-approval",
+    "/no-entitlement",
+    "/entitlement-pending",
+  ],
 };
